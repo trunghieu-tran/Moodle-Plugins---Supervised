@@ -62,8 +62,8 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
         $leaf->assertionsafter[] = $assert;
         $pos = 1;
         $a = $leaf->match($str, $pos, $length);
-        $this->assertTrue($a, 'Return boolean flag is not equal to expected');
-        $this->assertEquals($length, 1, 'Return length is not equal to expected');
+        $this->assertTrue($a);
+        $this->assertEquals($length, 1);
     }
 
     function test_match_character_with_circumflex() {
@@ -74,8 +74,8 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
         $assert = new qtype_preg_leaf_assert_circumflex;
         $leaf->assertionsafter[] = $assert;
         $pos = 0;
-        $this->assertFalse($leaf->match($str, $pos, $length), 'Return boolean flag is not equal to expected');
-        $this->assertEquals($length, 0, 'Return length is not equal to expected');
+        $this->assertFalse($leaf->match($str, $pos, $length));
+        $this->assertEquals($length, 0);
     }
 
     function test_match_string_ends_dollar_assert() {
@@ -86,8 +86,8 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
         $assert = new qtype_preg_leaf_assert_dollar;
         $leaf->assertionsbefore[] = $assert;
         $pos = 2;
-        $this->assertTrue($leaf->match($str, $pos, $length), 'Return boolean flag is not equal to expected');
-        $this->assertEquals($length, 1, 'Return length is not equal to expected');
+        $this->assertTrue($leaf->match($str, $pos, $length));
+        $this->assertEquals($length, 1);
     }
 
     function test_match_character_with_dollar() {
@@ -98,8 +98,8 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
         $assert = new qtype_preg_leaf_assert_dollar;
         $leaf->assertionsbefore[] = $assert;
         $pos = 2;
-        $this->assertFalse($leaf->match($str, $pos, $length), 'Return boolean flag is not equal to expected');
-        $this->assertEquals($length, 0, 'Return length is not equal to expected');
+        $this->assertFalse($leaf->match($str, $pos, $length));
+        $this->assertEquals($length, 0);
     }
 
     function test_match_one_string() {
@@ -108,8 +108,8 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
         $lexer = $this->create_lexer("[a]");
         $leaf = $lexer->nextToken()->value;
         $pos = 0;
-        $this->assertTrue($leaf->match($str, $pos, $length), 'Return boolean flag is not equal to expected');
-        $this->assertEquals($length, 1, 'Return length is not equal to expected');
+        $this->assertTrue($leaf->match($str, $pos, $length));
+        $this->assertEquals($length, 1);
     }
 
     function test_match_single_assert() {
@@ -117,8 +117,8 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
         $length = 0;
         $leaf= new qtype_preg_leaf_assert_circumflex;
         $pos = 0;
-        $this->assertTrue($leaf->match($str, $pos, $length), 'Return boolean flag is not equal to expected');
-        $this->assertEquals($length, 0, 'Return length is not equal to expected');
+        $this->assertTrue($leaf->match($str, $pos, $length));
+        $this->assertEquals($length, 0);
     }
 
     function test_match_before_and_after_asserts_true() {
@@ -131,8 +131,8 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
         $leaf->assertionsbefore[] = $assert1;
         $leaf->assertionsafter[] = $assert2;
         $pos = 2;
-        $this->assertTrue($leaf->match($str, $pos, $length), 'Return boolean flag is not equal to expected');
-        $this->assertEquals($length, 1, 'Return length is not equal to expected');
+        $this->assertTrue($leaf->match($str, $pos, $length));
+        $this->assertEquals($length, 1);
     }
 
     function test_match_before_and_after_asserts_false() {
@@ -145,8 +145,8 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
         $leaf->assertionsbefore[] = $assert1;
         $leaf->assertionsafter[] = $assert2;
         $pos = 2;
-        $this->assertFalse($leaf->match($str, $pos, $length), 'Return boolean flag is not equal to expected');
-        $this->assertEquals($length, 0, 'Return length is not equal to expected');
+        $this->assertFalse($leaf->match($str, $pos, $length));
+        $this->assertEquals($length, 0);
     }
 
     function test_match_empty_string_true() {
@@ -159,8 +159,8 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
         $leaf->assertionsbefore[] = $assert1;
         $leaf->assertionsafter[] = $assert2;
         $pos = 3;
-        $this->assertTrue($leaf->match($str, $pos, $length), 'Return boolean flag is not equal to expected');
-        $this->assertEquals($length, 1, 'Return length is not equal to expected');
+        $this->assertTrue($leaf->match($str, $pos, $length));
+        $this->assertEquals($length, 1);
     }
 
     function test_match_empty_string_false() {
@@ -173,8 +173,8 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
         $leaf->assertionsbefore[] = $assert1;
         $leaf->assertionsafter[] = $assert2;
         $pos = 3;
-        $this->assertFalse($leaf->match($str, $pos, $length), 'Return boolean flag is not equal to expected');
-        $this->assertEquals($length, 0, 'Return length is not equal to expected');
+        $this->assertFalse($leaf->match($str, $pos, $length));
+        $this->assertEquals($length, 0);
     }
 
     function test_match_single_dollar_in_the_end() {
@@ -182,8 +182,8 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
         $length = 0;
         $leaf = new qtype_preg_leaf_assert_dollar;
         $pos = 6;
-        $this->assertTrue($leaf->match($str, $pos, $length), 'Return boolean flag is not equal to expected');
-        $this->assertEquals($length, 0, 'Return length is not equal to expected');
+        $this->assertTrue($leaf->match($str, $pos, $length));
+        $this->assertEquals($length, 0);
     }
 
     function test_match_middle_of_the_string() {
@@ -194,8 +194,8 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
         $assert = new qtype_preg_leaf_assert_circumflex;
         $leaf->assertionsafter[] = $assert;
         $pos = 1;
-        $this->assertFalse($leaf->match($str, $pos, $length), 'Return boolean flag is not equal to expected');
-        $this->assertEquals($length, 0, 'Return length is not equal to expected');
+        $this->assertFalse($leaf->match($str, $pos, $length));
+        $this->assertEquals($length, 0);
     }*/
 
     ////////////////////////////////////////// next_character
@@ -214,127 +214,178 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
 
         $transition = $this->transition_by_regex("[ab\n\\x1]", $esca, $smallescz, $capescz, $circumflex, $dollar, $subexpr);
         list($flag, $ch) = $transition->next_character($str, $str, $pos, $length);
-        $this->assertEquals($ch, "\n", 'Return character is not equal to expected');
+        $this->assertEquals($ch, "\n");
     }
 
-    /*
-
-    /*function test_generation_string_ends_false() {
+    function test_generation_string_ends_false() {
         $str = new qtype_poasquestion_string("b\n");
-        $length = 0;
-        $lexer = $this->create_lexer("[ab]");
-        $leaf = $lexer->nextToken()->value;
-        $dollar = false;
-        $circumflex = true;
         $pos = 1;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
-        $this->assertEquals($flag, qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, 'Return character is not equal to expected');
+        $length = 0;
+
+        $esca = false;
+        $smallescz = false;
+        $capescz = false;
+        $circumflex = true;
+        $dollar = false;
+        $subexpr = false;
+
+        $transition = $this->transition_by_regex("[ab]", $esca, $smallescz, $capescz, $circumflex, $dollar, $subexpr);
+        list($flag, $ch) = $transition->next_character($str, $str, $pos, $length);
+        $this->assertEquals($flag, qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE);
     }
 
     function test_generation_string_ends_dollar_assert() {
         $str = new qtype_poasquestion_string("bx\na\nas");
-        $length = 0;
-        $lexer = $this->create_lexer("[ab\n]");
-        $leaf = $lexer->nextToken()->value;
-        $dollar = true;
-        $circumflex = false;
         $pos = 2;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
-        $this->assertEquals($ch, "\n", 'Return character is not equal to expected');
+        $length = 0;
+
+        $esca = false;
+        $smallescz = false;
+        $capescz = false;
+        $circumflex = false;
+        $dollar = true;
+        $subexpr = false;
+
+        $transition = $this->transition_by_regex("[ab\n]", $esca, $smallescz, $capescz, $circumflex, $dollar, $subexpr);
+        list($flag, $ch) = $transition->next_character($str, $str, $pos, $length);
+        $this->assertEquals($ch, "\n");
     }
 
     function test_generation_character_with_dollar() {
         $str = new qtype_poasquestion_string("b\na\nas");
-        $length = 0;
-        $lexer = $this->create_lexer("[ab]");
-        $leaf = $lexer->nextToken()->value;
-        $dollar = true;
-        $circumflex = false;
         $pos = 1;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
-        $this->assertEquals($flag, qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, 'Return character is not equal to expected');
+        $length = 0;
+
+        $esca = false;
+        $smallescz = false;
+        $capescz = false;
+        $circumflex = false;
+        $dollar = true;
+        $subexpr = false;
+
+        $transition = $this->transition_by_regex("[ab]", $esca, $smallescz, $capescz, $circumflex, $dollar, $subexpr);
+        list($flag, $ch) = $transition->next_character($str, $str, $pos, $length);
+        $this->assertEquals($flag, qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE);
     }
 
     function test_generation_one_string() {
         $str = new qtype_poasquestion_string("ab");
-        $length = 0;
-        $lexer = $this->create_lexer("[x-z]");
-        $leaf = $lexer->nextToken()->value;
         $pos = 1;
-        $dollar = false;
+        $length = 0;
+
+        $esca = false;
+        $smallescz = false;
+        $capescz = false;
         $circumflex = false;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
-        $this->assertEquals($ch, 'x', 'Return character is not equal to expected');
+        $dollar = false;
+        $subexpr = false;
+
+        $transition = $this->transition_by_regex("[x-z]", $esca, $smallescz, $capescz, $circumflex, $dollar, $subexpr);
+        list($flag, $ch) = $transition->next_character($str, $str, $pos, $length);
+        $this->assertEquals($ch, 'x');
     }
 
     function test_generation_single_assert() {
         $str = new qtype_poasquestion_string("\n\nas");
-        $length = 0;
-        $leaf = new qtype_preg_leaf_assert_circumflex;
         $pos = 0;
-        $dollar = false;
+        $length = 0;
+
+        $esca = false;
+        $smallescz = false;
+        $capescz = false;
         $circumflex = false;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
-        $this->assertEquals($ch, '', 'Return character is not equal to expected');
+        $dollar = false;
+        $subexpr = false;
+
+        $transition = $this->transition_by_regex("^", $esca, $smallescz, $capescz, $circumflex, $dollar, $subexpr);
+        list($flag, $ch) = $transition->next_character($str, $str, $pos, $length);
+        $this->assertEquals($ch, '');
     }
 
     function test_generation_before_and_after_asserts_false() {
         $str = new qtype_poasquestion_string("a\na\nas");
-        $length = 0;
-        $lexer = $this->create_lexer("[ab]");
-        $leaf = $lexer->nextToken()->value;
-        $dollar = true;
-        $circumflex = true;
         $pos = 1;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
-        $this->assertEquals($flag, qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, 'Return character is not equal to expected');
+        $length = 0;
+
+        $esca = false;
+        $smallescz = false;
+        $capescz = false;
+        $circumflex = true;
+        $dollar = true;
+        $subexpr = false;
+
+
+        $transition = $this->transition_by_regex("[ab]", $esca, $smallescz, $capescz, $circumflex, $dollar, $subexpr);
+        list($flag, $ch) = $transition->next_character($str, $str, $pos, $length);
+        $this->assertEquals($flag, qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE);
     }
 
     function test_generation_before_and_after_asserts_true() {
         $str = new qtype_poasquestion_string("abcd\nas");
-        $length = 0;
-        $lexer = $this->create_lexer("[a-z\n]");
-        $leaf = $lexer->nextToken()->value;
-        $dollar = true;
-        $circumflex = true;
         $pos = 1;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
-        $this->assertEquals($ch, "\n", 'Return character is not equal to expected');
+        $length = 0;
+
+        $esca = false;
+        $smallescz = false;
+        $capescz = false;
+        $circumflex = true;
+        $dollar = true;
+        $subexpr = false;
+
+        $transition = $this->transition_by_regex("[a-z\n]", $esca, $smallescz, $capescz, $circumflex, $dollar, $subexpr);
+        list($flag, $ch) = $transition->next_character($str, $str, $pos, $length);
+        $this->assertEquals($ch, "\n");
     }
 
     function test_generation_single_dollar_in_the_end() {
         $str = new qtype_poasquestion_string("as");
-        $length = 0;
-        $leaf = new qtype_preg_leaf_assert_dollar;
         $pos = 2;
-        $dollar = false;
+        $length = 0;
+
+        $esca = false;
+        $smallescz = false;
+        $capescz = false;
         $circumflex = false;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
-        $this->assertEquals($flag, qtype_preg_leaf::NEXT_CHAR_END_HERE, 'Return character is not equal to expected');
+        $dollar = false;
+        $subexpr = false;
+
+        $transition = $this->transition_by_regex("$", $esca, $smallescz, $capescz, $circumflex, $dollar, $subexpr);
+        list($flag, $ch) = $transition->next_character($str, $str, $pos, $length);
+        $this->assertEquals($flag, qtype_preg_leaf::NEXT_CHAR_END_HERE);
     }
 
     function test_generation_middle_of_the_string() {
         $str = new qtype_poasquestion_string("bcd");
-        $length = 0;
-        $lexer = $this->create_lexer("[c\n]");
-        $leaf = $lexer->nextToken()->value;
-        $dollar = false;
-        $circumflex = true;
         $pos = 1;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
-        $this->assertEquals($ch, "\n", 'Return character is not equal to expected');
+        $length = 0;
+
+        $esca = false;
+        $smallescz = false;
+        $capescz = false;
+        $circumflex = true;
+        $dollar = false;
+        $subexpr = false;
+
+        $transition = $this->transition_by_regex("[c\n]", $esca, $smallescz, $capescz, $circumflex, $dollar, $subexpr);
+        list($flag, $ch) = $transition->next_character($str, $str, $pos, $length);
+        $this->assertEquals($ch, "\n");
     }
 
-    /*function test_generation_last_character() {           TODO: этот тест надо перенести в тест переходов
+    function test_generation_last_character() {
         $str = new qtype_poasquestion_string("a\n");
-        $length = 0;
-        $lexer = $this->create_lexer("[\n]");
-        $leaf = $lexer->nextToken()->value;
-        $assert = new qtype_preg_leaf_assert_capital_esc_z;
-        $leaf->assertionsbefore[] = $assert;
         $pos = 1;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
-        $this->assertEquals($ch, "\n", 'Return character is not equal to expected');
+        $length = 0;
+
+        $esca = false;
+        $smallescz = false;
+        $capescz = true;
+        $circumflex = false;
+        $dollar = false;
+        $subexpr = false;
+
+        $transition = $this->transition_by_regex("[\n]", $esca, $smallescz, $capescz, $circumflex, $dollar, $subexpr);
+        list($flag, $ch) = $transition->next_character($str, $str, $pos, $length);
+        $this->assertEquals($ch, "\n");
         $this->assertEquals($flag, qtype_preg_leaf::NEXT_CHAR_END_HERE, 'Return flag is not equal to expected');
-    }*/
+    }
 }
