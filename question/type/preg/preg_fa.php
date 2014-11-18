@@ -146,10 +146,20 @@ class qtype_preg_fa_transition {
             return $this->pregleaf->next_character($originalstr, $newstr, $pos, $length, $matcherstateobj);
         }
 
+        // Get ranges from charset
+        $ranges = $this->pregleaf->ranges();
+
+        if (empty($ranges)) {
+            return array(qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, null);
+        }
+
+        // Determine which assertions we have
+
         $circumflex = array('before' => false, 'after' => false);
         $dollar = array('before' => false, 'after' => false);
         $capz = array('before' => false, 'after' => false);
         $condassert = array('before' => false, 'after' => false);
+        $thecondassert = null;
         $key = 'before';
         $epscount = 0;
 
@@ -172,55 +182,66 @@ class qtype_preg_fa_transition {
                 }
                 else if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_SUBEXPR_CAPTURED) {
                     $condassert[$key] = true;
-                    $condassertindex = array_search($assertion, $assertions);
+                    $thecondassert = $assertion;
                 }
                 else if ($assertion->pregleaf->subtype = qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
                     $epscount++;
                 }
-
             }
-
             $key = 'after';
         }
 
-        // Check all the returned ranges.
-        $ranges = $this->pregleaf->next_character_ranges($originalstr, $newstr, $pos, $length, $matcherstateobj, $dollar['before'], $circumflex['after']);
-
-        if (empty($ranges)) {
-            return array(qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, null);
-        }
-
-        if (count($this->mergedbefore) + count($this->mergedafter) == $epscount) {
-            // There are no merged assertions.
-            return array(qtype_preg_leaf::NEXT_CHAR_OK, new qtype_poasquestion_string(qtype_preg_unicode::code2utf8($ranges[0][0])));
-        }
-
-
+        // If there are assertions we can only return \n
         if ($dollar['before'] || $capz['before']) {
             // There are end string assertions.
             if (qtype_preg_unicode::is_in_range("\n", $ranges)) {
-                if ($capz['before']) {
-                    return array(qtype_preg_leaf::NEXT_CHAR_END_HERE, new qtype_poasquestion_string("\n"));
-                }
-                return array(qtype_preg_leaf::NEXT_CHAR_OK, new qtype_poasquestion_string("\n"));
+                return $capz['before']
+                    ? array(qtype_preg_leaf::NEXT_CHAR_END_HERE, new qtype_poasquestion_string("\n"))
+                    : array(qtype_preg_leaf::NEXT_CHAR_OK, new qtype_poasquestion_string("\n"));
+            } else {
+                return array(qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, null);
             }
         } else if ($circumflex['after']) {
             // There are start string assertions.
             if (qtype_preg_unicode::is_in_range("\n", $ranges)) {
                 return array(qtype_preg_leaf::NEXT_CHAR_OK, new qtype_poasquestion_string("\n"));
-            }
-        }
-        if ($condassert['before']) {
-            $list = $this->mergedbefore[$condassertindex]->next_character($originalstr, $newstr, $pos, $length, $matcherstateobj);
-            if ($list[0] === qtype_preg_leaf::NEXT_CHAR_OK) {
-                $result = $this->pregleaf->next_character($originalstr, $newstr, $pos, $length, $matcherstateobj);
-                if (count($result) != 0) {
-                    return array(qtype_preg_leaf::NEXT_CHAR_OK, $result[0]);    // TODO: возвращать нужно все-таки символ этого листа, а не то что было в ассерте
-                }
+            } else {
+                return array(qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, null);
             }
         }
 
-        return array(qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, null);
+
+        // Now we don't have assertions affecting characters. Form the resulting ranges. trying desired ranges first
+
+        $originalchar = $originalstr[$pos];
+        $originalcode = core_text::utf8ord($originalchar);
+
+        $desired_ranges = array();
+        if ($pos < $originalstr->length()) {
+            $desired_ranges[] = array(array($originalcode, $originalcode)); // original character - highest priority
+        }
+        $desired_ranges[] = array(array(0x21, 0x7F));   // regular ASCII characters - middle priority
+        $desired_ranges[] = array(array(0x20, 0x20));   // space for \s - lowest priority
+
+        $result_ranges = $ranges;   // By default original leaf's ranges.
+        foreach ($desired_ranges as $desired) {
+            $tmp = qtype_preg_unicode::intersect_ranges($ranges, $desired);
+            //$tmp = qtype_preg_unicode::kinda_operator($ranges, $desired, true, false, false, false);
+            if (!empty($tmp)) {
+                $result_ranges = $tmp;
+                break;
+            }
+        }
+
+        // Here result_ranges is guaranteed to be non-empty
+        if ($condassert['before']) {
+            list($flag, $ch) = $thecondassert->next_character($originalstr, $newstr, $pos, $length, $matcherstateobj);
+            if ($flag != qtype_preg_leaf::NEXT_CHAR_OK) {
+                return array(qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, null);
+            }
+        }
+
+        return array(qtype_preg_leaf::NEXT_CHAR_OK, new qtype_poasquestion_string(core_text::code2utf8($result_ranges[0][0])));
     }
 
     public function is_start_anchor() {
