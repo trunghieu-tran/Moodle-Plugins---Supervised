@@ -7,11 +7,9 @@ require_once($CFG->dirroot . '/question/type/preg/preg_fa.php');
 
 class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
 
-    function create_lexer($regex, $options = null) {
-        if ($options === null) {
-            $options = new qtype_preg_handling_options();
-            $options->preserveallnodes = true;
-        }
+    function create_lexer($regex) {
+        $options = new qtype_preg_handling_options();
+        $options->preserveallnodes = true;
         StringStreamController::createRef('regex', $regex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
@@ -19,19 +17,38 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
         return $lexer;
     }
 
-    function leaf_by_regex($regex, $options = null) {
-        $lexer = $this->create_lexer($regex, $options);
+    function leaf_by_regex($regex) {
+        $lexer = $this->create_lexer($regex);
         return $lexer->nextToken()->value;
     }
 
-    function transition_by_regex($regex, $dollar = false, $circumflex = false, $options = null) {
-        $leaf = $this->leaf_by_regex($regex, $options);
+    /**
+     * Create transition by regex with merged asserions. All assertions are true/false, except subexpr: that
+     * should be 'false' or '+-number' for positive/negative asserting respectively.
+     */
+    function transition_by_regex($regex, $esca = false, $smallescz = false, $capescz = false, $circumflex = false, $dollar = false, $subexpr = false) {
+        $leaf = $this->leaf_by_regex($regex);
         $transition = new qtype_preg_fa_transition(0, $leaf, 0);
-        if ($dollar) {
-            $transition->mergedbefore[] = $this->transition_by_regex('$');
+        if ($esca) {
+            $transition->mergedafter[] = $this->transition_by_regex('\A');
+        }
+        if ($smallescz) {
+            $transition->mergedbefore[] = $this->transition_by_regex('\z');
+        }
+        if ($capescz) {
+            $transition->mergedbefore[] = $this->transition_by_regex('\Z');
         }
         if ($circumflex) {
             $transition->mergedafter[] = $this->transition_by_regex('^');
+        }
+        if ($dollar) {
+            $transition->mergedbefore[] = $this->transition_by_regex('$');
+        }
+        if ($subexpr !== false) {
+            $negative = $subexpr < 0;
+            $number = abs($subexpr);
+            $assertleaf = new qtype_preg_leaf_assert_subexpr_captured($negative, $number);
+            $transition->mergedbefore[] = new qtype_preg_fa_transition(0, $assertleaf, 0);
         }
         return $transition;
     }
@@ -187,12 +204,20 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
         $str = new qtype_poasquestion_string("ax");
         $pos = 1;
         $length = 0;
-        $dollar = false;
+
+        $esca = false;
+        $smallescz = false;
+        $capescz = false;
         $circumflex = true;
-        $transition = $this->transition_by_regex("[ab\n\\x1]", $dollar, $circumflex);
+        $dollar = false;
+        $subexpr = false;
+
+        $transition = $this->transition_by_regex("[ab\n\\x1]", $esca, $smallescz, $capescz, $circumflex, $dollar, $subexpr);
         list($flag, $ch) = $transition->next_character($str, $str, $pos, $length);
         $this->assertEquals($ch, "\n", 'Return character is not equal to expected');
     }
+
+    /*
 
     /*function test_generation_string_ends_false() {
         $str = new qtype_poasquestion_string("b\n");
@@ -202,7 +227,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
         $dollar = false;
         $circumflex = true;
         $pos = 1;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length, $dollar, $circumflex);
+        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
         $this->assertEquals($flag, qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, 'Return character is not equal to expected');
     }
 
@@ -214,7 +239,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
         $dollar = true;
         $circumflex = false;
         $pos = 2;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length, $dollar, $circumflex);
+        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
         $this->assertEquals($ch, "\n", 'Return character is not equal to expected');
     }
 
@@ -226,7 +251,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
         $dollar = true;
         $circumflex = false;
         $pos = 1;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length, $dollar, $circumflex);
+        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
         $this->assertEquals($flag, qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, 'Return character is not equal to expected');
     }
 
@@ -238,7 +263,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
         $pos = 1;
         $dollar = false;
         $circumflex = false;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length, $dollar, $circumflex);
+        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
         $this->assertEquals($ch, 'x', 'Return character is not equal to expected');
     }
 
@@ -249,7 +274,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
         $pos = 0;
         $dollar = false;
         $circumflex = false;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length, $dollar, $circumflex);
+        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
         $this->assertEquals($ch, '', 'Return character is not equal to expected');
     }
 
@@ -261,7 +286,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
         $dollar = true;
         $circumflex = true;
         $pos = 1;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length, $dollar, $circumflex);
+        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
         $this->assertEquals($flag, qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, 'Return character is not equal to expected');
     }
 
@@ -273,7 +298,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
         $dollar = true;
         $circumflex = true;
         $pos = 1;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length, $dollar, $circumflex);
+        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
         $this->assertEquals($ch, "\n", 'Return character is not equal to expected');
     }
 
@@ -284,7 +309,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
         $pos = 2;
         $dollar = false;
         $circumflex = false;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length, $dollar, $circumflex);
+        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
         $this->assertEquals($flag, qtype_preg_leaf::NEXT_CHAR_END_HERE, 'Return character is not equal to expected');
     }
 
@@ -296,7 +321,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
         $dollar = false;
         $circumflex = true;
         $pos = 1;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length, $dollar, $circumflex);
+        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
         $this->assertEquals($ch, "\n", 'Return character is not equal to expected');
     }
 
@@ -308,7 +333,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
         $assert = new qtype_preg_leaf_assert_capital_esc_z;
         $leaf->assertionsbefore[] = $assert;
         $pos = 1;
-        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length, $dollar, $circumflex);
+        list($flag, $ch) = $leaf->next_character($str, $str, $pos, $length);
         $this->assertEquals($ch, "\n", 'Return character is not equal to expected');
         $this->assertEquals($flag, qtype_preg_leaf::NEXT_CHAR_END_HERE, 'Return flag is not equal to expected');
     }*/
