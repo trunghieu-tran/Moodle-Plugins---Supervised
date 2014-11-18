@@ -540,10 +540,8 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
      * @param pos index where the generated character will be placed.
      * @param length number of characters matched (can be greater than 0 in case of a partial backreference match).
      * @param matcherstateobj an object which implements the qtype_preg_matcher_state interface.
-     * @param dollar bool is there a $ assertion before the leaf?
-     * @param circumflex bool is there a ^ assertion after the leaf?
      */
-    abstract public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false);
+    abstract public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null);
 
     /**
      * Returns a human-readable form of this leaf.
@@ -678,6 +676,10 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         }
     }
 
+    public function clear_cached_ranges() {
+        $this->cachedranges = null;
+    }
+
     public function is_single_character() {
         return count($this->flags) == 1 &&
                $this->flags[0][0]->type == qtype_preg_charset_flag::TYPE_SET &&
@@ -769,50 +771,14 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         return $result;
     }
 
-    public function next_character_ranges($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false) {
-        $originalchar = $originalstr[$pos];
-        $originalcode = core_text::utf8ord($originalchar);
-
-        /*$desired_ranges = array();	// Contains ranges of desired characters, decreasing priority.
-
-        if (!$dollar && !$circumflex) {					// && !$capz['before']
-            if ($pos < $originalstr->length()) {
-                $desired_ranges[] = array(array($originalcode, $originalcode)); // original character - highest priority
-            }
-            $desired_ranges[] = array(array(0x21, 0x7F));   // regular characters - middle priority
-            $desired_ranges[] = array(array(0x20, 0x20));   // regular whitespaces - lowest priority
-        } else if ($originalchar == "\n") {
-            $desired_ranges[] = array(array($originalcode, $originalcode));
-        }*/
-
+    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
         $ranges = $this->ranges();
 
-        // Try to form the result ranges by intersecting this leaf's ranges and desired ranges
-        $result_ranges = null;
-        /*foreach ($desired_ranges as $desired) {
-            $tmp = qtype_preg_unicode::kinda_operator($ranges, $desired, true, false, false, false);	// intersect_ranges?
-            if (!empty($tmp)) {
-                $result_ranges = $tmp;
-                break;
-            }
-        }*/
-
-        // If the were no intersections, just use this leaf's ranges
-        if ($result_ranges === null) {
-        	$result_ranges = $ranges;
-        }
-
-        return $result_ranges;
-    }
-
-    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false) {
-        $result_ranges = $this->next_character_ranges($originalstr, $newstr, $pos, $length, $matcherstateobj, $dollar, $circumflex);
-
-        if (empty($result_ranges)) {
+        if (empty($ranges)) {
         	return array(self::NEXT_CHAR_CANNOT_GENERATE, null);
         }
 
-        return array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(qtype_preg_unicode::code2utf8($result_ranges[0][0])));
+        return array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(qtype_preg_unicode::code2utf8($ranges[0][0])));
     }
 
     /*public function tohr() {
@@ -1174,7 +1140,7 @@ class qtype_preg_leaf_meta extends qtype_preg_leaf {
         return true;
     }
 
-    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false) {
+    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
         return array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''));
     }
 
@@ -1260,7 +1226,7 @@ class qtype_preg_leaf_assert_esc_b extends qtype_preg_leaf_assert {
         return (($start || $end || $wnotw || $notww) xor $this->negative);
     }
 
-    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false) {
+    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
         return array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''));  // TODO
     }
 
@@ -1284,7 +1250,7 @@ class qtype_preg_leaf_assert_esc_a extends qtype_preg_leaf_assert {
         return ($pos == 0);
     }
 
-    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false) {
+    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
         if ($pos == 0) {
             return array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''));
         }
@@ -1311,7 +1277,7 @@ class qtype_preg_leaf_assert_small_esc_z extends qtype_preg_leaf_assert {
         return ($pos == $str->length());
     }
 
-    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false) {
+    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
         return array(self::NEXT_CHAR_END_HERE, null);
     }
 
@@ -1334,7 +1300,7 @@ class qtype_preg_leaf_assert_capital_esc_z extends qtype_preg_leaf_assert_small_
         return ($pos == $str->length() - 1 && $str[$pos] == "\n") || parent::match($str, $pos, $length, $matcherstateobj);
     }
 
-    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false) {
+    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
         return array(self::NEXT_CHAR_END_HERE, null);
     }
 
@@ -1355,7 +1321,7 @@ class qtype_preg_leaf_assert_esc_g extends qtype_preg_leaf_assert {
         return false; // TODO
     }
 
-    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false) {
+    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
         return array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''));  // TODO
     }
 
@@ -1379,7 +1345,7 @@ class qtype_preg_leaf_assert_circumflex extends qtype_preg_leaf_assert_esc_a {
         return ($str[$pos - 1] == "\n") || parent::match($str, $pos, $length, $matcherstateobj);
     }
 
-    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false) {
+    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
         if ($pos == 0 || $newstr[$pos - 1] == "\n") {
             return array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''));
         }
@@ -1406,7 +1372,7 @@ class qtype_preg_leaf_assert_dollar extends qtype_preg_leaf_assert_capital_esc_z
         return ($str[$pos] == "\n") || parent::match($str, $pos, $length, $matcherstateobj);
     }
 
-    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false) {
+    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
         return array(self::NEXT_CHAR_END_HERE, null);
     }
 
@@ -1431,7 +1397,7 @@ class qtype_preg_leaf_assert_subexpr_captured extends qtype_preg_leaf_assert {
         return ($matcherstateobj->is_subexpr_captured($this->number) xor $this->negative);
     }
 
-    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false) {
+    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
         $ok = ($matcherstateobj->is_subexpr_captured($this->number) xor $this->negative);
         return $ok ? array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''))
                    : array(self::NEXT_CHAR_CANNOT_GENERATE, null);
@@ -1518,7 +1484,7 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
         return $result;
     }
 
-    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false) {
+    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
         if (!$matcherstateobj->is_subexpr_captured($this->number)) {
             return array(self::NEXT_CHAR_CANNOT_GENERATE, null);
         }
@@ -1571,7 +1537,7 @@ class qtype_preg_leaf_subexpr_call extends qtype_preg_leaf {
         return false;
     }
 
-    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false) {
+    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
         return array(self::NEXT_CHAR_CANNOT_GENERATE, null);
     }
 
@@ -1638,7 +1604,7 @@ class qtype_preg_leaf_control extends qtype_preg_leaf {
     public function match($str, $pos, &$length, $matcherstateobj = null) {
         // Do nothing, the matching should be controlled by the matching engine.
     }
-    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false) {
+    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
         // Do nothing, the matching should be controlled by the matching engine.
     }
     public function tohr() {
@@ -1659,7 +1625,7 @@ class qtype_preg_leaf_options extends qtype_preg_leaf {
     public function match($str, $pos, &$length, $matcherstateobj = null) {
         die ('TODO: implement abstract function match for qtype_preg_leaf_options class before use it!');
     }
-    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null, $dollar = false, $circumflex = false) {
+    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
         die ('TODO: implement abstract function character for qtype_preg_leaf_options class before use it!');
     }
     public function tohr() {
