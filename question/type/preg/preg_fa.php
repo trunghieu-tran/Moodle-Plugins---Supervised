@@ -696,11 +696,11 @@ class qtype_preg_fa {
         global $CFG;
         $this->statelimit = 250;
         $this->transitionlimit = 250;
-        if (isset($CFG->qtype_preg_fa_transition_limit)) {
-            $this->statelimit = $CFG->qtype_preg_fa_transition_limit;
-        }
         if (isset($CFG->qtype_preg_fa_state_limit)) {
-            $this->transitionlimit = $CFG->qtype_preg_fa_state_limit;
+            $this->statelimit = $CFG->qtype_preg_fa_state_limit;
+        }
+        if (isset($CFG->qtype_preg_fa_transition_limit)) {
+            $this->transitionlimit = $CFG->qtype_preg_fa_transition_limit;
         }
     }
 
