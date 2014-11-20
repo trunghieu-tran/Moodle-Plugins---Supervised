@@ -35,7 +35,7 @@ class qtype_preg_unicode extends core_text {
     }
 
     public static function max_possible_code() {
-        return 0x10FFFD;
+        return 0x10FFFF;
     }
 
     public static function minmax_ranges() {
@@ -43,7 +43,7 @@ class qtype_preg_unicode extends core_text {
     }
 
     public static function dot_ranges() {
-        return array(array(0=>0x0000, 1=>0x10FFFD));
+        return array(array(0=>0x0000, 1=>0x10FFFF));
     }
 
     public static function slashd_ranges() {
@@ -874,7 +874,7 @@ class qtype_preg_unicode extends core_text {
                      array(0=>0x2B735, 1=>0x2B73F),
                      array(0=>0x2B81E, 1=>0x2F7FF),
                      array(0=>0x2FA1E, 1=>0xE00FF),
-                     array(0=>0xE01F0, 1=>0x10FFFD));
+                     array(0=>0xE01F0, 1=>0x10FFFF));
     }
 
     public static function Cc_ranges() {
@@ -1501,7 +1501,8 @@ class qtype_preg_unicode extends core_text {
                      array(0=>0xE0002, 1=>0xE001F),
                      array(0=>0xE0080, 1=>0xE00FF),
                      array(0=>0xE01F0, 1=>0xEFFFF),
-                     array(0=>0xFFFFE, 1=>0xFFFFF));
+                     array(0=>0xFFFFE, 1=>0xFFFFF),
+                     array(0=>0x10FFFE, 1=>0x10FFFF));
     }
 
     public static function Co_ranges() {
@@ -6367,7 +6368,7 @@ class qtype_preg_unicode extends core_text {
         return array(array(0=>0x0024, 1=>0x0024),
                      array(0=>0x0040, 1=>0x0040),
                      array(0=>0x0060, 1=>0x0060),
-                     array(0=>0x00A0, 1=>0x10FFFD));
+                     array(0=>0x00A0, 1=>0x10FFFF));
     }
 
     public static function Xwd_ranges() {
@@ -7701,7 +7702,7 @@ class qtype_preg_unicode extends core_text {
                      array(0=>0x2B735, 1=>0x2B73F),
                      array(0=>0x2B81E, 1=>0x2F7FF),
                      array(0=>0x2FA1E, 1=>0xE00FF),
-                     array(0=>0xE01F0, 1=>0x10FFFD));
+                     array(0=>0xE01F0, 1=>0x10FFFF));
     }
 
     public static function Coptic_ranges() {
