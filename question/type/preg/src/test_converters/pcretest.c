@@ -3956,6 +3956,8 @@ while (!done)
         modifiers[modifiers_length++] = *pp;
     }
 
+    options |= PCRE_UTF8; use_utf = 1;  // Force the utf8 mode
+
     switch (*pp++)
       {
       case 'f': options |= PCRE_FIRSTLINE; break;
@@ -5205,13 +5207,6 @@ while (!done)
 
     bptr = dbuffer;
 
-    int attempt_number = 1;
-
-/*TRY_PARTIAL_MATCH:
-    if (attempt_number == 2) {
-      options = options | PCRE_PARTIAL;   // we always want at least a partial match
-    }*/
-
 #if !defined NOPOSIX
     if (posix || do_posix)
       {
@@ -5414,16 +5409,10 @@ while (!done)
           }
         }
 
-      if (re != NULL && datanumber == 1 /*&& regex_length > 0*/ && attempt_number == 1) { // partial matching means 2nd retry
+      if (re != NULL && datanumber == 1 /*&& regex_length > 0*/) {
           regex_number++;
           print_method_header(regex_number);
       }
-
-      // Try partial matching if full matching failed
-      /*if (count == PCRE_ERROR_NOMATCH && !(options & PCRE_PARTIAL)) {
-        attempt_number = 2;
-        goto TRY_PARTIAL_MATCH;
-      }*/
 
       /* Matched */
 

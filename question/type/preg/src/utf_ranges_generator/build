@@ -1,3 +1,0 @@
-# /usr/bin/env
-
-g++ -lstdc++ -lpcre -licuuc main.cpp
