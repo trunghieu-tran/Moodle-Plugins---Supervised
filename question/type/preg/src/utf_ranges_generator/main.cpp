@@ -7,6 +7,8 @@
 #include <list>
 #include <algorithm>
 
+#define UTF8_MAX 0x10FFFF
+
 bool preg_match(const char * regex, const char * string, int length)
 {
     int options = PCRE_UTF8 | PCRE_DOTALL;
@@ -227,7 +229,7 @@ int main()
 
         std::list<std::string> allhex;
 
-        for (int i = 0; i <= 0x10FFFD; i++) {
+        for (int i = 0; i <= UTF8_MAX; i++) {
             UnicodeString ustr(i);
             std::string utf8;
             ustr.toUTF8String(utf8);

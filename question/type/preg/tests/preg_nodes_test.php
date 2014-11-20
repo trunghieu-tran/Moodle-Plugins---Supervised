@@ -466,6 +466,13 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($length, 0);
     }
 
+    function test_dot() {
+        $charset = $this->leaf_by_regex(".");
+        $length = 0;
+        $this->assertTrue($charset->match(new qtype_poasquestion_string('a'), 0, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion_string(core_text::code2utf8(0x10FFFF)), 0, $length));
+    }
+
     function test_charflag_set_match() {
         $charset = $this->leaf_by_regex("[asdf0123]");
         $length = 0;
