@@ -80,7 +80,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     const TAG_MODE_PCRE          = 0x0100; // PCRE compatibility mode which is default.
     const TAG_MODE_POSIX         = 0x0200; // POSIX compatibility mode.
 
-    const TAG_DONT_CHECK_PARTIAL = 0x0400; // Indicates that if there's no full match, the cross-tester skips partial match checking.
+    const TAG_DONT_CHECK_PARTIAL = 0x0400; // Indicates that if there's no full match, the cross-tester skips partial match and next character/left checking.
     const TAG_DEBUG_MODE         = 0x0800; // Informs matchers that it's debug mode.
 
     const MAX_BUILDING_TIME      = 2000;   // Max time for matchers to be compiled from regex, milliseconds.
@@ -293,15 +293,19 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         $nextpassed = true;
         $leftpassed = true;
 
-        if (!$skippartialcheck) {
-            // Check match existance.
+        $checkindexes = $expected['full'] || !$skippartialcheck;
+        $checkextendedindexes = $obtained->extendedmatch !== null && array_key_exists('ext_index_first', $expected);
+        $checknext = !$expected['full'] && !$skippartialcheck && $obtained->extendedmatch !== null && $matcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING);
+        $checkleft = !$expected['full'] && !$skippartialcheck && $matcher->is_supporting(qtype_preg_matcher::CHARACTERS_LEFT);
+
+        // Match existance, indexes and lengths
+        if ($checkindexes) {
             if ($matcher->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING)) {
                 $ismatchpassed = ($expected['is_match'] === $obtained->is_match());
             } else {
                 $ismatchpassed = $fullpassed;
             }
 
-            // Check indexes and lengths.
             $subexprsupported = $matcher->is_supporting(qtype_preg_matcher::SUBEXPRESSION_CAPTURING);
             foreach ($obtained->indexfirst as $key => $index) {
                 if (!$subexprsupported && $key != 0) {
@@ -317,43 +321,40 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                 $lengthpassed = $lengthpassed && ((!array_key_exists($key, $expected['length']) && $index === qtype_preg_matching_results::NO_MATCH_FOUND) ||
                                                   (array_key_exists($key, $expected['length']) && $expected['length'][$key] === $obtained->length[$key]));
             }
+        }
 
-            if ($obtained->extendedmatch !== null && array_key_exists('ext_index_first', $expected)) {
-                foreach ($obtained->extendedmatch->indexfirst as $key => $index) {
-                    if (!$subexprsupported && $key != 0) {
-                        continue;
-                    }
-                    $extindexfirstpassed = $extindexfirstpassed && ((!array_key_exists($key, $expected['ext_index_first']) && $index === qtype_preg_matching_results::NO_MATCH_FOUND) ||
-                                                              (array_key_exists($key, $expected['ext_index_first']) && $expected['ext_index_first'][$key] === $obtained->extendedmatch->indexfirst[$key]));
+        // Indexes and lengths of the extended match
+        if ($checkextendedindexes) {
+            foreach ($obtained->extendedmatch->indexfirst as $key => $index) {
+                if (!$subexprsupported && $key != 0) {
+                    continue;
                 }
-                foreach ($obtained->extendedmatch->length as $key => $index) {
-                    if (!$subexprsupported && $key != 0) {
-                        continue;
-                    }
-                    $extlengthpassed = $extlengthpassed && ((!array_key_exists($key, $expected['ext_length']) && $index === qtype_preg_matching_results::NO_MATCH_FOUND) ||
-                                                      (array_key_exists($key, $expected['ext_length']) && $expected['ext_length'][$key] === $obtained->extendedmatch->length[$key]));
-                }
+                $extindexfirstpassed = $extindexfirstpassed && ((!array_key_exists($key, $expected['ext_index_first']) && $index === qtype_preg_matching_results::NO_MATCH_FOUND) ||
+                                                          (array_key_exists($key, $expected['ext_index_first']) && $expected['ext_index_first'][$key] === $obtained->extendedmatch->indexfirst[$key]));
             }
+            foreach ($obtained->extendedmatch->length as $key => $index) {
+                if (!$subexprsupported && $key != 0) {
+                    continue;
+                }
+                $extlengthpassed = $extlengthpassed && ((!array_key_exists($key, $expected['ext_length']) && $index === qtype_preg_matching_results::NO_MATCH_FOUND) ||
+                                                  (array_key_exists($key, $expected['ext_length']) && $expected['ext_length'][$key] === $obtained->extendedmatch->length[$key]));
+            }
+        }
 
-            // Check the next possible character.
-            $obtainednext = qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER;
-            if (!$expected['full'] && $matcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING)) {
-                if ($obtained->extendedmatch !== null) {
-                    $obtainednext = $obtained->string_extension();
-                }
-                $pattern = $expected['next'];
-                $char = qtype_poasquestion_string::substr($obtainednext, 0, 1);
-                $nextpassed = (($expected['next'] === $obtainednext && $obtainednext === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) ||
-                               ($expected['next'] !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $this->check_next_character($pattern, $char)));
+        // Next character
+        if ($checknext) {
+            if ($obtained->extendedmatch !== null) {
+                $obtainednext = $obtained->string_extension();
             }
+            $pattern = $expected['next'];
+            $char = qtype_poasquestion_string::substr($obtainednext, 0, 1);
+            $nextpassed = (($expected['next'] === $obtainednext && $obtainednext === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) ||
+                           ($expected['next'] !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $this->check_next_character($pattern, $char)));
+        }
 
-            // Check the number of characters left.
-            if (!$expected['full'] && $matcher->is_supporting(qtype_preg_matcher::CHARACTERS_LEFT)) {
-                $leftpassed = in_array($obtained->left, $expected['left']);
-            }
-            if ($this->doextrachecks) {
-                $this->do_extra_check($regex, $notation, $mods, $obtained);
-            }
+        // Left
+        if ($checkleft) {
+            $leftpassed = in_array($obtained->left, $expected['left']);
         }
 
         $passed = $ismatchpassed && $fullpassed && $indexfirstpassed && $lengthpassed && $extindexfirstpassed && $extlengthpassed && $nextpassed && $leftpassed;
@@ -481,6 +482,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                 $timestart = round(microtime(true) * 1000);
                 $options->mode = in_array(self::TAG_MODE_POSIX, $regextags) ? qtype_preg_handling_options::MODE_POSIX : qtype_preg_handling_options::MODE_PCRE;
                 $options->debugmode = in_array(self::TAG_DEBUG_MODE, $regextags);
+                $options->extensionneeded = !in_array(self::TAG_DONT_CHECK_PARTIAL, $regextags);
                 $matcher = $this->question->get_matcher($enginename, $regex, false, $modifiers, null, $notation);
                 $matcher->set_options($options);
                 $timeend = round(microtime(true) * 1000);
