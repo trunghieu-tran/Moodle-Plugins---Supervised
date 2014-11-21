@@ -211,7 +211,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $newstate->write_tag_values($transition, $curpos, $length);
 
         if (in_array($transition->to, $this->backtrackstates)) {
-            $newstate->backtrack_states[] = $curstate;
+            $newstate->backtrack_states[] = $newstate;
         }
     }
 
@@ -772,7 +772,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                     $match->extendedmatch = $tmp;
                     $match->left = $left;
                 } else if (($match->left > $left) ||
-                           ($match->left == $left && abs($match->extendedmatch->length - $match->length) > abs($tmp->length - $match->length))) {
+                           ($match->left == $left && abs($match->extendedmatch->length - $match->length) > abs($tmp->length - $backtrack->length))) {
                     $match->extendedmatch = $tmp;
                     $match->left = $left;
                 }
