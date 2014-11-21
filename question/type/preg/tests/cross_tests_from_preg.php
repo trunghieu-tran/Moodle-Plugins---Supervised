@@ -4776,14 +4776,14 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
-    function data_for_test_uprops_and_posix_negative_negative() {
+    function data_for_test_uprops_and_posix_negative_negative_1() {
         $test1 = array( 'str'=>'',
                         'is_match'=>false,
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
                         'left'=>array(1),
-                        'next'=>'[^\P{C}[:^alpha:]\H]');
+                        'next'=>'[^\P{L}[:^alpha:]\W]');
 
         $test2 = array( 'str'=>'!',
                         'is_match'=>false,
@@ -4791,18 +4791,31 @@ class qtype_preg_cross_tests_from_preg {
                         'index_first'=>array(),
                         'length'=>array(),
                         'left'=>array(1),
-                        'next'=>'[^\P{C}[:^alpha:]\H]');
+                        'next'=>'[^\P{L}[:^alpha:]\W]');
 
         $test3 = array( 'str'=>'alnum characters here',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>5),
+                        'left'=>array(0));
+
+        return array('regex'=>'[^\P{L}[:^alpha:]\W]+',
+                     'tests'=>array($test1, $test2, $test3),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+    }
+
+    function data_for_test_uprops_and_posix_negative_negative_2() {
+        $test1 = array( 'str'=>'abcd',
                         'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>21),
-                        'left'=>array(0),
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
-        return array('regex'=>'[^\P{C}[:^alpha:]\H]+',
-                     'tests'=>array($test1, $test2),
+        return array('regex'=>'[^\P{C}[:^alpha:]\H]+',  // This is an empty charset
+                     'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
