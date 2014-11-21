@@ -3861,6 +3861,8 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0),
                         'length'=>array(0=>1,1=>1),
+                        'ext_index_first'=>array(0=>0,1=>0),
+                        'ext_length'=>array(0=>2,1=>1),
                         'left'=>array(1),
                         'next'=>'a',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
