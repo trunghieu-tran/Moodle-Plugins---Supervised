@@ -23,9 +23,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"What do you know about the quick brown fox?",
                        'is_match'=>true,
@@ -37,9 +35,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"the quick brown fox",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -274,57 +270,43 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test32 = array('str'=>"abxyzpqrrabbxyyyypqAzz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test33 = array('str'=>"abxyzpqrrrrabbxyyyypqAzz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test34 = array('str'=>"abxyzpqrrrabxyyyypqAzz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test35 = array('str'=>"aaaabcxyzzzzpqrrrabbbxyyyyyypqAzz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test36 = array('str'=>"aaaabcxyzzzzpqrrrabbbxyyypqAzz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test37 = array('str'=>"aaabcxyzpqrrrabbxyyyypqqqqqqqAzz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"a*abc?xyz+pqr{3}ab{2,}xy{4,5}pq{0,6}AB{0,}zz",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -348,33 +330,25 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"zz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"abcabcabczz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>">>abczz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(abc){1,2}zz",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -434,25 +408,19 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test10 = array('str'=>"aaac",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test11 = array('str'=>"abbbbbbbbbbbac",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(b+?|a){1,2}?c",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -512,25 +480,19 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test10 = array('str'=>"aaac",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test11 = array('str'=>"abbbbbbbbbbbac",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(b+|a){1,2}c",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -572,25 +534,19 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"bababbc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"babababc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(b*|ba){1,2}?bc",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -620,25 +576,19 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"bababbc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"babababc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(ba|b*){1,2}?bc",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -698,33 +648,25 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test8 = array('str'=>"fthing",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test9 = array('str'=>"[thing",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test10 = array('str'=>"\\thing",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^[ab\\]cde]",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -760,25 +702,19 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"athing",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test7 = array('str'=>"fthing",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^[]cde]",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -814,49 +750,37 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"bthing",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test7 = array('str'=>"]thing",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test8 = array('str'=>"cthing",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test9 = array('str'=>"dthing",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test10 = array('str'=>"ething",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^[^ab\\]cde]",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -886,33 +810,25 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"cthing",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"dthing",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test7 = array('str'=>"ething",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^[^]cde]",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -996,17 +912,13 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test14 = array('str'=>"abc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^[0-9]+\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -1054,17 +966,13 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"xxx",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^xxx[0-9]+\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -1094,17 +1002,13 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"123",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"x1234",
                        'is_match'=>true,
@@ -1140,17 +1044,13 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"123",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"x1234",
                        'is_match'=>true,
@@ -1174,41 +1074,31 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"!pqr=apquxz.ixr.zzz.ac.uk",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"abc!=apquxz.ixr.zzz.ac.uk",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"abc!pqr=apquxz:ixr.zzz.ac.uk",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"abc!pqr=apquxz.ixr.zzz.ac.ukk",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^([^!]+)!(.+)=apquxz\\.ixr\\.zzz\\.ac\\.uk\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -1226,9 +1116,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>":",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -1288,41 +1176,31 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test10 = array('str'=>"0zzz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test11 = array('str'=>"gzzz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test12 = array('str'=>"fed ",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test13 = array('str'=>"Any old rubbish",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"([\\da-f:]+)\$",
                      'modifiers'=>"i",
@@ -1347,33 +1225,25 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>".1.2.3333",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"1.2.3",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"1234.2.3",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^.*\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -1397,17 +1267,13 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"1IN SOA non-sp1 non-sp2(",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(\\d+)\\s+IN\\s+SOA\\s+(\\S+)\\s+(\\S+)\\s*\\(\\s*\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -1455,17 +1321,13 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test8 = array('str'=>"-abc.peq.",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^[a-zA-Z\\d][a-zA-Z\\d\\-]*(\\.[a-zA-Z\\d][a-zA-z\\d\\-]*)*\\.\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -1501,41 +1363,31 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"*.0",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test7 = array('str'=>"*.a-",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test8 = array('str'=>"*.a-b.c-",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test9 = array('str'=>"*.c-a.0-c",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^\\*\\.[a-z]([a-z\\-\\d]*[a-z\\d]+)?(\\.[a-z]([a-z\\-\\d]*[a-z\\d]+)?)*\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -1626,17 +1478,13 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"\"1234\" : things",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^\\\".*\\\"\\s*(;.*)?\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -1654,9 +1502,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -1674,25 +1520,19 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"abc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"ab cde",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"   ^    a   (?# begins with a)  b\\sc (?# then b c) \$ (?# then end)",
                      'modifiers'=>"x",
@@ -1711,25 +1551,19 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"abc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"ab cde",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?x)   ^    a   (?# begins with a)  b\\sc (?# then b c) \$ (?# then end)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -1753,25 +1587,19 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"abcd",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"ab d",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^   a\\ b[c ]d       \$",
                      'modifiers'=>"x",
@@ -2030,17 +1858,13 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"1234567",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^\\d{8}\\w{2,}",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -2076,17 +1900,13 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"123456",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^[aeiou\\d]{4,5}\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -2146,17 +1966,13 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"abc=defdef",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"\\A(abc|def)=(\\1){2,3}\\Z",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -2234,17 +2050,13 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"From abcd  Sep 01 12:33:02 1997",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^From\\s+\\S+\\s+([a-zA-Z]{3}\\s+){2}\\d{1,2}\\s+\\d\\d:\\d\\d",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -2335,17 +2147,13 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"abc123",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(\\D*)(?=\\d)(?!123)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -2444,17 +2252,13 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"abc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?!^)abc",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -2472,17 +2276,13 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"the abc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?=^)abc",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -2584,17 +2384,13 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test9 = array('str'=>"The quick brown fox",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"  (?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*                          # optional leading comment\n(?:    (?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|\n\" (?:                      # opening quote...\n[^\\\\\\x80-\\xff\\n\\015\"]                #   Anything except backslash and quote\n|                     #    or\n\\\\ [^\\x80-\\xff]           #   Escaped something (something != CR)\n)* \"  # closing quote\n)                    # initial word\n(?:  (?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*  \\.  (?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*   (?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|\n\" (?:                      # opening quote...\n[^\\\\\\x80-\\xff\\n\\015\"]                #   Anything except backslash and quote\n|                     #    or\n\\\\ [^\\x80-\\xff]           #   Escaped something (something != CR)\n)* \"  # closing quote\n)  )* # further okay, if led by a period\n(?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*  @  (?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*    (?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|   \\[                         # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*    #    stuff\n\\]                        #           ]\n)                           # initial subdomain\n(?:                                  #\n(?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*  \\.                        # if led by a period...\n(?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*   (?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|   \\[                         # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*    #    stuff\n\\]                        #           ]\n)                     #   ...further okay\n)*\n# address\n|                     #  or\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|\n\" (?:                      # opening quote...\n[^\\\\\\x80-\\xff\\n\\015\"]                #   Anything except backslash and quote\n|                     #    or\n\\\\ [^\\x80-\\xff]           #   Escaped something (something != CR)\n)* \"  # closing quote\n)             # one word, optionally followed by....\n(?:\n[^()<>@,;:\".\\\\\\[\\]\\x80-\\xff\\000-\\010\\012-\\037]  |  # atom and space parts, or...\n\\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)       |  # comments, or...\n\n\" (?:                      # opening quote...\n[^\\\\\\x80-\\xff\\n\\015\"]                #   Anything except backslash and quote\n|                     #    or\n\\\\ [^\\x80-\\xff]           #   Escaped something (something != CR)\n)* \"  # closing quote\n# quoted strings\n)*\n<  (?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*                     # leading <\n(?:  @  (?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*    (?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|   \\[                         # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*    #    stuff\n\\]                        #           ]\n)                           # initial subdomain\n(?:                                  #\n(?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*  \\.                        # if led by a period...\n(?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*   (?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|   \\[                         # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*    #    stuff\n\\]                        #           ]\n)                     #   ...further okay\n)*\n\n(?:  (?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*  ,  (?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*  @  (?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*    (?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|   \\[                         # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*    #    stuff\n\\]                        #           ]\n)                           # initial subdomain\n(?:                                  #\n(?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*  \\.                        # if led by a period...\n(?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*   (?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|   \\[                         # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*    #    stuff\n\\]                        #           ]\n)                     #   ...further okay\n)*\n)* # further okay, if led by comma\n:                                # closing colon\n(?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*  )? #       optional route\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|\n\" (?:                      # opening quote...\n[^\\\\\\x80-\\xff\\n\\015\"]                #   Anything except backslash and quote\n|                     #    or\n\\\\ [^\\x80-\\xff]           #   Escaped something (something != CR)\n)* \"  # closing quote\n)                    # initial word\n(?:  (?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*  \\.  (?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*   (?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|\n\" (?:                      # opening quote...\n[^\\\\\\x80-\\xff\\n\\015\"]                #   Anything except backslash and quote\n|                     #    or\n\\\\ [^\\x80-\\xff]           #   Escaped something (something != CR)\n)* \"  # closing quote\n)  )* # further okay, if led by a period\n(?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*  @  (?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*    (?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|   \\[                         # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*    #    stuff\n\\]                        #           ]\n)                           # initial subdomain\n(?:                                  #\n(?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*  \\.                        # if led by a period...\n(?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*   (?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|   \\[                         # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*    #    stuff\n\\]                        #           ]\n)                     #   ...further okay\n)*\n#       address spec\n(?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*  > #                  trailing >\n# name and address\n)  (?: [\\040\\t] |  \\(\n(?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  |  \\( (?:  [^\\\\\\x80-\\xff\\n\\015()]  |  \\\\ [^\\x80-\\xff]  )* \\)  )*\n\\)  )*                       # optional trailing comment\n",
                      'modifiers'=>"x",
@@ -2649,17 +2445,13 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test9 = array('str'=>"The quick brown fox",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n# optional leading comment\n(?:\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n# Atom\n|                       #  or\n\"                                     # \"\n[^\\\\\\x80-\\xff\\n\\015\"] *                            #   normal\n(?:  \\\\ [^\\x80-\\xff]  [^\\\\\\x80-\\xff\\n\\015\"] * )*        #   ( special normal* )*\n\"                                     #        \"\n# Quoted string\n)\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n(?:\n\\.\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n# Atom\n|                       #  or\n\"                                     # \"\n[^\\\\\\x80-\\xff\\n\\015\"] *                            #   normal\n(?:  \\\\ [^\\x80-\\xff]  [^\\\\\\x80-\\xff\\n\\015\"] * )*        #   ( special normal* )*\n\"                                     #        \"\n# Quoted string\n)\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n# additional words\n)*\n@\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|\n\\[                            # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*     #    stuff\n\\]                           #           ]\n)\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n# optional trailing comments\n(?:\n\\.\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|\n\\[                            # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*     #    stuff\n\\]                           #           ]\n)\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n# optional trailing comments\n)*\n# address\n|                             #  or\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n# Atom\n|                       #  or\n\"                                     # \"\n[^\\\\\\x80-\\xff\\n\\015\"] *                            #   normal\n(?:  \\\\ [^\\x80-\\xff]  [^\\\\\\x80-\\xff\\n\\015\"] * )*        #   ( special normal* )*\n\"                                     #        \"\n# Quoted string\n)\n# leading word\n[^()<>@,;:\".\\\\\\[\\]\\x80-\\xff\\000-\\010\\012-\\037] *               # \"normal\" atoms and or spaces\n(?:\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n|\n\"                                     # \"\n[^\\\\\\x80-\\xff\\n\\015\"] *                            #   normal\n(?:  \\\\ [^\\x80-\\xff]  [^\\\\\\x80-\\xff\\n\\015\"] * )*        #   ( special normal* )*\n\"                                     #        \"\n) # \"special\" comment or quoted string\n[^()<>@,;:\".\\\\\\[\\]\\x80-\\xff\\000-\\010\\012-\\037] *            #  more \"normal\"\n)*\n<\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n# <\n(?:\n@\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|\n\\[                            # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*     #    stuff\n\\]                           #           ]\n)\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n# optional trailing comments\n(?:\n\\.\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|\n\\[                            # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*     #    stuff\n\\]                           #           ]\n)\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n# optional trailing comments\n)*\n(?: ,\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n@\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|\n\\[                            # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*     #    stuff\n\\]                           #           ]\n)\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n# optional trailing comments\n(?:\n\\.\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|\n\\[                            # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*     #    stuff\n\\]                           #           ]\n)\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n# optional trailing comments\n)*\n)*  # additional domains\n:\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n# optional trailing comments\n)?     #       optional route\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n# Atom\n|                       #  or\n\"                                     # \"\n[^\\\\\\x80-\\xff\\n\\015\"] *                            #   normal\n(?:  \\\\ [^\\x80-\\xff]  [^\\\\\\x80-\\xff\\n\\015\"] * )*        #   ( special normal* )*\n\"                                     #        \"\n# Quoted string\n)\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n(?:\n\\.\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n# Atom\n|                       #  or\n\"                                     # \"\n[^\\\\\\x80-\\xff\\n\\015\"] *                            #   normal\n(?:  \\\\ [^\\x80-\\xff]  [^\\\\\\x80-\\xff\\n\\015\"] * )*        #   ( special normal* )*\n\"                                     #        \"\n# Quoted string\n)\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n# additional words\n)*\n@\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|\n\\[                            # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*     #    stuff\n\\]                           #           ]\n)\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n# optional trailing comments\n(?:\n\\.\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n(?:\n[^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]+    # some number of atom characters...\n(?![^(\\040)<>@,;:\".\\\\\\[\\]\\000-\\037\\x80-\\xff]) # ..not followed by something that could be part of an atom\n|\n\\[                            # [\n(?: [^\\\\\\x80-\\xff\\n\\015\\[\\]] |  \\\\ [^\\x80-\\xff]  )*     #    stuff\n\\]                           #           ]\n)\n[\\040\\t]*                    # Nab whitespace.\n(?:\n\\(                              #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                             #     normal*\n(?:                                 #       (\n(?:  \\\\ [^\\x80-\\xff]  |\n\\(                            #  (\n[^\\\\\\x80-\\xff\\n\\015()] *                            #     normal*\n(?:  \\\\ [^\\x80-\\xff]   [^\\\\\\x80-\\xff\\n\\015()] * )*        #     (special normal*)*\n\\)                           #                       )\n)    #         special\n[^\\\\\\x80-\\xff\\n\\015()] *                         #         normal*\n)*                                  #            )*\n\\)                             #                )\n[\\040\\t]* )*    # If comment found, allow more spaces.\n# optional trailing comments\n)*\n#       address spec\n>                    #                 >\n# name and address\n)\n",
                      'modifiers'=>"x",
@@ -2756,25 +2548,19 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"A Z",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"A    Z",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"A\\x0{2,3}Z",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -2798,17 +2584,13 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"cowbell",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(cow|)\\1(bell)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -2850,17 +2632,13 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test7 = array('str'=>"abc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^\\s",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -2903,17 +2681,13 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"acb",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(a|)\\1*b",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -2943,17 +2717,13 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"ab",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(a|)\\1+b",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -2983,17 +2753,13 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"acb",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(a|)\\1?b",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -3017,33 +2783,25 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"ab",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"aab",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"aaaab",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(a|)\\1{2}b",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -3073,33 +2831,25 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"ab",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"aab",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test7 = array('str'=>"aaaaab",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(a|)\\1{2,3}b",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -3129,25 +2879,19 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"abc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"abbbbbc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"ab{1,3}bc",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -3203,17 +2947,13 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"wxy",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^[W-c]+\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -3300,33 +3040,25 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"qqq\nabc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"abc\nzzz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"qqq\nabc\nzzz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^abc\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -3350,33 +3082,25 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"qqq\nabc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"abc\nzzz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"qqq\nabc\nzzz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"\\Aabc\\Z",
                      'modifiers'=>"m",
@@ -3408,9 +3132,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"\\A(.)*\\Z",
                      'modifiers'=>"m",
@@ -3453,9 +3175,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"[-az]+",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -3479,9 +3199,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"[az-]+",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -3505,9 +3223,7 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"[a\\-z]+",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -3537,17 +3253,13 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"aaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"[\\d-]+",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -3565,17 +3277,13 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"aaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"[\\d-z]+",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -3605,17 +3313,13 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"Zulu",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"\\x20Z",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -3712,17 +3416,13 @@ class qtype_preg_cross_tests_from_pcre_testinput1 {
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"abc\ndef",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"abc\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -3828,17 +3528,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"A 8B 9C",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^A\\8B\\9C\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -3868,17 +3564,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"A8B9C ",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^[A\\8B\\9C]+\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -4028,25 +3720,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test7 = array('str'=>"bc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test8 = array('str'=>"baccd",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^([^a])([^\\b])([^c]*)([^d]{3,4})",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -4132,9 +3818,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"[^k]\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -4170,25 +3854,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"akb",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test7 = array('str'=>"akk",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"[^k]{2,3}\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -4212,25 +3890,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"12345678@x.y.uk",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"1234567@a.b.c.d",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^\\d{8,}\\@.+[^k]\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -4254,17 +3926,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"aaaaaaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(a)\\1{8,}",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -4422,17 +4090,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"1.235",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(\\.\\d\\d((?=0)|\\d(?=\\d)))",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -4607,17 +4271,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"ABC123",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(\\D*)(?=\\d)(?!123)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -4641,49 +4301,37 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"Wall",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"Zebra",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"42",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test7 = array('str'=>"[abcd]",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test8 = array('str'=>"]abcd[",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^[W-]46]",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -4743,25 +4391,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test10 = array('str'=>"-46]789",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test11 = array('str'=>"well",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^[W-\\]46]",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -4791,9 +4433,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"word (?:[a-zA-Z0-9]+ ){0,10}otherword",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -4805,9 +4445,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"word (?:[a-zA-Z0-9]+ ){0,300}otherword",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -4957,9 +4595,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"abc",
                        'is_match'=>true,
@@ -4983,9 +4619,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"abc",
                        'is_match'=>true,
@@ -5009,9 +4643,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"abc",
                        'is_match'=>true,
@@ -5041,9 +4673,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"abc",
                        'is_match'=>true,
@@ -5256,17 +4886,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"abcde\nBar",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(.*X|^B)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -5315,17 +4941,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"abcde\nBar",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(.*X|^B)",
                      'modifiers'=>"s",
@@ -5375,17 +4997,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"abcde\nBar",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?s)(.*X|^B)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -5409,17 +5027,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"abcde\nBar",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?s:.*X|^B)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -5431,17 +5045,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"abc\nB",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^.*B",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -5591,17 +5201,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"z",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^[abcdefghijklmnopqrstuvwxy0123456789]",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -5619,17 +5225,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"abce",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"abcde{0,0}",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -5647,17 +5249,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"abcde",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"ab[cd]{0,0}e",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -5675,17 +5273,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"abcd",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"ab(c){0,0}d",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -5721,9 +5315,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"a(b*)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -5741,17 +5333,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"ab1e",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"ab\\d{0}e",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -5870,17 +5458,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"a\nb",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"a.b",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -6002,9 +5586,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"ax\n",
                        'is_match'=>true,
@@ -6107,25 +5689,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"barfoo",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test7 = array('str'=>"towbarfoo",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?<!bar)foo",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -6143,33 +5719,25 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"foo",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"barfoo",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"towbarfoo",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"\\w{3}(?<!bar)foo",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -6187,25 +5755,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"bar",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"foobbar",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?<=(foo)a)bar",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -6223,41 +5785,31 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"abc\n",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"qqq\nabc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"abc\nzzz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"qqq\nabc\nzzz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"\\Aabc\\z",
                      'modifiers'=>"m",
@@ -6270,9 +5822,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?>.*/)foo",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -6308,17 +5858,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"1.235",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?>(\\.\\d\\d[1-9]?))\\d+",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -6336,17 +5882,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"this is not a line with only words and spaces!",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^((?>\\w+)|(?>\\s+))*\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -6382,17 +5924,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"12345+",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"((?>\\d+))(\\w)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -6488,17 +6026,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"((()aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"\\(((?>[^()]+)|\\([^()]+\\))+\\)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -6522,25 +6056,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"aB",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"AB",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"a(?-i)b",
                      'modifiers'=>"i",
@@ -6559,33 +6087,25 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"a b cd e",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"abcd e",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"a bcde",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(a (?x)b c)d e",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -6603,17 +6123,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"abcdef",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(a b(?x)c d (?-x)e f)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -6637,57 +6153,43 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"abC",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"aBC",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"Abc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test7 = array('str'=>"ABc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test8 = array('str'=>"ABC",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test9 = array('str'=>"AbC",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(a(?i)b)c",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -6711,33 +6213,25 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"ABC",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"abC",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"aBC",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"a(?i:b)c",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -6761,25 +6255,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"aBC",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"aBBC",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"a(?i:b)*c",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -6803,25 +6291,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"aBCd",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"abcD",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"a(?=b(?i)c)\\w\\wd",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -6851,25 +6333,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"MORE THAN MILLION",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"more \n than \n million",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?s-i:more.*than).*million",
                      'modifiers'=>"i",
@@ -6900,25 +6376,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"MORE THAN MILLION",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"more \n than \n million",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?:(?s-i)more.*than).*million",
                      'modifiers'=>"i",
@@ -6949,33 +6419,25 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"Abc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"abAb",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test7 = array('str'=>"abbC",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?>a(?i)b+)+c",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -6999,33 +6461,25 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"Ab",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"abC",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"aBC",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?=a(?i)b)\\w\\wc",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -7049,33 +6503,25 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"Abxxc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"ABxxc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"abxxC",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?<=a(?i)b)(\\w\\w)c",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -7099,25 +6545,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"aB",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"bA",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?:(a)|b)(?(1)A|B)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -7147,17 +6587,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"ab",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(a)?(?(1)a|b)+\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -7181,25 +6617,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"123",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"xyz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(?(?=abc)\\w{3}:|\\d\\d)\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -7223,25 +6653,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"123",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"xyz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(?(?!abc)\\d\\d|\\w{3}:)\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -7277,17 +6701,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"foocat",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?(?<=foo)bar|cat)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -7323,17 +6743,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"foocat",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?(?<!foo)cat|bar)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -7425,17 +6841,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"1234",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(?(2)a|(1)(2))+\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -7471,33 +6883,25 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"blah BLAH",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test7 = array('str'=>"Blah blah",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test8 = array('str'=>"blaH blah",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"((?i)blah)\\s+\\1",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -7869,17 +7273,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"sep-12-98",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?(?=[^a-z]+[a-z])  \\d{2}-[a-z]{3}-\\d{2}  |  \\d{2}-\\d{2}-\\d{2} ) ",
                      'modifiers'=>"x",
@@ -7904,25 +7304,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"foobar",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"barfoo",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?<=(foo))bar\\1",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -8006,41 +7400,31 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"abcX",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test7 = array('str'=>"aBCX",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test8 = array('str'=>"bbX",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test9 = array('str'=>"BBX",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(a(?i)bc|BB)x",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -8094,17 +7478,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test9 = array('str'=>"Africa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^([ab](?i)[cd]|[ef])",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -8152,25 +7532,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test8 = array('str'=>"aCD",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test9 = array('str'=>"XY",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(ab|a(?i)[b-c](?m-i)d|x(?i)y|z)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -8188,25 +7562,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"bar",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"baz\nbar",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?<=foo\\n)^bar",
                      'modifiers'=>"m",
@@ -8237,25 +7605,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"baz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"foobarbaz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?<=(?<!foo)bar)baz",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -8267,17 +7629,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"/recursive references in Perl, as far as 5.11.3 - see some stuff in test #2./",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"The cases of aaaa and aaaaaa are missed out below because Perl does things",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -8289,25 +7647,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"aa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"aaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"aaaaa",
                        'is_match'=>true,
@@ -8325,17 +7677,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test7 = array('str'=>"aaaaaaaaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test8 = array('str'=>"aaaaaaaaaa",
                        'is_match'=>true,
@@ -8347,49 +7695,37 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test10 = array('str'=>"aaaaaaaaaaaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test11 = array('str'=>"aaaaaaaaaaaaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test12 = array('str'=>"aaaaaaaaaaaaaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test13 = array('str'=>"aaaaaaaaaaaaaaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test14 = array('str'=>"aaaaaaaaaaaaaaaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(a\\1?){4}\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -8401,25 +7737,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"aa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"aaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"aaaa",
                        'is_match'=>true,
@@ -8449,17 +7779,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test9 = array('str'=>"aaaaaaaaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test10 = array('str'=>"aaaaaaaaaa",
                        'is_match'=>true,
@@ -8471,49 +7797,37 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test12 = array('str'=>"aaaaaaaaaaaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test13 = array('str'=>"aaaaaaaaaaaaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test14 = array('str'=>"aaaaaaaaaaaaaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test15 = array('str'=>"aaaaaaaaaaaaaaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test16 = array('str'=>"aaaaaaaaaaaaaaaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(a\\1?)(a\\1?)(a\\2?)(a\\3?)\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -8525,9 +7839,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"The following tests are taken from the Perl 5.005 test suite; some of them",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -8557,33 +7869,25 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"xbc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"axc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test7 = array('str'=>"abx",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"abc",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -8673,25 +7977,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"abc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"abq",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"ab+bc",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -8751,25 +8049,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"abq",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"abbbbc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"ab{4,5}bc",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -8841,25 +8133,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"abbbbc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"abcc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^abc\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -8889,9 +8175,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"aabc",
                        'is_match'=>true,
@@ -8903,9 +8187,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"abc\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -8977,25 +8259,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"axyzd",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"abc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"a[bc]d",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -9085,25 +8361,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"abd",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"abd",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"a[^bc]d",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -9133,9 +8403,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"a-c",
                        'is_match'=>true,
@@ -9147,9 +8415,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"a[^]b]c",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -9185,33 +8451,25 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"xy",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"yz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"xyz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"\\by\\b",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -9229,25 +8487,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"-a",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"-a-",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"\\Ba\\B",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -9325,9 +8577,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"\\W",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -9357,9 +8607,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"a-b",
                        'is_match'=>true,
@@ -9371,9 +8619,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"a\\Sb",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -9415,9 +8661,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"\\D",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -9459,9 +8703,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"[\\W]",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -9491,9 +8733,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"a-b",
                        'is_match'=>true,
@@ -9505,9 +8745,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"a[\\S]b",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -9549,9 +8787,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"[\\D]",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -9623,9 +8859,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"a\\\\b",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -9781,17 +9015,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"b",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"abc",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -10001,25 +9231,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"abcde",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"adcdcde",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"a[bcd]+dcdcde",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -10097,25 +9321,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"effg",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"bcdd",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(bc+d\$|ef*g.|h?i(j|k))",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -10163,25 +9381,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"aa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"uh-uh",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"multiple words of text",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -10307,9 +9519,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(a)|\\1",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -10387,41 +9597,31 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"aaxabxbaxbbx",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"XBC",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test7 = array('str'=>"AXC",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test8 = array('str'=>"ABX",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"abc",
                      'modifiers'=>"i",
@@ -10505,25 +9705,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"ABC",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"ABQ",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"ab+bc",
                      'modifiers'=>"i",
@@ -10588,25 +9782,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"ABQ",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"ABBBBC",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"ab{4,5}?bc",
                      'modifiers'=>"i",
@@ -10683,25 +9871,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"ABBBBC",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"ABCC",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^abc\$",
                      'modifiers'=>"i",
@@ -10798,9 +9980,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"AABC",
                        'is_match'=>true,
@@ -10812,9 +9992,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"a.*c",
                      'modifiers'=>"i",
@@ -10846,25 +10024,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"ABC",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"ABD",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"a[b-d]e",
                      'modifiers'=>"i",
@@ -10961,25 +10133,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"ABD",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"A-C",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"a[^-b]c",
                      'modifiers'=>"i",
@@ -11037,25 +10203,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"A]C",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"B",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"\$b",
                      'modifiers'=>"i",
@@ -11100,9 +10260,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"a\\\\b",
                      'modifiers'=>"i",
@@ -11420,9 +10578,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(ab|cd)e",
                      'modifiers'=>"i",
@@ -11609,33 +10765,25 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"ADCDCDE",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"EFFG",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test7 = array('str'=>"BCDD",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(bc+d\$|ef*g.|h?i(j|k))",
                      'modifiers'=>"i",
@@ -11713,25 +10861,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"AA",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"UH-UH",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"multiple words of text",
                      'modifiers'=>"i",
@@ -12112,33 +11254,25 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"AB",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"aaaaaaaaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"aaaaaaaaaaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(a\\1?){4}\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -12156,25 +11290,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"aaaaaaaaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"aaaaaaaaaaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(a(?(1)\\1)){4}\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -12204,25 +11332,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"cb",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"b",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?<=a)b",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -12414,25 +11536,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"cb",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"aB",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?:(?i)a)b",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -12492,25 +11608,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"aB",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"aB",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?i:a)b",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -12574,9 +11684,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"aB",
                        'is_match'=>true,
@@ -12588,9 +11696,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?:(?-i)a)b",
                      'modifiers'=>"i",
@@ -12629,25 +11735,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"Ab",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"AB",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?:(?-i)a)b",
                      'modifiers'=>"i",
@@ -12712,25 +11812,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"AB",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"Ab",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?-i:a)b",
                      'modifiers'=>"i",
@@ -12769,25 +11863,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"Ab",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"AB",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?-i:a)b",
                      'modifiers'=>"i",
@@ -12800,25 +11888,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"AB",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"a\nB",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"((?-i:a.))b",
                      'modifiers'=>"i",
@@ -12936,25 +12018,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"B\nB",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"dbcb",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?<![cd])b",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -13026,33 +12102,25 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"dbcb",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test7 = array('str'=>"a--",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test8 = array('str'=>"aa--",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(?:a?b?)*\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -13172,25 +12240,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"a\nb\nc\n",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"a\nb\nc\n",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"()^b",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -13214,25 +12276,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"a",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"a",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(x)?(?(1)a|b)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -13292,33 +12348,25 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"a",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"blah)",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"(blah",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(\\()?blah(?(1)(\\)))\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -13342,25 +12390,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"blah)",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"(blah",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(\\(+)?blah(?(1)(\\)))\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -13384,25 +12426,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"a",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"a",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?(?=a)b|a)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -13474,25 +12510,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"aaab",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"aaab",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(?=(a+?))\\1ab",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -13564,17 +12594,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"abcd:",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"([\\w:]+::)?(\\w+)\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -13682,25 +12708,19 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"aaab",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"a\nb\n",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"a\\Z",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -13742,9 +12762,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"b\\z",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -13810,113 +12828,85 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test11 = array('str'=>"",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test12 = array('str'=>".a",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test13 = array('str'=>"-a",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test14 = array('str'=>"a-",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test15 = array('str'=>"a.",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test16 = array('str'=>"a_b",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test17 = array('str'=>"a.-",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test18 = array('str'=>"a..",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test19 = array('str'=>"ab..bc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test20 = array('str'=>"the.quick.brown.fox-",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test21 = array('str'=>"the.quick.brown.fox.",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test22 = array('str'=>"the.quick.brown.fox_",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test23 = array('str'=>"the.quick.brown.fox+",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(?>(?(1)\\.|())[^\\W_](?>[a-z0-9-]*[^\\W_])?)+\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -13940,17 +12930,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"a rather long string that doesn't end with one of them",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?>.*)(?<=(abcd|wxyz))",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -13968,9 +12954,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"word (?>(?:(?!otherword)[a-zA-Z0-9]+ ){0,30})otherword",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -13982,9 +12966,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"word (?>[a-zA-Z0-9]+ ){0,30}otherword",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -14008,17 +12990,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"123abcfoo",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?<=\\d{3}(?!999))foo",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -14042,17 +13020,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"123abcfoo",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?<=(?!...999)\\d{3})foo",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -14076,17 +13050,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"123999foo",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?<=\\d{3}(?!999)...)foo",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -14110,17 +13080,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"123999foo",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?<=\\d{3}...)(?<!999)foo",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -14298,17 +13264,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"bcdef",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^[\\d-a]",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -14394,9 +13356,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?!^)x",
                      'modifiers'=>"m",
@@ -14439,17 +13399,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"abcabcabc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"   abc\\Q abc\\Eabc",
                      'modifiers'=>"x",
@@ -14544,17 +13500,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"xyzabc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"\\Gabc",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -14598,17 +13550,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"Xa b c d Y",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"a(?x: b c )d",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -14644,17 +13592,13 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"XabcY",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?i)AB(?-i)C",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -14678,41 +13622,31 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"abcE",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"abCe",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"dE",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test7 = array('str'=>"De",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"((?i)AB(?-i)C|D)E",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -14815,73 +13749,55 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test8 = array('str'=>"1:2:3:4:5:6:7:8",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test9 = array('str'=>"a123:bce:ddde:9999:b342::324e:dcba:abcd",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test10 = array('str'=>"a123::9999:b342::324e:dcba:abcd",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test11 = array('str'=>"abcde:2:3:4:5:6:7:8",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test12 = array('str'=>"::1",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test13 = array('str'=>"abcd:fee0:123::",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test14 = array('str'=>":1",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test15 = array('str'=>"1:",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(?!:)                       # colon disallowed at start\n  (?:                         # start of item\n    (?: [0-9a-f]{1,4} |       # 1-4 hex digits or\n    (?(1)0 | () ) )           # if null previously matched, fail; else null\n    :                         # followed by colon\n  ){1,7}                      # end item; 1-7 of them required               \n  [0-9a-f]{1,4} \$             # final hex number at end of string\n  (?(1)|.)                    # check that there was an empty component\n  ",
                      'modifiers'=>"xi",
@@ -14930,9 +13846,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"[z\\Qa-d]\\E]",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -14974,9 +13888,7 @@ str: abcÓ
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(a+)*b",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -15014,17 +13926,13 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"abcddefg",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"ab cd(?x) de fg",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -15042,17 +13950,13 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"boobarX",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?<![^f]oo)(bar)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -15070,17 +13974,13 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"onyX",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?<![^f])X",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -15098,17 +13998,13 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"offX",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?<=[^f])X",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -15237,17 +14133,13 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"#",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?x)(?-x: \\s*#\\s*)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -15265,25 +14157,19 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"A#include",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"A #Include",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?x-is)(?:(?-ixs) \\s*#\\s*) include",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -15502,17 +14388,13 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"E",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^[\\Eabc]",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -15530,25 +14412,19 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"-",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"E",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^[a-\\Ec]",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -15566,25 +14442,19 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"-",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"E",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^[a\\E\\E-\\Ec]",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -15602,17 +14472,13 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"-",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^[\\E\\Qa\\E-\\Qz\\E]+",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -15738,9 +14604,7 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa4",
                        'is_match'=>true,
@@ -15758,9 +14622,7 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa4",
                        'is_match'=>true,
@@ -15778,9 +14640,7 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa4",
                        'is_match'=>true,
@@ -15817,9 +14677,7 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(?s)(?>.*)(?<!\\n)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -15837,9 +14695,7 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(?![^\\n]*\\n\\z)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -15857,9 +14713,7 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"\\z(?<!\\n)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -15976,9 +14830,7 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>".*[op][xyz]",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -16014,9 +14866,7 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?(?=^.*b)b|^)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -16118,17 +14968,13 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"XABX",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?i)a(?-i)b|c",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -16164,9 +15010,7 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(abc)\\1",
                      'modifiers'=>"i",
@@ -16179,9 +15023,7 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(abc)\\1",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -16231,25 +15073,19 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"12abc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"12ABC",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"[^a]*?X",
                      'modifiers'=>"i",
@@ -16262,25 +15098,19 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"12abc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"12ABC",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"[^a]+?X",
                      'modifiers'=>"i",
@@ -16569,9 +15399,7 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?>a+|ab)+?c",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -16583,9 +15411,7 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?>a+|ab)+c",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -16633,9 +15459,7 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(?:a|ab)++c",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -16647,9 +15471,7 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(?>a|ab)++c",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -16679,17 +15501,13 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"xyz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?=abc){3}abc",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -16707,17 +15525,13 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"xyz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?=abc)+abc",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -16735,17 +15549,13 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"xyz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?=abc)++abc",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -16769,17 +15579,13 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"xyz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?=abc){1}xyz",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -16881,17 +15687,13 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"\\ga",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^[\\g<a>]+",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -16957,17 +15759,13 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"xabc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?<=a{2})b",
                      'modifiers'=>"i",
@@ -16986,17 +15784,13 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"xaabc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?<!a{2})b",
                      'modifiers'=>"i",
@@ -17033,17 +15827,13 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"xaabc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?<=[^a]{2})b",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -17061,25 +15851,19 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"aAAbc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"xaabc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?<=[^a]{2})b",
                      'modifiers'=>"i",
@@ -17158,25 +15942,19 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"aaaaaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"aaaaaaaaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(a{2,3}){2,}+a",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -17188,17 +15966,13 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"aaaaaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(a{2,3})++a",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -17210,17 +15984,13 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"aaaaaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(a{2,3})*+a",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -17286,9 +16056,7 @@ str: „XAZXB
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
 /*Error -10 (bad UTF-8 string) offset=0 reason=20
 str:   X\n*/
@@ -17308,9 +16076,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
 /*Error -10 (bad UTF-8 string) offset=2 reason=20
 str: 	  \n*/
@@ -17366,25 +16132,19 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>">XYZ",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>">  X NY Z",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"\\h*X\\h?\\H+Y\\H?Z",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -17501,17 +16261,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"defabcxyz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^abc\\K",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -17553,9 +16309,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(^(a|b\\g{-1}))",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -17579,25 +16333,19 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"abcxyz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"xyzabc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?|(abc)|(xyz))\\1",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -17621,17 +16369,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"xyzxyz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?|(abc)|(xyz))(?1)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -17691,25 +16435,19 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"a:axyz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"ab:abxyz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?'abc'\\w+):\\k<abc>{2}",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -17733,25 +16471,19 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"a:axyz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"ab:abxyz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?'abc'\\w+):\\g{abc}{2}",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -17850,25 +16582,19 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"10.6",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"455.3.4.5",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?(DEFINE)(?<byte>2[0-4]\\d|25[0-5]|1\\d\\d|[1-9]?\\d))\\b(?&byte)(\\.(?&byte)){3}",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -17898,25 +16624,19 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"10.6",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"455.3.4.5",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"\\b(?&byte)(\\.(?&byte)){3}(?(DEFINE)(?<byte>2[0-4]\\d|25[0-5]|1\\d\\d|[1-9]?\\d))",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -17934,17 +16654,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"this is not a line with only words and spaces!",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(\\w++|\\s++)*\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -17962,17 +16678,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"12345+",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(\\d++)(\\w)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -18044,17 +16756,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"((()aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"\\(([^()]++|\\([^()]+\\))+\\)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -18084,17 +16792,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"a(b(c)d",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^([^()]|\\((?1)*\\))*\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -18154,17 +16858,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"Thequickbrownfox",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(?:((.)(?1)\\2|)|((.)(?3)\\4|.))\$",
                      'modifiers'=>"i",
@@ -18195,17 +16895,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"((2+2)*-3)-7)",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(\\d+|\\((?1)([+*-])(?1)\\)|-(?1))\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -18229,25 +16925,19 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"xxyzz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"xxyzxyzxyzz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(x(y|(?1){2})z)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -18295,17 +16985,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test8 = array('str'=>"<abc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"((< (?: (?(R) \\d++  | [^<>]*+) | (?2)) * >))",
                      'modifiers'=>"x",
@@ -18318,9 +17004,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^a+(*FAIL)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -18332,9 +17016,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"a+b?c+(*FAIL)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -18346,9 +17028,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"a+b?(*PRUNE)c+(*FAIL)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -18360,9 +17040,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"a+b?(*COMMIT)c+(*FAIL)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -18374,9 +17052,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"a+b?(*SKIP)c+(*FAIL)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -18484,9 +17160,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"a+b?(*THEN)c+(*FAIL)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -18522,17 +17196,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"AD",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(A (A|B(*ACCEPT)|C) D)(E)",
                      'modifiers'=>"x",
@@ -18569,17 +17239,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"The quick brown fox",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^\\W*+(?:((.)\\W*+(?1)\\W*+\\2|)|((.)\\W*+(?3)\\W*+\\4|\\W*+.\\W*+))\\W*+\$",
                      'modifiers'=>"i",
@@ -18628,17 +17294,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test8 = array('str'=>"the quick brown fox",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^((.)(?1)\\2|.)\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -18656,17 +17318,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"caz",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(a)(?<=b(?1))",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -18684,17 +17342,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"aaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?<=b(?1))(a)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -18730,25 +17384,19 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"abcdef",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"defabc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(?|(abc)|(def))\\1",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -18772,25 +17420,19 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"defdef",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"abcdef",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(?|(abc)|(def))(?1)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -18814,17 +17456,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"b\"11111",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?:a(?<quote> (?<apostrophe>')|(?<realquote>\")) |b(?<quote> (?<apostrophe>')|(?<realquote>\")) ) (?('quote')[a-z]+|[0-9]+)",
                      'modifiers'=>"xJ",
@@ -18849,17 +17487,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"CAD",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?:(?1)|B)(A(*F)|C)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -18883,33 +17517,25 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"ABCD",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"CAD",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"BAD",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(?:(?1)|B)(A(*F)|C)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -18951,25 +17577,19 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test7 = array('str'=>"ACX",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test8 = array('str'=>"ABC",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?:(?1)|B)(A(*ACCEPT)XX|C)D",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -19018,17 +17638,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"ac",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(?=a(*SKIP)b|ac)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -19046,17 +17662,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"ac",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(?=a(*PRUNE)b)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -19218,9 +17830,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"A(*COMMIT)(B|D)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -19232,25 +17842,19 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"AC",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"CB",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(A(*PRUNE:A)B|C(*PRUNE:B)D)",
                      'modifiers'=>"K",
@@ -19269,9 +17873,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(*MARK:A)(*SKIP:B)(C|X)",
                      'modifiers'=>"KS",
@@ -19284,17 +17886,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"CB",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(A(*THEN:A)B|C(*THEN:B)D)",
                      'modifiers'=>"K",
@@ -19307,9 +17905,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(?:A(*THEN:A)B|C(*THEN:B)D)",
                      'modifiers'=>"K",
@@ -19322,9 +17918,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(?>A(*THEN:A)B|C(*THEN:B)D)",
                      'modifiers'=>"K",
@@ -19376,9 +17970,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(*:A)A+(*SKIP:A)(B|Z)",
                      'modifiers'=>"KS",
@@ -19423,17 +18015,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"DEFGABC",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(*COMMIT)(A|P)(B|P)(C|P)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -19457,9 +18045,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(\\w+)b(*COMMIT)\\w{2}",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -19483,9 +18069,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?>(*COMMIT)(?>yes|no)(*THEN)(*F))?",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -19497,9 +18081,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?>(*COMMIT)(yes|no)(*THEN)(*F))?",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -19529,9 +18111,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(*SKIP)bc",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -19543,9 +18123,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(*SKIP)b",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -19587,33 +18165,25 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"aB",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"Ba",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test7 = array('str'=>"ba",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?i:([^b]))(?1)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -19631,17 +18201,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"aaaaaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(?&t)*+(?(DEFINE)(?<t>a))\\w\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -19683,17 +18249,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"aaaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(a)*+(\\w)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -19717,17 +18279,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"aaaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(?:a)*+(\\w)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -19745,25 +18303,19 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"aaaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"YZ",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(a)++(\\w)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -19781,25 +18333,19 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"aaaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"YZ",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(?:a)++(\\w)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -19853,25 +18399,19 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"aaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"YZ",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(a){2,}+(\\w)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -19889,25 +18429,19 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"aaa",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"YZ",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(?:a){2,}+(\\w)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -19943,25 +18477,19 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"ab",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"aab",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(a)++(?1)b",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -19973,25 +18501,19 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"ab",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"aab",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(a)*+(?1)b",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -20125,9 +18647,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(a)(?1)++ab",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -20310,9 +18830,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^.*? (a(*THEN)b) c",
                      'modifiers'=>"x",
@@ -20351,9 +18869,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^.*? ( (a(*THEN)b) ) c",
                      'modifiers'=>"x",
@@ -20366,9 +18882,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^.*? (?:a(*THEN)b) c",
                      'modifiers'=>"x",
@@ -20407,9 +18921,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^.*? (?: (?:a(*THEN)b) ) c",
                      'modifiers'=>"x",
@@ -20422,9 +18934,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^.*? (?>a(*THEN)b) c",
                      'modifiers'=>"x",
@@ -20463,9 +18973,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^.*? (?> (?>a(*THEN)b) ) c",
                      'modifiers'=>"x",
@@ -20478,9 +18986,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^.*? (a(*THEN)b)++ c",
                      'modifiers'=>"x",
@@ -20519,9 +19025,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^.*? ( (a(*THEN)b)++ )++ c",
                      'modifiers'=>"x",
@@ -20534,9 +19038,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^.*? (?:a(*THEN)b)++ c",
                      'modifiers'=>"x",
@@ -20575,9 +19077,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^.*? (?: (?:a(*THEN)b)++ )++ c",
                      'modifiers'=>"x",
@@ -20602,9 +19102,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^.*?(?(?=a)a|b(*THEN)c)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -20628,9 +19126,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^.*?(?(?=a)a(*THEN)b|c)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -20710,17 +19206,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"xacd",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?<=(a(*COMMIT)b))c",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -20817,9 +19309,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(*MARK:A)(*PRUNE:B)(C|X)",
                      'modifiers'=>"KS",
@@ -20838,9 +19328,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(*MARK:A)(*PRUNE:B)(C|X)",
                      'modifiers'=>"KS",
@@ -20859,9 +19347,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(*MARK:A)(*THEN:B)(C|X)",
                      'modifiers'=>"KS",
@@ -20880,9 +19366,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(*MARK:A)(*THEN:B)(C|X)",
                      'modifiers'=>"KSY",
@@ -20901,9 +19385,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(*MARK:A)(*THEN:B)(C|X)",
                      'modifiers'=>"KS",
@@ -20916,9 +19398,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"A(*MARK:A)A+(*SKIP)(B|Z) | AC",
                      'modifiers'=>"xK",
@@ -20931,9 +19411,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"A(*MARK:A)A+(*MARK:B)(*SKIP:B)(B|Z) | AC",
                      'modifiers'=>"xK",
@@ -20946,9 +19424,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"A(*:A)A+(*SKIP)(B|Z) | AC",
                      'modifiers'=>"xK",
@@ -20961,9 +19437,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"A(*MARK:A)A+(*SKIP:)(B|Z) | AC",
                      'modifiers'=>"xK",
@@ -20988,41 +19462,31 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"XAQQ",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"XAQQXZZ",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test6 = array('str'=>"AXQQQ",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test7 = array('str'=>"AXXQQQ",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"A(*:A)B|XX(*:B)Y",
                      'modifiers'=>"K",
@@ -21047,25 +19511,19 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"AC",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"CB",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(A(*THEN:A)B|C(*THEN:B)D)",
                      'modifiers'=>"K",
@@ -21090,25 +19548,19 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"AC",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"CB",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(A(*PRUNE:A)B|C(*PRUNE:B)D)",
                      'modifiers'=>"K",
@@ -21178,17 +19630,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"abc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"b(*:m)f|a(*:n)w",
                      'modifiers'=>"K",
@@ -21207,25 +19655,19 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"abc",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"abax",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"b(*:m)f|aw",
                      'modifiers'=>"K",
@@ -21251,17 +19693,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"axy",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"a(*PRUNE:X)bc|qq",
                      'modifiers'=>"KY",
@@ -21274,17 +19712,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"axy",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"a(*THEN:X)bc|qq",
                      'modifiers'=>"KY",
@@ -21303,17 +19737,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"abpq",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?=a(*MARK:A)b)..x",
                      'modifiers'=>"K",
@@ -21332,17 +19762,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"abpq",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?=a(*MARK:A)b)..(*:Y)x",
                      'modifiers'=>"K",
@@ -21361,17 +19787,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"abpq",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?=a(*PRUNE:A)b)..x",
                      'modifiers'=>"K",
@@ -21390,17 +19812,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"abpq",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?=a(*PRUNE:A)b)..(*:Y)x",
                      'modifiers'=>"K",
@@ -21419,17 +19837,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"abpq",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?=a(*THEN:A)b)..x",
                      'modifiers'=>"K",
@@ -21448,17 +19862,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"abpq",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?=a(*THEN:A)b)..(*:Y)x",
                      'modifiers'=>"K",
@@ -21483,9 +19893,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(another)?(\\1+)test",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -21582,9 +19990,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^a(*PRUNE)b",
                      'modifiers'=>"s",
@@ -21634,9 +20040,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?>^a)b",
                      'modifiers'=>"s",
@@ -21685,9 +20089,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?>.*)foo",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -21735,9 +20137,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?<=(*SKIP)ac)a",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -21909,9 +20309,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"aaaaa(*COMMIT)b|a+c",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -22098,9 +20496,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(a(*COMMIT)b)c|abd",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -22148,9 +20544,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"abc",
                        'is_match'=>true,
@@ -22186,9 +20580,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"a(?>b(*COMMIT)c)d|abd",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -22224,9 +20616,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?>a(*COMMIT)c)d|abd",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -22250,17 +20640,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test2 = array('str'=>"a",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^(a)?(?(1)a|b)+\$",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -22320,9 +20706,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"A(*PRUNE:A)A+(*SKIP:A)(B|Z) | AC",
                      'modifiers'=>"xK",
@@ -22341,17 +20725,13 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test3 = array('str'=>"abcxy",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^((abc|abcx)(*THEN)y|abcd)",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -22363,9 +20743,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^((yes|no)(*THEN)(*F))?",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -22377,9 +20755,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(A (.*)   C? (*THEN)  | A D) (*FAIL)",
                      'modifiers'=>"x",
@@ -22392,9 +20768,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(A (.*)   C? (*THEN)  | A D) z",
                      'modifiers'=>"x",
@@ -22407,9 +20781,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(A (.*)   C? (*THEN)  | A D) \\s* (*FAIL)",
                      'modifiers'=>"x",
@@ -22422,9 +20794,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(A (.*)   C? (*THEN)  | A D) \\s* z",
                      'modifiers'=>"x",
@@ -22437,9 +20807,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(A (.*)   (?:C|) (*THEN)  | A D) (*FAIL)",
                      'modifiers'=>"x",
@@ -22452,9 +20820,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(A (.*)   (?:C|) (*THEN)  | A D) z",
                      'modifiers'=>"x",
@@ -22467,9 +20833,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(A (.*)   C{0,6} (*THEN)  | A D) (*FAIL)",
                      'modifiers'=>"x",
@@ -22482,9 +20846,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(A (.*)   C{0,6} (*THEN)  | A D) z",
                      'modifiers'=>"x",
@@ -22497,9 +20859,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(A (.*)   (CE){0,6} (*THEN)  | A D) (*FAIL)",
                      'modifiers'=>"x",
@@ -22512,9 +20872,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(A (.*)   (CE){0,6} (*THEN)  | A D) z",
                      'modifiers'=>"x",
@@ -22527,9 +20885,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(A (.*)   (CE*){0,6} (*THEN)  | A D) (*FAIL)",
                      'modifiers'=>"x",
@@ -22542,9 +20898,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(A (.*)   (CE*){0,6} (*THEN)  | A D) z",
                      'modifiers'=>"x",
@@ -22557,9 +20911,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?=a(*COMMIT)b|ac)ac|ac",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -22571,9 +20923,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?=a(*COMMIT)b|(ac)) ac | (a)c",
                      'modifiers'=>"x",
@@ -22670,9 +21020,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?=b(*SKIP)a)bn|bnn",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -22862,9 +21210,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^\\d*\\w{4}",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -22882,9 +21228,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^[^b]*\\w{4}",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -22902,9 +21246,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^[^b]*\\w{4}",
                      'modifiers'=>"i",
@@ -22923,9 +21265,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^a*\\w{4}",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -22943,9 +21283,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"^a*\\w{4}",
                      'modifiers'=>"i",
@@ -23007,25 +21345,19 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test4 = array('str'=>"Afoofoo",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         $test5 = array('str'=>"Abarbar",
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?<n>A)(?:(?<n>foo)|(?<n>bar))\\k<n>",
                      'modifiers'=>"J",
@@ -23218,9 +21550,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?:x|(?:(xx|yy)+|x|x|x|x|x)|a|a|a)bc",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -23344,9 +21674,7 @@ str: 	  \n*/
                        'is_match'=>false,
                        'full'=>false,
                        'index_first'=>array(),
-                       'length'=>array(),
-                       'left'=>array(0),
-                       'next'=>'');
+                       'length'=>array());
 
         return array('regex'=>"(?:(?P=same)?(?:(?P=same)(?P<same>a)(?P=same)|(?P=same)?(?P<same>b)(?P=same)){2}(?P=same)(?P<same>c)(?P=same)){2}(?P<same>z)?",
                      'modifiers'=>"gJ",
