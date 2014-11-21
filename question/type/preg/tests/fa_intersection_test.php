@@ -9,7 +9,11 @@ require_once($CFG->dirroot . '/question/type/poasquestion/stringstream/stringstr
 require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 
-// TODO: 1 class
+/** TODO: 1 class
+ * TODO rewrite
+ * @deprecated
+*/
+/*
 class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
     public function test_word_starts() {
         $description = 'digraph example {
@@ -537,7 +541,7 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
-        public function test_two_lines() {
+    public function test_two_lines_2() {
         $description = 'digraph example {
                             0;
                             3;
@@ -577,7 +581,7 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
-    public function test_two_lines() {
+    public function test_two_lines_3() {
         $description = 'digraph example {
                             0;
                             8;
@@ -585,7 +589,7 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             1->2[label="[\b]"];
                             2->3[label="[b?+]"];
                             3->4[label="[\b]"];
-                            4->5[label="[c*/]"];
+                            4->5[label="[c*//*]"];
                             5->6[label="[\b]"];
                             6->7[label="[d]"];
                             6->7[label="[&]"];
@@ -597,8 +601,8 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             0->1[label = "[a!& ∩ \W]", color = violet];
                             2->4[label = "[b?+ ∩ \W]", color = violet];
                             1->3[label = "[b?+ ∩ \w]", color = violet];
-                            4->6[label = "[c*/ ∩ \w]", color = violet];
-                            3->5[label = "[c*/ ∩ \W]", color = violet];
+                            4->6[label = "[c*//* ∩ \w]", color = violet];
+                            3->5[label = "[c*//* ∩ \W]", color = violet];
                             5->7[label = "[d ∩ \w]", color = violet];
                             6->7[label = "[& ∩ \W]", color = violet];
                         }';
@@ -614,7 +618,7 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
-    public function test_two_lines() {
+    public function test_two_lines_4() {
         $description = 'digraph example {
                             0;
                             8;
@@ -622,7 +626,7 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             1->2[label="[\b]"];
                             2->3[label="[b?+]"];
                             3->4[label="[\b]"];
-                            4->5[label="[c*/]"];
+                            4->5[label="[c*//*]"];
                             5->6[label="[\b]"];
                             6->7[label="[d]"];
                         }';
@@ -631,7 +635,7 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             6;
                             0->1[label = "[a!& ∩ \W]", color = violet];
                             1->3[label = "[b?+ ∩ \w]", color = violet];
-                            3->5[label = "[c*/ ∩ \W]", color = violet];
+                            3->5[label = "[c*//* ∩ \W]", color = violet];
                             5->7[label = "[d ∩ \w]", color = violet];
                         }';
 
@@ -646,7 +650,7 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
-    public function test_two_lines() {
+    public function test_two_lines_5() {
         $description = 'digraph example {
                             0;
                             8;
@@ -654,7 +658,7 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             1->2[label="[\b]"];
                             2->3[label="[b?+]"];
                             3->4[label="[\b]"];
-                            4->5[label="[c*/]"];
+                            4->5[label="[c*//*]"];
                             5->6[label="[\b]"];
                             6->7[label="[&]"];
                         }';
@@ -663,7 +667,7 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             6;
                             0->2[label = "[a!& ∩ \w]", color = violet];
                             2->4[label = "[b?+ ∩ \W]", color = violet];
-                            4->6[label = "[c*/ ∩ \w]", color = violet];
+                            4->6[label = "[c*//* ∩ \w]", color = violet];
                             6->7[label = "[& ∩ \W]", color = violet];
                         }';
 
@@ -687,7 +691,7 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             2->3[label="[\b]"];
                             3->4[label="[b?+]"];
                             4->5[label="[\b]"];
-                            5->6[label="[c*/]"];
+                            5->6[label="[c*//*]"];
                             6->7[label="[\b]"];
                             7->8[label="[d]"];
                             7->8[label="[&]"];
@@ -700,11 +704,11 @@ class qtype_preg_fa_avoid_wordbreaks_test extends PHPUnit_Framework_TestCase {
                             0->2[label = "[^]", color = violet];
                             2->4[label = "[a!& ∩ \w]", color = violet];
                             4->6[label = "[b?+ ∩ \W]", color = violet];
-                            6->8[label = "[c*/ ∩ \w]", color = violet];
+                            6->8[label = "[c*//* ∩ \w]", color = violet];
                             8->9[label = "[& ∩ \W]", color = violet];
                             1->3[label = "[a!& ∩ \W]", color = violet];
                             3->5[label = "[b?+ ∩ \w]", color = violet];
-                            5->7[label = "[c*/ ∩ \W]", color = violet];
+                            5->7[label = "[c*//* ∩ \W]", color = violet];
                             7->9[label = "[d ∩ \w]", color = violet];
                         }';
 
@@ -7045,3 +7049,4 @@ class qtype_preg_fa_intersect_fa_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 }
+*/
