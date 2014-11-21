@@ -3051,13 +3051,13 @@ void print_test_for_full_match(int testnumber, char * bptr, int len, int * use_o
         fprintf(outfile, "%d=>%d", i / 2, logical_offsets[i + 1] - logical_offsets[i]);
     }
 
-    if (count == PCRE_ERROR_NOMATCH) {
+    /*if (count == PCRE_ERROR_NOMATCH) {
         fprintf(outfile, "),\n");
         fprintf(outfile, "                       'left'=>array(0),\n");
         fprintf(outfile, "                       'next'=>'');\n\n");
-    } else {
+    } else {*/
         fprintf(outfile, "));\n\n");
-    }
+    //}
 }
 
 /*************************************************
