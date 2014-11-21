@@ -786,7 +786,7 @@ class qtype_preg_fa {
         foreach ($states as $state) {
             $transitions = $this->get_adjacent_transitions($state, true);
             foreach ($transitions as $transition) {
-                // Check if the transition starts a
+                // Check if the transition starts a backref'd subexpression
                 if ($transition->startsbackrefedsubexprs) {
                     $result[$transition->from] = true;
                 }
@@ -798,7 +798,7 @@ class qtype_preg_fa {
         foreach ($endstates as $subpatt => $states) {
             // Check if current subpattern is a quantifier
             $node = $subpattmap[$subpatt];
-            if ($node->type != qtype_preg_node::TYPE_NODE_FINITE_QUANT && $node->type != qtype_preg_node::TYPE_NODE_INFINITE_QUANT) {
+            if ($node->type != qtype_preg_node::TYPE_NODE_FINITE_QUANT && $node->type != qtype_preg_node::TYPE_NODE_INFINITE_QUANT) {   // TODO: nullable alternation?
                 continue;
             }
             // Get quantifier's end state's inner epsilon closure
