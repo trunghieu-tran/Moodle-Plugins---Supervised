@@ -36,7 +36,7 @@ class qtype_preg_matching_results {
     // No match captured.
     const NO_MATCH_FOUND = -1;
     // No next character generated.
-    const UNKNOWN_NEXT_CHARACTER = '';
+    const UNKNOWN_NEXT_CHARACTER = -1;
     // How many characters left is unknown.
     const UNKNOWN_CHARACTERS_LEFT = 999999999;
 

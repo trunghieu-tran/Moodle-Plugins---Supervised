@@ -204,8 +204,10 @@ class qtype_preg_cross_tests_from_preg {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
+                        'ext_index_first'=>array(0=>0),
+                        'ext_length'=>array(0=>3),
                         'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+                        'next'=>'');
 
         $test4 = array('str'=>'abc',
                        'is_match'=>true,
@@ -458,8 +460,10 @@ class qtype_preg_cross_tests_from_preg {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>4),
+                        'ext_index_first'=>array(0=>0),
+                        'ext_length'=>array(0=>4),
                         'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+                        'next'=>'');
 
         return array('regex'=>'^a[^b]cd$',
                      'tests'=>array($test1, $test2, $test3),
@@ -666,8 +670,10 @@ class qtype_preg_cross_tests_from_preg {
                        'full'=>false,
                        'index_first'=>array(0=>0),
                        'length'=>array(0=>3),
+                       'index_first'=>array(0=>0),
+                       'length'=>array(0=>3),
                        'left'=>array(0),
-                       'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+                       'next'=>'');
 
         return array('regex'=>'abc$',
                      'tests'=>array($test1, $test2),
@@ -680,8 +686,10 @@ class qtype_preg_cross_tests_from_preg {
                        'full'=>false,
                        'index_first'=>array(0=>0),
                        'length'=>array(0=>1),
-                       'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
-                       'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+                       'ext_index_first'=>array(0=>0),
+                       'ext_length'=>array(0=>1),
+                       'left'=>array(1),
+                       'next'=>'a');
 
         $test2 = array('str'=>'ac',
                        'is_match'=>true,
@@ -784,8 +792,10 @@ class qtype_preg_cross_tests_from_preg {
                         'full'=>false,
                         'index_first'=>array(0=>1),
                         'length'=>array(0=>2),
+                        'index_first'=>array(0=>1),
+                        'length'=>array(0=>2),
                         'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+                        'next'=>'');
 
         return array('regex'=>'ab$',
                      'tests'=>array($test1, $test2),
@@ -812,8 +822,10 @@ class qtype_preg_cross_tests_from_preg {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>2),
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2),
                         'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+                        'next'=>'');
 
         return array('regex'=>'^ab$',
                      'tests'=>array($test1, $test2, $test3),
