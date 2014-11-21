@@ -295,7 +295,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
         $checkindexes = $expected['full'] || !$skippartialcheck;
         $checkextendedindexes = $obtained->extendedmatch !== null && array_key_exists('ext_index_first', $expected);
-        $checknext = !$expected['full'] && !$skippartialcheck && $obtained->extendedmatch !== null && $matcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING);
+        $checknext = !$expected['full'] && !$skippartialcheck && $matcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING);
         $checkleft = !$expected['full'] && !$skippartialcheck && $matcher->is_supporting(qtype_preg_matcher::CHARACTERS_LEFT);
 
         // Match existance, indexes and lengths
@@ -343,13 +343,20 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
         // Next character
         if ($checknext) {
-            if ($obtained->extendedmatch !== null) {
-                $obtainednext = $obtained->string_extension();
-            }
+            $obtainednext = $obtained->extendedmatch === null
+                          ? qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER
+                          : $obtained->string_extension();
+
             $pattern = $expected['next'];
-            $char = qtype_poasquestion_string::substr($obtainednext, 0, 1);
-            $nextpassed = (($expected['next'] === $obtainednext && $obtainednext === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) ||
-                           ($expected['next'] !== qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $this->check_next_character($pattern, $char)));
+
+            if ($obtainednext === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) {
+                $nextpassed = ($pattern === $obtainednext);
+            } else {
+                $char = qtype_poasquestion_string::substr($obtainednext, 0, 1);
+                $nextpassed = ($pattern === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $pattern === $obtainednext) ||
+                              ($pattern === '' && $pattern === $obtainednext) ||
+                              ($pattern !== '' && $this->check_next_character($pattern, $char));
+            }
         }
 
         // Left
