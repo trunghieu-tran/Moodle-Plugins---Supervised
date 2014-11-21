@@ -347,7 +347,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
         while (!empty($curstates)) {
             $curstate = array_pop($curstates);
-            if (in_array($curstate->state, $endstates) && ($result === null || $result->length > $curstate->length)) {
+            if (in_array($curstate->state, $endstates) && ($result === null || $curstate->leftmost_shortest($result))) {
                 $result = $curstate;
             }
             $transitions = $this->automaton->get_adjacent_transitions($curstate->state, true);
