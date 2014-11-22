@@ -36,6 +36,36 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         return $lexer->nextToken()->value;
     }
 
+    function test_consumes_false() {
+        $handler = new qtype_preg_fa_matcher('\Wa\W');
+        $transitions = $handler->automaton->get_adjacent_transitions($handler->automaton->start_states()[0], true);
+        $transition = $transitions[0];
+        $transition->consumeschars = false;
+        $handler->match(' a ');
+        $this->assertTrue($handler->get_match_results()->full);
+    }
+
+    function test_intersection_false() {
+        $handler = new qtype_preg_fa_matcher("[a!&]");
+        $transitions = $handler->automaton->get_adjacent_transitions($handler->automaton->start_states()[0], true);
+        $transition = $transitions[0];
+        // Create \W.
+        $flagbigw = new qtype_preg_charset_flag();
+        $flagbigw->set_data(qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::SLASH_W);
+        $flagbigw->negative = true;
+        $charsetbigw = new qtype_preg_leaf_charset();
+        $charsetbigw->flags = array(array($flagbigw));
+        $charsetbigw->userinscription = array(new qtype_preg_userinscription("\W", qtype_preg_charset_flag::SLASH_W));
+        $tranbigw = new qtype_preg_fa_transition(0, $charsetbigw, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST, false);
+        $result = $transition->intersect($tranbigw);
+        $result->from = $transition->from;
+        $result->to = $transition->to;
+        $handler->automaton->remove_transition($transition);
+        $handler->automaton->add_transition($result);
+        $handler->match('!b');
+        $this->assertFalse($handler->get_match_results()->full);
+    }
+
     function test_clone_preg_operator() {
         //Try copying tree for a|b*
         $anode = new qtype_preg_leaf_charset();
