@@ -287,7 +287,7 @@ class qtype_preg_question extends question_graded_automatically
 
             $matchingoptions->notation = $notation;
             $matchingoptions->exactmatch = $exact;
-            if(! is_empty($CFG->qtype_preg_assertfailmode)) {
+            if(! is_null($CFG->qtype_preg_assertfailmode)) {
                 $matchingoptions->mergeassertions = $CFG->qtype_preg_assertfailmode;
             }
 
