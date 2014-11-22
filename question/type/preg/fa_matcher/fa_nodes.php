@@ -558,7 +558,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                             $automaton->remove_transition($tran);
                             $automaton->add_transition($resulttran);
                             //printf($automaton->fa_to_dot());
-                            $changed[] = $resulttran->from;
+                            $changed[] = $resulttran->to;
                         }
                     }
                     if (count($outgoing) == count($uncapturing)) {
@@ -725,7 +725,7 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
         $this->operands[0]->create_automaton($automaton, $stack, $transform);
         $body = array_pop($stack);
         $prevtrans = $automaton->get_adjacent_transitions($body['end'], false);
-
+        $redirectedtransitions = array();
         // Now, clone all transitions from the start state to the end state.
         $greediness = $this->pregnode->lazy ? qtype_preg_fa_transition::GREED_LAZY : qtype_preg_fa_transition::GREED_GREEDY;
         $outgoing = $automaton->get_adjacent_transitions($body['start'], true);
@@ -737,6 +737,7 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
             $newtransition->loopsback = true;
             $newtransition->set_transition_type();
             $automaton->add_transition($newtransition);
+            $redirectedtransitions[] = $transition;
             if ($transform && ($newtransition->type == qtype_preg_fa_transition::TYPE_TRANSITION_EPS || $newtransition->type == qtype_preg_fa_transition::TYPE_TRANSITION_ASSERT)) {
                 qtype_preg_fa_node::go_round_transitions($automaton, $newtransition, array($body['end']));
             }
@@ -753,23 +754,32 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
             }
         }
 
+        
+        // Change end states if automaton was rebuilt with intersection.
+        if (!empty($modified)) {
+            foreach ($prevtrans as $prev) {
+                // Add transitions for coming from cycle without intersection with wordbreak
+                $newend = $automaton->add_state();
+                $prev->to = $newend;
+                $automaton->add_transition($prev);
+            }
+            $body['end'] = $newend;
+                    
+        }
         // The body automaton can be skipped by an eps-transition.
         self::add_ending_eps_transition_if_needed($automaton, $body, $transform);
         $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $transition = new qtype_preg_fa_transition($body['start'], $epsleaf, $body['end']);
         $automaton->add_transition($transition);
-        
-        // Change end states if automaton was rebuilt with intersection.
-        if (!empty($modified)) {
-            $newend = $modified[0];
-            for ($i = 1; $i < count($modified) && $modified[$i]!= $newend; $i++) {
+
+        // Change unconsumed with epsilons.
+        foreach ($redirectedtransitions as $redirected) {
+            if (!$redirected->consumeschars) {
                 $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-                $transition = new qtype_preg_fa_transition($modified[$i], $epsleaf, $newend);
+                $transition = new qtype_preg_fa_transition($redirected->from, $epsleaf, $redirected->to);
                 $automaton->add_transition($transition);
-                qtype_preg_fa_node::go_round_transitions($automaton, $transition, array($newend));
+                $automaton->remove_transition($redirected);
             }
-            $cur['end'] = $newend;
-                    
         }
 
         $stack[] = $body;
