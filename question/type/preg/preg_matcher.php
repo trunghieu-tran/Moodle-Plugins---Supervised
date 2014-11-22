@@ -384,6 +384,8 @@ class qtype_preg_matching_results {
  */
 class qtype_preg_matching_options extends qtype_preg_handling_options {
 
+    /** @var boolean Should matcher merge assertions? */
+    public $mergeassertions = false;
     /** @var boolean Should matcher try to generate extension? */
     public $extensionneeded = true;
     /** @var string Unicode property name for preferred alphabet for \w etc when generating extension.*/

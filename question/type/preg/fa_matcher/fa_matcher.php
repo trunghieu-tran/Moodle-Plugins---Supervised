@@ -890,13 +890,13 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
      * Constructs an FA corresponding to the given node.
      * @return - object of qtype_preg_fa in case of success, null otherwise.
      */
-    protected function build_fa() {
+    protected function build_fa($mergeassertions = false) {
         $result = new qtype_preg_fa($this, $this->get_nodes_with_subexpr_refs());
 
         // The create_automaton() can throw an exception in case of too large finite automaton.
         //try {
             $stack = array();
-            $this->dstroot->create_automaton($result, $stack, false);   // TODO: real value?
+            $this->dstroot->create_automaton($result, $stack, $mergeassertions);
             $body = array_pop($stack);
             $result->calculate_subexpr_start_and_end_states();
             //printf($result->fa_to_dot() . "\n");
@@ -917,7 +917,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             return;
         }
 
-        $this->automaton = self::build_fa();
+        $this->automaton = self::build_fa($this->options->mergeassertions);
         if ($this->automaton === null) {
             $this->errors[] = new qtype_preg_too_complex_error($regex, $this);
             return;
