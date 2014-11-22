@@ -829,6 +829,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
      */
     public function intersect_with_ranges(qtype_preg_leaf_charset $other) {
         $ranges = array();
+        $resrange = array();
         $neg = array();
         $charset = $this->intersect($other);
         foreach ($charset->flags as $flags) {
@@ -839,7 +840,6 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
                         $neg[] = $flag->negative;
                         break;
                     case qtype_preg_charset_flag::TYPE_FLAG:
-                    case qtype_preg_charset_flag::TYPE_UPROP:
                         $ranges[] = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
                         $neg[] = $flag->negative;
                         break;
