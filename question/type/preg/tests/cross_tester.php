@@ -73,15 +73,18 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     const TAG_FROM_PCRE          = 0x0008;
     const TAG_FROM_ATT           = 0x0010;
 
-    const TAG_CATEGORIZE         = 0x0020; // The test determines the matcher's associativity.
-    const TAG_ASSOC_LEFT         = 0x0040; // The test should be used for left-associative matchers.
-    const TAG_ASSOC_RIGHT        = 0x0080; // The test should be used for right-associative matchers.
+    const TAG_CATEGORIZE         = 0x0020; //         // The test determines the matcher's associativity.
+    const TAG_ASSOC_LEFT         = 0x0040; //         // The test should be used for left-associative matchers.
+    const TAG_ASSOC_RIGHT        = 0x0080; //         // The test should be used for right-associative matchers.
 
-    const TAG_MODE_PCRE          = 0x0100; // PCRE compatibility mode which is default.
-    const TAG_MODE_POSIX         = 0x0200; // POSIX compatibility mode.
+    const TAG_MODE_PCRE          = 0x0100; // default // PCRE compatibility mode.
+    const TAG_MODE_POSIX         = 0x0200; //         // POSIX compatibility mode.
 
-    const TAG_DONT_CHECK_PARTIAL = 0x0400; // Indicates that if there's no full match, the cross-tester skips partial match and next character/left checking.
-    const TAG_DEBUG_MODE         = 0x0800; // Informs matchers that it's debug mode.
+    const TAG_FAIL_MODE_AS_IS    = 0x0400; // default // When a match fails on an assertion, the fail position is at the assertion itself. E.g. "ab(?=ab)ac" vs "abac" fails at pos 2.
+    const TAG_FAIL_MODE_MERGE    = 0x0800; //         // When a match fails on an assertion, the fail position is at the affected character in main regex. E.g. "ab(?=ab)ac" vs "abac" fails at pos 3.
+
+    const TAG_DONT_CHECK_PARTIAL = 0x1000; //         // Indicates that if there's no full match, the cross-tester skips partial match and next character/left checking.
+    const TAG_DEBUG_MODE         = 0x2000; //         // Informs matchers that it's debug mode.
 
     const MAX_BUILDING_TIME      = 2000;   // Max time for matchers to be compiled from regex, milliseconds.
     const MAX_MATCHING_TIME      = 2000;   // Max time for matchers to match a string, milliseconds.
@@ -489,6 +492,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                 $timestart = round(microtime(true) * 1000);
                 $options->mode = in_array(self::TAG_MODE_POSIX, $regextags) ? qtype_preg_handling_options::MODE_POSIX : qtype_preg_handling_options::MODE_PCRE;
                 $options->debugmode = in_array(self::TAG_DEBUG_MODE, $regextags);
+                $options->mergeassertions = in_array(self::TAG_FAIL_MODE_MERGE, $regextags);
                 $options->extensionneeded = !in_array(self::TAG_DONT_CHECK_PARTIAL, $regextags);
                 $matcher = $this->question->get_matcher($enginename, $regex, false, $modifiers, null, $notation);
                 $matcher->set_options($options);
