@@ -91,9 +91,11 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         // Render simple colored string if specific feedback is possible and no hint including colored string was rendered.
         if (!$coloredhintrendered && $options->feedback == question_display_options::VISIBLE) {
             $hintobj = $question->hint_object('hintmatchingpart');
-            $hintmessage = $hintobj->render_hint($this, $qa, $options, array('answer' => $currentanswer));
-            if (qtype_poasquestion_string::strlen($hintmessage) > 0) {
-                $hintmessage .= $br;
+            if ($hintobj->hint_available(array('answer' => $currentanswer))) {
+                $hintmessage = $hintobj->render_hint($this, $qa, $options, array('answer' => $currentanswer));
+                if (qtype_poasquestion_string::strlen($hintmessage) > 0) {
+                    $hintmessage .= $br;
+                }
             }
         }
 
