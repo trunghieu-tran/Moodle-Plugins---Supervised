@@ -68,7 +68,7 @@ class qtype_preg_question extends question_graded_automatically
     public $langid;
     /** @var preferred name for a lexem by the teacher. */
     public $lexemusername;
-	public $regextests = array();
+    public $regextests = array();
 
     // Other fields.
     /** @var cache of matcher objects: key is answer id, value is matcher object. */
@@ -287,6 +287,9 @@ class qtype_preg_question extends question_graded_automatically
 
             $matchingoptions->notation = $notation;
             $matchingoptions->exactmatch = $exact;
+            if(! is_empty($CFG->qtype_preg_assertfailmode)) {
+                $matchingoptions->mergeassertions = $CFG->qtype_preg_assertfailmode;
+            }
 
             $engineclass = 'qtype_preg_'.$engine;
             $matcher = new $engineclass($regex, $matchingoptions);
