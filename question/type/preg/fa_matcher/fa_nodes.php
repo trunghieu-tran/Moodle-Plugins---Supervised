@@ -573,6 +573,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                     $automaton->remove_transition($tran);
                 }
             }
+            return $changed;
         }
 
         // Uncapturing transitions are incoming.
@@ -623,8 +624,9 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                     $automaton->remove_transition($tran);
                 }
             }
+            return $changed;
         }
-        return $changed;
+
     }
 
     protected static function concatenate(&$automaton, &$stack, $count, $transform) {
@@ -771,16 +773,6 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
         $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $transition = new qtype_preg_fa_transition($body['start'], $epsleaf, $body['end']);
         $automaton->add_transition($transition);
-
-        // Change unconsumed with epsilons.
-        foreach ($redirectedtransitions as $redirected) {
-            if (!$redirected->consumeschars) {
-                $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-                $transition = new qtype_preg_fa_transition($redirected->from, $epsleaf, $redirected->to);
-                $automaton->add_transition($transition);
-                $automaton->remove_transition($redirected);
-            }
-        }
 
         $stack[] = $body;
     }
