@@ -26,7 +26,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);    // Can't generate a character.
 
         return array('regex'=>'^abc[a-z.?!]\b[a-zA-Z]',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     // For asserts with modifiers.
@@ -54,7 +55,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'\n');
 
         return array('regex'=>'(?m)\Aabc\n^a',
-                     'tests'=>array($test1, $test2, $test3));
+                     'tests'=>array($test1, $test2, $test3),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_modifier_2() {
@@ -86,7 +88,8 @@ class qtype_preg_cross_tests_future {
                         'left'=>array(0=>3),
                         'next'=>'\n');
         return array('regex'=>'(?m)^ab\n^ab',
-                     'tests'=>array($test1, $test2, $test3, $test4));
+                     'tests'=>array($test1, $test2, $test3, $test4),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_modifier_3() {
@@ -121,7 +124,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'\n');
 
         return array('regex'=>'(?m)^ab$\n^ab',
-                     'tests'=>array($test1, $test2, $test3, $test4));
+                     'tests'=>array($test1, $test2, $test3, $test4),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_modifier_4() {
@@ -141,7 +145,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'\n');
 
         return array('regex'=>'(?m)\n^',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_modifier_5() {
@@ -166,7 +171,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>1));
 
         return array('regex'=>'(?m)$\n',
-                     'tests'=>array($test1, $test2, $test3));
+                     'tests'=>array($test1, $test2, $test3),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_modifier_6() {
@@ -192,7 +198,8 @@ class qtype_preg_cross_tests_future {
                         );
 
         return array('regex'=>'(?m)$\n^',
-                     'tests'=>array($test1, $test2, $test3));
+                     'tests'=>array($test1, $test2, $test3),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_modifier_7() {
@@ -205,7 +212,8 @@ class qtype_preg_cross_tests_future {
                         'next'=> 'NEXT_CHAR_CANNOT_GENERATE');
 
         return array('regex'=>'(?m)$a^',
-                     'tests'=>array($test1));
+                     'tests'=>array($test1),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_modifier_8() {
@@ -240,7 +248,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'NEXT_CHAR_END_HERE');
 
         return array('regex'=>'(?m)a\nb\Z\n',
-                     'tests'=>array($test1, $test2, $test3, $test4));
+                     'tests'=>array($test1, $test2, $test3, $test4),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_modifier_9() {
@@ -266,7 +275,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>3));
 
         return array('regex'=>'a\nb\Z',
-                     'tests'=>array($test1, $test2, $test3));
+                     'tests'=>array($test1, $test2, $test3),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_modifier_10() {
@@ -293,7 +303,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>3));
 
         return array('regex'=>'a\nb\z',
-                     'tests'=>array($test1, $test2, $test3));
+                     'tests'=>array($test1, $test2, $test3),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_modifier_11() {
@@ -306,7 +317,8 @@ class qtype_preg_cross_tests_future {
                         'next'=> 'NEXT_CHAR_CANNOT_GENERATE ');
 
         return array('regex'=>'(?D)a$\n',
-                     'tests'=>array($test1));
+                     'tests'=>array($test1),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_modifier_12() {
@@ -326,7 +338,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'\n');
 
         return array('regex'=>'(?m)a[a-z0-9\n]^b',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_modifier_13() {
@@ -345,7 +358,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'\n');
 
         return array('regex'=>'(?m)a$[ab0-9\n]b',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_modifier_14() {
@@ -364,7 +378,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'\n');
 
         return array('regex'=>'(?m)a$[ab0-9\n]^b',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_modifier_15() {
@@ -377,7 +392,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>' NEXT_CHAR_CANNOT_GENERATE ');
 
         return array('regex'=>'(?m)a$[ab0-9]^b',
-                     'tests'=>array($test1));
+                     'tests'=>array($test1),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_modifier_16() {
@@ -416,7 +432,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'\n');
 
         return array('regex'=>'(?m)a(b|$)\n',
-                     'tests'=>array($test1, $test2, $test3, $test4, $test5));
+                     'tests'=>array($test1, $test2, $test3, $test4, $test5),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_modifier_17() {
@@ -453,7 +470,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>2, 1=>1));
 
         return array('regex'=>'(?m)a(b|$\n)',
-                     'tests'=>array($test1, $test2, $test3, $test4, $test5));
+                     'tests'=>array($test1, $test2, $test3, $test4, $test5),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_modifier_18() {
@@ -486,7 +504,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'c');
 
         return array('regex'=>'(?m)a\n(b|^)c',
-                     'tests'=>array($test1, $test2, $test3, $test4));
+                     'tests'=>array($test1, $test2, $test3, $test4),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_modifier_19() {
@@ -517,7 +536,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>4, 1=>3));
 
         return array('regex'=>'(?m)a(ab\n)?',
-                     'tests'=>array($test1, $test2, $test3, $test4));
+                     'tests'=>array($test1, $test2, $test3, $test4),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_modifier_20() {
@@ -550,7 +570,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>10, 1=>3));
 
         return array( 'regex'=>'(?m)(ab$\n)*c',
-                     'tests'=>array($test1, $test2, $test3, $test4));
+                     'tests'=>array($test1, $test2, $test3, $test4),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_modifier_21() {
@@ -583,7 +604,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>9, 1=>3));
 
         return array('regex'=>'(?m)(^ab$\n)+',
-                     'tests'=>array($test1, $test2, $test3, $test4));
+                     'tests'=>array($test1, $test2, $test3, $test4),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_modifier_22() {
@@ -614,7 +636,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>1, 1=>0));
 
         return array('regex'=>'(?m)[a-z\n](^a$\n |)',
-                     'tests'=>array($test1, $test2, $test3, $test4));
+                     'tests'=>array($test1, $test2, $test3, $test4),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_modifier_23() {
@@ -646,7 +669,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>1, 1=>0));
 
         return array('regex'=>'(?m)\n(^|)',
-                     'tests'=>array($test1, $test2, $test3, $test4));
+                     'tests'=>array($test1, $test2, $test3, $test4),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_modifier_24() {
@@ -675,7 +699,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>0, 1=>-1));
 
         return array('regex'=>'(?m)(^a$\n)*',
-                     'tests'=>array($test1, $test2, $test3, $test4));
+                     'tests'=>array($test1, $test2, $test3, $test4),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_modifier_25() {
@@ -714,7 +739,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>5, 1=>1, 2=>1));
 
         return array('regex'=>'(?m)\A(^a|)b($\n)*\z',
-                     'tests'=>array($test1, $test2, $test3, $test4, $test5));
+                     'tests'=>array($test1, $test2, $test3, $test4, $test5),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_modifier_26() {
@@ -743,7 +769,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'NEXT_CHAR_CANNOT_GENERATE');
 
         return array('regex'=>'(?D)\Aabc\n$a',
-                     'tests'=>array($test1, $test2, $test3));
+                     'tests'=>array($test1, $test2, $test3),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_1() {
@@ -754,7 +781,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>2));
 
         return array('regex'=>'\t\bc',
-                     'tests'=>array($test1));
+                     'tests'=>array($test1),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_2() {
@@ -765,7 +793,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>2));
 
         return array('regex'=>'c\b\t',
-                     'tests'=>array($test1));
+                     'tests'=>array($test1),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_3() {
@@ -810,7 +839,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>3));
 
         return array('regex'=>'(?m)\bcat',
-                     'tests'=>array($test1, $test2, $test3));
+                     'tests'=>array($test1, $test2, $test3),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_5() {
@@ -833,7 +863,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>3));
 
         return array('regex'=>'cat\b',
-                     'tests'=>array($test1, $test2, $test3));
+                     'tests'=>array($test1, $test2, $test3),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_6() {
@@ -844,7 +875,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>4));
 
         return array('regex'=>'\b\tcat',
-                     'tests'=>array($test1));
+                     'tests'=>array($test1),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_7() {
@@ -855,7 +887,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>4));
 
         return array('regex'=>'cat\t\b',
-                     'tests'=>array($test1));
+                     'tests'=>array($test1),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_8() {
@@ -876,7 +909,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'a');
 
         return array('regex'=>'\t\Bc',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_9() {
@@ -897,7 +931,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'a');
 
         return array('regex'=>'c\B\t',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_10() {
@@ -916,7 +951,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'c');
 
         return array('regex'=>'a\Bc',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_11() {
@@ -935,7 +971,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'\w');
 
         return array('regex'=>'\Bcat',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_12() {
@@ -954,7 +991,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'c');
 
         return array('regex'=>'cat\B',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_13() {
@@ -977,7 +1015,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>4));
 
         return array('regex'=>'(?m)\B\tcat',
-                     'tests'=>array($test1, $test2, $test3));
+                     'tests'=>array($test1, $test2, $test3),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_14() {
@@ -1000,7 +1039,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>4));
 
         return array('regex'=>'(?m)cat\t\B',
-                     'tests'=>array($test1, $test2, $test3));
+                     'tests'=>array($test1, $test2, $test3),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_15() {
@@ -1011,7 +1051,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>3));
 
         return array('regex'=>'^\bcat\b$',
-                     'tests'=>array($test1));
+                     'tests'=>array($test1),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_16() {
@@ -1022,7 +1063,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>3));
 
         return array('regex'=>'^c\Ba\Bt$',
-                     'tests'=>array($test1));
+                     'tests'=>array($test1),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_17() {
@@ -1033,7 +1075,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>3));
 
         return array('regex'=>'^\bc\Ba\Bt\b$',
-                     'tests'=>array($test1));
+                     'tests'=>array($test1),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_18() {
@@ -1054,7 +1097,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'NEXT_CHAR_CANNOT_GENERATE');
 
         return array('regex'=>'^\Bc\Ba\bt\b$',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     /*function data_for_test_assertions_wordboundary_19() {
@@ -1087,7 +1131,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'c');
 
         return array('regex'=>'[a!?]\b[c+]',
-                     'tests'=>array($test1, $test2, $test3, $test4));
+                     'tests'=>array($test1, $test2, $test3, $test4),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }*/
 
     function data_for_test_assertions_wordboundary_20() {
@@ -1152,7 +1197,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>1, 1=>1, 2=>1));
 
         return array('regex'=>'([a!?]|)\b([c+]|)',
-                     'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9, $test10));
+                     'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9, $test10),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_21() {
@@ -1169,7 +1215,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>4, 1=>1));
 
         return array('regex'=>'[a!&]\b[b?+]\b[c*/]\b(d|&)',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_22() {
@@ -1188,7 +1235,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>4));
 
         return array('regex'=>'[a!&]\b[b?+]\b[c*/]\bd',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_23() {
@@ -1208,7 +1256,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'a');
 
         return array('regex'=>'[a!&]\b[b?+]\b[c*/]\b&',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_24() {
@@ -1232,7 +1281,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>4, 1=>1));
 
         return array('regex'=>'\b[a!&]\b[b?+]\b[c*/]\b(d|&)',
-                     'tests'=>array($test1, $test2, $test3));
+                     'tests'=>array($test1, $test2, $test3),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_25() {
@@ -1250,7 +1300,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>2, 1=>1));
 
         return array('regex'=>'c(at$|\b\t$)',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_26() {
@@ -1281,7 +1332,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>2, 1=>1));
 
         return array('regex'=>'[c!](at$|\b[a\t]$)',
-                     'tests'=>array($test1, $test2, $test3, $test4));
+                     'tests'=>array($test1, $test2, $test3, $test4),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_27() {
@@ -1292,7 +1344,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>3, 1=>2));
 
         return array('regex'=>'c(at$|\Bat$)',
-                     'tests'=>array($test1));
+                     'tests'=>array($test1),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_28() {
@@ -1310,7 +1363,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>4, 1=>3));
 
         return array('regex'=>'\t\b(cat|dog)$',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_29() {
@@ -1339,7 +1393,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>4, 1=>3));
 
         return array('regex'=>'[a\t]\b([c!]at|[d?]og)$',
-                     'tests'=>array($test1, $test2, $test3, $test4));
+                     'tests'=>array($test1, $test2, $test3, $test4),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_30() {
@@ -1359,7 +1414,8 @@ class qtype_preg_cross_tests_future {
 
 
         return array('regex'=>'\t\b(cat|\tog)$',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_31() {
@@ -1376,7 +1432,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>4, 1=>2));
 
         return array('regex'=>'c(at\b|ow)\t',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_32() {
@@ -1405,7 +1462,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>4, 1=>2));
 
         return array('regex'=>'c(a[!t]\b|ow)[a\t]',
-                     'tests'=>array($test1, $test2, $test3, $test4));
+                     'tests'=>array($test1, $test2, $test3, $test4),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_33() {
@@ -1440,7 +1498,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>3, 1=>2));
 
         return array('regex'=>'c(a[!t]\b|ow)',
-                     'tests'=>array($test1, $test2, $test3, $test4, $test5));
+                     'tests'=>array($test1, $test2, $test3, $test4, $test5),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_34() {
@@ -1457,7 +1516,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>4, 1=>2));
 
         return array('regex'=>'c(at|ow)\b\t',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_35() {
@@ -1488,7 +1548,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'\t');
 
         return array('regex'=>'c(a[!t]|ow)\b[a\t]',
-                     'tests'=>array($test1, $test2, $test3, $test4));
+                     'tests'=>array($test1, $test2, $test3, $test4),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_36() {
@@ -1517,7 +1578,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>1, 1=>0));
 
         return array('regex'=>'\b(a|)b',
-                     'tests'=>array($test1, $test2, $test3, $test4));
+                     'tests'=>array($test1, $test2, $test3, $test4),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_37() {
@@ -1534,7 +1596,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>9, 1=>4));
 
         return array('regex'=>'d(\tcat\b)+',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_38() {
@@ -1563,7 +1626,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>12, 1=>3));
 
         return array('regex'=>'d([b\t]ca[t!]\b)+',
-                     'tests'=>array($test1, $test2, $test3, $test4));
+                     'tests'=>array($test1, $test2, $test3, $test4),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_39() {
@@ -1586,7 +1650,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>7, 1=>2));
 
         return array('regex'=>'\ta(\b\ta)*c',
-                     'tests'=>array($test1, $test2, $test3));
+                     'tests'=>array($test1, $test2, $test3),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_40() {
@@ -1615,7 +1680,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>7, 1=>2));
 
         return array('regex'=>'[b\t][a!](\b[b\t][a!])*c',
-                     'tests'=>array($test1, $test2, $test3, $test4));
+                     'tests'=>array($test1, $test2, $test3, $test4),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_41() {
@@ -1632,7 +1698,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>4, 1=>2));
 
         return array('regex'=>'(\ta\b)+',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_42() {
@@ -1667,7 +1734,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>5, 1=>1));
 
         return array('regex'=>'([a!]\b)+',
-                     'tests'=>array($test1, $test2, $test3, $test4, $test5));
+                     'tests'=>array($test1, $test2, $test3, $test4, $test5),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_43() {
@@ -1684,7 +1752,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>4, 1=>1));
 
         return array('regex'=>'(a\B)+',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_44() {
@@ -1703,7 +1772,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'\w');
 
         return array('regex'=>'d(\tcat\B)+',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_45() {
@@ -1728,7 +1798,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>1, 1=>0));
 
         return array('regex'=>'d(\tcat\B)*',
-                     'tests'=>array($test1, $test2, $test3));
+                     'tests'=>array($test1, $test2, $test3),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_46() {
@@ -1745,7 +1816,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>5, 1=>2));
 
         return array('regex'=>'\b(ab)+c',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_47() {
@@ -1768,7 +1840,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>7, 1=>2));
 
         return array('regex'=>'\b([a!]b)+c',
-                     'tests'=>array($test1, $test2, $test3));
+                     'tests'=>array($test1, $test2, $test3),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_48() {
@@ -1797,7 +1870,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>6, 1=>2));
 
         return array('regex'=>'a((\b\t|bde)g)+f',
-                     'tests'=>array($test1, $test2, $test3, $test4));
+                     'tests'=>array($test1, $test2, $test3, $test4),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_49() {
@@ -1808,7 +1882,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>2));
 
         return array('regex'=>'\ba*t',
-                     'tests'=>array($test1));
+                     'tests'=>array($test1),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_50() {
@@ -1825,7 +1900,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>3));
 
         return array('regex'=>'a*\Bt',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_51() {
@@ -1836,7 +1912,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>2));
 
         return array('regex'=>'a\B*t',
-                     'tests'=>array($test1));
+                     'tests'=>array($test1),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_52() {
@@ -1853,7 +1930,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>8, 1=>2));
 
         return array('regex'=>'c(a[t!])+\b[d?]',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_wordboundary_53() {
@@ -1876,7 +1954,8 @@ class qtype_preg_cross_tests_future {
                         'length'=>array(0=>7, 1=>2));
 
         return array('regex'=>'c(a[t!])+\b',
-                     'tests'=>array($test1, $test2, $test3));
+                     'tests'=>array($test1, $test2, $test3),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
 	// Asserts with tags.
@@ -1896,7 +1975,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'\n');
 
 		return array('regex'=>'(?m)a$(c|\nb)',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 	}
 
 	function data_for_test_assertions_tags_2() {
@@ -1915,7 +1995,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'NEXT_CHAR_CANNOT_GENERATE');
 
 		return array('regex'=>'(?m)a(\n|c)(^b)',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 	}
 
 	function data_for_test_assertions_tags_3() {
@@ -1934,7 +2015,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'\n');
 
 		return array('regex'=>'(?m)(a$)(\n|c)',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 	}
 
 	function data_for_test_assertions_tags_4() {
@@ -1953,7 +2035,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'\n');
 
 		return array('regex'=>'(?m)(a$)(\n|c)^b',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 	}
 
 	function data_for_test_assertions_tags_5() {
@@ -1972,7 +2055,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'\n');
 
 		return array('regex'=>'(?m)(a$)(\n|c)(^b)',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 	}
 
 	function data_for_test_assertions_tags_6() {
@@ -1991,7 +2075,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'\n');
 
 		return array('regex'=>'(?m)a$(\n|c)(^b)',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 	}
 
 	function data_for_test_assertions_tags_7() {
@@ -2010,7 +2095,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'\n');
 
 		return array('regex'=>'(?m)(a\n$)(^(\n|c)b)',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 	}
 
 	function data_for_test_assertions_tags_8() {
@@ -2029,7 +2115,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'a');
 
 		return array('regex'=>'(?m)\A(^ab)',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 	}
 
 	function data_for_test_assertions_tags_9() {
@@ -2048,7 +2135,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'\n');
 
 		return array('regex'=>'(?m)(ab$)\Z(\n|c)',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 	}
 
 	function data_for_test_assertions_tags_10() {
@@ -2067,7 +2155,8 @@ class qtype_preg_cross_tests_future {
                         'next'=>'NEXT_CHAR_CANNOT_GENERATE');
 
 		return array('regex'=>'(?m)(\n|a)^b',
-                     'tests'=>array($test1, $test2));
+                     'tests'=>array($test1, $test2),
+					 'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 	}
 
 
