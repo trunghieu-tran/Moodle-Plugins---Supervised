@@ -33,7 +33,7 @@ foreach ((array)$param as $key=>$value) {
 }
 $PAGE->set_url($url);
 
-$qcobject = new question_category_object($pagevars['cpage'], $thispageurl,
+$qcobject = new ajax_question_category_object($pagevars['cpage'], $thispageurl,
         $contexts->having_one_edit_tab_cap('categories'), $param->edit,
         $pagevars['cat'], $param->delete, $contexts->having_cap('moodle/question:add'));
 
