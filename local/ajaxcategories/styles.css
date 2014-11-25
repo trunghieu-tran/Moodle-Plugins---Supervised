@@ -1,0 +1,5 @@
+.ajaxitem .drag-handle {
+    display: inline-block;
+    margin: 0 6px 0 0;
+    cursor: pointer;
+}
