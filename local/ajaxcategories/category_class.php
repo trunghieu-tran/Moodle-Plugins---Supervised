@@ -30,75 +30,79 @@ defined('MOODLE_INTERNAL') || die();
 define('QUESTION_PAGE_LENGTH', 25);
 
 require_once($CFG->libdir . '/listlib.php');
-require_once($CFG->dirroot . '/question/category_class.php');
 require_once($CFG->dirroot . '/question/category_form.php');
 require_once($CFG->dirroot . '/question/move_form.php');
 
 
 /**
- * Class representing a list of ajax question categories
+ * Class representing a list of question categories
  *
  */
-class ajax_question_category_list extends question_category_list {
+class ajax_question_category_list extends moodle_list {
+    public $table = "question_categories";
+    public $listitemclassname = 'ajax_question_category_list_item';
+    /**
+     * @var reference to list displayed below this one.
+     */
+    public $nextlist = null;
+    /**
+     * @var reference to list displayed above this one.
+     */
+    public $lastlist = null;
 
+    public $context = null;
+    public $sortby = 'parent, sortorder, name';
 
     public function __construct($type='ul', $attributes='', $editable = false, $pageurl=null, $page = 0, $pageparamname = 'page', $itemsperpage = 20, $context = null){
-        parent::__construct($type, $attributes, $editable, $pageurl, $page, $pageparamname, $itemsperpage, $context);
-        $this->$listitemclassname = 'ajax_question_category_list_item';
+        parent::__construct('ul', '', $editable, $pageurl, $page, 'cpage', $itemsperpage);
+        $this->context = $context;
+    }
+
+    public function get_records() {
+        $this->records = get_categories_for_contexts($this->context->id, $this->sortby);
     }
 
     /**
-     * Replace category item in choosen place.
+     * Returns html string.
      *
-     * @var $movingid - id of question_category_item replacing category.
-     * @var $environment - array with keys: 'before' - before item id
-     *                                      'after' - after item id
-     *                                      'level' - 'normal' or 'inner'
-     *                                      'dest' - destination list
+     * @param integer $indent depth of indentation.
      */
-    function change_category_list($movingid, $environment) {
-        global $DB;
-        // Change context.
-        if ($environment['dest']->context != $this->context) {
-            // Moving to a new context. Must move files belonging to questions.
-            question_move_category_to_context($movingid, $this->context, $environment['dest']->context);
-        }
-        $item = $this->find_item($movingid);
-        //  Define the place of replacing
-        if ($environment['after'] != -1 && $environment['level'] != "inner") {
-            // Replacing at the same level after some item.
-            $afteritem = $environment['dest']->find_item($environment['after']);
-            if ($environment['level'] != "inner") {
-                // At the same level.
-                if (isset($afteritem->parentlist->parentitem)) {
-                    $newparent = $afteritem->parentlist->parentitem->id;
-                } else {
-                    $newparent = 0;
+    public function to_html($indent=0, $extraargs=array()) {
+        if (count($this->items)) {
+            $tabs = str_repeat("\t", $indent);
+            $first = true;
+            $itemiter = 1;
+            $lastitem = '';
+            $html = '';
+            $html .= html_writer::start_div('ajaxcategorylist');
+            foreach ($this->items as $item) {
+                $html .= html_writer::start_tag('li', $attributes);
+                $html .= html_writer::start_div('ajaxitem');
+                $last = (count($this->items) == $itemiter);
+                if ($this->editable) {
+                    $item->set_icon_html($first, $last, $lastitem);
                 }
-                $DB->set_field($this->table, "parent", $newparent, array("id"=>$item->id));
-                $newpeers = $this->get_items_peers($afteritem->id);
-                $oldkey = array_search($afteritem->id, $newpeers);
-                $neworder = array_merge(array_slice($newpeers, 0, $oldkey+1), array($item->id), array_slice($newpeers, $oldkey+1));
-                $this->reorder_peers($neworder);
-            } else {
-                $newlist = new ajax_question_category_list($this->type, $this->attributes, $this->editable, $this->pageurl, $this->page, $this->pageparamname,  $this->itemsperpage, $this->context);
-                $newlist->parentitem = $afteritem;
-                $newparent = $afteritem->id;
-                $DB->set_field($this->table, "parent", $newparent, array("id"=>$item->id));
+                if ($itemhtml = $item->to_html($indent+1, $extraargs)) {
+                    $html .= $itemhtml;
+                }
+                $html .= html_writer::end_div();
+                $html .= html_writer::end_tag('li');
+                $first = false;
+                $lastitem = $item;
+                $itemiter++;
             }
+            $html .= html_writer::end_div();
         } else {
-            $beforeitem = $environment['dest']->find_item($environment['before']);
-            if (isset($beforeitem->parentlist->parentitem)) {
-                $newparent = $beforeitem->parentlist->parentitem->id;
-            } else {
-                $newparent = 0;
-            }
-            $DB->set_field($this->table, "parent", $newparent, array("id"=>$item->id));
-            $newpeers = $this->get_items_peers($beforeitem->id);
-            $oldkey = array_search($beforeitem->id, $newpeers);
-            $neworder = array_merge(array_slice($newpeers, 0, $oldkey), array($item->id), array_slice($newpeers, $oldkey));
-            $this->reorder_peers($neworder);
+            $html = '';
         }
+        if ($html) { //if there are list items to display then wrap them in ul / ol tag.
+            $tabs = str_repeat("\t", $indent);
+            $html = $tabs.'<'.$this->type.((!empty($this->attributes))?(' '.$this->attributes):'').">\n".$html;
+            $html .= $tabs."</".$this->type.">\n";
+        } else {
+            $html ='';
+        }
+        return $html;
     }
 }
 
@@ -106,8 +110,6 @@ class ajax_question_category_list extends question_category_list {
 /**
  * An item in a list of question categories.
  *
- * @copyright  1999 onwards Martin Dougiamas {@link http://moodle.com}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class ajax_question_category_list_item extends list_item {
     public function set_icon_html($first, $last, $lastitem){
@@ -133,7 +135,10 @@ class ajax_question_category_list_item extends list_item {
         global $CFG, $OUTPUT;
         $str = $extraargs['str'];
         $category = $this->item;
-
+        $attributes = array(
+            'class' => 'ajaxitem',
+            'data-id' => $category->id,
+        );
         $editqestions = get_string('editquestions', 'question');
 
         // Each section adds html to be displayed as part of this list item.
@@ -141,7 +146,7 @@ class ajax_question_category_list_item extends list_item {
         $questionbankurl->param('cat', $category->id . ',' . $category->contextid);
         $catediturl = new moodle_url($this->parentlist->pageurl, array('edit' => $this->id));
         $item = '';
-        $item .= html_writer::tag('a', $OUTPUT->pix_icon('i/move_2d', 'You can drag and drop this category'));
+        $item .= html_writer::div($OUTPUT->pix_icon('i/move_2d', 'You can drag and drop this category'), 'drag-handle');
         $item .= html_writer::tag('b', html_writer::link($catediturl,
                 format_string(' ' . $category->name, true, array('context' => $this->parentlist->context)),
                 array('title' => $str->edit))) . ' ';
@@ -158,6 +163,7 @@ class ajax_question_category_list_item extends list_item {
                             'class' => 'iconsmall', 'alt' => $str->delete)),
                     array('title' => $str->delete));
         }
+
         return $item;
     }
 }
@@ -165,9 +171,6 @@ class ajax_question_category_list_item extends list_item {
 
 /**
  * Class representing q question category
- *
- * @copyright  1999 onwards Martin Dougiamas {@link http://moodle.com}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class ajax_question_category_object {
 
@@ -237,7 +240,7 @@ class ajax_question_category_object {
     public function initialize($page, $contexts, $currentcat, $defaultcategory, $todelete, $addcontexts) {
         $lastlist = null;
         foreach ($contexts as $context){
-            $this->editlists[$context->id] = new question_category_list('ul', '', true, $this->pageurl, $page, 'cpage', QUESTION_PAGE_LENGTH, $context);
+            $this->editlists[$context->id] = new ajax_question_category_list('ul', '', true, $this->pageurl, $page, 'cpage', QUESTION_PAGE_LENGTH, $context);
             $this->editlists[$context->id]->lastlist =& $lastlist;
             if ($lastlist!== null){
                 $lastlist->nextlist =& $this->editlists[$context->id];
