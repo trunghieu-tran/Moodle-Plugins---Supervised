@@ -124,7 +124,7 @@ class qtype_preg_fa_stack_item {
      * Resets the given subpattern to no match.
      */
     protected function begin_subpatt_iteration($node, $matcher) {
-        if (!$matcher->get_options()->capturesubexpressions && $node->subpattern != $this->root_subpatt_number()) {
+        if (!$matcher->get_options()->capturesubexpressions && $node->subpattern != $matcher->get_ast_root()->subpattern) {
             return;
         }
 
@@ -162,7 +162,7 @@ class qtype_preg_fa_stack_item {
 
         // Set matches to ($strpos, -1) for the new iteration.
         foreach ($transition->opentags as $tag) {
-            if (!$options->capturesubexpressions && $tag->subpattern != $this->root_subpatt_number()) {
+            if (!$options->capturesubexpressions && $tag->subpattern != $matcher->get_ast_root()->subpattern) {
                 continue;
             }
             // Starting indexes are always the same, equal $strpos
@@ -172,7 +172,7 @@ class qtype_preg_fa_stack_item {
 
         // Set matches to ($strpos, length) for the ending iterations.
         foreach ($transition->closetags as $tag) {
-            if (!$options->capturesubexpressions && $tag->subpattern != $this->root_subpatt_number()) {
+            if (!$options->capturesubexpressions && $tag->subpattern != $matcher->get_ast_root()->subpattern) {
                 continue;
             }
             $current_match = $this->current_match($tag->subpattern);
@@ -188,7 +188,7 @@ class qtype_preg_fa_stack_item {
             if ($tag->subtype != qtype_preg_node_subexpr::SUBTYPE_SUBEXPR) {
                 continue;
             }
-            if (!$options->capturesubexpressions && $tag->subpattern != $this->root_subpatt_number()) {
+            if (!$options->capturesubexpressions && $tag->subpattern != $matcher->get_ast_root()->subpattern) {
                 continue;
             }
             $this->subexpr_to_subpatt[$tag->number] = $tag;
@@ -334,10 +334,6 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
 
     public function is_full() {
         return $this->is_flag_set(self::FLAG_FULL);
-    }
-
-    protected function root_subpatt_number() {
-        return $this->matcher->get_ast_root()->subpattern;
     }
 
     /**
@@ -557,7 +553,7 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
         }
 
         foreach ($tocompare as $stackitems) {
-            for ($i = $this->root_subpatt_number() + 1; $i <= $this->matcher->get_max_subpatt(); $i++) {
+            for ($i = $this->matcher->get_ast_root()->subpattern + 1; $i <= $this->matcher->get_max_subpatt(); $i++) {
                 $this_match = isset($stackitems[0]->matches[$i]) ? $stackitems[0]->matches[$i] : array(self::empty_subpatt_match());
                 $other_match = isset($stackitems[1]->matches[$i]) ? $stackitems[1]->matches[$i] : array(self::empty_subpatt_match());
 

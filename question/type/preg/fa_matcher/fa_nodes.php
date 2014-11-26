@@ -756,7 +756,7 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
             }
         }
 
-        
+
         // Change end states if automaton was rebuilt with intersection.
         if (!empty($modified)) {
             foreach ($prevtrans as $prev) {
@@ -766,7 +766,7 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
                 $automaton->add_transition($prev);
             }
             $body['end'] = $newend;
-                    
+
         }
         // The body automaton can be skipped by an eps-transition.
         self::add_ending_eps_transition_if_needed($automaton, $body, $transform);
@@ -832,7 +832,7 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
                         qtype_preg_fa_node::go_round_transitions($automaton, $transition, array($newend));
                     }
                     $cur['end'] = $newend;
-                    
+
                 }
                 $stack[] = $cur;
             }
@@ -996,11 +996,11 @@ class qtype_preg_fa_node_cond_subexpr extends qtype_preg_fa_operator {
         }
 
         $concatpos = new qtype_preg_node_concat();
-        $concatpos->operands[] = new qtype_preg_leaf_assert_subexpr_captured(false, $node->number);
+        $concatpos->operands[] = new qtype_preg_leaf_assert_subexpr_captured(false, $node->number, $node->name);
         $concatpos->operands[] = $node->operands[0 + $shift];
 
         $concatneg = new qtype_preg_node_concat();
-        $concatneg->operands[] = new qtype_preg_leaf_assert_subexpr_captured(true, $node->number);
+        $concatneg->operands[] = new qtype_preg_leaf_assert_subexpr_captured(true, $node->number, $node->name);
         $concatneg->operands[] = $node->operands[1 + $shift];
 
         $alt = new qtype_preg_node_alt();

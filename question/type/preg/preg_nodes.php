@@ -1383,13 +1383,16 @@ class qtype_preg_leaf_assert_dollar extends qtype_preg_leaf_assert_capital_esc_z
 
 class qtype_preg_leaf_assert_subexpr_captured extends qtype_preg_leaf_assert {
 
-    /** The number of a subexpression to refer to. */
+    /** Subexpression number to refer to. */
     public $number;
+    /** Subexpression name to refer to. */
+    public $name;
 
-    public function __construct($negative, $number) {
+    public function __construct($negative, $number = null, $name = null) {
         parent::__construct($negative);
         $this->subtype = self::SUBTYPE_SUBEXPR_CAPTURED;
         $this->number = $number;
+        $this->name = $name;
     }
 
     public function match($str, $pos, &$length, $matcherstateobj = null) {
@@ -1414,13 +1417,16 @@ class qtype_preg_leaf_assert_subexpr_captured extends qtype_preg_leaf_assert {
  */
 class qtype_preg_leaf_backref extends qtype_preg_leaf {
 
-    /** The number of a subexpression to refer to. */
+    /** Subexpression number to refer to. */
     public $number;
+    /** Subexpression name to refer to. */
+    public $name;
 
-    public function __construct($number = null) {
+    public function __construct($number = null, $name = null) {
         $this->type = qtype_preg_node::TYPE_LEAF_BACKREF;
         $this->subtype = $this->type;
         $this->number = $number;
+        $this->name = $name;
     }
 
     public function lang_key($usedescription = false) {
@@ -1504,15 +1510,18 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
 
 class qtype_preg_leaf_subexpr_call extends qtype_preg_leaf {
 
-    /** Number of the subexpression to call. All names are converted to numbers by lexer. */
+    /** Subexpression number to call. */
     public $number;
+    /** Subexpression name to call. */
+    public $name;
     /** Is this actually a recursive call? Calculated by parser. */
     public $isrecursive;
 
-    public function __construct($number = null) {
+    public function __construct($number = null, $name = null) {
         $this->type = qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL;
         $this->subtype = $this->type;
         $this->number = $number;
+        $this->name = $name;
         $this->isrecursive = false;
     }
 
@@ -1827,13 +1836,13 @@ class qtype_preg_node_subexpr extends qtype_preg_operator {
     const SUBTYPE_GROUPING = 'grouping_node_subexpr';
 
     /** Subexpression number. */
-    public $number = -1;
+    public $number;
     /** Subexpression name. */
-    public $name = null;
+    public $name;
     /** Is this a duplicate subexpression number or name? */
-    public $isduplicate = false;
+    public $isduplicate;
 
-    public function __construct($subtype, $number = -1, $name = null, $isduplicate = false) {
+    public function __construct($subtype, $number = null, $name = null, $isduplicate = false) {
         $this->type = qtype_preg_node::TYPE_NODE_SUBEXPR;
         $this->subtype = $subtype;
         $this->number = $number;
@@ -1878,13 +1887,16 @@ class qtype_preg_node_cond_subexpr extends qtype_preg_operator {
     /** Negative lookbehind assert. */
     const SUBTYPE_NLB = 'nlb_node_cond_subexpr';
 
-    /** Subexpression number. */
-    public $number = -1;
+    /** Subexpression number to refer to. */
+    public $number;
+    /** Subexpression name to refer to. */
+    public $name;
 
-    public function __construct($subtype = null, $number = -1, $condbranch = null) {
+    public function __construct($subtype = null, $number = null, $name = null, $condbranch = null) {
         $this->type = qtype_preg_node::TYPE_NODE_COND_SUBEXPR;
         $this->subtype = $subtype;
         $this->number = $number;
+        $this->name = $name;
         $this->operands = $condbranch === null ? array() : array($condbranch);   // Assertion condition is the first operand.
     }
 

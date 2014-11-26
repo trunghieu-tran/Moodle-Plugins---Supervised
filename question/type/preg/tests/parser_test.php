@@ -244,7 +244,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $errors = $handler->get_error_nodes();
         $this->assertTrue(count($errors) == 2);
         $root = $handler->get_ast_root();
-        $this->assertTrue($root->number === 'name');
+        $this->assertTrue($root->name === 'name');
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
         $this->assertTrue($root->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR);
         $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
@@ -521,7 +521,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(count($errors) == 1);
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
         $this->assertTrue($root->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR);
-        $this->assertTrue($root->number === 'name');
+        $this->assertTrue($root->name === 'name');
         $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
         $this->assertTrue($root->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         // Empty conditional subexpression with empty assertion but not empty branches.
@@ -588,7 +588,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errors[0]->position->collast === 9);
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
         $this->assertTrue($root->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR);
-        $this->assertTrue($root->number === 'name');
+        $this->assertTrue($root->name === 'name');
         $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
         $this->assertTrue($root->operands[0]->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY);
     }
