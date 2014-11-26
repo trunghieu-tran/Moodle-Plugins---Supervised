@@ -1447,12 +1447,16 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
     public function match($str, $pos, &$length, $matcherstateobj = null) {
         $length = 0;
 
-        if (!$matcherstateobj->is_subexpr_captured($this->number)) {
+        $subexpr = $this->name !== null
+                 ? $this->name
+                 : $this->number;
+
+        if (!$matcherstateobj->is_subexpr_captured($subexpr)) {
             // For no match return the result immediately.
             return false;
         }
 
-        $subexprlen = $matcherstateobj->length($this->number);
+        $subexprlen = $matcherstateobj->length($subexpr);
         if ($subexprlen == 0) {
             // For empty match return the result immediately.
             return true;
@@ -1463,7 +1467,7 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
             return false;
         }
 
-        $start = $matcherstateobj->index_first($this->number);
+        $start = $matcherstateobj->index_first($subexpr);
         $end = $start + $subexprlen - 1;
 
         $strcopy = clone $str;
@@ -1491,11 +1495,15 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
     }
 
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
-        if (!$matcherstateobj->is_subexpr_captured($this->number)) {
+        $subexpr = $this->name !== null
+                 ? $this->name
+                 : $this->number;
+
+        if (!$matcherstateobj->is_subexpr_captured($subexpr)) {
             return array(self::NEXT_CHAR_CANNOT_GENERATE, null);
         }
-        $start = $matcherstateobj->index_first($this->number);
-        $end = $start + $matcherstateobj->length($this->number);
+        $start = $matcherstateobj->index_first($subexpr);
+        $end = $start + $matcherstateobj->length($subexpr);
         if ($end > $newstr->length()) {
             return array(self::NEXT_CHAR_CANNOT_GENERATE, null);
         }
@@ -1504,7 +1512,11 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
     }
 
     public function tohr() {
-        return 'backref #' . $this->number;
+        $subexpr = $this->name !== null
+                 ? $this->name
+                 : $this->number;
+
+        return 'backref #' . $subexpr;
     }
 }
 
