@@ -116,28 +116,28 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             return $result;
         }
 
+        $stackitem = new qtype_preg_fa_stack_item();
+        $stackitem->state = $state;
+        $stackitem->flags = 0x00;
+        $stackitem->matches = array();
+        $stackitem->subexpr_to_subpatt = array(0 => $this->astroot);   // Remember this explicitly
+        $stackitem->last_transition = null;
+        $stackitem->last_match_len = 0;
+
+
         $result = new qtype_preg_fa_exec_state();
         $result->matcher = $this;
         $result->recursionlevel = 0;
-        $result->state = $state;
-
-        $result->matches = array();
-        $result->subexpr_to_subpatt = array(0 => $this->astroot);   // Remember this explicitly
         $result->startpos = $startpos;
         $result->length = 0;
-
-        $result->flags = 0x00;
         $result->left = qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
         $result->extendedmatch = null;
-
         $result->str = clone $str;
-        $result->last_transition = null;
-        $result->last_match_len = 0;
+        $result->stack = array($stackitem);
         $result->backtrack_states = array();
         if (in_array($state, $this->backtrackstates)) {
             $result->backtrack_states[] = $result;
         }
-
         return $result;
     }
 
@@ -194,9 +194,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
     protected function after_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr = 0) {
         $endstates = $this->automaton->end_states($subexpr);
 
-        $newstate->state = $transition->to;
+        $newstate->set_state($transition->to);
 
-        $newstate->set_full(in_array($newstate->state, $endstates));
+        $newstate->set_full(in_array($newstate->state(), $endstates));
         if ($transition->is_start_anchor()) {
             $newstate->set_flag(qtype_preg_fa_exec_state::FLAG_VISITED_START_ANCHOR);
         }
@@ -205,7 +205,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         }
         $newstate->left = $newstate->is_full() ? 0 : qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
         $newstate->last_transition = $transition;
-        $newstate->last_match_len = $length;
+        $newstate->set_last_match_len($length);
 
         $newstate->length += $length;
         $newstate->write_tag_values($transition, $curpos, $length);
@@ -245,7 +245,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         while (!empty($curstates)) {
             // Get the current state and iterate over all transitions.
             $curstate = array_pop($curstates);
-            $transitions = $this->automaton->get_adjacent_transitions($curstate->state, true);
+            $transitions = $this->automaton->get_adjacent_transitions($curstate->state(), true);
             foreach ($transitions as $transition) {
                 if ($transition->greediness == qtype_preg_fa_transition::GREED_ZERO && $subexpr == 0) {
                     // If transition has zero greediness ({0}-quantified) it should be skipped unless
@@ -264,7 +264,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 $this->after_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr);
 
                 // Resolve ambiguities if any.
-                $number = $newstate->state;
+                $number = $newstate->state();
                 $key = $transition->greediness == qtype_preg_fa_transition::GREED_LAZY
                      ? qtype_preg_fa_transition::GREED_LAZY
                      : qtype_preg_fa_transition::GREED_GREEDY;
@@ -282,17 +282,17 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
     protected function get_resume_state($str, $laststate, $subexpr = 0) {
         $endstates = $this->automaton->end_states($subexpr);
 
-        if ($laststate->last_match_len > 0 && $laststate->last_transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
+        if ($laststate->last_match_len() > 0 && $laststate->last_transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
             // The last transition was a partially matched backreference; we can only continue from this transition.
             $backref_length = $laststate->length($laststate->last_transition->pregleaf->number);
-            $prevpos = $laststate->startpos + $laststate->length - $laststate->last_match_len;
+            $prevpos = $laststate->startpos + $laststate->length - $laststate->last_match_len();
 
             $resumestate = clone $laststate;
             $this->after_transition_matched($laststate, $resumestate, $laststate->last_transition, $prevpos, $backref_length, $subexpr);
-            $resumestate->length -= $laststate->last_match_len; // Backreference was partially matched
+            $resumestate->length -= $laststate->last_match_len(); // Backreference was partially matched
 
             // Re-write the string with correct characters.
-            list($flag, $newchr) = $laststate->last_transition->next_character($str, $resumestate->str, $prevpos, $laststate->last_match_len, $laststate);
+            list($flag, $newchr) = $laststate->last_transition->next_character($str, $resumestate->str, $prevpos, $laststate->last_match_len(), $laststate);
             if ($newchr != null) {
                 $resumestate->str->concatenate($newchr);
             }
@@ -304,7 +304,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $curpos = $laststate->startpos + $laststate->length;
 
         // Check for a \Z \z or $ assertion before the eps-closure of the end state. Then it's possible to remove few characters.
-        $transitions = $this->automaton->get_adjacent_transitions($laststate->state, true);
+        $transitions = $this->automaton->get_adjacent_transitions($laststate->state(), true);
         foreach ($transitions as $transition) {
             if ($transition->greediness == qtype_preg_fa_transition::GREED_ZERO && $subexpr == 0) {
                 // If transition has zero greediness ({0}-quantified) it should be skipped unless
@@ -314,10 +314,10 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             if ($transition->loopsback || !($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $transition->pregleaf->is_end_anchor())) {
                 continue;
             }
-            $closure = $this->epsilon_closure(array($laststate->state => $laststate), $subexpr);
+            $closure = $this->epsilon_closure(array($laststate->state() => $laststate), $subexpr);
             $closure = array_merge($closure[qtype_preg_fa_transition::GREED_LAZY], $closure[qtype_preg_fa_transition::GREED_GREEDY]);
             foreach ($closure as $curclosure) {
-                if (in_array($curclosure->state, $endstates)) {
+                if (in_array($curclosure->state(), $endstates)) {
                     // The end state is reachable; return it immediately.
                     $result = clone $laststate;
                     $this->after_transition_matched($laststate, $result, $transition, $curpos, 0, $subexpr);
@@ -338,7 +338,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
     protected function generate_extension_brute_force($str, $laststate, $subexpr = 0) {
         $endstates = $this->automaton->end_states($subexpr);
         $resumestate = $this->get_resume_state($str, $laststate);
-        if (in_array($resumestate->state, $endstates)) {
+        if (in_array($resumestate->state(), $endstates)) {
             return $resumestate;
         }
 
@@ -347,10 +347,10 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
         while (!empty($curstates)) {
             $curstate = array_pop($curstates);
-            if (in_array($curstate->state, $endstates) && ($result === null || $curstate->leftmost_shortest($result))) {
+            if (in_array($curstate->state(), $endstates) && ($result === null || $curstate->leftmost_shortest($result))) {
                 $result = $curstate;
             }
-            $transitions = $this->automaton->get_adjacent_transitions($curstate->state, true);
+            $transitions = $this->automaton->get_adjacent_transitions($curstate->state(), true);
             foreach ($transitions as $transition) {
                 if ($transition->greediness == qtype_preg_fa_transition::GREED_ZERO && $subexpr == 0) {
                     // If transition has zero greediness ({0}-quantified) it should be skipped unless
@@ -408,7 +408,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
     protected function generate_extension_fast($str, $laststate, $subexpr = 0) {
         $endstates = $this->automaton->end_states($subexpr);
         $resumestate = $this->get_resume_state($str, $laststate);
-        if (in_array($resumestate->state, $endstates)) {
+        if (in_array($resumestate->state(), $endstates)) {
             return $resumestate;
         }
 
@@ -417,17 +417,17 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
         // Create an array of processing states for all fa states (the only resumestate, other states are null yet).
         foreach ($this->automaton->get_states() as $curstate) {
-            $states[$curstate] = $curstate === $resumestate->state
+            $states[$curstate] = $curstate === $resumestate->state()
                                ? $resumestate
                                : null;
         }
 
         // Get an epsilon-closure of the resume state.
-        $closure = $this->epsilon_closure(array($resumestate->state => $resumestate), $subexpr);
+        $closure = $this->epsilon_closure(array($resumestate->state() => $resumestate), $subexpr);
         $closure = array_merge($closure[qtype_preg_fa_transition::GREED_LAZY], $closure[qtype_preg_fa_transition::GREED_GREEDY]);
         foreach ($closure as $curclosure) {
-            $states[$curclosure->state] = $curclosure;
-            $curstates[] = $curclosure->state;
+            $states[$curclosure->state()] = $curclosure;
+            $curstates[] = $curclosure->state();
         }
 
         $result = null;
@@ -444,7 +444,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                         $result = $curstate;
                     }
                 }
-                $transitions = $this->automaton->get_adjacent_transitions($curstate->state, true);
+                $transitions = $this->automaton->get_adjacent_transitions($curstate->state(), true);
                 foreach ($transitions as $transition) {
                     if ($transition->greediness == qtype_preg_fa_transition::GREED_ZERO && $subexpr == 0) {
                         // If transition has zero greediness ({0}-quantified) it should be skipped unless
@@ -488,7 +488,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                     //}
 
                     // Save the current result.
-                    $number = $newstate->state;
+                    $number = $newstate->state();
                     if ($flag != qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE && (!isset($reached[$number]) || $newstate->leftmost_shortest($reached[$number]))) {
                         $reached[$number] = $newstate;
                     }
@@ -501,9 +501,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             // Replace curstates with reached.
             foreach ($reached as $curstate) {
                 // Currently stored state needs replacement if it's null, or if it's worse than the new state.
-                if ($states[$curstate->state] === null || $curstate->leftmost_shortest($states[$curstate->state])) {
-                    $states[$curstate->state] = $curstate;
-                    $curstates[] = $curstate->state;
+                if ($states[$curstate->state()] === null || $curstate->leftmost_shortest($states[$curstate->state()])) {
+                    $states[$curstate->state()] = $curstate;
+                    $curstates[] = $curstate->state();
                 }
             }
         }
@@ -532,7 +532,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             while (!empty($curstates)) {
                 // Get the current state and iterate over all transitions.
                 $curstate = array_pop($curstates);
-                $transitions = $this->automaton->get_adjacent_transitions($curstate->state, true);
+                $transitions = $this->automaton->get_adjacent_transitions($curstate->state(), true);
                 foreach ($transitions as $transition) {
                     if ($transition->greediness == qtype_preg_fa_transition::GREED_ZERO && $subexpr == 0) {
                         // If transition has zero greediness ({0}-quantified) it should be skipped unless
@@ -574,7 +574,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                         $newstate = clone $curstate;
                         $newstate->length += $length;
                         $newstate->last_transition = $transition;
-                        $newstate->last_match_len = $length;
+                        $newstate->set_last_match_len($length);
                         $partialmatches[] = $newstate;
                     }
                 }
@@ -635,8 +635,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $closure = $closure[qtype_preg_fa_transition::GREED_GREEDY];
         $curstates = array();
         foreach ($closure as $curclosure) {
-            $states[$curclosure->state] = $curclosure;
-            $curstates[] = $curclosure->state;
+            $states[$curclosure->state()] = $curclosure;
+            $curstates[] = $curclosure->state();
             $endstatereached = $endstatereached || $curclosure->is_full();
         }
 
@@ -648,7 +648,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             while (!empty($curstates)) {
                 // Get the current state and iterate over all transitions.
                 $curstate = $states[array_pop($curstates)];
-                $transitions = $this->automaton->get_adjacent_transitions($curstate->state, true);
+                $transitions = $this->automaton->get_adjacent_transitions($curstate->state(), true);
                 foreach ($transitions as $transition) {
                     if ($transition->greediness == qtype_preg_fa_transition::GREED_ZERO && $subexpr == 0) {
                         // If transition has zero greediness ({0}-quantified) it should be skipped unless
@@ -680,9 +680,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                             if ($transition->greediness == qtype_preg_fa_transition::GREED_LAZY) {
                                 $lazystates[] = $newstate;
                             } else {
-                                $number = $newstate->state;
+                                $number = $newstate->state();
                                 if ((!isset($reached[$number]) || $newstate->leftmost_longest($reached[$number])) &&                    // $reached contains a worse state
-                                    ($states[$newstate->state] === null || $newstate->leftmost_longest($states[$newstate->state]))) {   // $states does not contain a better state
+                                    ($states[$newstate->state()] === null || $newstate->leftmost_longest($states[$newstate->state()]))) {   // $states does not contain a better state
                                     $reached[$number] = $newstate;
                                 }
                             }
@@ -693,7 +693,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                         $newstate = clone $curstate;
                         $newstate->length += $length;
                         $newstate->last_transition = $transition;
-                        $newstate->last_match_len = $length;
+                        $newstate->set_last_match_len($length);
                         $partialmatches[] = $newstate;
                     }
                 }
@@ -713,12 +713,12 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 // Additional filtering for subexpression calls
                 $skip = $firststep && !$this->is_state_subexpr_match_started($newstate, $subexpr);
                 // Currently stored state needs replacement if it's null, or if it's worse than the new state.
-                if (!$skip && ($states[$newstate->state] === null || $newstate->leftmost_longest($states[$newstate->state]))) {
-                    $states[$newstate->state] = $newstate;
+                if (!$skip && ($states[$newstate->state()] === null || $newstate->leftmost_longest($states[$newstate->state()]))) {
+                    $states[$newstate->state()] = $newstate;
 
                     // Important: if a subexpression was called and it's already matched, DON'T add this to curstates
                     if (!$this->is_state_subexpr_match_finished($newstate, $subexpr)) {
-                        $curstates[] = $newstate->state;
+                        $curstates[] = $newstate->state();
                     }
 
                     $endstatereached = $endstatereached || $newstate->is_full();
