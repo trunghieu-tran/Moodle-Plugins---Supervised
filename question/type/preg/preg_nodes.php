@@ -1825,8 +1825,6 @@ class qtype_preg_node_subexpr extends qtype_preg_operator {
     const SUBTYPE_ONCEONLY = 'onceonly_node_subexpr';
     /** Grouping node. For author's tools only.*/
     const SUBTYPE_GROUPING = 'grouping_node_subexpr';
-    /** Duplicate subexpressions. For authoring tools only.*/
-    const SUBTYPE_DUPLICATE_SUBEXPRESSIONS = 'duplicate_node_subexpr';
 
     /** Subexpression number. */
     public $number = -1;

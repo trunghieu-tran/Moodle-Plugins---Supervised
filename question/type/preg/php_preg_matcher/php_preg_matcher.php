@@ -109,12 +109,12 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
     protected function match_inner($str) {
         // Prepare results.
         $matchresults = new qtype_preg_matching_results();
-        $matchresults->set_source_info($str, $this->get_max_subexpr(), $this->get_subexpr_map());// Needed to invalidate match correctly.
+        $matchresults->set_source_info($str, $this->get_max_subexpr(), $this->get_subexpr_name_to_number_map());// Needed to invalidate match correctly.
         $matchresults->invalidate_match();
 
         // Preparing regexp.
         $regex = $this->regex;
-        // Enclose 
+        // Enclose
         if (strpos($regex, '/') !== false) {// Escape any slashes.
             $regex = implode('\/', explode('/', $regex));
         }

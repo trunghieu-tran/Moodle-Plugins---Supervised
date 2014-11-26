@@ -194,7 +194,7 @@ class qtype_preg_lexer extends JLexBase  {
     public function get_max_subexpr() {
         return $this->maxsubexpr;
     }
-    public function get_subexpr_map() {
+    public function get_subexpr_name_to_number_map() {
         return $this->subexpr_name_to_number_map;
     }
     public function get_nodes_with_subexpr_refs() {

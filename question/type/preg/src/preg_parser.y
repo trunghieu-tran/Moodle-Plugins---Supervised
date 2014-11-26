@@ -9,16 +9,24 @@
 %include_class {
     // Root of the Abstract Syntax Tree (AST).
     private $root;
+
     // Objects of qtype_preg_node_error for errors found during the parsing.
     private $errornodes;
+
     // Handling options.
     private $handlingoptions;
+
     // Counter of nodes id. After parsing, equals the number of nodes in the tree.
     private $id_counter;
+
     // Counter of subpatterns.
     private $subpatt_counter;
+
     // Map subpattern number => subpattern node.
-    private $subpatt_map;
+    private $subpatt_number_to_node_map;
+
+    // Map subexpression number => nodes (possibly duplicates).
+    private $subexpr_number_to_nodes_map;
 
     public function __construct($handlingoptions = null) {
         $this->root = null;
@@ -29,7 +37,8 @@
         $this->handlingoptions = $handlingoptions;
         $this->id_counter = 0;
         $this->subpatt_counter = 0;
-        $this->subpatt_map = array();
+        $this->subpatt_number_to_node_map = array();
+        $this->subexpr_number_to_nodes_map = array();
     }
 
     public function get_root() {
@@ -56,8 +65,12 @@
         return $this->subpatt_counter - 1;
     }
 
-    public function get_subpatt_map() {
-        return $this->subpatt_map;
+    public function get_subpatt_number_to_node_map() {
+        return $this->subpatt_number_to_node_map;
+    }
+
+    public function get_subexpr_number_to_nodes_map() {
+        return $this->subexpr_number_to_nodes_map;
     }
 
     /**
@@ -152,30 +165,20 @@
         return $node;
     }
 
-    protected function assign_subpatts($node) {
-        if ($node->is_subpattern() || $node === $this->root) {
-            $node->subpattern = $this->subpatt_counter++;
-            $this->subpatt_map[$node->subpattern] = $node;
-        }
+    protected function build_subexpr_number_to_nodes_map($node) {
         if (is_a($node, 'qtype_preg_operator')) {
             foreach ($node->operands as $operand) {
-                $this->assign_subpatts($operand);
+                $this->build_subexpr_number_to_nodes_map($operand);
             }
+        }
+        if ($node->subtype == qtype_preg_node_subexpr::SUBTYPE_SUBEXPR) {
+            if (!array_key_exists($node->number, $this->subexpr_number_to_nodes_map)) {
+                $this->subexpr_number_to_nodes_map[$node->number] = array();
+            }
+            $this->subexpr_number_to_nodes_map[$node->number][] = $node;
         }
     }
 
-    protected function assign_ids($node) {
-        $node->id = ++$this->id_counter;
-        if (is_a($node, 'qtype_preg_operator')) {
-            foreach ($node->operands as $operand) {
-                $this->assign_ids($operand);
-            }
-        }
-    }
-
-    /**
-     * Calculates $isrecursive for all qtype_preg_leaf_subexpr_call instances.
-     */
     protected function detect_recursive_subexpr_calls($node, $currentsubexprs = array(0)) {
         if ($node->type == qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL) {
             $node->isrecursive = in_array($node->number, $currentsubexprs);
@@ -193,6 +196,25 @@
                 $this->detect_recursive_subexpr_calls($operand, $newsubexprs);
             }
         }
+    }
+
+    protected function replace_non_recursive_subexpr_calls($node) {
+        if (is_a($node, 'qtype_preg_operator')) {
+            foreach ($node->operands as $key => $operand) {
+                $node->operands[$key] = $this->replace_non_recursive_subexpr_calls($operand);
+            }
+        }
+
+        if ($node->type == qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL && !$node->isrecursive && array_key_exists($node->number, $this->subexpr_number_to_nodes_map)) {
+
+            // According to pcre.txt, we are able to replace the node.
+            // Options affected the (?n) leaf do not affect the original node.
+            // But we shoud treat the replacement node as an atomic group.
+            $node = clone $this->subexpr_number_to_nodes_map[$node->number][0];
+            $node->subtype = qtype_preg_node_subexpr::SUBTYPE_GROUPING;   // TODO: onceonly.
+        }
+
+        return $node;
     }
 
     protected function expand_quantifiers($node) {
@@ -237,6 +259,27 @@
         return $node;
     }
 
+    protected function assign_subpatts($node) {
+        if ($node->is_subpattern() || $node === $this->root) {
+            $node->subpattern = $this->subpatt_counter++;
+            $this->subpatt_number_to_node_map[$node->subpattern] = $node;
+        }
+        if (is_a($node, 'qtype_preg_operator')) {
+            foreach ($node->operands as $operand) {
+                $this->assign_subpatts($operand);
+            }
+        }
+    }
+
+    protected function assign_ids($node) {
+        $node->id = ++$this->id_counter;
+        if (is_a($node, 'qtype_preg_operator')) {
+            foreach ($node->operands as $operand) {
+                $this->assign_ids($operand);
+            }
+        }
+    }
+
     protected static function is_alt_nullable($altnode) {
         foreach ($altnode->operands as $operand) {
             if ($operand->type == qtype_preg_node::TYPE_LEAF_META && $operand->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
@@ -266,19 +309,27 @@ start ::= expr(B). {
     // Set the root node.
     $this->root = B;
 
-    // Assign subpattern numbers.
-    $this->assign_subpatts($this->root);
+    // Build subexpr map.
+    $this->build_subexpr_number_to_nodes_map($this->root);
+
+    // Calculate recursive subexpression calls.
+    $this->detect_recursive_subexpr_calls($this->root);
+
+    // Replace non-recursive subexpression calls if needed.
+    if ($this->handlingoptions->replacesubexprcalls) {
+        $this->root = $this->replace_non_recursive_subexpr_calls($this->root);
+    }
 
     // Expand quantifiers if needed.
     if ($this->handlingoptions->expandquantifiers) {
         $this->root = $this->expand_quantifiers($this->root);
     }
 
-    // Assign identifiers.
-    $this->assign_ids($this->root);
+    // Assign subpattern numbers.
+    $this->assign_subpatts($this->root);
 
-    // Calculate recursive subexpression calls.
-    $this->detect_recursive_subexpr_calls($this->root);
+     // Assign identifiers.
+    $this->assign_ids($this->root);
 }
 
 expr(A) ::= PARSELEAF(B). {
