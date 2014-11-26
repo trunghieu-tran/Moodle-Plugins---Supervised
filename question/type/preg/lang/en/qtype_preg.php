@@ -10,8 +10,8 @@
 
 $string['answersinstruct'] = '<p>Enter (at least one) regular expressions in the chosen notation as answers. If a correct answer is given, it should match at least one regular expression with 100% grade.</p><p>You can use placeholders like {$0} in the feedback to insert captured parts of a student\'s response. {$0} will be replaced by the whole match, {$1} with the first subpattern match etc. If the chosen engine doesn\'t support subpattern capturing you should use only {$0}.</p>';
 $string['assertfailmodeasis'] = 'Fast';
-$string['assertfailmodedescription'] = 'Full mode let FA matcher work 100% correctly with simple assertions and enables support for complex assertions, but it works roughtly 2 time slower than fast mode. Fast mode may rarely yield a wrong result in hint generation for complex regexes with world border assertions.';
-$string['assertfailmodelabel'] = 'Assertion support';
+$string['assertfailmodedescription'] = 'Full mode lets the FA engine work 100% correctly with simple assertions and enables support of complex assertions, but it works roughtly 2 times slower than the fast mode. Fast mode may rarely yield a wrong hint in complex regexes with \b or \B assertions.';
+$string['assertfailmodelabel'] = 'Assertion support mode';
 $string['assertfailmodemerge'] = 'Full';
 $string['answerno'] = 'Answer {$a}';
 $string['charhintpenalty'] = 'Penalty for the next character hint';
