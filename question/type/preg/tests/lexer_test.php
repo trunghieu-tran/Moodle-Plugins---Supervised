@@ -497,7 +497,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->subtype === qtype_preg_node_subexpr::SUBTYPE_GROUPING);
-        $map = $lexer->get_subexpr_map();
+        $map = $lexer->get_subexpr_name_to_number_map();
         $this->assertTrue(count($map) === 3);
         for ($i = 1; $i <= 3; $i++) {
             $this->assertTrue($map['name_' . $i] === $i + 1);   // +1 because of the first '('
@@ -555,7 +555,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_BACKREF);
         $this->assertTrue($token->value->number === 'rty');
-        $map = $lexer->get_subexpr_map();
+        $map = $lexer->get_subexpr_name_to_number_map();
         $this->assertTrue(count($map) === 2);
         $this->assertTrue(array_key_exists('qwe', $map) && $map['qwe'] === 1);
         $this->assertTrue(array_key_exists('rty', $map) && $map['rty'] === 2);

@@ -495,7 +495,7 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
         $index[0] = $this->startpos;
         $length[0] = $this->length;
         $result = new qtype_preg_matching_results($this->is_full(), $index, $length, $this->left, $this->extendedmatch);
-        $result->set_source_info($this->str, $this->matcher->get_max_subexpr(), $this->matcher->get_subexpr_map());
+        $result->set_source_info($this->str, $this->matcher->get_max_subexpr(), $this->matcher->get_subexpr_name_to_number_map());
         return $result;
     }
 
@@ -544,7 +544,7 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
             }
         }
 
-        $subpattmap = $this->matcher->get_subpatt_map();
+        $subpattmap = $this->matcher->get_subpatt_number_to_node_map();
         $refsmap = $this->matcher->get_subexpr_refs_map();
 
         // PCRE/POSIX selection goes on below. Iterate over all subpatterns skipping the first which is the whole expression.

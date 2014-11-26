@@ -300,7 +300,7 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
         return $this->maxsubexpr;
     }
 
-    public function get_subexpr_map() {
+    public function get_subexpr_name_to_number_map() {
         return $this->subexpr_name_to_number_map;
     }
 

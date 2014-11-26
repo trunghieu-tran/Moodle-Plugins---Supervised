@@ -143,7 +143,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
     protected function create_nomatch_result($str) {
         $result = new qtype_preg_matching_results();
-        $result->set_source_info($str, $this->get_max_subexpr(), $this->get_subexpr_map());
+        $result->set_source_info($str, $this->get_max_subexpr(), $this->get_subexpr_name_to_number_map());
         $result->invalidate_match();
         return $result;
     }
@@ -911,6 +911,11 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
     }
 
     public function __construct($regex = null, $options = null) {
+        if ($options === null) {
+            $options = new qtype_preg_matching_options();
+        }
+        $options->replacesubexprcalls = true;
+
         parent::__construct($regex, $options);
 
         if (!isset($regex) || !empty($this->errors)) {

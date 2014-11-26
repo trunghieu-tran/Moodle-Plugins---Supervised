@@ -794,7 +794,7 @@ class qtype_preg_fa {
         }
 
         // Second kind of backtrack states: quantifiers have non-empty intersection with next transitions
-        $subpattmap = $this->handler->get_subpatt_map();
+        $subpattmap = $this->handler->get_subpatt_number_to_node_map();
         foreach ($endstates as $subpatt => $states) {
             // Check if current subpattern is a quantifier
             $node = $subpattmap[$subpatt];

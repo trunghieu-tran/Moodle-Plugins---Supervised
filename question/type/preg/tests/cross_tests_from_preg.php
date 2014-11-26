@@ -4987,6 +4987,52 @@ class qtype_preg_cross_tests_from_preg {
                      'tests'=>array($test1));
     }
 
+    function data_for_test_subexpr_call_1() {
+        $test1 = array( 'str'=>'',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'left'=>array(4),
+                        'next'=>'a');
+
+        $test2 = array( 'str'=>'ab',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0,1=>0),
+                        'length'=>array(0=>2,1=>2),
+                        'left'=>array(2),
+                        'next'=>'a');
+
+        $test3 = array( 'str'=>'abab',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0),
+                        'length'=>array(0=>4,1=>2));
+
+        return array('regex'=>'(ab)(?1)',
+                     'tests'=>array($test1, $test2, $test3));
+    }
+
+    function data_for_test_subexpr_call_case_sensitivity() {
+        $test1 = array( 'str'=>'abAB',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0,1=>0),
+                        'length'=>array(0=>2,1=>2),
+                        'left'=>array(2),
+                        'next'=>'a');
+
+        $test2 = array( 'str'=>'abab',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0),
+                        'length'=>array(0=>4,1=>2));
+
+        return array('regex'=>'(ab)(?i:(?1))',
+                     'tests'=>array($test1, $test2));
+    }
+
     /*function data_for_test_leaf_assert_G() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,

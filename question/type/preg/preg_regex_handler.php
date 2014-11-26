@@ -98,6 +98,8 @@ class qtype_preg_handling_options {
     public $preserveallnodes = false;
     /** @var boolean Should parser expand nodes x{m,n} to sequences like xxxx?x?x?x?. */
     public $expandquantifiers = false;
+    /** @var boolean Should parser replace non-recursive subexpr calls (?1) with the subexpr node clone. */
+    public $replacesubexprcalls = false;
     /** @var boolean Are we running in debug mode? If so, engines can print debug information during matching. */
     public $debugmode = false;
     /** @var string Notation, in which regex was passed*/
@@ -443,9 +445,16 @@ class qtype_preg_regex_handler {
     /**
      * Returns subexpressions name => number map.
      */
-    public function get_subexpr_map() {
+    public function get_subexpr_name_to_number_map() {
         if ($this->lexer !== null) {
-            return $this->lexer->get_subexpr_map();
+            return $this->lexer->get_subexpr_name_to_number_map();
+        }
+        return array();
+    }
+
+    public function get_subexpr_number_to_nodes_map() {
+        if ($this->parser !== null) {
+            return $this->parser->get_subexpr_number_to_nodes_map();
         }
         return array();
     }
@@ -453,10 +462,10 @@ class qtype_preg_regex_handler {
     /**
      * Returns subpatterns number => node map.
      */
-    public function get_subpatt_map() {
+    public function get_subpatt_number_to_node_map() {
         $result = array();
         if ($this->parser !== null) {
-            $result = $this->parser->get_subpatt_map();
+            $result = $this->parser->get_subpatt_number_to_node_map();
         }
         if ($this->selectednode !== null) {
             $result[-2] = $this->selectednode;
