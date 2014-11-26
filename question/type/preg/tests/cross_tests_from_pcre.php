@@ -8139,8 +8139,8 @@ class qtype_preg_cross_tests_from_pcre {
         $test4 = array( 'str'=>"b\"11111",
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0,1=>1,3=>1),
-                        'length'=>array(0=>2,1=>1,3=>1),
+                        'index_first'=>array(0=>0,4=>1,6=>1),
+                        'length'=>array(0=>2,4=>1,6=>1),
                         'left'=>array(1),
                         'next'=>'a',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
