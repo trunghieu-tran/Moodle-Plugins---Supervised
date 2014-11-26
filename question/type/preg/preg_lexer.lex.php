@@ -690,18 +690,20 @@ class qtype_preg_lexer extends JLexBase  {
         $number = $this->subexpr_name_to_number_map[$name];
         $topitem = end($this->opt_stack);
         $modJ = $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_DUPNAMES);
-        $assumed_name = $this->subexpr_number_to_name_map[$number];
-        if (!$modJ && $number == $this->lastsubexpr) {
-            // Two subexpressions with same number in a row is error.
-            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBEXPR_NAMES, $name, '');
-            return $error;
+        if ($modJ) {
+            // Just keep on increasing numbers.
+            $this->lastsubexpr++;
+            $this->maxsubexpr = max($this->maxsubexpr, $this->lastsubexpr);
+            return $this->lastsubexpr;
+        } else {
+            // Check if the number is correct.
+            if ($number == $this->lastsubexpr) {
+                // Two subexpressions with same number in a row is error.
+                $error = $this->form_error(qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBEXPR_NAMES, $name, '');
+                return $error;
+            }
+            return $number;
         }
-        if ($modJ && $number == $this->lastsubexpr) {
-            $number++;
-        }
-        $this->lastsubexpr++;
-        $this->maxsubexpr = max($this->maxsubexpr, $this->lastsubexpr);
-        return $number;
     }
     /**
      * Calculates the character for a \cx sequence.

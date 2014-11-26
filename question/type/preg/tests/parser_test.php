@@ -438,6 +438,22 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[0]->operands[2]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[0]->operands[2]->flags[0][0]->data->string() === 'c');
     }
+    function test_parser_duplicate_subexpression_names_with_J() {
+        $options = new qtype_preg_handling_options;
+        $options->set_modifier(qtype_preg_handling_options::MODIFIER_DUPNAMES);
+        $handler = $this->run_handler('(?<n>A)(?:(?<n>foo)|(?<n>bar))\\k<n>', $options);  // taken from PCRE
+        $root = $handler->get_ast_root();
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_CONCAT);
+        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        $this->assertTrue($root->operands[0]->number === 1);
+        $this->assertTrue($root->operands[0]->name === 'n');
+        $this->assertTrue($root->operands[1]->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        $this->assertTrue($root->operands[1]->operands[0]->operands[0]->number === 2);
+        $this->assertTrue($root->operands[1]->operands[0]->operands[0]->name === 'n');
+        $this->assertTrue($root->operands[1]->operands[0]->operands[1]->number === 3);
+        $this->assertTrue($root->operands[1]->operands[0]->operands[1]->name === 'n');
+        $this->assertTrue($root->operands[2]->name === 'n');
+    }
     function test_parser_index() {
         $handler = $this->run_handler('abcdefgh|(abcd)*');
         $root = $handler->get_ast_root();
