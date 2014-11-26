@@ -1396,19 +1396,31 @@ class qtype_preg_leaf_assert_subexpr_captured extends qtype_preg_leaf_assert {
     }
 
     public function match($str, $pos, &$length, $matcherstateobj = null) {
+        $subexpr = $this->name !== null
+                 ? $this->name
+                 : $this->number;
+
         $length = 0;
-        return ($matcherstateobj->is_subexpr_captured($this->number) xor $this->negative);
+        return ($matcherstateobj->is_subexpr_captured($subexpr) xor $this->negative);
     }
 
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
-        $ok = ($matcherstateobj->is_subexpr_captured($this->number) xor $this->negative);
+        $subexpr = $this->name !== null
+                 ? $this->name
+                 : $this->number;
+
+        $ok = ($matcherstateobj->is_subexpr_captured($subexpr) xor $this->negative);
         return $ok ? array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''))
                    : array(self::NEXT_CHAR_CANNOT_GENERATE, null);
     }
 
     public function tohr() {
-        return $this->negative ? '!(' . $this->number . ')'
-                               : '(' . $this->number . ')';
+        $subexpr = $this->name !== null
+                 ? $this->name
+                 : $this->number;
+
+        return $this->negative ? '!(' . $subexpr . ')'
+                               : '(' . $subexpr . ')';
     }
 }
 
@@ -1431,7 +1443,7 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
 
     public function lang_key($usedescription = false) {
         $result = parent::lang_key($usedescription);
-        if ($usedescription && is_string($this->number)) {
+        if ($usedescription && $this->name !== null) {
             $result .= '_name';
         }
         return $result;
@@ -1541,7 +1553,7 @@ class qtype_preg_leaf_subexpr_call extends qtype_preg_leaf {
         $result = parent::lang_key($usedescription);
         if ($usedescription && $this->number === 0) {
             $result .= '_all';
-        } else if ($usedescription && is_string($this->number)) {
+        } else if ($usedescription && $this->name !== null) {
             $result .= '_name';
         }
         return $result;
@@ -1930,7 +1942,7 @@ class qtype_preg_node_cond_subexpr extends qtype_preg_operator {
 
         if ($this->number === 0) {
             $result .= '_all';
-        } else if (is_string($this->number)) {
+        } else if ($this->name !== null) {
             $result .= '_name';
         }
         return $result;
