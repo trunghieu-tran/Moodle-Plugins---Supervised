@@ -7515,8 +7515,8 @@ class qtype_preg_cross_tests_from_pcre {
         $test3 = array( 'str'=>'** Failers',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>4,1=>4),
-                        'length'=>array(0=>1,1=>1),
+                        'index_first'=>array(0=>4),
+                        'length'=>array(0=>1),
                         'left'=>array(5),
                         'next'=>'b',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -8107,8 +8107,8 @@ class qtype_preg_cross_tests_from_pcre {
         $test4 = array( 'str'=>'defdef',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>3),
+                        'index_first'=>array(0=>0,1=>0),
+                        'length'=>array(0=>3,1=>3),
                         'left'=>array(3),
                         'next'=>'a',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -8116,8 +8116,8 @@ class qtype_preg_cross_tests_from_pcre {
         $test5 = array( 'str'=>'abcdef',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>3),
+                        'index_first'=>array(0=>0,1=>0),
+                        'length'=>array(0=>3,1=>3),
                         'left'=>array(3),
                         'next'=>'a',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
