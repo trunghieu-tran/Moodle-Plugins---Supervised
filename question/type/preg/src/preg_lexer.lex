@@ -99,28 +99,29 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
 
     // Check for references to unexisting subexpressions.
     foreach ($this->nodes_with_subexpr_refs as $node) {
-        $number = $node->number;
-        if (is_int($number)) {
-            if ($number > $this->maxsubexpr) {
+        if (is_int($node->number)) {
+            if ($node->number > $this->maxsubexpr) {
                 // Error: unexisting subexpression.
-                $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBEXPR, $number, $node);
+                $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBEXPR, $node->number, $node);
                 $error->set_user_info($node->position, $node->userinscription);
             }
             continue;   // No need for further checks if it's an integer number.
         }
 
-        // Convert name to number.
-        $number = isset($this->subexpr_name_to_number_map[$number]) ? $this->subexpr_name_to_number_map[$number] : null;
+        // Convert names to numbers.
+        if (isset($node->name)) {
+            $number = isset($this->subexpr_name_to_number_map[$node->name]) ? $this->subexpr_name_to_number_map[$node->name] : null;
 
-        if ($number === null && !($node->type == qtype_preg_node::TYPE_NODE_COND_SUBEXPR && $node->number === '')) {
-            // Error: unexisting subexpression.
-            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBEXPR, $node->number, $node);
-            $error->set_user_info($node->position, $node->userinscription);
-        }
+            if ($number === null && !($node->type == qtype_preg_node::TYPE_NODE_COND_SUBEXPR && $node->name === '')) {
+                // Error: unexisting subexpression.
+                $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBEXPR, $node->name, $node);
+                $error->set_user_info($node->position, $node->userinscription);
+            }
 
-        // For matchers: replace name with number for simple usage.
-        if (!$this->options->preserveallnodes) {
-            $node->number = $number;
+            // For matchers: replace name with number for simple usage.
+            //if (!$this->options->preserveallnodes) {
+                $node->number = $number;
+            //}
         }
     }
 
@@ -601,7 +602,7 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
         return $this->form_subexpr($text, qtype_preg_node_subexpr::SUBTYPE_SUBEXPR, $number, $name, $isduplicate);
     }
 
-    protected function form_subexpr($text, $subtype, $number = -1, $name = null, $isduplicate = false) {
+    protected function form_subexpr($text, $subtype, $number = null, $name = null, $isduplicate = false) {
         $node = new qtype_preg_node_subexpr($subtype, $number, $name, $isduplicate);
         $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
         return new JLexToken(qtype_preg_parser::OPENBRACK, $node);
@@ -610,7 +611,7 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     /**
      * Returns a conditional subexpression (number of name condition) token.
      */
-    protected function form_numeric_or_named_cond_subexpr($text, $number, $ending = '') {
+    protected function form_numeric_or_named_cond_subexpr($text, $number, $name, $ending = '') {
         $this->push_options_stack_item();
 
         // Error: unclosed condition.
@@ -619,15 +620,15 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
             return new JLexToken(qtype_preg_parser::OPENBRACK, $error);
         }
 
-        $node = new qtype_preg_node_cond_subexpr(qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR, $number);
+        $node = new qtype_preg_node_cond_subexpr(qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR, $number, $name);
         $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
 
-        if (is_integer($number) && $number == 0) {
+        if (is_integer($number) && $number === 0) {
             // Error: reference to the whole expression.
-            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CONSUBEXPR_ZERO_CONDITION, $number, $node);
-        } else if ($number === '') {
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CONSUBEXPR_ZERO_CONDITION, '', $node);
+        } else if (is_string($name) && $name === '') {
             // Error: assertion expected.
-            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED, $number, $node);
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED, '', $node);
         }
 
         $this->nodes_with_subexpr_refs[] = $node;
@@ -643,7 +644,7 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     /**
      * Returns a conditional subexpression (recursion condition) token.
      */
-    protected function form_recursive_cond_subexpr($text, $number) {
+    protected function form_recursive_cond_subexpr($text, $number, $name) {
         $this->push_options_stack_item();
 
         // Error: unclosed condition.
@@ -652,12 +653,12 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
             return new JLexToken(qtype_preg_parser::OPENBRACK, $error);
         }
 
-        $node = new qtype_preg_node_cond_subexpr(qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION, $number);
+        $node = new qtype_preg_node_cond_subexpr(qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION, $number, $name);
         $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
 
-        if ($number === '') {
+        if ($name === '') {
             // Error: assertion expected.
-            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED, $number, $node);
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED, '', $node);
         }
 
         $closebr = new qtype_preg_lexem();
@@ -727,14 +728,14 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
             return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
         }
 
-        return $this->form_backref($text, $name);
+        return $this->form_backref($text, null, $name);
     }
 
     /**
      * Returns a backreference token.
      */
-    protected function form_backref($text, $number) {
-        $node = new qtype_preg_leaf_backref($number);
+    protected function form_backref($text, $number, $name) {
+        $node = new qtype_preg_leaf_backref($number, $name);
         $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
         $this->set_node_modifiers($node);
         $this->nodes_with_subexpr_refs[] = $node;
@@ -783,16 +784,15 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
             $error = $this->form_error(qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED, $text);
             return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
         }
-        return $this->form_subexpr_call($text, $name);
+        return $this->form_subexpr_call($text, null, $name);
     }
 
     /**
      * Returns a subexpression call token.
      */
-    protected function form_subexpr_call($text, $number) {
-        $node = new qtype_preg_leaf_subexpr_call();
+    protected function form_subexpr_call($text, $number, $name) {
+        $node = new qtype_preg_leaf_subexpr_call($number, $name);
         $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
-        $node->number = $number;
         $this->set_node_modifiers($node);
         $this->nodes_with_subexpr_refs[] = $node;
         return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
@@ -873,7 +873,7 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
 
         $assumed_name = $this->subexpr_number_to_name_map[$number];
 
-        if ($number == $this->lastsubexpr && !$modJ) {
+        if (!$modJ && $number == $this->lastsubexpr) {
             // Two subexpressions with same number in a row is error.
             $error = $this->form_error(qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBEXPR_NAMES, $name, '');
             return $error;
@@ -1056,7 +1056,7 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     $str = qtype_preg_unicode::substr($text, 1);
     if ((int)$str < 8 || ((int)$str <= $this->maxsubexpr && (int)$str < 100)) {
         // Return a backreference.
-        return $this->form_backref($text, (int)$str);
+        return $this->form_backref($text, (int)$str, null);
     }
     // Return a character.
     $octal = '';
@@ -1102,7 +1102,7 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     if ($number < 0) {
         $number = $this->lastsubexpr + $number + 1;
     }
-    return $this->form_backref($text, $number);
+    return $this->form_backref($text, $number, null);
 }
 <YYINITIAL> "\g{"-?[0-9][0-9]?"}" {    /* \g{n} \g{-n}    Backreference by number */
     $text = $this->yytext();
@@ -1111,7 +1111,7 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     if ($number < 0) {
         $number = $this->lastsubexpr + $number + 1;
     }
-    return $this->form_backref($text, $number);
+    return $this->form_backref($text, $number, null);
 }
 <YYINITIAL> "\k<"{ALNUM}*">" {         /* \k<name>        Backreference by name (Perl) */
     return $this->form_named_backref($this->yytext(), 3, '<', '>');
@@ -1305,12 +1305,12 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
 
 <YYINITIAL> "(?R)" {                   /* (?R)            Recurse whole pattern */
     $text = $this->yytext();
-    return $this->form_subexpr_call($text, 0);
+    return $this->form_subexpr_call($text, 0, null);
 }
 <YYINITIAL> "(?"[0-9]+")" {            /* (?n)            Call subexpression by absolute number */
     $text = $this->yytext();
     $number = (int)qtype_preg_unicode::substr($text, 2, $this->yylength() - 3);
-    return $this->form_subexpr_call($text, $number);
+    return $this->form_subexpr_call($text, $number, null);
 }
 <YYINITIAL> "(?"{SIGN}[0-9]+")" {      /* (?+n) (?-n)     Call subexpression by relative number */
     $text = $this->yytext();
@@ -1320,7 +1320,7 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     } else {
         $number = $this->lastsubexpr + $number;
     }
-    return $this->form_subexpr_call($text, $number);
+    return $this->form_subexpr_call($text, $number, null);
 }
 <YYINITIAL> "(?&"{ALNUM}*")" {         /* (?&name)        Call subexpression by name (Perl) */
     $text = $this->yytext();
@@ -1372,20 +1372,20 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     $text = $this->yytext();
     // Special case: (?(R with existing subpattern named "R"
     if ($text == '(?(R)' && array_key_exists('R', $this->subexpr_name_to_number_map)) {
-        return $this->form_numeric_or_named_cond_subexpr($text, 'R', ')');
+        return $this->form_numeric_or_named_cond_subexpr($text, null, 'R', ')');
     }
     $number = (int)qtype_preg_unicode::substr($text, 4, $this->yylength() - 5);
-    return $this->form_recursive_cond_subexpr($text, $number);
+    return $this->form_recursive_cond_subexpr($text, $number, null);
 }
 <YYINITIAL> "(?(R&"{ALNUM}*")"? {      /* (?(name)...               Conditional subexpression - specific recursion condition */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 5, $this->yylength() - 6);
-    return $this->form_recursive_cond_subexpr($text, $name);
+    return $this->form_recursive_cond_subexpr($text, null, $name);
 }
 <YYINITIAL> "(?("[0-9]+")"? {          /* (?(n)...                  Conditional subexpression - absolute reference condition */
     $text = $this->yytext();
     $number = (int)qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_numeric_or_named_cond_subexpr($text, $number, ')');
+    return $this->form_numeric_or_named_cond_subexpr($text, $number, null, ')');
 }
 <YYINITIAL> "(?("{SIGN}[0-9]+")"? {    /* (?(+n)... or (?(-n)...    Conditional subexpression - relative reference condition */
     $text = $this->yytext();
@@ -1395,22 +1395,22 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     } else {
         $number = $this->lastsubexpr + $number;
     }
-    return $this->form_numeric_or_named_cond_subexpr($text, $number, ')');
+    return $this->form_numeric_or_named_cond_subexpr($text, $number, null, ')');
 }
 <YYINITIAL> "(?(<"{ALNUM}*(">)")? {    /* (?(<name>)...             Conditional subexpression - named reference condition (Perl) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 4, $this->yylength() - 6);
-    return $this->form_numeric_or_named_cond_subexpr($text, $name, '>)');
+    return $this->form_numeric_or_named_cond_subexpr($text, null, $name, '>)');
 }
 <YYINITIAL> "(?('"{ALNUM}*("')")? {    /* (?('name')...             Conditional subexpression - named reference condition (Perl) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 4, $this->yylength() - 6);
-    return $this->form_numeric_or_named_cond_subexpr($text, $name, "')");
+    return $this->form_numeric_or_named_cond_subexpr($text, null, $name, "')");
 }
 <YYINITIAL> "(?("{ALNUM}*")"? {        /* (?(name)...               Conditional subexpression - named reference condition (PCRE) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_numeric_or_named_cond_subexpr($text, $name, ")");
+    return $this->form_numeric_or_named_cond_subexpr($text, null, $name, ")");
 }
 
 

@@ -388,8 +388,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $matchoptions = new qtype_preg_matching_options();  // Forced subexpression catupring.
         $matcher = new qtype_preg_fa_matcher($regex, $matchoptions);
         $matcher->match('abc');
-        $backref = new qtype_preg_leaf_backref();
-        $backref->number = 1;
+        $backref = new qtype_preg_leaf_backref(1);
         $backref->matcher = $matcher;
 
         // Matching at the end of the string.
@@ -414,8 +413,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $matchoptions = new qtype_preg_matching_options();  // Forced subexpression catupring.
         $matcher = new qtype_preg_fa_matcher($regex, $matchoptions);
         $matcher->match('abc');
-        $backref = new qtype_preg_leaf_backref();
-        $backref->number = 1;
+        $backref = new qtype_preg_leaf_backref(1);
         $backref->matcher = $matcher;
 
         // Reaching the end of the string.
@@ -440,8 +438,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $matchoptions = new qtype_preg_matching_options();  // Forced subexpression catupring.
         $matcher = new qtype_preg_fa_matcher($regex, $matchoptions);
         $matcher->match('abc');
-        $backref = new qtype_preg_leaf_backref();
-        $backref->number = 1;
+        $backref = new qtype_preg_leaf_backref(1);
         $backref->matcher = $matcher;
 
         $str = new qtype_poasquestion_string('abcabc');
@@ -459,8 +456,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $matcher = new qtype_preg_fa_matcher($regex, $matchoptions);
         $matcher->match('');
         $this->assertTrue($matcher->get_match_results()->full);
-        $backref = new qtype_preg_leaf_backref();
-        $backref->number = 1;
+        $backref = new qtype_preg_leaf_backref(1);
         $backref->matcher = $matcher;
 
         $str = new qtype_poasquestion_string('');
@@ -477,8 +473,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $matchoptions = new qtype_preg_matching_options();  // Forced subexpression catupring.
         $matcher = new qtype_preg_fa_matcher($regex, $matchoptions);
         $matcher->match('ab');
-        $backref = new qtype_preg_leaf_backref();
-        $backref->number = 1;
+        $backref = new qtype_preg_leaf_backref(1);
         $backref->matcher = $matcher;
 
         // 2 characters matched
