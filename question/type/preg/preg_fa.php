@@ -34,7 +34,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
  */
 class qtype_preg_fa_transition {
 
-    const GREED_ZERO = 1;
+    //const GREED_ZERO = 1;
     const GREED_LAZY = 2;
     const GREED_GREEDY = 4;
     const GREED_POSSESSIVE = 8;
@@ -889,6 +889,10 @@ class qtype_preg_fa {
                         continue;
                     }
                     if ($subexpronly && $tag->type != qtype_preg_node::TYPE_NODE_SUBEXPR && $tag->subpattern != $this->handler->get_ast_root()->subpattern) {
+                        continue;
+                    }
+                    // Do not count duplicate subexpressions
+                    if ($subexpronly && $tag->type == qtype_preg_node::TYPE_NODE_SUBEXPR && $tag->isduplicate) {
                         continue;
                     }
                     $keys = array();

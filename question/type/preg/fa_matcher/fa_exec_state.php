@@ -30,6 +30,9 @@ require_once($CFG->dirroot . '/question/type/preg/fa_matcher/fa_nodes.php');
 
 class qtype_preg_fa_stack_item {
 
+    // The subexpression number being matched.
+    public $subexpr;
+
     // The corresponding fa state.
     public $state;
 
@@ -91,15 +94,6 @@ class qtype_preg_fa_stack_item {
         }
 
         return qtype_preg_fa_exec_state::empty_subpatt_match();
-    }
-
-    public function has_duplicate_subexpression() {
-        foreach ($this->subexpr_to_subpatt as $node) {
-            if ($node->type === qtype_preg_node::TYPE_NODE_SUBEXPR && $node->isduplicate) {
-                return true;
-            }
-        }
-        return false;
     }
 
     // TODO
@@ -279,6 +273,11 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
 
 /// wrapper functions
 
+    public function subexpr() {
+        $end = end($this->stack);
+        return $end->subexpr;
+    }
+
     public function state() {
         $end = end($this->stack);
         return $end->state;
@@ -309,8 +308,6 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
         $end->last_match_len = $value;
     }
 
-///
-
     public function set_flag($flag) {
         $end = end($this->stack);
         $end->flags = ($end->flags | $flag);
@@ -338,6 +335,8 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
     public function is_full() {
         return $this->is_flag_set(self::FLAG_FULL);
     }
+
+///
 
     /**
      * Returns the current match for the given subpattern number. If there was no attemt to match, returns null.
@@ -423,18 +422,19 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
         return $hasattempts ? self::empty_subpatt_match() : null;
     }
 
-    public function has_duplicate_subexpression() {
-        $end = end($this->stack);
-        return $end->has_duplicate_subexpression();
-    }
-
     public function is_subexpr_match_started($subexpr) {
         $end = end($this->stack);
+        if ($subexpr == 0 && $end->subexpr == 0) {
+            return true;
+        }
         return $end->is_subexpr_match_started($subexpr);
     }
 
     public function is_subexpr_match_finished($subexpr) {
         $end = end($this->stack);
+        if ($subexpr == 0 && $end->subexpr == 0) {
+            return false;
+        }
         return $end->is_subexpr_match_finished($subexpr);
     }
 
@@ -453,10 +453,6 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
     public function is_subexpr_captured($subexpr) {
         $last = $this->last_subexpr_match($subexpr);
         return $last !== null && self::is_completely_captured($last[0], $last[1]);
-    }
-
-    public function match_from_pos_internal($str, $startpos, $subexpr = 0, $recursionlevel = 0) {
-        return $this->matcher->match_from_pos_internal($str, $startpos, $subexpr, $recursionlevel);
     }
 
     public function start_pos() {
