@@ -166,7 +166,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             }
 
             if ($result) {
-                $this->after_transition_matched($curstate, $newstate, $tr, $curpos, $tmplength);
+                $this->after_transition_matched($newstate, $tr, $curpos, $tmplength);
             }
 
             // Increase curpos and length anyways, even if the match is partial (backrefs)
@@ -185,7 +185,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
     /**
      * Updates all fields in the newstate after a transition match
      */
-    protected function after_transition_matched($curstate, $newstate, $transition, $curpos, $length) {
+    protected function after_transition_matched($newstate, $transition, $curpos, $length) {
         $endstates = $this->automaton->end_states($newstate->subexpr());
 
         $newstate->set_state($transition->to);
@@ -232,7 +232,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
                 // Create a new state.
                 $newstate = clone $curstate;
-                $this->after_transition_matched($curstate, $newstate, $transition, $curpos, $length);
+                $this->after_transition_matched($newstate, $transition, $curpos, $length);
 
                 // Resolve ambiguities if any.
                 $number = $newstate->state();
@@ -259,7 +259,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             $prevpos = $laststate->startpos + $laststate->length - $laststate->last_match_len();
 
             $resumestate = clone $laststate;
-            $this->after_transition_matched($laststate, $resumestate, $laststate->last_transition, $prevpos, $backref_length);
+            $this->after_transition_matched($resumestate, $laststate->last_transition, $prevpos, $backref_length);
             $resumestate->length -= $laststate->last_match_len(); // Backreference was partially matched
 
             // Re-write the string with correct characters.
@@ -286,7 +286,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 if (in_array($curclosure->state(), $endstates)) {
                     // The end state is reachable; return it immediately.
                     $result = clone $laststate;
-                    $this->after_transition_matched($laststate, $result, $transition, $curpos, 0);
+                    $this->after_transition_matched($result, $transition, $curpos, 0);
                     return $result;
                 }
             }
@@ -340,7 +340,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
                 // Create a new state.
                 $newstate = clone $curstate;
-                $this->after_transition_matched($curstate, $newstate, $transition, $newstate->startpos + $curstate->length, $length);
+                $this->after_transition_matched($newstate, $transition, $newstate->startpos + $curstate->length, $length);
 
                 // Generate a next character.
                 //if ($length > 0) {
@@ -432,7 +432,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
                     // Create a new state.
                     $newstate = clone $curstate;
-                    $this->after_transition_matched($curstate, $newstate, $transition, $newstate->startpos + $curstate->length, $length);
+                    $this->after_transition_matched($newstate, $transition, $newstate->startpos + $curstate->length, $length);
 
                     // Generate a next character.
                     //if ($length > 0) {

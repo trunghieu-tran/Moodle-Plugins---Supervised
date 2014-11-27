@@ -96,6 +96,18 @@ class qtype_preg_fa_stack_item {
         return qtype_preg_fa_exec_state::empty_subpatt_match();
     }
 
+    public function last_subexpr_match($mode, $subexpr) {
+        if (!isset($this->subexpr_to_subpatt[$subexpr])) {
+            return null;
+        }
+        $subpatt = $this->subexpr_to_subpatt[$subexpr]->subpattern;
+        $last = $this->last_match($mode, $subpatt);
+        if (qtype_preg_fa_exec_state::is_completely_captured($last[0], $last[1])) {
+            return $last;
+        }
+        return qtype_preg_fa_exec_state::empty_subpatt_match();
+    }
+
     // TODO
     public function is_subexpr_match_started($subexpr) {
         if (!isset($this->subexpr_to_subpatt[$subexpr])) {
@@ -210,6 +222,32 @@ class qtype_preg_fa_stack_item {
             }
         }
         return false;
+    }
+
+    public function subpatts_to_string() {
+        $res = '';
+        foreach ($this->matches as $subpatt => $repetitions) {
+            $res .= $subpatt . ': ';
+            foreach ($repetitions as $repetition) {
+                $ind = $repetition[0];
+                $len = $repetition[1];
+                $res .= "($ind, $len) ";
+            }
+            $res .= "\n";
+        }
+        return $res;
+    }
+
+    public function subexprs_to_string($mode) {
+        $res = '';
+        foreach ($this->subexpr_to_subpatt as $subexpr => $node) {
+            $lastmatch = $this->last_subexpr_match($mode, $node->subpattern);
+            $ind = $lastmatch[0];
+            $len = $lastmatch[1];
+            $res .= $subexpr . ": ($ind, $len) ";
+        }
+        $res .= "\n";
+        return $res;
     }
 }
 
@@ -408,14 +446,10 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
         $hasattempts = false;
 
         foreach ($array as $item) {
-            if (!isset($item->subexpr_to_subpatt[$subexpr])) {
-                continue;   // Can get here when {0} occurs in the regex.
-            }
-            $hasattempts = true;
-            $subpatt = $item->subexpr_to_subpatt[$subexpr]->subpattern;
-            $last = $item->last_match($this->matcher->get_options()->mode, $subpatt);
-            if (self::is_completely_captured($last[0], $last[1])) {
-                return $last;
+            $cur = $item->last_subexpr_match($this->matcher->get_options()->mode, $subexpr);
+            $hasattempts = $hasattempts || ($cur !== null);
+            if (self::is_completely_captured($cur[0], $cur[1])) {
+                return $cur;
             }
         }
 
