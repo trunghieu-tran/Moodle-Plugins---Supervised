@@ -111,22 +111,12 @@ class qtype_preg_fa_stack_item {
         return qtype_preg_fa_exec_state::empty_subpatt_match();
     }
 
-    // TODO
     public function is_subexpr_match_started($subexpr) {
         if (!isset($this->subexpr_to_subpatt[$subexpr])) {
             return false;
         }
         $current = $this->current_match($this->subexpr_to_subpatt[$subexpr]->subpattern);
         return ($current !== null && $current[0] !== qtype_preg_matching_results::NO_MATCH_FOUND);
-    }
-
-    // TODO
-    public function is_subexpr_match_finished($subexpr) {
-        if (!isset($this->subexpr_to_subpatt[$subexpr])) {
-            return false;
-        }
-        $current = $this->current_match($this->subexpr_to_subpatt[$subexpr]->subpattern);
-        return ($current !== null && qtype_preg_fa_exec_state::is_completely_captured($current[0], $current[1]));
     }
 
     /**
@@ -462,18 +452,10 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
 
     public function is_subexpr_match_started($subexpr) {
         $end = end($this->stack);
-        if ($subexpr == 0 && $end->subexpr == 0 || empty($end->matches)) {
+        if ($subexpr == 0 && $end->subexpr == 0) {
             return true;
         }
         return $end->is_subexpr_match_started($subexpr);
-    }
-
-    public function is_subexpr_match_finished($subexpr) {
-        $end = end($this->stack);
-        if ($subexpr == 0 && $end->subexpr == 0 || empty($end->matches)) {
-            return false;
-        }
-        return $end->is_subexpr_match_finished($subexpr);
     }
 
     public function index_first($subexpr = 0) {
