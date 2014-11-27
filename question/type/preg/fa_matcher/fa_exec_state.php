@@ -703,30 +703,4 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
         $end = end($this->stack);
         $end->write_tag_values($transition, $strpos, $matchlen, $this->matcher);
     }
-
-    public function subpatts_to_string() {
-        $res = '';
-        foreach ($this->matches as $subpatt => $repetitions) {
-            $res .= $subpatt . ': ';
-            foreach ($repetitions as $repetition) {
-                $ind = $repetition[0];
-                $len = $repetition[1];
-                $res .= "($ind, $len) ";
-            }
-            $res .= "\n";
-        }
-        return $res;
-    }
-
-    public function subexprs_to_string() {
-        $res = '';
-        foreach ($this->subexpr_to_subpatt as $subexpr => $node) {
-            $lastmatch = $this->last_match($node->subpattern);
-            $ind = $lastmatch[0];
-            $len = $lastmatch[1];
-            $res .= $subexpr . ": ($ind, $len) ";
-        }
-        $res .= "\n";
-        return $res;
-    }
 }
