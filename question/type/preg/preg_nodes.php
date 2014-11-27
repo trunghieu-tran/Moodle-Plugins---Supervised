@@ -246,16 +246,6 @@ interface qtype_preg_matcher_state {
      * Returns whether the given subexpression is captured.
      */
     public function is_subexpr_captured($subexpression);
-
-    /**
-     * Starting position of the match.
-     */
-    public function start_pos();
-
-    /**
-     * Current recursion level.
-     */
-    public function recursion_level();
 }
 
 /**
@@ -1555,15 +1545,9 @@ class qtype_preg_leaf_subexpr_call extends qtype_preg_leaf {
     }
 
     public function match($str, $pos, &$length, $matcherstateobj = null) {
+        // Matchers should handle subexpr calls without this node
         $length = 0;
-        /*$result = $matcherstateobj->match_from_pos_internal($str, $matcherstateobj->start_pos(), $this->number, $matcherstateobj);
-        // is_full() should be set if the needed subexpression is captured.
-        if ($result->is_full()) {
-            $length = $result->length() - $pos;
-            return true;
-        }*/
-        // TODO
-        return false;
+        return true;
     }
 
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {

@@ -33,6 +33,9 @@ class qtype_preg_fa_stack_item {
     // The subexpression number being matched.
     public $subexpr;
 
+    // Position where recursion was started.
+    public $recursionstartpos;
+
     // The corresponding fa state.
     public $state;
 
@@ -266,9 +269,6 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
     // FA being executed.
     public $matcher;
 
-    // Level of recursion
-    public $recursionlevel;
-
     // Starting position of the match.
     public $startpos;
 
@@ -314,6 +314,10 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
     public function subexpr() {
         $end = end($this->stack);
         return $end->subexpr;
+    }
+
+    public function recursion_level() {
+        return count($this->stack) - 1;
     }
 
     public function state() {
@@ -487,14 +491,6 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
     public function is_subexpr_captured($subexpr) {
         $last = $this->last_subexpr_match($subexpr);
         return $last !== null && self::is_completely_captured($last[0], $last[1]);
-    }
-
-    public function start_pos() {
-        return $this->startpos;
-    }
-
-    public function recursion_level() {
-        return $this->recursionlevel;
     }
 
     public function to_matching_results() {
