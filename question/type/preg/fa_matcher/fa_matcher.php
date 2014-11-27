@@ -681,8 +681,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                                 $lazystates[] = $newstate;
                             } else {
                                 $number = $newstate->state();
-                                if ((!isset($reached[$number]) || $newstate->leftmost_longest($reached[$number])) &&                    // $reached contains a worse state
-                                    ($states[$newstate->state()] === null || $newstate->leftmost_longest($states[$newstate->state()]))) {   // $states does not contain a better state
+                                if ((!isset($reached[$number]) || $newstate->leftmost_longest($reached[$number])) &&  // $reached contains a worse state
+                                    ($states[$number] === null || $newstate->leftmost_longest($states[$number]))) {   // $states contains a worse state
                                     $reached[$number] = $newstate;
                                 }
                             }
@@ -713,12 +713,13 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 // Additional filtering for subexpression calls
                 $skip = $firststep && !$this->is_state_subexpr_match_started($newstate, $subexpr);
                 // Currently stored state needs replacement if it's null, or if it's worse than the new state.
-                if (!$skip && ($states[$newstate->state()] === null || $newstate->leftmost_longest($states[$newstate->state()]))) {
-                    $states[$newstate->state()] = $newstate;
+                $number = $newstate->state();
+                if (!$skip && ($states[$number] === null || $newstate->leftmost_longest($states[$number]))) {
+                    $states[$number] = $newstate;
 
                     // Important: if a subexpression was called and it's already matched, DON'T add this to curstates
                     if (!$this->is_state_subexpr_match_finished($newstate, $subexpr)) {
-                        $curstates[] = $newstate->state();
+                        $curstates[] = $number;
                     }
 
                     $endstatereached = $endstatereached || $newstate->is_full();
