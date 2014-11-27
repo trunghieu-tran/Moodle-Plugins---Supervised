@@ -494,7 +494,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         }
 
         // Do search.
-        $firststep = true;
         while (!empty($curstates)) {
             $reached = array();
             while (!empty($curstates)) {
@@ -508,37 +507,62 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                     //$char = core_text::substr($str, $curpos, 1);
                     //echo "trying $transition at pos $curpos (char '$char') and recursion level {$curstate->recursion_level()}\n";
 
-                    $newstate = $this->match_regular_transition($curstate, $transition, $str, $curpos, $length);
+                    if ($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL) {
+                        // Handle a recursive transition
+                        $newstate = $this->match_recursive_transition_begin($curstate, $transition, $str, $curpos, $length);
 
-                    if ($newstate !== null) {
-                        //echo "MATCHED $transition at pos $curpos (char '$char') and recursion level count($curstate->stack). length changed {$curstate->length} : {$newstate->length}\n\n";
-
-                        // Additional filtering for subexpression calls
-                        $skip = $firststep && !$newstate->is_subexpr_match_started($newstate->subexpr());
-                        $skip = $skip || $newstate->is_subexpr_match_finished($newstate->subexpr());
-
-                        $skip = $skip || ($transition->loopsback && $newstate->has_null_iterations());
-
-                        // Save the current match.
-                        if (!$skip) {
-                            if ($transition->greediness == qtype_preg_fa_transition::GREED_LAZY) {
-                                $lazystates[] = $newstate;
-                            } else {
-                                $reached[] = $newstate;
+                        if ($newstate !== null) {
+                            $startstates = $this->automaton->start_states($transition->pregleaf->number);
+                            foreach ($startstates as $state) {
+                                $newnewstate = clone $newstate;
+                                $newnewstate->stack[] = $this->create_fa_exec_stack_item($transition->pregleaf->number, $state, $curpos);
+                                $reached[] = $newnewstate;
                             }
                         }
 
-                        if ($newstate->is_full()) {
-                            $fullmatches[] = $newstate;
+                    } else {
+                        // Handle a non-recursive transition transition
+                        $newstate = $this->match_regular_transition($curstate, $transition, $str, $curpos, $length);
+
+                        if ($newstate !== null) {
+
+                            // This could be the end of a recursive call
+                            if ($newstate->recursion_level() > 0 && $newstate->is_full()) {
+                                $topitem = array_pop($newstate->stack);
+                                $recursionmatch = $topitem->last_subexpr_match($this->get_options()->mode, $topitem->subexpr);
+                                $newstate = $this->match_recursive_transition_end($newstate, $topitem->recursionstartpos, $recursionmatch[1], $str, $curpos, $length);
+                            }
+
+                            // Additional filtering for subexpression calls
+                            $skip = !$newstate->is_subexpr_match_started($newstate->subexpr());
+                            $skip = $skip || ($newstate->recursion_level() > 0 && $newstate->is_subexpr_match_finished($newstate->subexpr()));
+                            $skip = $skip || ($transition->loopsback && $newstate->has_null_iterations());
+
+                            // Save the current match.
+                            if (!$skip) {
+                                if ($transition->greediness == qtype_preg_fa_transition::GREED_LAZY) {
+                                    $lazystates[] = $newstate;
+                                } else {
+                                    $reached[] = $newstate;
+                                }
+                            }
+
+                            if ($newstate->is_full()) {
+                                $fullmatches[] = $newstate;
+                            }
                         }
-                    } else if (empty($fullmatches) && $curstate->subexpr() == 0) {
+                    }
+
+                    if ($newstate === null) {
+                        // Handle a partial match.
                         //echo "not matched, partial match length is $length\n";
-                        // Transition not matched, save the partial match.
-                        $newstate = clone $curstate;
-                        $newstate->length += $length;
-                        $newstate->set_last_transition($transition);
-                        $newstate->set_last_match_len($length);
-                        $partialmatches[] = $newstate;
+                        if (empty($fullmatches) && $curstate->recursion_level() == 0) {
+                            $newstate = clone $curstate;
+                            $newstate->length += $length;
+                            $newstate->set_last_transition($transition);
+                            $newstate->set_last_match_len($length);
+                            $partialmatches[] = $newstate;
+                        }
                     }
                 }
 
@@ -548,7 +572,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 }
             }
             $curstates = $reached;
-            $firststep = false;
         }
 
         // Return array of all possible matches.
@@ -634,7 +657,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                             }
                         }
                     } else {
-                        // Handle a non-recursive transition match
+                        // Handle a non-recursive transition transition
                         $newstate = $this->match_regular_transition($curstate, $transition, $str, $curpos, $length);
                         if ($newstate !== null) {
                             $endstatereached = $endstatereached || ($newstate->recursion_level() === 0 && $newstate->is_full());
@@ -643,7 +666,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                             if ($newstate->recursion_level() > 0 && $newstate->is_full()) {
                                 $topitem = array_pop($newstate->stack);
                                 $recursionmatch = $topitem->last_subexpr_match($this->get_options()->mode, $topitem->subexpr);
-                                $newtopitem = end($newstate->stack);
                                 $newstate = $this->match_recursive_transition_end($newstate, $topitem->recursionstartpos, $recursionmatch[1], $str, $curpos, $length);
                             }
 
@@ -652,6 +674,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
                             // Additional filtering for subexpression calls
                             $skip = !$newstate->is_subexpr_match_started($newstate->subexpr());
+                            $skip = $skip || ($newstate->recursion_level() > 0 && $newstate->is_subexpr_match_finished($newstate->subexpr()));
 
                             // Save the current result.
                             if (!$skip) {
@@ -677,7 +700,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                             $newstate->set_last_match_len($length);
                             $partialmatches[] = $newstate;
                         }
-                        continue;
                     }
                 }
             }
@@ -695,6 +717,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             foreach ($reached as $newstate) {
                 // Additional filtering for subexpression calls
                 $skip = !$newstate->is_subexpr_match_started($newstate->subexpr());
+                $skip = $skip || ($newstate->recursion_level() > 0 && $newstate->is_subexpr_match_finished($newstate->subexpr()));
                 // Currently stored state needs replacement if it's null, or if it's worse than the new state.
                 $number = $newstate->state();
                 if (!$skip && ($states[$number] === null || $newstate->leftmost_longest($states[$number]))) {
