@@ -54,7 +54,7 @@ class ajax_question_category_list extends moodle_list {
     public $sortby = 'parent, sortorder, name';
 
     public function __construct($type='ul', $attributes='', $editable = false, $pageurl=null, $page = 0, $pageparamname = 'page', $itemsperpage = 20, $context = null){
-        parent::__construct('ul', '', $editable, $pageurl, $page, 'cpage', $itemsperpage);
+        parent::__construct('ul', $attributes, $editable, $pageurl, $page, 'cpage', $itemsperpage);
         $this->context = $context;
     }
 
@@ -68,13 +68,17 @@ class ajax_question_category_list extends moodle_list {
      * @param integer $indent depth of indentation.
      */
     public function to_html($indent=0, $extraargs=array()) {
+        $attributes = array(
+            'id' => 'ajaxlistitem',
+            'data-id' => $category->id,
+        );
         if (count($this->items)) {
             $tabs = str_repeat("\t", $indent);
             $first = true;
             $itemiter = 1;
             $lastitem = '';
             $html = '';
-            $html .= html_writer::start_div('ajaxcategorylist');
+            $html .= html_writer::start_div('ajaxcategorylist',  array('id' => 'ajaxcategorylist'));
             foreach ($this->items as $item) {
                 $html .= html_writer::start_tag('li', $attributes);
                 $html .= html_writer::start_div('ajaxitem');
@@ -135,10 +139,7 @@ class ajax_question_category_list_item extends list_item {
         global $CFG, $OUTPUT;
         $str = $extraargs['str'];
         $category = $this->item;
-        $attributes = array(
-            'class' => 'ajaxitem',
-            'data-id' => $category->id,
-        );
+
         $editqestions = get_string('editquestions', 'question');
 
         // Each section adds html to be displayed as part of this list item.
@@ -146,7 +147,7 @@ class ajax_question_category_list_item extends list_item {
         $questionbankurl->param('cat', $category->id . ',' . $category->contextid);
         $catediturl = new moodle_url($this->parentlist->pageurl, array('edit' => $this->id));
         $item = '';
-        $item .= html_writer::div($OUTPUT->pix_icon('i/move_2d', 'You can drag and drop this category'), 'drag-handle');
+        $item .= html_writer::tag('a', $OUTPUT->pix_icon('i/move_2d', 'You can drag and drop this category'));
         $item .= html_writer::tag('b', html_writer::link($catediturl,
                 format_string(' ' . $category->name, true, array('context' => $this->parentlist->context)),
                 array('title' => $str->edit))) . ' ';
@@ -240,7 +241,7 @@ class ajax_question_category_object {
     public function initialize($page, $contexts, $currentcat, $defaultcategory, $todelete, $addcontexts) {
         $lastlist = null;
         foreach ($contexts as $context){
-            $this->editlists[$context->id] = new ajax_question_category_list('ul', '', true, $this->pageurl, $page, 'cpage', QUESTION_PAGE_LENGTH, $context);
+            $this->editlists[$context->id] = new ajax_question_category_list('ul', array('id' => 'ajaxcategorylist'), true, $this->pageurl, $page, 'cpage', QUESTION_PAGE_LENGTH, $context);
             $this->editlists[$context->id]->lastlist =& $lastlist;
             if ($lastlist!== null){
                 $lastlist->nextlist =& $this->editlists[$context->id];
