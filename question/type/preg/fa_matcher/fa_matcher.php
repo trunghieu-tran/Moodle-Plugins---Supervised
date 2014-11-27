@@ -499,13 +499,14 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             while (!empty($curstates)) {
                 // Get the current state and iterate over all transitions.
                 $curstate = array_pop($curstates);
+                $curpos = $startpos + $curstate->length;
+                $cursubexpr = $curstate->subexpr();
+                $recursionlevel = $curstate->recursion_level();
                 $transitions = $this->automaton->get_adjacent_transitions($curstate->state(), true);
                 foreach ($transitions as $transition) {
-                    $curpos = $startpos + $curstate->length;
                     $length = 0;
 
                     //$char = core_text::substr($str, $curpos, 1);
-                    //$recursionlevel = $curstate->recursion_level();
                     //echo "level $recursionlevel: trying $transition at pos $curpos (char '$char')\n";
 
                     if ($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL) {
@@ -527,20 +528,22 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
                         if ($newstate !== null) {
 
-                            // This could be the end of a recursive call
-                            if ($newstate->recursion_level() > 0 && $newstate->is_full()) {
-                                $topitem = array_pop($newstate->stack);
-                                $recursionmatch = $topitem->last_subexpr_match($this->get_options()->mode, $topitem->subexpr);
-                                $newstate = $this->match_recursive_transition_end($newstate, $topitem->recursionstartpos, $recursionmatch[1], $str, $curpos, $length);
-                            }
-
                             //echo "level $recursionlevel: MATCHED $transition at pos $curpos (char '$char'). length changed {$curstate->length} : {$newstate->length}\n\n";
                             //echo $newstate->subpatts_to_string();
 
-                            // Additional filtering for subexpression calls
-                            $skip = !$newstate->is_subexpr_match_started($newstate->subexpr());
-                            $skip = $skip || ($newstate->recursion_level() > 0 && $newstate->is_subexpr_match_finished($newstate->subexpr()));
+                            // Filter out states that did not start the actual subexpression call.
+                            $skip = !$newstate->is_subexpr_match_started($cursubexpr);
+
+                            // Filter out states that have senseless zero-length loops.
                             $skip = $skip || ($transition->loopsback && $newstate->has_null_iterations());
+
+                            // This could be the end of a recursive call.
+                            if (!$skip && $recursionlevel > 0 && $newstate->is_full()) {
+                                $topitem = array_pop($newstate->stack);
+                                $recursionmatch = $topitem->last_subexpr_match($this->get_options()->mode, $topitem->subexpr);
+                                $newstate = $this->match_recursive_transition_end($newstate, $topitem->recursionstartpos, $recursionmatch[1], $str, $curpos, $length);
+                                $skip = $skip || ($newstate === null);
+                            }
 
                             // Save the current match.
                             if (!$skip) {
@@ -551,7 +554,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                                 }
                             }
 
-                            if ($newstate->is_full()) {
+                            if (!$skip && $recursionlevel === 0 && $newstate->is_full()) {
                                 $fullmatches[] = $newstate;
                             }
                         }
@@ -560,7 +563,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                     if ($newstate === null) {
                         // Handle a partial match.
                         //echo "level $recursionlevel: not matched, partial match length is $length\n";
-                        if (empty($fullmatches) && $curstate->recursion_level() == 0) {
+                        if (empty($fullmatches) && $recursionlevel === 0) {
                             $newstate = clone $curstate;
                             $newstate->length += $length;
                             $newstate->set_last_transition($transition);
@@ -636,16 +639,18 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             while (!empty($curstates)) {
                 // Get the current state and iterate over all transitions.
                 $curstate = $states[array_pop($curstates)];
+                $curpos = $startpos + $curstate->length;
+                $cursubexpr = $curstate->subexpr();
+                $recursionlevel = $curstate->recursion_level();
                 $transitions = $this->automaton->get_adjacent_transitions($curstate->state(), true);
                 foreach ($transitions as $transition) {
                     if ($transition->pregleaf->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
                         continue;
                     }
-                    $curpos = $startpos + $curstate->length;
+
                     $length = 0;
 
                     //$char = core_text::substr($str, $curpos, 1);
-                    //$recursionlevel = $curstate->recursion_level();
                     //echo "level $recursionlevel: trying $transition at pos $curpos (char '$char')\n";
 
                     if ($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL) {
@@ -664,22 +669,24 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                     } else {
                         // Handle a non-recursive transition transition
                         $newstate = $this->match_regular_transition($curstate, $transition, $str, $curpos, $length);
-                        if ($newstate !== null) {
-                            $endstatereached = $endstatereached || ($newstate->recursion_level() === 0 && $newstate->is_full());
 
-                            // This could be the end of a recursive call
-                            if ($newstate->recursion_level() > 0 && $newstate->is_full()) {
-                                $topitem = array_pop($newstate->stack);
-                                $recursionmatch = $topitem->last_subexpr_match($this->get_options()->mode, $topitem->subexpr);
-                                $newstate = $this->match_recursive_transition_end($newstate, $topitem->recursionstartpos, $recursionmatch[1], $str, $curpos, $length);
-                            }
+                        if ($newstate !== null) {
 
                             //echo "level $recursionlevel: MATCHED $transition at pos $curpos (char '$char'). length changed {$curstate->length} : {$newstate->length}\n\n";
                             //echo $newstate->subpatts_to_string();
 
-                            // Additional filtering for subexpression calls
-                            $skip = !$newstate->is_subexpr_match_started($newstate->subexpr());
-                            $skip = $skip || ($newstate->recursion_level() > 0 && $newstate->is_subexpr_match_finished($newstate->subexpr()));
+                            // Filter out states that did not start the actual subexpression call.
+                            $skip = !$newstate->is_subexpr_match_started($cursubexpr);
+
+                            $endstatereached = $endstatereached || (!$skip && $newstate->recursion_level() === 0 && $newstate->is_full());
+
+                            // This could be the end of a recursive call.
+                            if (!$skip && $recursionlevel > 0 && $newstate->is_full()) {
+                                $topitem = array_pop($newstate->stack);
+                                $recursionmatch = $topitem->last_subexpr_match($this->get_options()->mode, $topitem->subexpr);
+                                $newstate = $this->match_recursive_transition_end($newstate, $topitem->recursionstartpos, $recursionmatch[1], $str, $curpos, $length);
+                                $skip = $skip || ($newstate === null);
+                            }
 
                             // Save the current result.
                             if (!$skip) {
@@ -698,7 +705,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                     if ($newstate === null) {
                         // Handle a partial match.
                         //echo "level $recursionlevel: not matched, partial match length is $length\n";
-                        if (!$endstatereached && $curstate->recursion_level() == 0) {
+                        if (!$endstatereached && $recursionlevel === 0) {
                             $newstate = clone $curstate;
                             $newstate->length += $length;
                             $newstate->set_last_transition($transition);
@@ -720,19 +727,11 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
             // Replace curstates with reached.
             foreach ($reached as $newstate) {
-                // Additional filtering for subexpression calls
-                $skip = !$newstate->is_subexpr_match_started($newstate->subexpr());
-                $skip = $skip || ($newstate->recursion_level() > 0 && $newstate->is_subexpr_match_finished($newstate->subexpr()));
                 // Currently stored state needs replacement if it's null, or if it's worse than the new state.
                 $number = $newstate->state();
-                if (!$skip && ($states[$number] === null || $newstate->leftmost_longest($states[$number]))) {
+                if ($states[$number] === null || $newstate->leftmost_longest($states[$number])) {
                     $states[$number] = $newstate;
-
-                    // Important: if a subexpression was called and it's already matched, DON'T add this to curstates
-                    if (!$newstate->is_subexpr_match_finished($newstate->subexpr())) {
-                        $curstates[] = $number;
-                    }
-
+                    $curstates[] = $number;
                     $endstatereached = $endstatereached || ($newstate->recursion_level() === 0 && $newstate->is_full());
                 }
             }
