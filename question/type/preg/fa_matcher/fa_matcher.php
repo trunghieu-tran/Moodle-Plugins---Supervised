@@ -108,15 +108,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
     /**
      * Creates a processing state object for the given state filled with "nomatch" values.
      */
-    protected function create_initial_state($state, $str, $startpos, $prevlevelstate) {
-        if ($prevlevelstate !== null) {
-            $result = clone $prevlevelstate;
-            $result->recursionlevel = $prevlevelstate->recursionlevel + 1;
-            $result->state = $state;
-            return $result;
-        }
-
+    protected function create_initial_state($state, $str, $startpos) {
         $stackitem = new qtype_preg_fa_stack_item();
+        $stackitem->subexpr = 0;
         $stackitem->state = $state;
         $stackitem->flags = 0x00;
         $stackitem->matches = array();
@@ -153,7 +147,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
      * Checks if this transition (with all merged to it) matches a character. Returns a new state
      * if matches, null otherwise.
      */
-    protected function match_transition($curstate, $transition, $str, $curpos, &$length, $subexpr = 0) {
+    protected function match_transition($curstate, $transition, $str, $curpos, &$length) {
         // TODO FIXME when recursion will be supported
         $matcherstateobj = $transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL
                          ? clone $curstate
@@ -172,7 +166,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             }
 
             if ($result) {
-                $this->after_transition_matched($curstate, $newstate, $tr, $curpos, $tmplength, $subexpr);
+                $this->after_transition_matched($curstate, $newstate, $tr, $curpos, $tmplength);
             }
 
             // Increase curpos and length anyways, even if the match is partial (backrefs)
@@ -191,8 +185,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
     /**
      * Updates all fields in the newstate after a transition match
      */
-    protected function after_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr = 0) {
-        $endstates = $this->automaton->end_states($subexpr);
+    protected function after_transition_matched($curstate, $newstate, $transition, $curpos, $length) {
+        $endstates = $this->automaton->end_states($newstate->subexpr());
 
         $newstate->set_state($transition->to);
 
@@ -216,28 +210,11 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
     }
 
     /**
-     * Check if a fa_exec_state instance has
-     */
-    protected function is_state_subexpr_match_started($state, $subexpr = 0) {
-        if ($subexpr == 0) {
-            return true;
-        }
-        return $state->is_subexpr_match_started($subexpr) && !$state->has_duplicate_subexpression();
-    }
-
-    protected function is_state_subexpr_match_finished($state, $subexpr = 0) {
-        if ($subexpr == 0) {
-            return false;
-        }
-        return $state->is_subexpr_match_finished($subexpr);
-    }
-
-    /**
      * Returns an array of states which can be reached without consuming characters.
      * @param qtype_preg_fa_exec_state startstates states to go from.
      * @return an array of states (including the start state) which can be reached without consuming characters.
      */
-    protected function epsilon_closure($startstates, $subexpr = 0) {
+    protected function epsilon_closure($startstates) {
         $curstates = $startstates;
         $result = array(qtype_preg_fa_transition::GREED_LAZY => array(),
                         qtype_preg_fa_transition::GREED_GREEDY => $startstates
@@ -247,12 +224,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             $curstate = array_pop($curstates);
             $transitions = $this->automaton->get_adjacent_transitions($curstate->state(), true);
             foreach ($transitions as $transition) {
-                if ($transition->greediness == qtype_preg_fa_transition::GREED_ZERO && $subexpr == 0) {
-                    // If transition has zero greediness ({0}-quantified) it should be skipped unless
-                    // matching called explicitly via $subexpr > 0
-                    continue;
-                }
-
                 $curpos = $curstate->startpos + $curstate->length;
                 $length = 0;
                 if ($transition->pregleaf->subtype != qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
@@ -261,7 +232,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
                 // Create a new state.
                 $newstate = clone $curstate;
-                $this->after_transition_matched($curstate, $newstate, $transition, $curpos, $length, $subexpr);
+                $this->after_transition_matched($curstate, $newstate, $transition, $curpos, $length);
 
                 // Resolve ambiguities if any.
                 $number = $newstate->state();
@@ -279,8 +250,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         return $result;
     }
 
-    protected function get_resume_state($str, $laststate, $subexpr = 0) {
-        $endstates = $this->automaton->end_states($subexpr);
+    protected function get_resume_state($str, $laststate) {
+        $endstates = $this->automaton->end_states($laststate->subexpr());
 
         if ($laststate->last_match_len() > 0 && $laststate->last_transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
             // The last transition was a partially matched backreference; we can only continue from this transition.
@@ -288,7 +259,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             $prevpos = $laststate->startpos + $laststate->length - $laststate->last_match_len();
 
             $resumestate = clone $laststate;
-            $this->after_transition_matched($laststate, $resumestate, $laststate->last_transition, $prevpos, $backref_length, $subexpr);
+            $this->after_transition_matched($laststate, $resumestate, $laststate->last_transition, $prevpos, $backref_length);
             $resumestate->length -= $laststate->last_match_len(); // Backreference was partially matched
 
             // Re-write the string with correct characters.
@@ -306,21 +277,16 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         // Check for a \Z \z or $ assertion before the eps-closure of the end state. Then it's possible to remove few characters.
         $transitions = $this->automaton->get_adjacent_transitions($laststate->state(), true);
         foreach ($transitions as $transition) {
-            if ($transition->greediness == qtype_preg_fa_transition::GREED_ZERO && $subexpr == 0) {
-                // If transition has zero greediness ({0}-quantified) it should be skipped unless
-                // matching called explicitly via $subexpr > 0
-                continue;
-            }
             if ($transition->loopsback || !($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $transition->pregleaf->is_end_anchor())) {
                 continue;
             }
-            $closure = $this->epsilon_closure(array($laststate->state() => $laststate), $subexpr);
+            $closure = $this->epsilon_closure(array($laststate->state() => $laststate));
             $closure = array_merge($closure[qtype_preg_fa_transition::GREED_LAZY], $closure[qtype_preg_fa_transition::GREED_GREEDY]);
             foreach ($closure as $curclosure) {
                 if (in_array($curclosure->state(), $endstates)) {
                     // The end state is reachable; return it immediately.
                     $result = clone $laststate;
-                    $this->after_transition_matched($laststate, $result, $transition, $curpos, 0, $subexpr);
+                    $this->after_transition_matched($laststate, $result, $transition, $curpos, 0);
                     return $result;
                 }
             }
@@ -335,8 +301,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
      * @param qtype_preg_fa_exec_state laststate - the last state matched.
      * @return object of qtype_preg_fa_exec_state.
      */
-    protected function generate_extension_brute_force($str, $laststate, $subexpr = 0) {
-        $endstates = $this->automaton->end_states($subexpr);
+    protected function generate_extension_brute_force($str, $laststate) {
+        $endstates = $this->automaton->end_states($laststate->subexpr());
         $resumestate = $this->get_resume_state($str, $laststate);
         if (in_array($resumestate->state(), $endstates)) {
             return $resumestate;
@@ -352,11 +318,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             }
             $transitions = $this->automaton->get_adjacent_transitions($curstate->state(), true);
             foreach ($transitions as $transition) {
-                if ($transition->greediness == qtype_preg_fa_transition::GREED_ZERO && $subexpr == 0) {
-                    // If transition has zero greediness ({0}-quantified) it should be skipped unless
-                    // matching called explicitly via $subexpr > 0
-                    continue;
-                }
                 // Skip loops.
                 if ($transition->loopsback) {
                     continue;
@@ -379,7 +340,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
                 // Create a new state.
                 $newstate = clone $curstate;
-                $this->after_transition_matched($curstate, $newstate, $transition, $newstate->startpos + $curstate->length, $length, $subexpr);
+                $this->after_transition_matched($curstate, $newstate, $transition, $newstate->startpos + $curstate->length, $length);
 
                 // Generate a next character.
                 //if ($length > 0) {
@@ -405,8 +366,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
      * @param qtype_preg_fa_exec_state laststate - the last state matched.
      * @return object of qtype_preg_fa_exec_state.
      */
-    protected function generate_extension_fast($str, $laststate, $subexpr = 0) {
-        $endstates = $this->automaton->end_states($subexpr);
+    protected function generate_extension_fast($str, $laststate) {
+        $endstates = $this->automaton->end_states($laststate->subexpr());
         $resumestate = $this->get_resume_state($str, $laststate);
         if (in_array($resumestate->state(), $endstates)) {
             return $resumestate;
@@ -423,7 +384,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         }
 
         // Get an epsilon-closure of the resume state.
-        $closure = $this->epsilon_closure(array($resumestate->state() => $resumestate), $subexpr);
+        $closure = $this->epsilon_closure(array($resumestate->state() => $resumestate));
         $closure = array_merge($closure[qtype_preg_fa_transition::GREED_LAZY], $closure[qtype_preg_fa_transition::GREED_GREEDY]);
         foreach ($closure as $curclosure) {
             $states[$curclosure->state()] = $curclosure;
@@ -446,11 +407,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 }
                 $transitions = $this->automaton->get_adjacent_transitions($curstate->state(), true);
                 foreach ($transitions as $transition) {
-                    if ($transition->greediness == qtype_preg_fa_transition::GREED_ZERO && $subexpr == 0) {
-                        // If transition has zero greediness ({0}-quantified) it should be skipped unless
-                        // matching called explicitly via $subexpr > 0
-                        continue;
-                    }
                     if ($transition->pregleaf->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
                         continue;
                     }
@@ -476,7 +432,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
                     // Create a new state.
                     $newstate = clone $curstate;
-                    $this->after_transition_matched($curstate, $newstate, $transition, $newstate->startpos + $curstate->length, $length, $subexpr);
+                    $this->after_transition_matched($curstate, $newstate, $transition, $newstate->startpos + $curstate->length, $length);
 
                     // Generate a next character.
                     //if ($length > 0) {
@@ -495,7 +451,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 }
             }
 
-            $reached = $this->epsilon_closure($reached, $subexpr);
+            $reached = $this->epsilon_closure($reached);
             $reached = array_merge($reached[qtype_preg_fa_transition::GREED_LAZY], $reached[qtype_preg_fa_transition::GREED_GREEDY]);
 
             // Replace curstates with reached.
@@ -514,15 +470,15 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
      * This method should be used if there are backreferences in the regex.
      * Returns array of all possible matches.
      */
-    protected function match_brute_force($str, $startpos, $subexpr = 0, $prevlevelstate = null) {
+    protected function match_brute_force($str, $startpos) {
         $fullmatches = array();       // Possible full matches.
         $partialmatches = array();    // Possible partial matches.
 
         $curstates = array();    // States which the automaton is in at the current wave front.
         $lazystates = array();   // States reached lazily.
 
-        foreach ($this->automaton->start_states($subexpr) as $state) {
-            $curstates[] = $this->create_initial_state($state, $str, $startpos, $prevlevelstate);
+        foreach ($this->automaton->start_states(0) as $state) {
+            $curstates[] = $this->create_initial_state($state, $str, $startpos);
         }
 
         // Do search.
@@ -534,25 +490,20 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 $curstate = array_pop($curstates);
                 $transitions = $this->automaton->get_adjacent_transitions($curstate->state(), true);
                 foreach ($transitions as $transition) {
-                    if ($transition->greediness == qtype_preg_fa_transition::GREED_ZERO && $subexpr == 0) {
-                        // If transition has zero greediness ({0}-quantified) it should be skipped unless
-                        // matching called explicitly via $subexpr > 0
-                        continue;
-                    }
                     $curpos = $startpos + $curstate->length;
                     $length = 0;
 
                     //$char = core_text::substr($str, $curpos, 1);
                     //echo "trying $transition at pos $curpos (char '$char') and recursion level $curstate->recursionlevel\n";
 
-                    $newstate = $this->match_transition($curstate, $transition, $str, $curpos, $length, $subexpr);
+                    $newstate = $this->match_transition($curstate, $transition, $str, $curpos, $length);
 
                     if ($newstate !== null) {
                         //echo "MATCHED $transition at pos $curpos (char '$char') and recursion level $curstate->recursionlevel. length changed {$curstate->length} : {$newstate->length}\n\n";
 
                         // Additional filtering for subexpression calls
-                        $skip = $firststep && !$this->is_state_subexpr_match_started($newstate, $subexpr);
-                        $skip = $skip || $this->is_state_subexpr_match_finished($newstate, $subexpr);
+                        $skip = $firststep && !$newstate->is_subexpr_match_started($newstate->subexpr());
+                        $skip = $skip || $newstate->is_subexpr_match_finished($newstate->subexpr());
 
                         $skip = $skip || ($transition->loopsback && $newstate->has_null_iterations());
 
@@ -568,7 +519,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                         if ($newstate->is_full()) {
                             $fullmatches[] = $newstate;
                         }
-                    } else if (empty($fullmatches) && $subexpr == 0) {
+                    } else if (empty($fullmatches) && $curstate->subexpr() == 0) {
                         //echo "not matched, partial match length is $length\n";
                         // Transition not matched, save the partial match.
                         $newstate = clone $curstate;
@@ -605,21 +556,21 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
      * This method should be used if there are no backreferences in the regex.
      * Returns array of all possible matches.
      */
-    protected function match_fast($str, $startpos, $subexpr = 0, $prevlevelstate = null) {
+    protected function match_fast($str, $startpos) {
         $states = array();           // Objects of qtype_preg_fa_exec_state.
         $curstates = array();        // Numbers of states which the automaton is in at the current wave front.
         $lazystates = array();       // States (objects!) reached lazily.
         $partialmatches = array();   // Possible partial matches.
 
-        $startstates = $this->automaton->start_states($subexpr);
-        $endstates = $this->automaton->end_states($subexpr);
+        $startstates = $this->automaton->start_states(0);
+        $endstates = $this->automaton->end_states(0);
 
         $endstatereached = false;
 
         // Create an array of processing states for all fa states (the only initial state, other states are null yet).
         foreach ($this->automaton->get_states() as $curstate) {
             $states[$curstate] = in_array($curstate, $startstates)
-                               ? $this->create_initial_state($curstate, $str, $startpos, $prevlevelstate)
+                               ? $this->create_initial_state($curstate, $str, $startpos)
                                : null;
         }
 
@@ -630,7 +581,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             }
         }
 
-        $closure = $this->epsilon_closure($curstates, $subexpr);
+        $closure = $this->epsilon_closure($curstates);
         $lazystates = array_merge($lazystates, $closure[qtype_preg_fa_transition::GREED_LAZY]);
         $closure = $closure[qtype_preg_fa_transition::GREED_GREEDY];
         $curstates = array();
@@ -650,11 +601,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 $curstate = $states[array_pop($curstates)];
                 $transitions = $this->automaton->get_adjacent_transitions($curstate->state(), true);
                 foreach ($transitions as $transition) {
-                    if ($transition->greediness == qtype_preg_fa_transition::GREED_ZERO && $subexpr == 0) {
-                        // If transition has zero greediness ({0}-quantified) it should be skipped unless
-                        // matching called explicitly via $subexpr > 0
-                        continue;
-                    }
                     if ($transition->pregleaf->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
                         continue;
                     }
@@ -664,7 +610,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                     //$char = core_text::substr($str, $curpos, 1);
                     //echo "trying $transition at pos $curpos (char '$char') and recursion level $curstate->recursionlevel\n";
 
-                    $newstate = $this->match_transition($curstate, $transition, $str, $curpos, $length, $subexpr);
+                    $newstate = $this->match_transition($curstate, $transition, $str, $curpos, $length);
 
                     if ($newstate !== null) {
                         $endstatereached = $endstatereached || $newstate->is_full();
@@ -673,7 +619,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                         //echo $newstate->subpatts_to_string();
 
                         // Additional filtering for subexpression calls
-                        $skip = $firststep && !$this->is_state_subexpr_match_started($newstate, $subexpr);
+                        $skip = $firststep && !$newstate->is_subexpr_match_started($newstate->subexpr());
 
                         // Save the current result.
                         if (!$skip) {
@@ -687,7 +633,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                                 }
                             }
                         }
-                    } else if (!$endstatereached && $subexpr == 0) {
+                    } else if (!$endstatereached && $curstate->subexpr() == 0) {
                         //echo "not matched, partial match length is $length\n";
                         // Transition not matched, save the partial match.
                         $newstate = clone $curstate;
@@ -704,21 +650,21 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 $reached[] = array_pop($lazystates);
             }
 
-            $reached = $this->epsilon_closure($reached, $subexpr);
+            $reached = $this->epsilon_closure($reached);
             $lazystates = array_merge($lazystates, $reached[qtype_preg_fa_transition::GREED_LAZY]);
             $reached = $reached[qtype_preg_fa_transition::GREED_GREEDY];
 
             // Replace curstates with reached.
             foreach ($reached as $newstate) {
                 // Additional filtering for subexpression calls
-                $skip = $firststep && !$this->is_state_subexpr_match_started($newstate, $subexpr);
+                $skip = $firststep && !$newstate->is_subexpr_match_started($newstate->subexpr());
                 // Currently stored state needs replacement if it's null, or if it's worse than the new state.
                 $number = $newstate->state();
                 if (!$skip && ($states[$number] === null || $newstate->leftmost_longest($states[$number]))) {
                     $states[$number] = $newstate;
 
                     // Important: if a subexpression was called and it's already matched, DON'T add this to curstates
-                    if (!$this->is_state_subexpr_match_finished($newstate, $subexpr)) {
+                    if (!$newstate->is_subexpr_match_finished($newstate->subexpr())) {
                         $curstates[] = $number;
                     }
 
@@ -743,7 +689,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         return $result;
     }
 
-    protected function generate_extensions($matches, $str, $startpos, $subexpr = 0, $prevlevelstate = null) {
+    protected function generate_extensions($matches, $str, $startpos) {
         foreach ($matches as $match) {
             $match->extendedmatch = null;
             // Try each backtrack state and choose the shortest one.
@@ -752,8 +698,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 $backtrack->str = $backtrack->str->substring(0, $startpos + $backtrack->length);
 
                 $tmp = $this->bruteforcegeneration
-                     ? $this->generate_extension_brute_force($str, $backtrack, $subexpr)
-                     : $this->generate_extension_fast($str, $backtrack, $subexpr);
+                     ? $this->generate_extension_brute_force($str, $backtrack)
+                     : $this->generate_extension_fast($str, $backtrack);
 
                 if ($tmp === null) {
                     continue;
@@ -781,54 +727,45 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         }
     }
 
-    public function match_from_pos_internal($str, $startpos, $subexpr = 0, $prevlevelstate = null) {
-        //$recursionlevel = $prevlevelstate == null ? 0 : $prevlevelstate->recursionlevel + 1;
-        //echo "======================== $recursionlevel\n";
-
-        if ($prevlevelstate !== null && $prevlevelstate->recursionlevel > 30) {
-            return $this->create_initial_state(null, $str, $startpos, $prevlevelstate);
-        }
+    public function match_from_pos($str, $startpos) {
 
         // Find all possible matches. Using the fast match method if there are no backreferences.
         $possiblematches = $this->bruteforcematch
-                         ? $this->match_brute_force($str, $startpos, $subexpr, $prevlevelstate)
-                         : $this->match_fast($str, $startpos, $subexpr, $prevlevelstate);
+                         ? $this->match_brute_force($str, $startpos)
+                         : $this->match_fast($str, $startpos);
 
         if (empty($possiblematches)) {
-            return $this->create_initial_state(null, $str, $startpos, $prevlevelstate);
-        }
+            $result = $this->create_initial_state(null, $str, $startpos);
+            if ($this->options->extensionneeded) {
+                $this->generate_extensions(array($result), $str, $startpos);
+            }
+        } else {
+            // Check if a full match was found.
+            $fullmatchexists = false;
+            foreach ($possiblematches as $match) {
+                if ($match->is_full()) {
+                    $fullmatchexists = true;
+                    break;
+                }
+            }
 
-        // Check if a full match was found.
-        $fullmatchexists = false;
-        foreach ($possiblematches as $match) {
-            if ($match->is_full()) {
-                $fullmatchexists = true;
-                break;
+            // If there was no full match, generate extensions for each partial match.
+            if (!$fullmatchexists && $this->generateextensionforeachmatch && $this->options->extensionneeded) {
+                $this->generate_extensions($possiblematches, $str, $startpos);
+            }
+
+            // Choose the best one.
+            $result = array_pop($possiblematches);
+            foreach ($possiblematches as $match) {
+                if ($match->leftmost_longest($result, false)) {
+                    $result = $match;
+                }
+            }
+
+            if (!$fullmatchexists && !$this->generateextensionforeachmatch && $this->options->extensionneeded) {
+                $this->generate_extensions(array($result), $str, $startpos);
             }
         }
-
-        // If there was no full match, generate extensions for each partial match.
-        if (!$fullmatchexists && $this->generateextensionforeachmatch && $this->options->extensionneeded) {
-            $this->generate_extensions($possiblematches, $str, $startpos, $subexpr, $prevlevelstate);
-        }
-
-        // Choose the best one.
-        $result = array_pop($possiblematches);
-        foreach ($possiblematches as $match) {
-            if ($match->leftmost_longest($result, false)) {
-                $result = $match;
-            }
-        }
-
-        if (!$fullmatchexists && !$this->generateextensionforeachmatch && $this->options->extensionneeded) {
-            $this->generate_extensions(array($result), $str, $startpos, $subexpr, $prevlevelstate);
-        }
-
-        return $result;
-    }
-
-    public function match_from_pos($str, $startpos, $subexpr = 0, $prevlevelstate = null) {
-        $result = $this->match_from_pos_internal($str, $startpos);
 
         if ($result->extendedmatch !== null) {
             $result->extendedmatch = $result->extendedmatch->to_matching_results();

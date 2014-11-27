@@ -5014,6 +5014,17 @@ class qtype_preg_cross_tests_from_preg {
                      'tests'=>array($test1, $test2, $test3));
     }
 
+    function data_for_test_subexpr_call_2() {
+        $test1 = array( 'str'=>'a',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1));
+
+        return array('regex'=>'(a){0}(?1)',
+                     'tests'=>array($test1));
+    }
+
     function data_for_test_subexpr_call_case_sensitivity() {
         $test1 = array( 'str'=>'abAB',
                         'is_match'=>true,
