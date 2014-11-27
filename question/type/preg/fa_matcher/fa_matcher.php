@@ -628,8 +628,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                             foreach ($startstates as $state) {
                                 $newnewstate = clone $newstate;
                                 $newnewstate->stack[] = $this->create_fa_exec_stack_item($transition->pregleaf->number, $state, $curpos);
-                                if ((!isset($reached[$state]) || $newnewstate->leftmost_longest($reached[$state])) &&  // $reached contains a worse state
-                                    ($states[$state] === null || $newnewstate->leftmost_longest($states[$state]))) {   // $states contains a worse state
+                                if (!isset($reached[$state]) || $newnewstate->leftmost_longest($reached[$state])) {  // $reached contains a worse state
                                     $reached[$state] = $newnewstate;
                                 }
                             }
@@ -660,8 +659,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                                     $lazystates[] = $newstate;
                                 } else {
                                     $number = $newstate->state();
-                                    if ((!isset($reached[$number]) || $newstate->leftmost_longest($reached[$number])) &&  // $reached contains a worse state
-                                        ($states[$number] === null || $newstate->leftmost_longest($states[$number]))) {   // $states contains a worse state
+                                    if (!isset($reached[$number]) || $newstate->leftmost_longest($reached[$number])) {  // $reached contains a worse state
                                         $reached[$number] = $newstate;
                                     }
                                 }
