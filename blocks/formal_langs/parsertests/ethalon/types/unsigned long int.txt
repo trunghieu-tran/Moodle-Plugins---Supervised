@@ -1,0 +1,11 @@
+[
+ (type) {
+  (non_const_type) {
+   (builtintype) {
+    unsigned
+    long
+    int
+   }
+  }
+ }
+]

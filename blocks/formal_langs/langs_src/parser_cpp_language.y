@@ -1362,10 +1362,32 @@ primitive_or_complex_type(R) ::= primitive_or_complex_type(A)  NAMESPACE_RESOLVE
 	R = $this->create_node('primitive_or_complex_type', array( A, B, C, D, E, F));
 }
 
+/* ================================= VALIDATED PART ================================= */
+
 builtintype(R) ::= TYPENAME(A) . {
     $this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%s"));
 	R = $this->create_node('builtintype', array( A ));
 }
+
+
+/*  FLOATING POINT VARIATIONS */
+
+
+builtintype(R) ::= FLOAT(A) . {
+    $this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("имя типа c плавающей запятой одинарной точности"));
+	R = $this->create_node('builtintype', array( A ));
+}
+
+builtintype(R) ::= DOUBLE(A) . {
+    $this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("имя типа c плавающей запятой двойной точности"));
+	R = $this->create_node('builtintype', array( A ));
+}
+
+builtintype(R) ::= LONG(A) DOUBLE(B) . {
+    $this->currentrule = new block_formal_langs_description_rule("имя длинного типа c плавающей запятой двойной точности", array("признак длинного числа", "имя типа c плавающей запятой двойной точности"));
+	R = $this->create_node('builtintype', array( A, B ));
+}
+
 
 /*  CHAR VARIATIONS */
 
@@ -1374,12 +1396,12 @@ builtintype(R) ::= CHAR(A) . {
 	R = $this->create_node('builtintype', array( A ));
 }
 
-builtintype(R) ::= SIGNED CHAR(A) . {
+builtintype(R) ::= SIGNED(A) CHAR(B) . {
     $this->currentrule = new block_formal_langs_description_rule("знаковый символьный тип", array("признак знаковости", "%ur(именительный)"));
 	R = $this->create_node('builtintype', array( A, B ));
 }
 
-builtintype(R) ::= UNSIGNED CHAR(A) . {
+builtintype(R) ::= UNSIGNED(A) CHAR(B) . {
     $this->currentrule = new block_formal_langs_description_rule("беззнаковый символьный тип", array("признак беззнаковости", "%ur(именительный)"));
 	R = $this->create_node('builtintype', array( A, B ));
 }

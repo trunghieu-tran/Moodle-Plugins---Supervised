@@ -97,7 +97,17 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
     public function maptable($any) {
         $table = array(
             'identifier' => array( $any => 'IDENTIFIER' ),
-            'typename'   => array( $any => 'TYPENAME', 'signed' => 'SIGNED', 'unsigned' => 'UNSIGNED', 'long' => 'LONG'),
+            'typename'   => array( 
+				$any => 'TYPENAME', 
+				'signed' => 'SIGNED', 
+				'unsigned' => 'UNSIGNED', 
+				'long' => 'LONG', 
+				'short' => 'SHORT', 
+				'char' => 'CHAR', 
+				'int' => 'INT',
+				'float' => 'FLOAT',
+				'double' => 'DOUBLE',
+			),
             'numeric'    => array( $any => 'NUMERIC'),
             'ellipsis'   => array( $any => 'ELLIPSIS'),
             'operators'  => array(
