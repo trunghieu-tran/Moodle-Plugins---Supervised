@@ -5044,6 +5044,29 @@ class qtype_preg_cross_tests_from_preg {
                      'tests'=>array($test1, $test2));
     }
 
+    function data_for_test_recursion_1() {
+        $test1 = array( 'str'=>'[]',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2));
+
+        $test2 = array( 'str'=>'[[]]',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>1),
+                        'length'=>array(0=>4,1=>2));
+
+        $test3 = array( 'str'=>'[[[]]]',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>1),
+                        'length'=>array(0=>6,1=>4));
+
+        return array('regex'=>'\[((?R))?\]',
+                     'tests'=>array($test1, $test2, $test3));
+    }
+
     /*function data_for_test_leaf_assert_G() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
