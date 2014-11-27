@@ -462,7 +462,7 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
 
     public function is_subexpr_match_started($subexpr) {
         $end = end($this->stack);
-        if ($subexpr == 0 && $end->subexpr == 0) {
+        if ($subexpr == 0 && $end->subexpr == 0 || empty($end->matches)) {
             return true;
         }
         return $end->is_subexpr_match_started($subexpr);
@@ -470,7 +470,7 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
 
     public function is_subexpr_match_finished($subexpr) {
         $end = end($this->stack);
-        if ($subexpr == 0 && $end->subexpr == 0) {
+        if ($subexpr == 0 && $end->subexpr == 0 || empty($end->matches)) {
             return false;
         }
         return $end->is_subexpr_match_finished($subexpr);
