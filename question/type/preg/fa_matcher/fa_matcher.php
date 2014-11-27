@@ -226,7 +226,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
      * @param qtype_preg_fa_exec_state startstates states to go from.
      * @return an array of states (including the start state) which can be reached without consuming characters.
      */
-    protected function epsilon_closure($startstates) {
+    protected function epsilon_closure($startstates, $str) {
         $curstates = $startstates;
         $result = array(qtype_preg_fa_transition::GREED_LAZY => array(),
                         qtype_preg_fa_transition::GREED_GREEDY => $startstates
@@ -234,9 +234,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         while (!empty($curstates)) {
             // Get the current state and iterate over all transitions.
             $curstate = array_pop($curstates);
+            $curpos = $curstate->startpos + $curstate->length;
             $transitions = $this->automaton->get_adjacent_transitions($curstate->state(), true);
             foreach ($transitions as $transition) {
-                $curpos = $curstate->startpos + $curstate->length;
                 $length = 0;
                 if ($transition->pregleaf->subtype != qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
                     continue;
@@ -245,6 +245,17 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 // Create a new state.
                 $newstate = clone $curstate;
                 $this->after_transition_matched($newstate, $transition, $curpos, $length);
+
+                // This could be the end of a recursive call.
+                if ($newstate->recursion_level() > 0 && $newstate->is_full()) {
+                    $topitem = array_pop($newstate->stack);
+                    $recursionmatch = $topitem->last_subexpr_match($this->get_options()->mode, $topitem->subexpr);
+                    $newstate = $this->match_recursive_transition_end($newstate, $topitem->recursionstartpos, $recursionmatch[1], $str, $curpos, $length);
+                }
+
+                if ($newstate === null) {
+                    continue;
+                }
 
                 // Resolve ambiguities if any.
                 $number = $newstate->state();
@@ -292,7 +303,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             if ($transition->loopsback || !($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $transition->pregleaf->is_end_anchor())) {
                 continue;
             }
-            $closure = $this->epsilon_closure(array($laststate->state() => $laststate));
+            $closure = $this->epsilon_closure(array($laststate->state() => $laststate), $str);
             $closure = array_merge($closure[qtype_preg_fa_transition::GREED_LAZY], $closure[qtype_preg_fa_transition::GREED_GREEDY]);
             foreach ($closure as $curclosure) {
                 if (in_array($curclosure->state(), $endstates)) {
@@ -396,7 +407,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         }
 
         // Get an epsilon-closure of the resume state.
-        $closure = $this->epsilon_closure(array($resumestate->state() => $resumestate));
+        $closure = $this->epsilon_closure(array($resumestate->state() => $resumestate), $str);
         $closure = array_merge($closure[qtype_preg_fa_transition::GREED_LAZY], $closure[qtype_preg_fa_transition::GREED_GREEDY]);
         foreach ($closure as $curclosure) {
             $states[$curclosure->state()] = $curclosure;
@@ -463,7 +474,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 }
             }
 
-            $reached = $this->epsilon_closure($reached);
+            $reached = $this->epsilon_closure($reached, $str);
             $reached = array_merge($reached[qtype_preg_fa_transition::GREED_LAZY], $reached[qtype_preg_fa_transition::GREED_GREEDY]);
 
             // Replace curstates with reached.
@@ -622,7 +633,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             }
         }
 
-        $closure = $this->epsilon_closure($curstates);
+        $closure = $this->epsilon_closure($curstates, $str);
         $lazystates = array_merge($lazystates, $closure[qtype_preg_fa_transition::GREED_LAZY]);
         $closure = $closure[qtype_preg_fa_transition::GREED_GREEDY];
         $curstates = array();
@@ -721,7 +732,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 $reached[] = array_pop($lazystates);
             }
 
-            $reached = $this->epsilon_closure($reached);
+            $reached = $this->epsilon_closure($reached, $str);
             $lazystates = array_merge($lazystates, $reached[qtype_preg_fa_transition::GREED_LAZY]);
             $reached = $reached[qtype_preg_fa_transition::GREED_GREEDY];
 
