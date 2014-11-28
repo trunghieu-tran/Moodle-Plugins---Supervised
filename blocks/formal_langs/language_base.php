@@ -28,16 +28,6 @@ require_once($CFG->dirroot.'/question/type/poasquestion/stringstream/stringstrea
 abstract class block_formal_langs_abstract_language {
 
     /**
-     * A cache for strings, indexed by string, used in create_from_string
-     * @var array
-     */
-    private static $cachedstringsbystring = array();
-    /**
-     * A cache for strings, used in create_from_db
-     * @var array
-     */
-    private static $cachedstringsfromdb = array();
-    /**
      * Id in language table.
      * @var integer
      */
@@ -129,28 +119,11 @@ abstract class block_formal_langs_abstract_language {
     /**
      *  Creates a processed string from string
      *  @param string $string string
-     *  @param string $classname  a name of class, which type must be used for creating string
      *  @return block_formal_langs_processed_string string
      */
      public function create_from_string($string, $classname = 'block_formal_langs_processed_string') {
-         // Consult with cache, when creating from string
-         $key = get_class($this);
-         if (array_key_exists($key, self::$cachedstringsbystring)) {
-            $map = self::$cachedstringsbystring[$key];
-            if (array_key_exists($string, $map)) {
-                if (is_a($map[$string], $classname)) {
-                    return $map[$string];
-                }
-            }
-        }
         $result = new $classname($this);
         $result->string = $string;
-
-         // Update cache with new string
-        if (array_key_exists($key, self::$cachedstringsbystring) == false) {
-            self::$cachedstringsbystring[$key] = array();
-        }
-        self::$cachedstringsbystring[$key][$string] = $result;
         return $result;
      }
 
@@ -159,41 +132,12 @@ abstract class block_formal_langs_abstract_language {
       *  @param string $tablename table name
       *  @param string $tableid    id of source table
       *  @param string|null $string string data
-      *  @param string $classname a class, which should be used when creating data
       *  @return block_formal_langs_processed_string processed string
       */
     public function create_from_db($tablename, $tableid, $string = null, $classname = 'block_formal_langs_processed_string') {
-        // Consult with cache, when creating from string
-        $key = get_class($this);
-        if (array_key_exists($key, self::$cachedstringsfromdb)) {
-            $map = self::$cachedstringsfromdb[$key];
-            if (array_key_exists($tablename, $map)) {
-                $map = $map[$tablename];
-                if (array_key_exists($tableid, $map)) {
-                    $map = $map[$tableid];
-                    if (array_key_exists($string, $map)) {
-                        if (is_a($map[$string], $classname)) {
-                            return $map[$string];
-                        }
-                    }
-                }
-            }
-        }
         $result = new $classname($this);
         $result->set_table_params($tablename,$tableid);
         $result->string  = $string;
-
-        // Insert entry into cache
-        if (array_key_exists($key, self::$cachedstringsfromdb) == false) {
-            self::$cachedstringsfromdb[$key] = array();
-        }
-        if (array_key_exists($tablename, self::$cachedstringsfromdb[$key]) == false) {
-            self::$cachedstringsfromdb[$key][$tablename] = array();
-        }
-        if (array_key_exists($tableid, self::$cachedstringsfromdb[$key][$tablename]) == false) {
-            self::$cachedstringsfromdb[$key][$tablename][$tableid] = array();
-        }
-        self::$cachedstringsfromdb[$key][$tablename][$tableid][$string] = $result;
         return $result;
     }
 
@@ -207,7 +151,6 @@ abstract class block_formal_langs_abstract_language {
  * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
 abstract class block_formal_langs_predefined_language extends block_formal_langs_abstract_language {
-
     /**
      * Создает новый язык
      * @param int $id ID записи из БД
@@ -215,6 +158,18 @@ abstract class block_formal_langs_predefined_language extends block_formal_langs
      */
     public function __construct($id, $langdbrecord = NULL) {
         $this->id = $id;
+        $this->parser = null;
+    }
+    
+    /** Returns a pasrser for parsing data
+        @return mixed parser
+     */
+    public function parser()  {
+        if ($this->parser == null) {
+            $parsername = $this->parsername();
+            $this->parser =  new $parsername();
+        }
+        return $this->parser;
     }
     /** Preprocesses a string before scanning. This can be used for simplifying analyze
         and some other purposes, like merging some different variations of  same character
@@ -287,9 +242,8 @@ abstract class block_formal_langs_predefined_language extends block_formal_langs
     public function parse($processedstring, $iscorrect) {
         if ($processedstring->stream == null) {
             $this->scan($processedstring);
-        }
-        $parsername = $this->parsername();
-        $parser =  new $parsername();
+        }        
+        $parser =  $this->parser();
         $parser->parse($processedstring, $iscorrect);
     }
     

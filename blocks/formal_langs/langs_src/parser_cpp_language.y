@@ -85,6 +85,7 @@ require_once($CFG->dirroot.'/blocks/formal_langs/descriptions/descriptionrule.ph
 %left    TYPEUNARY.
 %nonassoc MACROPARAMETERPRIORITY.
 
+
 program(R) ::= stmt_list(A) .  {
 	$stack = array( $this->create_node('program', array( A ) ) );
 	if (is_array($this->root)) {
@@ -354,20 +355,24 @@ stmt_or_defined_macro(R) ::= template_def(A) BINARYNOT(B) CUSTOMTYPENAME(C) LEFT
 	R = $this->create_node('stmt_or_defined_macro', array(A, B, C, D, E, F));
 }
 
+/*
 stmt_or_defined_macro(R) ::= template_def(A) primitive_or_complex_type(B) NAMESPACE_RESOLVE(C) BINARYNOT(D) CUSTOMTYPENAME(E) LEFTROUNDBRACKET(F) RIGHTROUNDBRACKET(G) function_body(H) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "оператор разрешения пространства имен", "тильда", "%s", "левая круглая скобка", "правая круглая скобка", "%ur(именительный)"));
 	R = $this->create_node('stmt_or_defined_macro', array(A, B, C, D, E, F));
 }
+*/
 
 stmt_or_defined_macro(R) ::= BINARYNOT(B) CUSTOMTYPENAME(C) LEFTROUNDBRACKET(D) RIGHTROUNDBRACKET(E) function_body(F) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("тильда", "%s", "левая круглая скобка", "правая круглая скобка", "%ur(именительный)"));
 	R = $this->create_node('stmt_or_defined_macro', array(B, C, D, E, F));
 }
 
+/*
 stmt_or_defined_macro(R) ::= primitive_or_complex_type(B) NAMESPACE_RESOLVE(C) BINARYNOT(D) CUSTOMTYPENAME(E) LEFTROUNDBRACKET(F) RIGHTROUNDBRACKET(G) function_body(H) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "оператор разрешения пространства имен", "тильда", "%s", "левая круглая скобка", "правая круглая скобка", "%ur(именительный)"));
 	R = $this->create_node('stmt_or_defined_macro', array(B, C, D, E, F));
 }
+*/
 
 /* TEMPLATES */
 
@@ -1280,7 +1285,7 @@ typecast(R) ::= LEFTROUNDBRACKET(A)  type(B) RIGHTROUNDBRACKET(C) . {
 }
 
 /* LIST OF TYPES */
-
+/*
 type_list(R) ::= type(A) .  {
 	$this->currentrule = new block_formal_langs_description_rule("список типов", array("%ur(именительный)"));
 	R = $this->create_node('type_list', array( A ) );
@@ -1290,6 +1295,7 @@ type_list(R) ::= type_list(A) COMMA(B) type(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("%l(type)", array("список типов", "запятая", "%n-ый тип"));
 	R = $this->create_node('type_list', array( A, B, C ) );
 }
+*/
 
 /* TYPE DEFINITIONS */
 
@@ -1328,6 +1334,7 @@ non_const_type(R) ::= primitive_or_complex_type(A) . {
 	R = $this->create_node('non_const_type', array( A ));
 }
 
+/*
 primitive_or_complex_type(R) ::= CUSTOMTYPENAME(A) . {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%s"));
 	R = $this->create_node('primitive_or_complex_type', array( A ));
@@ -1361,14 +1368,43 @@ primitive_or_complex_type(R) ::= primitive_or_complex_type(A)  NAMESPACE_RESOLVE
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%s", "%s", "%ur", "%s"));
 	R = $this->create_node('primitive_or_complex_type', array( A, B, C, D, E, F));
 }
+*/
+
+non_const_type(R) ::= user_defined_type(A) . {
+	R = A;
+}
+
+primitive_or_complex_type(R) ::= namespace_resolve(A) TYPENAME(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%s"));
+	$this->mapper->clear_lookup_namespace();
+	R = $this->create_node('primitive_or_complex_type', array( A,  B));
+} 
+
+namespace_resolve(R) ::=  namespace_resolve(A) TYPENAME(B) NAMESPACE_RESOLVE(C) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "операция разрешения видимости"));
+	$this->mapper->push_lookup_entry((string)(B->value()));
+	R = $this->create_node('namespace_resolve', array( A, B, C));
+}
+
+namespace_resolve(R) ::= TYPENAME(A) NAMESPACE_RESOLVE(B) .  {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "операция разрешения видимости"));
+	$this->mapper->push_lookup_entry((string)(A->value()));
+	R = $this->create_node('namespace_resolve', array( A, B));
+}
 
 /* ================================= VALIDATED PART ================================= */
 
-builtintype(R) ::= TYPENAME(A) . {
+user_defined_type(R) ::= TYPENAME(A) . {
     $this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%s"));
-	R = $this->create_node('builtintype', array( A ));
+	R = $this->create_node('user_defined_type', array( A ));
 }
 
+/* VOID */
+
+builtintype(R) ::= VOID(A) . {
+    $this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("имя пустого типа"));
+	R = $this->create_node('builtintype', array( A ));
+}
 
 /*  FLOATING POINT VARIATIONS */
 
