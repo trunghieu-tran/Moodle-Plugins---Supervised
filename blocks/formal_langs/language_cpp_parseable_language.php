@@ -78,6 +78,22 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
         $this->stack[count($this->stack) - 1][]= (string)$typename;
     }
 
+    
+    public function is_type_in_tree($name, $tree) {
+        $currentlookupnamespace = array();
+        if (count($this->lookupnamespacestack) != 0) {
+            $currentlookupnamespace = $this->lookupnamespacestack[count($this->lookupnamespacestack) - 1];
+        }
+        $nspace = $tree;
+        for($i = 0; $i < count($currentlookupnamespace); $i++) {
+            $space = $currentlookupnamespace[$i];
+            if (array_key_exists($space, $nspace) == false) {
+                return false;
+            }            
+            $nspace = $nspace[$space];
+        }
+                return array_key_exists($name, $nspace);
+    }
 
     /**
      * Returns true, whether token value is string
@@ -87,25 +103,20 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
     public function is_type($name) {
         $result = false;
         $name = (string)$name;
-        $currentlookupnamespace = array();
-        if (count($this->lookupnamespacestack) != 0) {
-            $currentlookupnamespace = $this->lookupnamespacestack[count($this->lookupnamespacestack) - 1];
-        }
         $result = false;
-        if (count($currentlookupnamespace)) {
-            for($i = count($currentlookupnamespace) - 1; $i >  -1; $i--) {
-                $nspace = $this->namespacetree;
-                for($j = 0; $j <= $i; $j++) {
-                    $nspace = $nspace[$currentlookupnamespace[$j]];
+        for($i = count($this->introducednamespacestack) - 1; $i > -1; $i--) { 
+            $tree = $this->namespacetree;
+            $exists = true;
+            for($j = 0; $j <= $i && $exists; $j++) {
+                if (array_key_exists($this->introducednamespacestack[$j], $tree)) {
+                    $tree = $tree[$this->introducednamespacestack[$j]];
+                } else {
+                    $exists = false;
                 }
-                $result = $result ||  array_key_exists($name, $nspace);
             }
-            if ($result == false) {
-                $result = array_key_exists($name, $this->namespacetree);
-            }
-        } else {
-            $result = array_key_exists($name, $this->namespacetree);
-        }        
+            $result = $result || $this->is_type_in_tree($name, $tree);
+        }
+        $result = $result || $this->is_type_in_tree($name, $this->namespacetree);
         return $result;
     }
 
