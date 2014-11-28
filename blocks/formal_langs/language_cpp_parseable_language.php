@@ -32,19 +32,49 @@ require_once($CFG->dirroot .'/blocks/formal_langs/lexer_to_parser_mapper.php');
  * A mapper for mapping C++ lexer to parser constants
  */
 class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_parser_mapper {
+
+    /*! An array, where keys are namespaces and class names and values are nested namespaces.
+        If calsss has no nested namespaces, he should not get it
+     */
+    protected $namespacetree;
+    /*! A stack, which should be used for looking up 
+     */
+    protected $lookupnamespacestack;
+    /*! A stack for introducted type namespace
+     */
+    protected $introducednamespacestack;
     /**
      * Construcs mapper
      */
-    public function __construct()
-    {
+    public function __construct() {
         parent::__construct();
+        $this->namespacetree = array();
+        $this->lookupnamespacestack = array();
+        $this->instroducednamespacestack = array();
+    }
+    
+    public function push_lookup_entry($name) {
+        if (count($this->lookupnamespacestack) == 0) {
+            $this->lookupnamespacestack[] = array();
+        }
+        $this->lookupnamespacestack[0][] = $name;
+    }
+    
+    public function clear_lookup_namespace() {
+        $this->lookupnamespacestack[0] = $this->introducednamespacestack;
+    }
+    
+    /** Sets namespace tree for a mapper
+     *  @param array $tree a tree for namespaces
+     */
+    public function setNamespaceTree($tree) {
+        $this->namespacetree = $tree;
     }
     /**
      * Adds new type to a test
      * @param string $typename a name for type
      */
-    public function introduce_type($typename)
-    {
+    public function introduce_type($typename) {
         $this->stack[count($this->stack) - 1][]= (string)$typename;
     }
 
@@ -54,20 +84,28 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
      * @param string $name token value
      * @return boolean whether token value is type
      */
-    public function is_type($name)
-    {
+    public function is_type($name) {
         $result = false;
         $name = (string)$name;
-        if (count($this->stack))
-        {
-            foreach($this->stack as $frame)
-            {
-                if (count($frame))
-                {
-                    $result = $result || in_array($name, $frame);
-                }
-            }
+        $currentlookupnamespace = array();
+        if (count($this->lookupnamespacestack) != 0) {
+            $currentlookupnamespace = $this->lookupnamespacestack[count($this->lookupnamespacestack) - 1];
         }
+        $result = false;
+        if (count($currentlookupnamespace)) {
+            for($i = count($currentlookupnamespace) - 1; $i >  -1; $i--) {
+                $nspace = $this->namespacetree;
+                for($j = 0; $j <= $i; $j++) {
+                    $nspace = $nspace[$currentlookupnamespace[$j]];
+                }
+                $result = $result ||  array_key_exists($name, $nspace);
+            }
+            if ($result == false) {
+                $result = array_key_exists($name, $this->namespacetree);
+            }
+        } else {
+            $result = array_key_exists($name, $this->namespacetree);
+        }        
         return $result;
     }
 
@@ -106,7 +144,8 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
 				'char' => 'CHAR', 
 				'int' => 'INT',
 				'float' => 'FLOAT',
-				'double' => 'DOUBLE',
+				'double' => 'DOUBLE',                
+                'void' => 'VOID'
 			),
             'numeric'    => array( $any => 'NUMERIC'),
             'ellipsis'   => array( $any => 'ELLIPSIS'),
@@ -251,7 +290,7 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
         }
         if ($token->type() == 'identifier') {
             if ($this->is_type($token->value())) {
-                return 'CUSTOMTYPENAME';
+                return 'TYPENAME';
             }
         }
         return parent::map($token);

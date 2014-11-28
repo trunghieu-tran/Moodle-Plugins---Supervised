@@ -1,0 +1,7 @@
+[
+ (type) {
+  (user_defined_type) {
+   a
+  }
+ }
+]
