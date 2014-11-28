@@ -190,6 +190,7 @@ if (count($inputs)) {
 		$name = preg_replace("/\.php$/", ".txt", $file);
 		
 		$lang = new block_formal_langs_language_cpp_parseable_language();
+		$lang->parser()->setNamespaceTree($namespacetree);
 		$result = $lang->create_from_string($string);
 		$newstring = print_node($result->syntaxtree, 0);
 		if ($buildethalon)
