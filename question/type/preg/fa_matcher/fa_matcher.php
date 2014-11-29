@@ -247,7 +247,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 $this->after_transition_matched($newstate, $transition, $curpos, $length);
 
                 // This could be the end of a recursive call.
-                if ($newstate->recursion_level() > 0 && $newstate->is_full()) {
+                while ($newstate !== null && $newstate->recursion_level() > 0 && $newstate->is_full()) {
                     $topitem = array_pop($newstate->stack);
                     $recursionmatch = $topitem->last_subexpr_match($this->get_options()->mode, $topitem->subexpr);
                     $newstate = $this->match_recursive_transition_end($newstate, $topitem->recursionstartpos, $recursionmatch[1], $str, $curpos, $length);
@@ -549,12 +549,13 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                             $skip = $skip || ($transition->loopsback && $newstate->has_null_iterations());
 
                             // This could be the end of a recursive call.
-                            if (!$skip && $recursionlevel > 0 && $newstate->is_full()) {
+                            while (!$skip && $newstate !== null && $newstate->recursion_level() > 0 && $newstate->is_full()) {
                                 $topitem = array_pop($newstate->stack);
                                 $recursionmatch = $topitem->last_subexpr_match($this->get_options()->mode, $topitem->subexpr);
                                 $newstate = $this->match_recursive_transition_end($newstate, $topitem->recursionstartpos, $recursionmatch[1], $str, $curpos, $length);
-                                $skip = $skip || ($newstate === null);
                             }
+
+                            $skip = $skip || ($newstate === null);
 
                             // Save the current match.
                             if (!$skip) {
@@ -692,12 +693,13 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                             $endstatereached = $endstatereached || (!$skip && $newstate->recursion_level() === 0 && $newstate->is_full());
 
                             // This could be the end of a recursive call.
-                            if (!$skip && $recursionlevel > 0 && $newstate->is_full()) {
+                            while (!$skip && $newstate !== null && $newstate->recursion_level() > 0 && $newstate->is_full()) {
                                 $topitem = array_pop($newstate->stack);
                                 $recursionmatch = $topitem->last_subexpr_match($this->get_options()->mode, $topitem->subexpr);
                                 $newstate = $this->match_recursive_transition_end($newstate, $topitem->recursionstartpos, $recursionmatch[1], $str, $curpos, $length);
-                                $skip = $skip || ($newstate === null);
                             }
+
+                            $skip = $skip || ($newstate === null);
 
                             // Save the current result.
                             if (!$skip) {
