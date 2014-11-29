@@ -66,7 +66,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             case qtype_preg_node::TYPE_LEAF_META:
             case qtype_preg_node::TYPE_LEAF_ASSERT:
             case qtype_preg_node::TYPE_LEAF_BACKREF:
-            //case qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL:
+            case qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL:
                 return 'qtype_preg_fa_leaf';
         }
 
@@ -97,7 +97,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             case qtype_preg_node::TYPE_LEAF_META:
             case qtype_preg_node::TYPE_LEAF_ASSERT:
             case qtype_preg_node::TYPE_LEAF_BACKREF:
-            //case qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL:
+            case qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL:
             case qtype_preg_node::TYPE_NODE_ERROR:
                 return true;
             default:
@@ -505,7 +505,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                     $length = 0;
 
                     //$char = core_text::substr($str, $curpos, 1);
-                    //echo "trying $transition at pos $curpos (char '$char') and recursion level {$curstate->recursion_level()}\n";
+                    //$recursionlevel = $curstate->recursion_level();
+                    //echo "level $recursionlevel: trying $transition at pos $curpos (char '$char')\n";
 
                     if ($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL) {
                         // Handle a recursive transition
@@ -533,6 +534,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                                 $newstate = $this->match_recursive_transition_end($newstate, $topitem->recursionstartpos, $recursionmatch[1], $str, $curpos, $length);
                             }
 
+                            //echo "level $recursionlevel: MATCHED $transition at pos $curpos (char '$char'). length changed {$curstate->length} : {$newstate->length}\n\n";
+                            //echo $newstate->subpatts_to_string();
+
                             // Additional filtering for subexpression calls
                             $skip = !$newstate->is_subexpr_match_started($newstate->subexpr());
                             $skip = $skip || ($newstate->recursion_level() > 0 && $newstate->is_subexpr_match_finished($newstate->subexpr()));
@@ -555,7 +559,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
                     if ($newstate === null) {
                         // Handle a partial match.
-                        //echo "not matched, partial match length is $length\n";
+                        //echo "level $recursionlevel: not matched, partial match length is $length\n";
                         if (empty($fullmatches) && $curstate->recursion_level() == 0) {
                             $newstate = clone $curstate;
                             $newstate->length += $length;
@@ -641,7 +645,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                     $length = 0;
 
                     //$char = core_text::substr($str, $curpos, 1);
-                    //echo "trying $transition at pos $curpos (char '$char') and recursion level {$curstate->recursion_level()}\n";
+                    //$recursionlevel = $curstate->recursion_level();
+                    //echo "level $recursionlevel: trying $transition at pos $curpos (char '$char')\n";
 
                     if ($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL) {
                         // Handle a recursive transition
@@ -669,7 +674,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                                 $newstate = $this->match_recursive_transition_end($newstate, $topitem->recursionstartpos, $recursionmatch[1], $str, $curpos, $length);
                             }
 
-                            //echo "MATCHED $transition at pos $curpos (char '$char') and recursion level count($curstate->stack). length changed {$curstate->length} : {$newstate->length}\n\n";
+                            //echo "level $recursionlevel: MATCHED $transition at pos $curpos (char '$char'). length changed {$curstate->length} : {$newstate->length}\n\n";
                             //echo $newstate->subpatts_to_string();
 
                             // Additional filtering for subexpression calls
@@ -692,7 +697,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
                     if ($newstate === null) {
                         // Handle a partial match.
-                        //echo "not matched, partial match length is $length\n";
+                        //echo "level $recursionlevel: not matched, partial match length is $length\n";
                         if (!$endstatereached && $curstate->recursion_level() == 0) {
                             $newstate = clone $curstate;
                             $newstate->length += $length;
