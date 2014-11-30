@@ -325,9 +325,9 @@ M.preg_authoring_tools_script = (function ($) {
     graph_node_misclicked : function (e) {
         e.preventDefault();
         if (!self.is_graph_selection_rectangle_visible()) {
-        
+
             $('input[name=\'tree_selected_node_points\']').val('');
-            
+
             self.load_content();
             self.load_strings();
         }
@@ -364,11 +364,7 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     upd_content_success : function (data, textStatus, jqXHR) {
-        if (typeof data == "object") {
-            new M.core.ajaxException(data);
-            return;
-        }
-        var json = JSON.parse(data),
+        var json = (typeof data == "object") ? data : JSON.parse(data),
             regex = json['regex'],
             //engine = json['engine'],
             notation = json['notation'],
@@ -395,11 +391,7 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     upd_strings_success : function (data, textStatus, jqXHR) {
-        if (typeof data == "object") {
-            new M.core.ajaxException(data);
-            return;
-        }
-        var json = JSON.parse(data),
+        var json = (typeof data == "object") ? data : JSON.parse(data),
             regex = json['regex'],
             engine = json['engine'],
             notation = json['notation'],
@@ -491,9 +483,9 @@ M.preg_authoring_tools_script = (function ($) {
                             + parseInt(translate_x) - $('#graph_hnd').prop('scrollLeft')),
                         (document.getElementById('graph_hnd').getBoundingClientRect().top - document.getElementById('graph_img').getBoundingClientRect().top
                             + parseInt(translate_y) + $('#graph_hnd').prop('scrollTop')));
-                            
+
                     $('input[name=\'tree_selected_node_points\']').val(sel.indfirst + ',' + sel.indlast);
-                            
+
                     self.load_content(sel.indfirst, sel.indlast);
                     self.load_strings(sel.indfirst, sel.indlast);
 
