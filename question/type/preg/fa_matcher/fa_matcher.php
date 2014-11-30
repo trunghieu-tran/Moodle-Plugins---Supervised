@@ -935,8 +935,10 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             $this->dstroot->create_automaton($result, $stack, $mergeassertions);
             $body = array_pop($stack);
             $result->calculate_subexpr_start_and_end_states();
-            //printf($result->fa_to_dot() . "\n");
-            //$result->remove_unreachable_states();     TODO 27
+
+            if ($mergeassertions) {
+                $result->remove_unreachable_states();
+            }
             //printf($result->fa_to_dot() . "\n");
             //var_dump($result->start_states());
             //var_dump($result->end_states());
