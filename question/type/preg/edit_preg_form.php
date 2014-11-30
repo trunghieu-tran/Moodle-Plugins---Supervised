@@ -124,7 +124,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         $mform->addHelpButton('usecharhint', 'usecharhint', 'qtype_preg');
         $mform->addElement('text', 'charhintpenalty', get_string('charhintpenalty', 'qtype_preg'), array('size' => 3));
         $mform->setDefault('charhintpenalty', '0.2');
-        $mform->setType('charhintpenalty', PARAM_NUMBER);
+        $mform->setType('charhintpenalty', PARAM_FLOAT);
         $mform->addHelpButton('charhintpenalty', 'charhintpenalty', 'qtype_preg');
 
         $mform->addElement('selectyesno', 'uselexemhint', get_string('uselexemhint', 'qtype_preg'));
@@ -132,7 +132,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         $mform->addHelpButton('uselexemhint', 'uselexemhint', 'qtype_preg');
         $mform->addElement('text', 'lexemhintpenalty', get_string('lexemhintpenalty', 'qtype_preg'), array('size' => 3));
         $mform->setDefault('lexemhintpenalty', '0.4');
-        $mform->setType('lexemhintpenalty', PARAM_NUMBER);
+        $mform->setType('lexemhintpenalty', PARAM_FLOAT);
         $mform->addHelpButton('lexemhintpenalty', 'lexemhintpenalty', 'qtype_preg');
 
         // Fetch course context if it is possible.
@@ -156,8 +156,8 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         $mform->setAdvanced('lexemusername');
         $mform->setType('lexemusername', PARAM_TEXT);
 
-        $creategrades = get_grade_options();
-        $mform->addElement('select', 'hintgradeborder', get_string('hintgradeborder', 'qtype_preg'), $creategrades->gradeoptions);
+        $gradeoptions = question_bank::fraction_options();
+        $mform->addElement('select', 'hintgradeborder', get_string('hintgradeborder', 'qtype_preg'), $gradeoptions);
         $mform->setDefault('hintgradeborder', 1);
         $mform->addHelpButton('hintgradeborder', 'hintgradeborder', 'qtype_preg');
         $mform->setAdvanced('hintgradeborder');
