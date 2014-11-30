@@ -5116,6 +5116,33 @@ class qtype_preg_cross_tests_from_preg {
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
+    function data_for_test_recursion_3() {
+        $test1 = array( 'str'=>'[a[a',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>4),
+                        'ext_index_first'=>array(0=>0,1=>0),
+                        'ext_length'=>array(0=>3,1=>3),
+                        'left'=>array(1),
+                        'next'=>'\]',
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        $test2 = array( 'str'=>'[a[a]',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>5),
+                        'ext_index_first'=>array(0=>0,1=>0),
+                        'ext_length'=>array(0=>6,1=>6),
+                        'left'=>array(1),
+                        'next'=>'\]',
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        return array('regex'=>'^(\[[a-z](?1)?\])$',
+                     'tests'=>array($test1, $test2));
+    }
+
     /*function data_for_test_leaf_assert_G() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,

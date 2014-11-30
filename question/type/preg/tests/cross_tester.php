@@ -62,7 +62,6 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
-require_once($CFG->dirroot . '/question/type/preg/question.php');
 
 abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
@@ -97,7 +96,6 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     // TODO: tags for different capabilities for matchers.
     protected $testdataobjects;        // Objects with test data.
     protected $doextrachecks;          // Is it needed to do extra checks.
-    protected $question;               // Question object for getting matchers.
     protected $blacklist;              // Blacklist of tags in different modes.
 
     /**
@@ -110,6 +108,11 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
      */
     protected function blacklist_tags() {
         return array();
+    }
+
+    protected function get_matcher($enginename, $regex, $options) {
+        $engineclass = 'qtype_preg_' . $enginename;
+        return new $engineclass($regex, $options);
     }
 
     /**
@@ -134,18 +137,17 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         // Create a matcher in POSIX mode for categorization tests.
         $options = new qtype_preg_matching_options();
         $options->mode = qtype_preg_handling_options::MODE_POSIX;
-        $matcher = $this->question->get_matcher($this->engine_name(), $regex);
-        $matcher->set_options($options);
+        $matcher = $this->get_matcher($this->engine_name(), $regex, $options);
 
         // Match the first test.
         $matcher->match($test1['str']);
         $obtained1 = $matcher->get_match_results();
-        $right = $this->compare_results($regex, self::NOTATION_NATIVE, $test1['str'], 0, '', $matcher, $test1, $obtained1, 'categorize', 'associativity', false, false);
+        $right = $this->compare_results($regex, self::NOTATION_NATIVE, $test1['str'], '', $matcher, $test1, $obtained1, 'categorize', 'associativity', false, false);
 
         // Match the second test.
         $matcher->match($test2['str']);
         $obtained2 = $matcher->get_match_results();
-        $left = $this->compare_results($regex, self::NOTATION_NATIVE, $test2['str'], 0, '', $matcher, $test2, $obtained2, 'categorize', 'associativity', false, false);
+        $left = $this->compare_results($regex, self::NOTATION_NATIVE, $test2['str'], '', $matcher, $test2, $obtained2, 'categorize', 'associativity', false, false);
 
         if ($left && !$right) {
             return self::TAG_ASSOC_LEFT;
@@ -158,7 +160,6 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     public function __construct() {
         $this->testdataobjects = array();
         $this->doextrachecks = false;       // TODO: control this field from outside.
-        $this->question = new qtype_preg_question();
         $this->blacklist = array();
 
         $testdir = dirname(__FILE__) . '/';
@@ -250,21 +251,19 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
     /**
      * Performs some extra checks on results which contain generated ending of a partial match.
      * @param $regex - regular expression.
-     * @param $modifiers - modifiers.
      * @param $obtained - a result to check.
      * @return true if everything is correct, false otherwise.
      */
-    function do_extra_check($regex, $notation, $modifiers, $obtained) {
+    /*function do_extra_check($regex, $options, $obtained) {
         if ($obtained->extendedmatch === null || !$obtained->extendedmatch->full) {
             return true;
         }
 
-        $str = $obtained->matched_part() . $obtained->string_extension();
         $boolstr = array(false => 'FALSE', true => 'TRUE');
         $result = true;
-        $matcher = $this->question->get_matcher('php_preg_matcher', $regex, false, $modifiers, null, $notation);
+        $matcher = $this->get_matcher('php_preg_matcher', $regex, $options);
 
-        $matcher->match($str);
+        $matcher->match($obtained->extendedmatch->str);
         $newresults = $matcher->get_match_results();
 
         // Length + left should remain the same.
@@ -280,12 +279,12 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         }
 
         return $result;
-    }
+    }*/
 
     /**
      * Compares obtained results with expected and writes all flags.
      */
-    function compare_results($regex, $notation, $str, $mods, $modstr, $matcher, $expected, $obtained, $classname, $methodname, $skippartialcheck, $dumpfails) {
+    function compare_results($regex, $notation, $str, $modstr, $matcher, $expected, $obtained, $classname, $methodname, $skippartialcheck, $dumpfails) {
         // Do some initialization.
         $fullpassed = ($expected['full'] === $obtained->full);
         $ismatchpassed = true;
@@ -422,7 +421,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
             }
 
             $enginename = $matcher->name();
-            echo $mods == '' ?
+            echo $modstr == '' ?
                  "$enginename failed on regex '$regex' and string '$str' ($classname, $methodname):\n" :
                  "$enginename failed on regex '$regex' string '$str' and modifiers '$modstr' ($classname, $methodname):\n";
             echo $obtainedstr;
@@ -448,7 +447,6 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         $exceptiontests = array();
 
         $options = new qtype_preg_matching_options();  // Forced subexpression catupring.
-        $enginename = $this->engine_name();
         $blacklist = array_merge($this->blacklist_tags(), $this->blacklist);
 
         foreach ($this->testdataobjects as $testdataobj) {
@@ -464,12 +462,10 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                 $data = $testdataobj->$methodname();
                 $regex = $data['regex'];
                 $modifiersstr = '';
-                $modifiers = 0;
                 $regextags = array();
                 $notation = self::NOTATION_NATIVE;
                 if (array_key_exists('modifiers', $data)) {
                     $modifiersstr = $data['modifiers'];
-                    $modifiers = qtype_preg_handling_options::string_to_modifiers($modifiersstr);
                 }
                 if (array_key_exists('tags', $data)) {
                     $regextags = $data['tags'];
@@ -491,11 +487,11 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                 // Get matcher for the regex.
                 $timestart = round(microtime(true) * 1000);
                 $options->mode = in_array(self::TAG_MODE_POSIX, $regextags) ? qtype_preg_handling_options::MODE_POSIX : qtype_preg_handling_options::MODE_PCRE;
+                $options->modifiers = qtype_preg_handling_options::string_to_modifiers($modifiersstr);
                 $options->debugmode = in_array(self::TAG_DEBUG_MODE, $regextags);
                 $options->mergeassertions = in_array(self::TAG_FAIL_MODE_MERGE, $regextags);
                 $options->extensionneeded = !in_array(self::TAG_DONT_CHECK_PARTIAL, $regextags);
-                $matcher = $this->question->get_matcher($enginename, $regex, false, $modifiers, null, $notation);
-                $matcher->set_options($options);
+                $matcher = $this->get_matcher($this->engine_name(), $regex, $options);
                 $timeend = round(microtime(true) * 1000);
                 if ($timeend - $timestart > self::MAX_BUILDING_TIME) {
                     $slowbuildtests[] = $classname . ' : ' . $methodname;
@@ -539,7 +535,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
                     // Results obtained, check them.
                     $skippartialcheck = in_array(self::TAG_DONT_CHECK_PARTIAL, $tags);
-                    if ($this->compare_results($regex, $notation, $str, $modifiers, $modifiersstr, $matcher, $expected, $obtained, $classname, $methodname, $skippartialcheck, true)) {
+                    if ($this->compare_results($regex, $notation, $str, $modifiersstr, $matcher, $expected, $obtained, $classname, $methodname, $skippartialcheck, true)) {
                         $passcount++;
                     } else {
                         $failcount++;
