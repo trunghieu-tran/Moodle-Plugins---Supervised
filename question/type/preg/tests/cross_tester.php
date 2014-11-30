@@ -420,6 +420,11 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                 $expectedstr .= $this->dump_scalar('LEFT:            ', $expected['left'][0]);
             }
 
+            // full generated string
+            if ($obtained->extendedmatch !== null && (!$nextpassed || !$leftpassed)) {
+                $obtainedstr .= $this->dump_scalar('FULL STR:        ', $obtained->extendedmatch->str());
+            }
+
             $enginename = $matcher->name();
             echo $modstr == '' ?
                  "$enginename failed on regex '$regex' and string '$str' ($classname, $methodname):\n" :
