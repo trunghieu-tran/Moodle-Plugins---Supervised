@@ -5067,6 +5067,55 @@ class qtype_preg_cross_tests_from_preg {
                      'tests'=>array($test1, $test2, $test3));
     }
 
+    function data_for_test_recursion_2() {
+        $test1 = array( 'str'=>'[',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1),
+                        'ext_index_first'=>array(0=>0),
+                        'ext_length'=>array(0=>3),
+                        'left'=>array(2),
+                        'next'=>'a',
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        $test2 = array( 'str'=>'[[',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1),
+                        'ext_index_first'=>array(0=>0),
+                        'ext_length'=>array(0=>3),
+                        'left'=>array(2),
+                        'next'=>'a',
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        $test3 = array( 'str'=>'[a[',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>3),
+                        'ext_index_first'=>array(0=>0),
+                        'ext_length'=>array(0=>3),
+                        'left'=>array(1),
+                        'next'=>'\]',
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        $test4 = array( 'str'=>'[a[a',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>4),
+                        'ext_index_first'=>array(0=>0),
+                        'ext_length'=>array(0=>3),
+                        'left'=>array(1),
+                        'next'=>'\]',
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        return array('regex'=>'\[[a-z](?R)?\]',
+                     'tests'=>array($test1, $test2, $test3, $test4));
+    }
+
     /*function data_for_test_leaf_assert_G() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,

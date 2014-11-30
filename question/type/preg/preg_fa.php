@@ -790,6 +790,10 @@ class qtype_preg_fa {
                 if ($transition->startsbackrefedsubexprs) {
                     $result[$transition->from] = true;
                 }
+                // Check if the transition starts a recursive subexpression call
+                if ($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL && $transition->pregleaf->isrecursive) {
+                    $result[$transition->from] = true;
+                }
             }
         }
 
