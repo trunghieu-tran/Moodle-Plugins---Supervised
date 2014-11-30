@@ -865,6 +865,10 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             }
         }
 
+        // Because a partial match could be found in a recursive call, remove all
+        // recursive stack items to get back to the 0-level
+        $result->stack = array($result->stack[0]);
+
         if ($result->extendedmatch !== null) {
             $result->extendedmatch = $result->extendedmatch->to_matching_results();
         }

@@ -7741,6 +7741,8 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>10),
                         'length'=>array(0=>11,1=>1),
+                        'ext_index_first'=>array(0=>0,1=>10),
+                        'ext_length'=>array(0=>11,1=>1),
                         'left'=>array(0),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -7750,8 +7752,10 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0),
                         'length'=>array(0=>7,1=>1),
-                        'left'=>array(1),
-                        'next'=>'\)',
+                        'ext_index_first'=>array(0=>0,1=>0),
+                        'ext_length'=>array(0=>1,1=>1),
+                        'left'=>array(0),
+                        'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'^([^()]|\((?1)*\))*$',
@@ -7762,17 +7766,21 @@ class qtype_preg_cross_tests_from_pcre {
         $test5 = array( 'str'=>'*** Failers',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0,3=>0,4=>0),
-                        'length'=>array(0=>3,3=>3,4=>1),
+                        'index_first'=>array(0=>0,2=>0),
+                        'length'=>array(0=>11,2=>1),
+                        'ext_index_first'=>array(0=>0,1=>0),
+                        'ext_length'=>array(0=>0,1=>0),
                         'left'=>array(0),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test6 = array( 'str'=>'Thequickbrownfox',
-                        'is_match'=>false,
+                        'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(),
-                        'length'=>array(),
+                        'index_first'=>array(0=>0,2=>0),
+                        'length'=>array(0=>16,2=>1),
+                        'ext_index_first'=>array(0=>0,1=>0),
+                        'ext_length'=>array(0=>0,1=>0),
                         'left'=>array(0),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
