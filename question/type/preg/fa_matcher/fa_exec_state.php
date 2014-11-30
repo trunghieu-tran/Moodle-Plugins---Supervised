@@ -668,6 +668,12 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
             return false;
         }
 
+        if ($this->recursion_level() < $other->recursion_level()) {
+            return true;
+        } else if ($other->recursion_level() < $this->recursion_level()) {
+            return false;
+        }
+
         if ($this->length < $other->length) {
             return true;
         } else if ($other->length < $this->length) {

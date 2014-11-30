@@ -598,16 +598,14 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                         }
                     }
 
-                    if ($newstate === null) {
+                    if ($newstate === null && empty($fullmatches)) {
                         // Handle a partial match.
                         //echo "level $recursionlevel: not matched, partial match length is $length\n";
-                        if (empty($fullmatches) && $recursionlevel === 0) {
-                            $newstate = clone $curstate;
-                            $newstate->length += $length;
-                            $newstate->set_last_transition($transition);
-                            $newstate->set_last_match_len($length);
-                            $partialmatches[] = $newstate;
-                        }
+                        $newstate = clone $curstate;
+                        $newstate->length += $length;
+                        $newstate->set_last_transition($transition);
+                        $newstate->set_last_match_len($length);
+                        $partialmatches[] = $newstate;
                     }
                 }
 
@@ -741,16 +739,14 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                         }
                     }
 
-                    if ($newstate === null) {
+                    if ($newstate === null && !$endstatereached) {
                         // Handle a partial match.
                         //echo "level $recursionlevel: not matched, partial match length is $length\n";
-                        if (!$endstatereached && $recursionlevel === 0) {
-                            $newstate = clone $curstate;
-                            $newstate->length += $length;
-                            $newstate->set_last_transition($transition);
-                            $newstate->set_last_match_len($length);
-                            $partialmatches[] = $newstate;
-                        }
+                        $newstate = clone $curstate;
+                        $newstate->length += $length;
+                        $newstate->set_last_transition($transition);
+                        $newstate->set_last_match_len($length);
+                        $partialmatches[] = $newstate;
                     }
                 }
             }
