@@ -7795,8 +7795,10 @@ class qtype_preg_cross_tests_from_pcre {
         $test5 = array( 'str'=>'((2+2)*-3)-7)',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>10),
+                        'index_first'=>array(0=>0,1=>0,2=>6),
+                        'length'=>array(0=>10,1=>10,2=>1),
+                        'ext_index_first'=>array(0=>0,1=>0,2=>6),
+                        'ext_length'=>array(0=>10,1=>10,2=>1),
                         'left'=>array(0),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
