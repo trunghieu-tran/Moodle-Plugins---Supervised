@@ -574,8 +574,8 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0,2=>4),
                         'length'=>array(0=>28,1=>3,2=>24),
-                        'left'=>array(21),
-                        'next'=>'=',
+                        'left'=>array(14),
+                        'next'=>'\.',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test6 = array( 'str'=>'abc!pqr=apquxz.ixr.zzz.ac.ukk',
@@ -583,8 +583,8 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0,2=>4),
                         'length'=>array(0=>29,1=>3,2=>25),
-                        'left'=>array(21),
-                        'next'=>'=',
+                        'left'=>array(0),
+                        'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'^([^!]+)!(.+)=apquxz\.ixr\.zzz\.ac\.uk$',
@@ -822,8 +822,10 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>15),
-                        'left'=>array(1),
-                        'next'=>'"',
+                        'ext_index_first'=>array(0=>0),
+                        'ext_length'=>array(0=>6),
+                        'left'=>array(0),
+                        'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'^\".*\"\s*(;.*)?$',
@@ -2734,8 +2736,10 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>64),
-                        'left'=>array(10),
-                        'next'=>' ',
+                        'ext_index_first'=>array(0=>0),
+                        'ext_length'=>array(0=>14),
+                        'left'=>array(9),
+                        'next'=>'o',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'word (?:[a-zA-Z0-9]+ ){0,10}otherword',
@@ -6468,8 +6472,10 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>5),
                         'length'=>array(0=>1),
-                        'left'=>array(3),
-                        'next'=>'[Bb]',
+                        'ext_index_first'=>array(0=>5,1=>5),
+                        'ext_length'=>array(0=>2,1=>1),
+                        'left'=>array(2),
+                        'next'=>'[Dd]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test4 = array( 'str'=>'abcE',

@@ -40,9 +40,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
     // States to backtrack to when generating extensions
     protected $backtrackstates = array();
 
-    // Should we generate extensions for each match before choosing the best one?
-    protected $generateextensionforeachmatch = false;
-
     // Should we call bruteforce method to find a match?
     protected $bruteforcematch = false;
 
@@ -848,11 +845,11 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             }
 
             // If there was no full match, generate extensions for each partial match.
-            if (!$fullmatchexists && $this->generateextensionforeachmatch && $this->options->extensionneeded) {
+            if (!$fullmatchexists && $this->options->extensionneeded) {
                 $this->generate_extensions($possiblematches, $str, $startpos);
             }
 
-            // Choose the best one.
+            // Choose the best match.
             $result = array_pop($possiblematches);
             foreach ($possiblematches as $match) {
                 if ($match->leftmost_longest($result, false)) {
@@ -860,9 +857,21 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 }
             }
 
-            if (!$fullmatchexists && !$this->generateextensionforeachmatch && $this->options->extensionneeded) {
-                $this->generate_extensions(array($result), $str, $startpos);
+            // Choose the best extension. A better extension could be generated from another match.
+            // But use the extention from the choosen match as the default value.
+            if (!$fullmatchexists && $this->options->extensionneeded) {
+                foreach ($possiblematches as $match) {
+                    $ext = $match->extendedmatch;
+                    if ($ext === null) {
+                        continue;
+                    }
+                    if ($result->extendedmatch === null || $match->left < $result->left) {
+                        $result->extendedmatch = $ext;
+                        $result->left = $match->left;
+                    }
+                }
             }
+
         }
 
         // Because a partial match could be found in a recursive call, remove all
@@ -903,14 +912,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
     protected function calculate_backtrackstates() {
         $this->backtrackstates = $this->automaton->calculate_backtrack_states();
-    }
-
-    /**
-     * Check if it's necessary to generate extensions for each possible match. For now the only such situation
-     * is when a transition ending a quantifier has non-empty intersection with next transitions.
-     */
-    protected function calculate_generateextensionforeachmatch() {
-        $this->generateextensionforeachmatch = !empty($this->backtrackstates);
     }
 
     protected function calculate_bruteforce() {
@@ -972,7 +973,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
         $this->calculate_nesting_map($this->astroot, array($this->astroot->subpattern));
         $this->calculate_backtrackstates();
-        $this->calculate_generateextensionforeachmatch();
         $this->calculate_bruteforce();
 
         // Here we need to inform the automaton that 0-subexpr is represented by the AST root.
