@@ -1,0 +1,10 @@
+[
+ (type) {
+  const
+  (builtintype) {
+   unsigned
+   short
+   int
+  }
+ }
+]
