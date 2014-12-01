@@ -3914,9 +3914,9 @@ class qtype_preg_cross_tests_from_preg {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
                         'ext_index_first'=>array(0=>0,1=>2),
-                        'ext_length'=>array(0=>5,1=>3),
-                        'left'=>array(2),
-                        'next'=>'f');
+                        'ext_length'=>array(0=>3,1=>1),
+                        'left'=>array(1),
+                        'next'=>'h');
 
         return array('regex'=>'ab(cd|efg|h)',
                      'tests'=>array($test1, $test2, $test3),
