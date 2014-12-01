@@ -1,0 +1,12 @@
+[
+ (instantiated_template_type) {
+  vector
+  (template_instantiation_arguments) {
+   <
+   (builtintype) {
+    int
+   }
+   >
+  }
+ }
+]

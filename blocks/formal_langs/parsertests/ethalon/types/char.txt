@@ -1,9 +1,5 @@
 [
- (type) {
-  (non_const_type) {
-   (builtintype) {
-    char
-   }
-  }
+ (builtintype) {
+  char
  }
 ]

@@ -1,11 +1,7 @@
 [
- (type) {
-  (non_const_type) {
-   (builtintype) {
-    unsigned
-    short
-    int
-   }
-  }
+ (builtintype) {
+  unsigned
+  short
+  int
  }
 ]

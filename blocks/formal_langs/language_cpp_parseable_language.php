@@ -57,11 +57,17 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
         if (count($this->lookupnamespacestack) == 0) {
             $this->lookupnamespacestack[] = array();
         }
-        $this->lookupnamespacestack[0][] = $name;
+        $this->lookupnamespacestack[count($this->lookupnamespacestack) - 1][] = $name;
+    }
+    
+    public function start_new_lookup_namespace() {
+        $this->lookupnamespacestack[] = array();
     }
     
     public function clear_lookup_namespace() {
-        $this->lookupnamespacestack[0] = $this->introducednamespacestack;
+        if (count($this->lookupnamespacestack)) {
+            unset($this->lookupnamespacestack[count($this->lookupnamespacestack) - 1]);
+        }
     }
     
     /** Sets namespace tree for a mapper
@@ -92,7 +98,7 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
             }            
             $nspace = $nspace[$space];
         }
-                return array_key_exists($name, $nspace);
+        return array_key_exists($name, $nspace);
     }
 
     /**
