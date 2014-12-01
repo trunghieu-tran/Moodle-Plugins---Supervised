@@ -444,11 +444,6 @@ function_body(R) ::= SEMICOLON(A) . {
 }
 
 
-possible_function_name(R) ::= primitive_or_complex_type(A) . {
-    $this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%s"));
-	R = $this->create_node('possible_function_name', array(A));
-}
-
 possible_function_name(R) ::= IDENTIFIER(A) . {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%s"));
 	R = $this->create_node('possible_function_name', array(A));
@@ -813,18 +808,8 @@ expr_prec_11(R) ::= type(A) expr_atom(B) ASSIGN(C) expr_prec_9(D) . {
 	R = $this->create_node('variable_declaration_with_assignment', array( A, B, C, D ));
 }
 
-expr_prec_11(R) ::= type(A) primitive_or_complex_type(B) ASSIGN(C) expr_prec_9(D) . {
-	$this->currentrule = new block_formal_langs_description_rule("объявление переменной %2(имя переменной)", array("%ur(именительный)", "%s", "оператор присваивания", "%ur(именительный)"));
-	R = $this->create_node('variable_declaration_with_assignment', array( A, B, C, D ));
-}
-
 expr_prec_11(R) ::= type(A) IDENTIFIER(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("объявление переменной %2(имя переменной)", array("%ur(именительный)", "%s"));
-	R = $this->create_node('variable_declaration', array( A, B ));
-}
-
-expr_prec_11(R) ::= type(A) primitive_or_complex_type(B)  . {
-    $this->currentrule = new block_formal_langs_description_rule("объявление переменной %2(имя переменной)", array("%ur(именительный)", "%s"));
 	R = $this->create_node('variable_declaration', array( A, B ));
 }
 
@@ -833,17 +818,8 @@ expr_prec_11(R) ::= type_with_qualifier(A) IDENTIFIER(C) ASSIGN(D) expr_prec_9(E
 	R = $this->create_node('variable_declaration_with_assignment', array( A,  C, D, E ));
 }
 
-expr_prec_11(R) ::= type_with_qualifier(A)  primitive_or_complex_type(C) ASSIGN(D) expr_prec_9(E) . {
-	$this->currentrule = new block_formal_langs_description_rule("объявление переменной %2(имя переменной)", array("%ur(именительный)", "%s", "оператор присваивания", "%ur(именительный)"));
-	R = $this->create_node('variable_declaration_with_assignment', array( A, C, D, E ));
-}
 
 expr_prec_11(R) ::= type_with_qualifier(A)  IDENTIFIER(C)  . {
-	$this->currentrule = new block_formal_langs_description_rule("объявление переменной %2(имя переменной)", array("%ur(именительный)", "%s"));
-	R = $this->create_node('variable_declaration', array( A, C ));
-}
-
-expr_prec_11(R) ::= type_with_qualifier(A) primitive_or_complex_type(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("объявление переменной %2(имя переменной)", array("%ur(именительный)", "%s"));
 	R = $this->create_node('variable_declaration', array( A, C ));
 }
@@ -1305,80 +1281,38 @@ type(R) ::= CONSTKWD(A) non_const_type(B) . {
 }
 
 type(R) ::= non_const_type(A) . {
-    $this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
-    R = $this->create_node('type', array( A ));
-}
-
-non_const_type(R) ::= non_const_type(A) MULTIPLY(B) . [TYPEUNARY] {
-	$this->currentrule = new block_formal_langs_description_rule("указатель на переменную %1(родительный) типа", array("%ur(именительный)", "признак указателя"));
-	R = $this->create_node('type', array( A, B ));
-}
-
-non_const_type(R) ::= non_const_type(A) CONSTKWD(B) MULTIPLY(C) . [TYPEUNARY] {
-	$this->currentrule = new block_formal_langs_description_rule("указатель на константную переменную %1(родительный) типа", array("%ur(именительный)", "ключевое слово константности", "признак указателя"));
-	R = $this->create_node('type', array( A, B, C ));
-}
-
-non_const_type(R) ::= non_const_type(A) AMPERSAND(B) . [TYPEUNARY] {
-	$this->currentrule = new block_formal_langs_description_rule("ссылка на  переменную %1(родительный) типа", array("%ur(именительный)", "амперсанд"));
-	R = $this->create_node('type', array( A, B ));
+    R = A;
 }
 
 non_const_type(R) ::= builtintype(A) . {
-	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
-	R = $this->create_node('non_const_type', array( A ));
-}
-
-non_const_type(R) ::= primitive_or_complex_type(A) . {
-	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
-	R = $this->create_node('non_const_type', array( A ));
-}
-
-/*
-primitive_or_complex_type(R) ::= CUSTOMTYPENAME(A) . {
-	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%s"));
-	R = $this->create_node('primitive_or_complex_type', array( A ));
-}
-
-primitive_or_complex_type(R) ::= CUSTOMTYPENAME(A) LESSER(B) GREATER(C) .  {
-	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s", "%s"));
-	R = $this->create_node('primitive_or_complex_type', array( A, B, C ));
-}
-
-primitive_or_complex_type(R) ::= CUSTOMTYPENAME(A) LESSER(B) type_list(C) GREATER(D) .  {
-	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s", "%ur(именительный)", "%s"));
-	R = $this->create_node('primitive_or_complex_type', array( A, B, C, D ));
-}
-
-primitive_or_complex_type(R) ::= primitive_or_complex_type(A)  NAMESPACE_RESOLVE(B) IDENTIFIER(C)  . {
-	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%s"));
-	R = $this->create_node('primitive_or_complex_type', array( A, B, C));
-}
-primitive_or_complex_type(R) ::= primitive_or_complex_type(A)  NAMESPACE_RESOLVE(B) CUSTOMTYPENAME(C)  . {
-	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%s"));
-	R = $this->create_node('primitive_or_complex_type', array( A, B, C));
-}
-
-primitive_or_complex_type(R) ::= primitive_or_complex_type(A)  NAMESPACE_RESOLVE(B) CUSTOMTYPENAME(C) LESSER(D) GREATER(E) . {
-	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%s", "%s", "%s"));
-	R = $this->create_node('primitive_or_complex_type', array( A, B, C, D, E));
-}
-
-primitive_or_complex_type(R) ::= primitive_or_complex_type(A)  NAMESPACE_RESOLVE(B) CUSTOMTYPENAME(C) LESSER(D) type_list(E) GREATER(F) . {
-	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%s", "%s", "%ur", "%s"));
-	R = $this->create_node('primitive_or_complex_type', array( A, B, C, D, E, F));
-}
-*/
-
-non_const_type(R) ::= user_defined_type(A) . {
 	R = A;
 }
 
-primitive_or_complex_type(R) ::= namespace_resolve(A) TYPENAME(B) . {
+non_const_type(R) ::= scoped_type(A) . {
+	R = A;
+}
+
+non_const_type(R) ::= typename_or_instantiated_template_type(A) . {
+	R = A;
+}
+
+scoped_type(R) ::= namespace_resolve(A) TYPENAME(B) template_instantiation_arguments(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%s"));
 	$this->mapper->clear_lookup_namespace();
-	R = $this->create_node('primitive_or_complex_type', array( A,  B));
+	R = $this->create_node('scoped_type', array( A,  B, C));
 } 
+
+scoped_type(R) ::= namespace_resolve(A) TYPENAME(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%s"));
+	$this->mapper->clear_lookup_namespace();
+	R = $this->create_node('scoped_type', array( A,  B));
+} 
+
+namespace_resolve(R) ::=  namespace_resolve(A) TYPENAME(B) template_instantiation_arguments(C)  NAMESPACE_RESOLVE(D) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%ur(именительный)", "операция разрешения видимости"));
+	$this->mapper->push_lookup_entry((string)(B->value()));
+	R = $this->create_node('namespace_resolve', array( A, B, C, D));
+}
 
 namespace_resolve(R) ::=  namespace_resolve(A) TYPENAME(B) NAMESPACE_RESOLVE(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "операция разрешения видимости"));
@@ -1386,18 +1320,108 @@ namespace_resolve(R) ::=  namespace_resolve(A) TYPENAME(B) NAMESPACE_RESOLVE(C) 
 	R = $this->create_node('namespace_resolve', array( A, B, C));
 }
 
+namespace_resolve(R) ::= TYPENAME(A) template_instantiation_arguments(B) NAMESPACE_RESOLVE(C) .  {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)", "операция разрешения видимости"));
+	$this->mapper->start_new_lookup_namespace();
+	$this->mapper->push_lookup_entry((string)(A->value()));
+	R = $this->create_node('namespace_resolve', array( A, B, C));
+}
+
+
 namespace_resolve(R) ::= TYPENAME(A) NAMESPACE_RESOLVE(B) .  {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "операция разрешения видимости"));
+	$this->mapper->start_new_lookup_namespace();
 	$this->mapper->push_lookup_entry((string)(A->value()));
 	R = $this->create_node('namespace_resolve', array( A, B));
 }
 
-/* ================================= VALIDATED PART ================================= */
+/* TYPENAME OR INSTANTIATION */
 
-user_defined_type(R) ::= TYPENAME(A) . {
-    $this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%s"));
-	R = $this->create_node('user_defined_type', array( A ));
+typename_or_instantiated_template_type(R) ::= TYPENAME(A) . {
+	R = A;
 }
+
+typename_or_instantiated_template_type(R) ::= TYPENAME(A) template_instantiation_arguments(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('instantiated_template_type', array( A, B));
+}
+
+
+/* TYPE WITH POINTER OR REFERENCE */
+
+type_ref(R) ::= type(A) AMPERSAND(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("ссылка на %1(именительный)", array("%ur(именительный)", "признак  ссылки"));
+	R = $this->create_node('type_ref', array( A, B));
+}
+
+type_ref(R) ::= type(A) AMPERSAND(B) AMPERSAND(C) . {
+	$this->currentrule = new block_formal_langs_description_rule("ссылка на %1(именительный)", array("%ur(именительный)", "признак  ссылки",  "признак  ссылки"));
+	R = $this->create_node('type_ref', array( A, B, C));
+}
+
+type_or_type_ref(R) ::= type(A) . {
+	R = A;
+}
+
+type_or_type_ref(R) ::= type_ref(A) . {
+	R = A;
+}
+
+type_or_type_ref_or_with_ptr(R) ::= type_or_type_ref(A) . {
+	R = A;
+}
+
+type_or_type_ref_or_with_ptr(R) ::= type_or_type_ref_or_with_ptr(A) MULTIPLY(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("ссылка на %1(именительный)", array("%ur(именительный)", "признак указателя"));
+	R = $this->create_node('type_with_ptr', array( A, B));
+}
+
+type_or_type_ref_or_with_ptr(R) ::= type_or_type_ref_or_with_ptr(A) CONSTKWD(B) MULTIPLY(C) . {
+	$this->currentrule = new block_formal_langs_description_rule("ссылка на %1(именительный)", array("%ur(именительный)", "признак константности", "признак указателя"));
+	R = $this->create_node('type_with_ptr', array( A, B, C));
+}
+
+/* ================================= TEMPLATE INSTANTIATION PART  ================================= */
+
+template_instantiation_argument_list(R) ::= type_or_type_ref_or_with_ptr(A) . {
+	R = A;
+}
+
+template_instantiation_argument_list(R) ::= expr_atom(A) . {
+	R = A;
+}
+
+template_instantiation_argument_list(R) ::= template_instantiation_argument_list(A) COMMA(B) type_or_type_ref_or_with_ptr(C)  . {
+	$this->currentrule = new block_formal_langs_description_rule("список типов", array("список типов", "запятая", "%ur(именительный)"));
+	R = $this->create_node('template_instantiation_argument_list', array( A, B, C));
+}
+
+template_instantiation_argument_list(R) ::= template_instantiation_argument_list(A) COMMA(B) expr_atom(C)  . {
+	$this->currentrule = new block_formal_langs_description_rule("список типов", array("список типов", "запятая", "%ur(именительный)"));
+	R = $this->create_node('type_with_ptr', array( A, B, C));
+}
+
+template_instantiation_arguments_begin(R) ::= LESSER(A) . {
+	$this->mapper->start_new_lookup_namespace();
+	R = A;
+}	
+
+template_instantiation_arguments_end(R) ::= GREATER(B) . {
+	$this->mapper->clear_lookup_namespace();
+	R = B;
+}	
+
+template_instantiation_arguments(R) ::= template_instantiation_arguments_begin(A) template_instantiation_arguments_end(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("список аргументов инстанцирования шаблона", array("начало списка аргументов инстанцирования шаблона", "конец списка аргументов инстанцирования шаблона"));
+	R = $this->create_node('template_instantiation_arguments', array( A, B));
+}
+
+template_instantiation_arguments(R) ::= template_instantiation_arguments_begin(A) template_instantiation_argument_list(B) template_instantiation_arguments_end(C) . {
+	$this->currentrule = new block_formal_langs_description_rule("список аргументов инстанцирования шаблона", array("начало списка аргументов инстанцирования шаблона", "%ur(именительный)", "конец списка аргументов инстанцирования шаблона"));
+	R = $this->create_node('template_instantiation_arguments', array( A, B, C));
+}
+
+/* ================================= VALIDATED PART ================================= */
 
 /* VOID */
 

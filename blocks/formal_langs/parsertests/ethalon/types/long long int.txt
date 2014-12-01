@@ -1,11 +1,7 @@
 [
- (type) {
-  (non_const_type) {
-   (builtintype) {
-    long
-    long
-    int
-   }
-  }
+ (builtintype) {
+  long
+  long
+  int
  }
 ]

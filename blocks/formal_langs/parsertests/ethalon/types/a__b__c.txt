@@ -1,17 +1,13 @@
 [
- (type) {
-  (non_const_type) {
-   (primitive_or_complex_type) {
-    (namespace_resolve) {
-     (namespace_resolve) {
-      a
-      ::
-     }
-     b
-     ::
-    }
-    c
+ (scoped_type) {
+  (namespace_resolve) {
+   (namespace_resolve) {
+    a
+    ::
    }
+   b
+   ::
   }
+  c
  }
 ]
