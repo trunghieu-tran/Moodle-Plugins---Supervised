@@ -57,17 +57,35 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
         if (count($this->lookupnamespacestack) == 0) {
             $this->lookupnamespacestack[] = array();
         }
-        $this->lookupnamespacestack[count($this->lookupnamespacestack) - 1][] = $name;
+		//echo "Before push: ";
+		//var_dump($this->lookupnamespacestack);
+		$index = count($this->lookupnamespacestack) - 1;
+		//echo "Mapper::push_lookup_entry(" . $index . "," . $name . ")\n";
+        $this->lookupnamespacestack[$index][] = $name;
+		//echo "After push: ";
+		//var_dump($this->lookupnamespacestack);
     }
     
     public function start_new_lookup_namespace() {
-        $this->lookupnamespacestack[] = array();
+		//echo "Before start: ";
+		//var_dump($this->lookupnamespacestack);
+		$this->lookupnamespacestack[] = array();
+		//echo "After start: ";
+		//var_dump($this->lookupnamespacestack);
+		//echo "Mapper::start_new_lookup_namespace - count(" . (count($this->lookupnamespacestack)) . ")\n";        
     }
     
     public function clear_lookup_namespace() {
-        if (count($this->lookupnamespacestack)) {
+        //echo "Before clean: ";
+		//var_dump($this->lookupnamespacestack);
+		if (count($this->lookupnamespacestack)) {
             unset($this->lookupnamespacestack[count($this->lookupnamespacestack) - 1]);
+			// Fix atrocious behaviour, when unsetting made indexes be preserved.
+			$this->lookupnamespacestack = array_values($this->lookupnamespacestack);
         }
+		//echo "After clean: ";
+		//var_dump($this->lookupnamespacestack);		
+		//echo "Mapper::clear_lookup_namespace - count(" . count($this->lookupnamespacestack) . ")\n";
     }
     
     /** Sets namespace tree for a mapper
@@ -90,6 +108,7 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
         if (count($this->lookupnamespacestack) != 0) {
             $currentlookupnamespace = $this->lookupnamespacestack[count($this->lookupnamespacestack) - 1];
         }
+		//echo "Looking for a $name in tree, while stack is " . implode($currentlookupnamespace, ",") . "\n";
         $nspace = $tree;
         for($i = 0; $i < count($currentlookupnamespace); $i++) {
             $space = $currentlookupnamespace[$i];
@@ -110,6 +129,7 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
         $result = false;
         $name = (string)$name;
         $result = false;
+		//var_dump($this->lookupnamespacestack);
         for($i = count($this->introducednamespacestack) - 1; $i > -1; $i--) { 
             $tree = $this->namespacetree;
             $exists = true;
@@ -307,9 +327,11 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
         }
         if ($token->type() == 'identifier') {
             if ($this->is_type($token->value())) {
-                return 'TYPENAME';
+                //echo $token->value() . " is type \n";
+				return 'TYPENAME';
             }
         }
+		//echo $token->value() . " is not a type \n";
         return parent::map($token);
     }
 

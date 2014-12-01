@@ -1308,31 +1308,49 @@ scoped_type(R) ::= namespace_resolve(A) TYPENAME(B) . {
 	R = $this->create_node('scoped_type', array( A,  B));
 } 
 
-namespace_resolve(R) ::=  namespace_resolve(A) TYPENAME(B) template_instantiation_arguments(C)  NAMESPACE_RESOLVE(D) . {
-	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%ur(именительный)", "операция разрешения видимости"));
-	$this->mapper->push_lookup_entry((string)(B->value()));
-	R = $this->create_node('namespace_resolve', array( A, B, C, D));
-}
-
-namespace_resolve(R) ::=  namespace_resolve(A) TYPENAME(B) NAMESPACE_RESOLVE(C) . {
-	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "операция разрешения видимости"));
-	$this->mapper->push_lookup_entry((string)(B->value()));
-	R = $this->create_node('namespace_resolve', array( A, B, C));
-}
-
-namespace_resolve(R) ::= TYPENAME(A) template_instantiation_arguments(B) NAMESPACE_RESOLVE(C) .  {
+namespace_resolve(R) ::=  namespace_resolve(A) instantiated_template_type_on_in_namespace_resolve(B)  NAMESPACE_RESOLVE(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)", "операция разрешения видимости"));
-	$this->mapper->start_new_lookup_namespace();
-	$this->mapper->push_lookup_entry((string)(A->value()));
 	R = $this->create_node('namespace_resolve', array( A, B, C));
 }
 
+namespace_resolve(R) ::=  namespace_resolve(A) typename_in_namespace_resolve(B) NAMESPACE_RESOLVE(C) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "операция разрешения видимости"));
+	R = $this->create_node('namespace_resolve', array( A, B, C));
+}
 
-namespace_resolve(R) ::= TYPENAME(A) NAMESPACE_RESOLVE(B) .  {
+typename_in_namespace_resolve(R) ::= TYPENAME(A) . {
+	$this->mapper->push_lookup_entry((string)(A->value()));
+	R = A;
+}
+
+instantiated_template_type_on_in_namespace_resolve(R) ::= TYPENAME(A) template_instantiation_arguments(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	$this->mapper->push_lookup_entry((string)(A->value()));
+	R = $this->create_node('instantiated_template_type', array( A, B));
+}
+
+namespace_resolve(R) ::= instantiated_template_type_on_start_of_namespace_resolve(A) NAMESPACE_RESOLVE(B) .  {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "операция разрешения видимости"));
+	R = $this->create_node('namespace_resolve', array( A, B));
+}
+
+
+namespace_resolve(R) ::= typename_on_start_of_namespace_resolve(A) NAMESPACE_RESOLVE(B) .  {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "операция разрешения видимости"));
+	R = $this->create_node('namespace_resolve', array( A, B));
+}
+
+instantiated_template_type_on_start_of_namespace_resolve(R) ::= TYPENAME(A) template_instantiation_arguments(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
 	$this->mapper->start_new_lookup_namespace();
 	$this->mapper->push_lookup_entry((string)(A->value()));
-	R = $this->create_node('namespace_resolve', array( A, B));
+	R = $this->create_node('instantiated_template_type', array( A, B));
+}
+
+typename_on_start_of_namespace_resolve(R) ::= TYPENAME(A) . {
+	$this->mapper->start_new_lookup_namespace();
+	$this->mapper->push_lookup_entry((string)(A->value()));
+	R = A;
 }
 
 /* TYPENAME OR INSTANTIATION */
