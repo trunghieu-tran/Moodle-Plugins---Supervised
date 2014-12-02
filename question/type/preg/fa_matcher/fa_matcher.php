@@ -134,13 +134,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         return $result;
     }
 
-    protected function create_nomatch_result($str) {
-        $result = new qtype_preg_matching_results();
-        $result->set_source_info($str, $this->get_max_subexpr(), $this->get_subexpr_name_to_number_map());
-        $result->invalidate_match();
-        return $result;
-    }
-
     protected function match_transitions($curstate, $transitions, $str, $curpos, &$length) {
         $newstate = clone $curstate;
         $length = 0;
@@ -823,6 +816,11 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
     }
 
     public function match_from_pos($str, $startpos) {
+
+        if ($this->automaton->is_empty()) {
+            $result = $this->create_initial_state(null, $str, $startpos);
+            return $result->to_matching_results();
+        }
 
         // Find all possible matches. Using the fast match method if there are no backreferences.
         $possiblematches = $this->bruteforcematch
