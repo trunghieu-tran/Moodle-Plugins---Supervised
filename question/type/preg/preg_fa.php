@@ -728,7 +728,7 @@ class qtype_preg_fa {
     }
 
     public function is_empty() {
-        return ($this->statecount == 0);
+        return empty($this->adjacencymatrix);
     }
 
     /**
@@ -1010,7 +1010,7 @@ class qtype_preg_fa {
         $states = $this->get_states();
         foreach ($states as $curstate) {
             // Current state wasn't passed.
-            if (array_search($curstate, $aregoneforward) === false || array_search($curstate, $aregoneback) === false) {
+            if (!in_array($curstate, $aregoneforward) || !in_array($curstate, $aregoneback)) {
                 $this->remove_state($curstate);
             }
         }
@@ -1281,14 +1281,14 @@ class qtype_preg_fa {
      * Check if such state is in array of start states.
      */
     public function has_startstate($state) {
-        return array_search($state, $this->start_states()) !== false;
+        return in_array($state, $this->start_states());
     }
 
     /**
      * Check if such state is in array of end states.
      */
     public function has_endstate($state) {
-        return array_search($state, $this->end_states()) !== false;
+        return in_array($state, $this->end_states());
     }
 
     /**
@@ -1634,8 +1634,7 @@ class qtype_preg_fa {
             } else {
                 $number = ltrim($state, ',');
             }
-            $sourceindex = array_search($number, $numbers);
-            if ($sourceindex !== false) {
+            if (in_array($number, $numbers)) {
                 foreach ($transitions as $tran) {
                     if ($direction == 0) {
                         $sourcenum = trim($numbers[$tran->from], '()');
@@ -1723,7 +1722,7 @@ class qtype_preg_fa {
                     $isfind = false;
                     // Search among states which were in automata.
                     if (count($stateswere) != 0) {
-                        if (array_search($changedstate, $stateswere) !== false) {
+                        if (in_array($changedstate, $stateswere)) {
                             $isfind = true;
                             $workstate = array_search($changedstate, $stateswere);
                         }
@@ -1888,7 +1887,7 @@ class qtype_preg_fa {
                         $conectstates = $this->get_connected_states($state, 0);
                     }
                     foreach ($conectstates as $conectstate) {
-                        if (array_search($conectstate, $newfront) === false && array_search($conectstate, $aregone) === false) {
+                        if (!in_array($conectstate, $newfront) && !in_array($conectstate, $aregone)) {
                             $newfront[] = $conectstate;
                         }
                     }
@@ -1966,7 +1965,7 @@ class qtype_preg_fa {
             }
         } else {
             // Has transitions from previous states.
-            if (array_search($realnumber, $resnumbers) !== false) {
+            if (in_array($realnumber, $resnumbers)) {
                 $hasalready = true;
             }
             unset($clones[count($clones) - 2]);
@@ -2002,7 +2001,7 @@ class qtype_preg_fa {
         while (count($oldfront) != 0) {
             foreach ($oldfront as $curstate) {
                 // State hasn't been  already gone.
-                if (array_search($curstate, $aregone) === false) {
+                if (!in_array($curstate, $aregone)) {
                     // Mark as gone.
                     $aregone[] = $curstate;
                     // Get connected states if they are.
@@ -2056,14 +2055,14 @@ class qtype_preg_fa {
             }
             $state = array_search($statenum, $this->statenumbers);
             // Set start states.
-            $isfirststart = $numbers[0] !== '' && array_search($workstate1, $fastarts) !== false;
-            $issecstart = $numbers[1] !== '' && array_search($workstate2, $anotherfastarts) !== false;
+            $isfirststart = $numbers[0] !== '' && in_array($workstate1, $fastarts);
+            $issecstart = $numbers[1] !== '' && in_array($workstate2, $anotherfastarts);
             if (($isfirststart || $issecstart) && count($this->get_adjacent_transitions($state, false)) == 0) {
                 $this->add_start_state(array_search($statenum, $this->statenumbers));
             }
             // Set end states.
-            $isfirstend = $numbers[0] !== '' && array_search($workstate1, $faends) !== false;
-            $issecend = $numbers[1] !== '' && array_search($workstate2, $anotherfaends) !== false;
+            $isfirstend = $numbers[0] !== '' && in_array($workstate1, $faends);
+            $issecend = $numbers[1] !== '' && in_array($workstate2, $anotherfaends);
             if (($isfirstend || $issecend) && count($this->get_adjacent_transitions($state, true)) == 0) {
                 $this->add_end_state(array_search($statenum, $this->statenumbers));
             }
@@ -2101,14 +2100,14 @@ class qtype_preg_fa {
                 }
             }
             // Set start states.
-            $isfirststart = ($numbers[0] !== '' && array_search($workstate1, $fastarts) !== false) || $numbers[0] == '';
-            $issecstart = ($numbers[1] !== '' && array_search($workstate2, $anotherfastarts) !== false) || $numbers[1] == '';
+            $isfirststart = ($numbers[0] !== '' && in_array($workstate1, $fastarts)) || $numbers[0] == '';
+            $issecstart = ($numbers[1] !== '' && in_array($workstate2, $anotherfastarts)) || $numbers[1] == '';
             if ($isfirststart && $issecstart) {
                 $this->add_start_state(array_search($statenum, $this->statenumbers));
             }
             // Set end states.
-            $isfirstend = ($numbers[0] !== '' && array_search($workstate1, $faends) !== false) || $numbers[0] == '';
-            $issecend = ($numbers[1] !== '' && array_search($workstate2, $anotherfaends) !== false) || $numbers[1] == '';
+            $isfirstend = ($numbers[0] !== '' && in_array($workstate1, $faends)) || $numbers[0] == '';
+            $issecend = ($numbers[1] !== '' && in_array($workstate2, $anotherfaends)) || $numbers[1] == '';
             if ($isfirstend && $issecend) {
                 $this->add_end_state(array_search($statenum, $this->statenumbers));
             }
@@ -2328,7 +2327,7 @@ class qtype_preg_fa {
                                 $conectstates = $result->get_connected_states($curstate, 0);
                             }
                             foreach ($conectstates as $conectstate) {
-                                if (array_search($conectstate, $newfront) === false && array_search($conectstate, $aregone) === false) {
+                                if (!in_array($conectstate, $newfront) && !in_array($conectstate, $aregone)) {
                                     $newfront[] = $conectstate;
                                 }
                             }
