@@ -340,6 +340,14 @@ abstract class qtype_preg_fa_node {
 
         $wordbreakinto = self::get_wordbreaks_transitions($tran->pregleaf->negative, true);
         $wordbreakout = self::get_wordbreaks_transitions($tran->pregleaf->negative, false);
+        foreach ($wordbreakinto as $wordbreak) {
+            $wordbreak->opentags = $tran->opentags;
+        }
+        foreach ($wordbreakout as $wordbreak) {
+            $wordbreak->closetags = $tran->closetags;
+        }
+
+
 
         // Intersect transitions.
         for ($i = 0; $i < count($wordbreakinto); $i++) {
