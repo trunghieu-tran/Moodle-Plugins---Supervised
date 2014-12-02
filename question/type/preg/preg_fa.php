@@ -126,17 +126,11 @@ class qtype_preg_fa_transition {
 
     public function __clone() {
         $this->pregleaf = clone $this->pregleaf;
-        $mergedbefore = $this->mergedbefore;
-        $this->mergedbefore = array();
-        foreach ($mergedbefore as $before) {
-            $newbefore = clone $before;
-            $this->mergedbefore[] = $newbefore;
+        foreach ($this->mergedbefore as $key => $merged) {
+            $this->mergedbefore[$key] = clone $merged;
         }
-        $mergedafter = $this->mergedafter;
-        $this->mergedafter = array();
-        foreach ($mergedafter as $after) {
-            $newafter = clone $after;
-            $this->mergedafter[] = $newafter;
+        foreach ($this->mergedafter as $key => $merged) {
+            $this->mergedafter[$key] = clone $merged;
         }
     }
 
@@ -266,19 +260,16 @@ class qtype_preg_fa_transition {
     public function intersect_asserts($other) {
 
         // Adding assert to array.
-        $thisclone = clone($this);
         if ($this->is_start_anchor()) {
-            $this->mergedafter[] = $thisclone;
+            $this->append_mergedafter(clone $this);
         } else if ($this->is_end_anchor()) {
-            $this->mergedbefore[] = $thisclone;
+            $this->append_mergedbefore(clone $this);    // TODO: maybe prepend?
         }
 
-
-        $otherclone = clone($other);
         if ($other->is_start_anchor()) {
-            $other->mergedafter[] = $otherclone;
+            $other->append_mergedafter(clone $other);
         } else if ($other->is_end_anchor()){
-            $other->mergedbefore[] = $otherclone;
+            $other->append_mergedbefore(clone $other);  // TODO: same
         }
 
         $resultbefore = array_merge($this->mergedbefore, $other->mergedbefore);
@@ -360,20 +351,20 @@ class qtype_preg_fa_transition {
                 $assert = new qtype_preg_fa_transition(0, $pregleaf, 1);
             }
         }
-        $assert->mergedbefore = $resultbefore;
-        $assert->mergedafter = $resultafter;
+        $assert->set_mergedbefore($resultbefore);
+        $assert->set_mergedafter($resultafter);
         if ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
             if ($this->is_start_anchor()) {
-                unset($this->mergedafter[0]);
+                $this->pop_front_mergedafter();
             } else {
-                unset($this->mergedbefore[0]);
+                $this->pop_front_mergedbefore();
             }
         }
         if ($other->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
             if ($other->is_start_anchor()) {
-                unset($other->mergedafter[0]);
+                $other->pop_front_mergedafter();
             } else {
-                unset($other->mergedbefore[0]);
+                $other->pop_front_mergedbefore();
             }
         }
         return $assert;
@@ -396,8 +387,28 @@ class qtype_preg_fa_transition {
         $this->clear_cache();
     }
 
+    public function append_mergedbefore($value) {
+        $this->mergedbefore[] = $value;
+        $this->clear_cache();
+    }
+
+    public function pop_front_mergedbefore() {
+        array_shift($this->mergedbefore);
+        $this->clear_cache();
+    }
+
     public function set_mergedafter($value) {
         $this->mergedafter = $value;
+        $this->clear_cache();
+    }
+
+    public function append_mergedafter($value) {
+        $this->mergedafter[] = $value;
+        $this->clear_cache();
+    }
+
+    public function pop_front_mergedafter() {
+        array_shift($this->mergedafter);
         $this->clear_cache();
     }
 
@@ -515,12 +526,15 @@ class qtype_preg_fa_transition {
      * Copies tags from other transition in this transition.
      */
     public function unite_tags($other, $result) {
-        $cloneother = clone $other;
-        $clonethis = clone $this;
-        //var_dump($this->get_label_for_dot(0,1));
-        // Normal intersection.
-        $result->opentags = array_merge($clonethis->opentags, $cloneother->opentags);
-        $result->closetags = array_merge($clonethis->closetags, $cloneother->closetags);
+        $result->opentags = array_merge($this->opentags, $other->opentags);
+        $result->closetags = array_merge($this->closetags, $other->closetags);
+        foreach ($result->opentags as $key => $tag) {
+            $result->opentags[$key] = clone $tag;
+        }
+        foreach ($result->closetags as $key => $tag) {
+            $result->closetags[$key] = clone $tag;
+        }
+        $result->clear_cache();
     }
 
     /**
@@ -535,16 +549,12 @@ class qtype_preg_fa_transition {
         // Consider that eps and transition which doesn't consume characters always intersect
         if ($this->is_eps() && $other->consumeschars == false) {
             $resulttran = new qtype_preg_fa_transition(0, $other->pregleaf, 1, self::ORIGIN_TRANSITION_INTER, $other->consumeschars);
-            if ($resulttran !== null) {
-                $this->unite_tags($other, $resulttran);
-            }
+            $this->unite_tags($other, $resulttran);
             return $resulttran;
         }
         if ($other->is_eps() && $this->consumeschars == false) {
             $resulttran = new qtype_preg_fa_transition(0, $this->pregleaf, 1, self::ORIGIN_TRANSITION_INTER, $this->consumeschars);
-            if ($resulttran !== null) {
-                $this->unite_tags($other, $resulttran);
-            }
+            $this->unite_tags($other, $resulttran);
             return $resulttran;
         }
         if ($this->is_unmerged_assert() && $this->consumeschars == false && (!$other->is_eps() && !$other->is_unmerged_assert())
@@ -564,8 +574,8 @@ class qtype_preg_fa_transition {
         if ($resulttran !== null ) {
             $this->unite_tags($other, $resulttran);
             $assert = $this->intersect_asserts($other);
-            $resulttran->mergedafter = $assert->mergedafter;
-            $resulttran->mergedbefore = $assert->mergedbefore;
+            $resulttran->set_mergedbefore($assert->mergedbefore);
+            $resulttran->set_mergedafter($assert->mergedafter);
         }
         return $resulttran;
     }
