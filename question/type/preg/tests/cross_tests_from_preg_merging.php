@@ -1849,14 +1849,14 @@ class qtype_preg_cross_tests_from_preg_merging {
         $test1 = array( 'str'=>'abdegf',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>1),
-                        'length'=>array(0=>6, 1=>4));
+                        'index_first'=>array(0=>0, 1=>1, 2=>1),
+                        'length'=>array(0=>6, 1=>4, 2=>3));
 
         $test2 = array( 'str'=>'abdegbdegf',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>5),
-                        'length'=>array(0=>10, 1=>4));
+                        'index_first'=>array(0=>0, 1=>5, 2=>5),
+                        'length'=>array(0=>10, 1=>4, 2=>3));
 
         $test3 = array( 'str'=>"a\tgf",
                         'is_match'=>true,
@@ -1940,13 +1940,13 @@ class qtype_preg_cross_tests_from_preg_merging {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0, 1=>3),
-                        'length'=>array(0=>6, 1=>2));
+                        'length'=>array(0=>5, 1=>2));
 
         $test2 = array( 'str'=>'cata!at?',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0, 1=>5),
-                        'length'=>array(0=>8, 1=>2));
+                        'length'=>array(0=>7, 1=>2));
 
         $test3 = array( 'str'=>'cata!at',
                         'is_match'=>true,
