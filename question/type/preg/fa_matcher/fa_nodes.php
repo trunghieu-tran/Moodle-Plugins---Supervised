@@ -204,9 +204,9 @@ abstract class qtype_preg_fa_node {
                     $merged = array_merge($delclone->mergedbefore, array($delclone), $delclone->mergedafter);
                     // Work with tags.
                     if ($del->is_unmerged_assert() && $del->is_start_anchor() || ($del->is_eps() && in_array($del->to, $endstates))) {
-                        $tran->set_mergedafter(array_merge($tran->mergedafter, $merged));
+                        $tran->mergedafter = array_merge($tran->mergedafter, $merged);
                     } else {
-                        $tran->set_mergedbefore(array_merge($merged, $tran->mergedbefore));
+                        $tran->mergedbefore = array_merge($merged, $tran->mergedbefore);
                     }
 
                     $clonetransitions[] = $tran;
