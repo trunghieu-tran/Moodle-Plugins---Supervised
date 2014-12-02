@@ -341,10 +341,16 @@ abstract class qtype_preg_fa_node {
         $wordbreakinto = self::get_wordbreaks_transitions($tran->pregleaf->negative, true);
         $wordbreakout = self::get_wordbreaks_transitions($tran->pregleaf->negative, false);
         foreach ($wordbreakinto as $wordbreak) {
-            $wordbreak->opentags = $tran->opentags;
+            $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+            $epstran = new qtype_preg_fa_transition($wordbreak->from, $epsleaf, $wordbreak->to);
+            $epstran->opentags = $tran->opentags;
+            $wordbreak->mergedafter[] = $epstran;
         }
         foreach ($wordbreakout as $wordbreak) {
-            $wordbreak->closetags = $tran->closetags;
+            $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+            $epstran = new qtype_preg_fa_transition($wordbreak->from, $epsleaf, $wordbreak->to);
+            $epstran->closetags = $tran->closetags;
+            $wordbreak->mergedbefore[] = $epstran;
         }
 
 
