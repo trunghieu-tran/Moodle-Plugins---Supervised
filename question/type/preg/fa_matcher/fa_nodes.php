@@ -565,6 +565,14 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                             if ($del) {
                                 $automaton->remove_transition($tran);
                             }
+                            foreach ($resulttran->mergedbefore as &$merged) {
+                                $merged->from = $resulttran->from;
+                                $merged->to = $resulttran->to;
+                            }
+                            foreach ($resulttran->mergedafter as &$merged) {
+                                $merged->from = $resulttran->from;
+                                $merged->to = $resulttran->to;
+                            }
                             $automaton->add_transition($resulttran);
                             //printf($automaton->fa_to_dot());
                             $changed[] = $resulttran->to;
@@ -619,6 +627,14 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                             //$resulttran->consumeschars = true;
                             if ($del) {
                                 $automaton->remove_transition($tran);
+                            }
+                            foreach ($resulttran->mergedbefore as &$merged) {
+                                $merged->from = $resulttran->from;
+                                $merged->to = $resulttran->to;
+                            }
+                            foreach ($resulttran->mergedafter as &$merged) {
+                                $merged->from = $resulttran->from;
+                                $merged->to = $resulttran->to;
                             }
                             $automaton->add_transition($resulttran);
                             $changed[] = $resulttran->from;
