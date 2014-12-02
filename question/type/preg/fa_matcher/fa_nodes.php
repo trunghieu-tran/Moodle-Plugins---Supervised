@@ -201,13 +201,12 @@ abstract class qtype_preg_fa_node {
                     $tran = clone($transition);
                     $delclone = clone $del;
                     $tran->greediness = qtype_preg_fa_transition::min_greediness($tran->greediness, $del->greediness);
-                    $merged = array_merge($delclone->mergedbefore, array($delclone));
-                    $merged = array_merge($merged, $delclone->mergedafter);
+                    $merged = array_merge($delclone->mergedbefore, array($delclone), $delclone->mergedafter);
                     // Work with tags.
                     if ($del->is_unmerged_assert() && $del->is_start_anchor() || ($del->is_eps() && in_array($del->to, $endstates))) {
-                        $tran->mergedafter = array_merge($tran->mergedafter, $merged);
+                        $tran->set_mergedafter(array_merge($tran->mergedafter, $merged));
                     } else {
-                        $tran->mergedbefore = array_merge($merged, $tran->mergedbefore);
+                        $tran->set_mergedbefore(array_merge($merged, $tran->mergedbefore));
                     }
 
                     $clonetransitions[] = $tran;

@@ -391,6 +391,16 @@ class qtype_preg_fa_transition {
         $this->allclosetags = null;
     }
 
+    public function set_mergedbefore($value) {
+        $this->mergedbefore = $value;
+        $this->clear_cache();
+    }
+
+    public function set_mergedafter($value) {
+        $this->mergedafter = $value;
+        $this->clear_cache();
+    }
+
     public function is_merged() {
         return $this->ismerged;
     }
