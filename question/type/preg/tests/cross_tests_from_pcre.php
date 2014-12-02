@@ -3658,9 +3658,9 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>21),
                         'ext_index_first'=>array(0=>0),
-                        'ext_length'=>array(0=>15),
-                        'left'=>array(11),
-                        'next'=>'t',
+                        'ext_length'=>array(0=>18),
+                        'left'=>array(7),
+                        'next'=>'[Mm]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'(?s-i:more.*than).*million',
@@ -3693,9 +3693,9 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>21),
                         'ext_index_first'=>array(0=>0),
-                        'ext_length'=>array(0=>15),
-                        'left'=>array(11),
-                        'next'=>'t',
+                        'ext_length'=>array(0=>18),
+                        'left'=>array(7),
+                        'next'=>'[Mm]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'(?:(?s-i)more.*than).*million',
