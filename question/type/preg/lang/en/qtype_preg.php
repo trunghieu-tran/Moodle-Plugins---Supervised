@@ -199,13 +199,15 @@ $string['error_PCREincorrectregex']              = 'Incorrect regular expression
 $string['error_duringauthoringtool']             = 'There were errors while trying to build {$a}:';
 
 /******* FA limitations *******/
-$string['engine_heading_descriptions'] = 'Matching regular expressions can be time and memory consuming. These settings allow you to control limits of time and memory usage by the matching engines. Increase them when you get messages that the regular expression is too complex, but do mind your server\'s performance (you may also want to increase PHP time and memory limits). Decrease them if you get blank page when saving or running a preg question.';
-$string['too_large_fa'] = 'Regular expression is too complex to be matched by {$a->engine} due to the time and/or memory limits. Please try another matching engine, ask your administrator to <a href="{$a->link}"> increase time and memory limits</a> or simplify you regular expression.';
-$string['fa_state_limit'] = 'Automata size limit: states';
-$string['fa_transition_limit'] = 'Automata size limit: transitions';
 $string['fa_settings_heading'] = 'Finite state automata engine settings';
-$string['fa_state_limit_description'] = 'Allows you to tune time and memory limits for the FA engine when matching complex regexes';
-$string['fa_transition_limit_description'] = 'Maximum number of transitions in FA';
+$string['engine_heading_descriptions'] = 'Matching regular expressions can be time and memory consuming. These settings allow you to control limits of time and memory usage by the matching engines. Increase them when you get messages that the regular expression is too complex, but do mind your server\'s performance (you may also want to increase PHP time and memory limits). Decrease them if you get blank page when saving or running a preg question.';
+$string['fa_state_limit'] = 'Automata size limit: states';
+$string['fa_state_limit_description'] = 'Max number of states in FA. Tunes time and memory limits for the FA engine when matching complex regexes.';
+$string['fa_transition_limit'] = 'Automata size limit: transitions';
+$string['fa_transition_limit_description'] = 'Max number of transitions in FA. Tunes time and memory limits for the FA engine when matching complex regexes.';
+$string['fa_recursion_limit'] = 'Recursion limit';
+$string['fa_recursion_limit_description'] = 'Max recursion level when matching patterns with (?R) using the FA engine. Tunes time and memory limits and prevents from indefinite recursive loops.';
+$string['too_large_fa'] = 'Regular expression is too complex to be matched by {$a->engine} due to the time and/or memory limits. Please try another matching engine, ask your administrator to <a href="{$a->link}">increase time and memory limits</a> or simplify you regular expression.';
 
 /********** Strings for authoring tools form**********************/
 $string['authoring_form_page_header'] = 'Regex constructor';
