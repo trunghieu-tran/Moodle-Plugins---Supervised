@@ -510,6 +510,11 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
      * Returns array of all possible matches.
      */
     protected function match_brute_force($str, $startpos) {
+        global $CFG;
+        $maxrecursionlevel = isset($CFG->qtype_preg_fa_recursion_limit)
+                           ? $CFG->qtype_preg_fa_recursion_limit
+                           : 1000;
+
         $fullmatches = array();       // Possible full matches.
         $partialmatches = array();    // Possible partial matches.
 
@@ -538,8 +543,10 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
                     if ($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL) {
                         // Handle a recursive transition
+                        if ($recursionlevel === $maxrecursionlevel) {
+                            continue;
+                        }
                         $newstate = $this->match_recursive_transition_begin($curstate, $transition, $str, $curpos, $length);
-
                         if ($newstate !== null) {
                             $startstates = $this->automaton->start_states($transition->pregleaf->number);
                             foreach ($startstates as $state) {
@@ -548,7 +555,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                                 $reached[] = $newnewstate;
                             }
                         }
-
                     } else {
                         // Handle a non-recursive transition transition
                         $newstate = $this->match_regular_transition($curstate, $transition, $str, $curpos, $length);
@@ -625,6 +631,11 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
      * Returns array of all possible matches.
      */
     protected function match_fast($str, $startpos) {
+        global $CFG;
+        $maxrecursionlevel = isset($CFG->qtype_preg_fa_recursion_limit)
+                           ? $CFG->qtype_preg_fa_recursion_limit
+                           : 1000;
+
         $states = array();           // Objects of qtype_preg_fa_exec_state.
         $curstates = array();        // Numbers of states which the automaton is in at the current wave front.
         $lazystates = array();       // States (objects!) reached lazily.
@@ -681,6 +692,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
                     if ($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL) {
                         // Handle a recursive transition
+                        if ($recursionlevel === $maxrecursionlevel) {
+                            continue;
+                        }
                         $newstate = $this->match_recursive_transition_begin($curstate, $transition, $str, $curpos, $length);
                         if ($newstate !== null) {
                             $startstates = $this->automaton->start_states($transition->pregleaf->number);
