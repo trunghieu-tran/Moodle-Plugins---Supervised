@@ -438,6 +438,7 @@ class qtype_preg_fa_transition {
             $label = $before->pregleaf->leaf_tohr();
             $lab .= $open . ' ' . str_replace('"', '\"', $label) . ' ' . $close;
             $lab .= '(' . $before->from . ',' . $before->to . ')';
+            $lab .= "\n";
         }
         $open = $this->tags_before_transition();
         $close = $this->tags_after_transition();
@@ -445,6 +446,7 @@ class qtype_preg_fa_transition {
         $lab .= $open . ' ' . str_replace('"', '\"', $label) . ' ' . $close;
 
         foreach ($this->mergedafter as $after) {
+            $lab .= "\n";
             $open = $after->tags_before_transition();
             $close = $after->tags_after_transition();
             $label = $after->pregleaf->leaf_tohr();
