@@ -25,9 +25,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qtype_preg';
-$plugin->version = 2014112300;
+$plugin->version = 2014120400;
 $plugin->requires = 2014050800;
-$plugin->release = 'Preg 2.7 Release';
+$plugin->release = 'Preg 2.8 Release';
 $plugin->maturity = MATURITY_STABLE;
 
 $plugin->dependencies = array(
