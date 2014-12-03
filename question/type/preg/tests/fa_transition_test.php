@@ -47,7 +47,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
         if ($subexpr !== false) {
             $negative = $subexpr < 0;
             $number = abs($subexpr);
-            $assertleaf = new qtype_preg_leaf_assert_subexpr_captured($negative, $number);
+            $assertleaf = new qtype_preg_leaf_assert_subexpr($negative, $number);
             $transition->mergedbefore[] = new qtype_preg_fa_transition(0, $assertleaf, 0);
         }
         return $transition;
