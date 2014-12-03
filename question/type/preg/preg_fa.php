@@ -169,7 +169,8 @@ class qtype_preg_fa_transition {
                 else if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z) {
                     $capz[$key] = true;
                 }
-                else if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_SUBEXPR_CAPTURED) {
+                else if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_SUBEXPR ||
+                         $assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_RECURSION) {
                     $condassert[$key] = true;
                     $thecondassert = $assertion;
                 }

@@ -245,7 +245,12 @@ interface qtype_preg_matcher_state {
     /**
      * Returns whether the given subexpression is captured.
      */
-    public function is_subexpr_captured($subexpression);
+    public function is_subexpr_captured($subexpression = 0);
+
+    /**
+     * Checks if the state is in a recursive call.
+     */
+    public function is_recursion($subexpression = 0);
 }
 
 /**
@@ -1154,7 +1159,9 @@ abstract class qtype_preg_leaf_assert extends qtype_preg_leaf {
     /** $ */
     const SUBTYPE_DOLLAR = 'dollar_leaf_assert';
     /** Assertion used by conditional subexpressions */
-    const SUBTYPE_SUBEXPR_CAPTURED = 'subexpr_captured_leaf_assert';
+    const SUBTYPE_SUBEXPR = 'subexpr_leaf_assert';
+    /** Assertion used by conditional subexpressions */
+    const SUBTYPE_RECURSION = 'recursion_leaf_assert';
 
     public function __construct($negative = false) {
         $this->type = qtype_preg_node::TYPE_LEAF_ASSERT;
@@ -1366,7 +1373,10 @@ class qtype_preg_leaf_assert_dollar extends qtype_preg_leaf_assert_capital_esc_z
     }
 }
 
-class qtype_preg_leaf_assert_subexpr_captured extends qtype_preg_leaf_assert {
+/**
+ * Assertion that checks if a subexpression is captured.
+ */
+class qtype_preg_leaf_assert_subexpr extends qtype_preg_leaf_assert {
 
     /** Subexpression number to refer to. */
     public $number;
@@ -1375,35 +1385,63 @@ class qtype_preg_leaf_assert_subexpr_captured extends qtype_preg_leaf_assert {
 
     public function __construct($negative, $number = null, $name = null) {
         parent::__construct($negative);
-        $this->subtype = self::SUBTYPE_SUBEXPR_CAPTURED;
+        $this->subtype = self::SUBTYPE_SUBEXPR;
         $this->number = $number;
         $this->name = $name;
     }
 
     public function match($str, $pos, &$length, $matcherstateobj = null) {
-        $subexpr = $this->name !== null
-                 ? $this->name
-                 : $this->number;
-
+        $subexpr = $this->name !== null ? $this->name : $this->number;
         $length = 0;
         return ($matcherstateobj->is_subexpr_captured($subexpr) xor $this->negative);
     }
 
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
-        $subexpr = $this->name !== null
-                 ? $this->name
-                 : $this->number;
-
+        $subexpr = $this->name !== null ? $this->name : $this->number;
         $ok = ($matcherstateobj->is_subexpr_captured($subexpr) xor $this->negative);
         return $ok ? array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''))
                    : array(self::NEXT_CHAR_CANNOT_GENERATE, null);
     }
 
     public function tohr() {
-        $subexpr = $this->name !== null
-                 ? $this->name
-                 : $this->number;
+        $subexpr = $this->name !== null ? $this->name : $this->number;
+        return $this->negative ? '!(' . $subexpr . ')'
+                               : '(' . $subexpr . ')';
+    }
+}
 
+/**
+ * Assertion that checks if a recursive call is running
+ */
+class qtype_preg_leaf_assert_recursion extends qtype_preg_leaf_assert {
+
+    /** Subexpression number to check. */
+    public $number;
+    /** Subexpression name to check. */
+    public $name;
+
+    public function __construct($negative, $number = null, $name = null) {
+        parent::__construct($negative);
+        $this->subtype = self::SUBTYPE_RECURSION;
+        $this->number = $number;
+        $this->name = $name;
+    }
+
+    public function match($str, $pos, &$length, $matcherstateobj = null) {
+        $subexpr = $this->name !== null ? $this->name : $this->number;
+        $length = 0;
+        return ($matcherstateobj->is_recursion($subexpr) xor $this->negative);
+    }
+
+    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
+        $subexpr = $this->name !== null ? $this->name : $this->number;
+        $ok = ($matcherstateobj->is_recursion($subexpr) xor $this->negative);
+        return $ok ? array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''))
+                   : array(self::NEXT_CHAR_CANNOT_GENERATE, null);
+    }
+
+    public function tohr() {
+        $subexpr = $this->name !== null ? $this->name : $this->number;
         return $this->negative ? '!(' . $subexpr . ')'
                                : '(' . $subexpr . ')';
     }
@@ -1443,10 +1481,7 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
 
     public function match($str, $pos, &$length, $matcherstateobj = null) {
         $length = 0;
-
-        $subexpr = $this->name !== null
-                 ? $this->name
-                 : $this->number;
+        $subexpr = $this->name !== null ? $this->name : $this->number;
 
         if (!$matcherstateobj->is_subexpr_captured($subexpr)) {
             // For no match return the result immediately.
@@ -1492,10 +1527,7 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
     }
 
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
-        $subexpr = $this->name !== null
-                 ? $this->name
-                 : $this->number;
-
+        $subexpr = $this->name !== null ? $this->name : $this->number;
         if (!$matcherstateobj->is_subexpr_captured($subexpr)) {
             return array(self::NEXT_CHAR_CANNOT_GENERATE, null);
         }
@@ -1509,10 +1541,7 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
     }
 
     public function tohr() {
-        $subexpr = $this->name !== null
-                 ? $this->name
-                 : $this->number;
-
+        $subexpr = $this->name !== null ? $this->name : $this->number;
         return 'backref #' . $subexpr;
     }
 }

@@ -470,9 +470,16 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
                               : $last[1];
     }
 
-    public function is_subexpr_captured($subexpr) {
+    public function is_subexpr_captured($subexpr = 0) {
         $last = $this->last_subexpr_match($subexpr);
         return $last !== null && self::is_completely_captured($last[0], $last[1]);
+    }
+
+    public function is_recursion($subexpr = 0) {
+        if ($this->recursion_level() === 0) {
+            return false;
+        }
+        return $subexpr === 0 || $this->subexpr() === $subexpr; // (R) or (R0) means any recoursive call
     }
 
     public function to_matching_results() {
@@ -565,11 +572,20 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
 
         foreach ($tocompare as $stackitems) {
             for ($i = $this->matcher->get_ast_root()->subpattern + 1; $i <= $this->matcher->get_max_subpatt(); $i++) {
-                $this_match = isset($stackitems[0]->matches[$i]) ? $stackitems[0]->matches[$i] : array(self::empty_subpatt_match());
-                $other_match = isset($stackitems[1]->matches[$i]) ? $stackitems[1]->matches[$i] : array(self::empty_subpatt_match());
+                $this_match = isset($stackitems[0]->matches[$i]) ? $stackitems[0]->matches[$i] : null;
+                $other_match = isset($stackitems[1]->matches[$i]) ? $stackitems[1]->matches[$i] : null;
 
                 $this_repetitions_count = count($this_match);
                 $other_repetitions_count = count($other_match);
+
+                // count === 0 means that there were no attempts at all.
+                if ($this_repetitions_count === 0 && $other_repetitions_count === 0) {
+                    continue;
+                } else if ($other_repetitions_count === 0) {
+                    return true;
+                } else if ($this_repetitions_count === 0) {
+                    return false;
+                }
 
                 $repetitions_count_difference = $this_repetitions_count - $other_repetitions_count;
                 if ($modepcre && abs($repetitions_count_difference) === 1) {

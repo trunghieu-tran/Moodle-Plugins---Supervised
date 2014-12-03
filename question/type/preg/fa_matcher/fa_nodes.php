@@ -1023,12 +1023,29 @@ class qtype_preg_fa_node_cond_subexpr extends qtype_preg_fa_operator {
             $node->operands[] = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         }
 
+        // Form the assertion nodes.
+        switch ($this->pregnode->subtype) {
+        case qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR:
+            $assertpos = new qtype_preg_leaf_assert_subexpr(false, $node->number, $node->name);
+            $assertneg = new qtype_preg_leaf_assert_subexpr(true, $node->number, $node->name);
+            break;
+        case qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION:
+            $assertpos = new qtype_preg_leaf_assert_recursion(false, $node->number, $node->name);
+            $assertneg = new qtype_preg_leaf_assert_recursion(true, $node->number, $node->name);
+            break;
+        default:
+            // WTF?
+            $assertpos = null;
+            $assertneg = null;
+            break;
+        }
+
         $concatpos = new qtype_preg_node_concat();
-        $concatpos->operands[] = new qtype_preg_leaf_assert_subexpr_captured(false, $node->number, $node->name);
+        $concatpos->operands[] = $assertpos;
         $concatpos->operands[] = $node->operands[0 + $shift];
 
         $concatneg = new qtype_preg_node_concat();
-        $concatneg->operands[] = new qtype_preg_leaf_assert_subexpr_captured(true, $node->number, $node->name);
+        $concatneg->operands[] = $assertneg;
         $concatneg->operands[] = $node->operands[1 + $shift];
 
         $alt = new qtype_preg_node_alt();
@@ -1043,7 +1060,8 @@ class qtype_preg_fa_node_cond_subexpr extends qtype_preg_fa_operator {
     }
 
     public function accept() {
-        if ($this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR) {
+        if ($this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR &&
+            $this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION) {
             return get_string($this->pregnode->subtype, 'qtype_preg');
         }
         return true;
