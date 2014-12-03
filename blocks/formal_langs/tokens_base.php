@@ -857,7 +857,15 @@ class block_formal_langs_processed_string {
      * @var array strings of token descriptions
      */
     protected $descriptions=null;
-    
+
+    /**
+     * @var array lexical and syntax errors
+     * 
+     * Empty array means no errors was found, null - no error search done.
+     * Error must be ast_node_base children object with correct position.
+     */
+    protected $errors=null;
+
     /**
      *  Sets a language for a string
      *  @param block_formal_langs_abstract_language $lang  language
@@ -871,7 +879,7 @@ class block_formal_langs_processed_string {
      *  @param string $name   name of field
      *  @param mixed  $value  value of string
      */
-    public function __set($name, $value) {
+    public function __set($name, $value) { //TODO - is there any need to write set_errors funtion?
         $settertable = array('string' => 'set_string', 'stream' => 'set_stream', 'syntaxtree' => 'set_syntax_tree');
         $settertable['descriptions'] = 'set_descriptions';
         
@@ -891,7 +899,7 @@ class block_formal_langs_processed_string {
      *  @return bool whether field exists
      */
     public function __isset($name) {
-        $getters = array('string', 'stream', 'syntaxtree', 'descriptions');
+        $getters = array('string', 'stream', 'syntaxtree', 'descriptions', 'errors');
         return in_array($name, $getters);
     }
 
@@ -903,6 +911,7 @@ class block_formal_langs_processed_string {
     public function __get($name) {
         $gettertable = array('string' => 'get_string', 'stream' => 'get_stream', 'syntaxtree' => 'get_syntax_tree');
         $gettertable['descriptions'] = 'node_descriptions_list';
+        $gettertable['errors'] = 'get_errors';
         if (array_key_exists($name, $gettertable)) {
             $method = $gettertable[$name];
             return $this->$method();
@@ -1317,6 +1326,16 @@ class block_formal_langs_processed_string {
         }
         return $this->syntaxtree;
     }
+
+    protected function get_errors() {
+        if ($this->errors === null) {
+            // No lexing and parsing was done, do now to look for errors.
+            $this->get_stream();
+            $this->get_syntax_tree();
+        }
+        return $this->errors;
+    }
+
     /**
      *  Returns inner string
      *  @return inner string
