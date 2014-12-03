@@ -5143,6 +5143,80 @@ class qtype_preg_cross_tests_from_preg {
                      'tests'=>array($test1, $test2));
     }
 
+    function data_for_test_cond_subexpr_subexpr_generation() {
+        $test1 = array( 'str'=>'',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'ext_index_first'=>array(0=>0),
+                        'ext_length'=>array(0=>1),
+                        'left'=>array(1),
+                        'next'=>'e');
+
+        $test2 = array( 'str'=>'ab',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2),
+                        'ext_index_first'=>array(0=>0),
+                        'ext_length'=>array(0=>1),
+                        'left'=>array(1),
+                        'next'=>'e');
+
+        $test3 = array( 'str'=>'abc',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0,1=>0),
+                        'length'=>array(0=>3,1=>3),
+                        'ext_index_first'=>array(0=>0,1=>0),
+                        'ext_length'=>array(0=>4,1=>3),
+                        'left'=>array(1),
+                        'next'=>'d');
+
+        return array('regex'=>'(abc)?(?(1)d|e)',
+                     'tests'=>array($test1, $test2, $test3),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+    }
+
+    function data_for_test_cond_subexpr_recursion_generation() {
+        $test1 = array( 'str'=>'',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'ext_index_first'=>array(0=>0,1=>0),
+                        'ext_length'=>array(0=>1,1=>1),
+                        'left'=>array(1),
+                        'next'=>'1');
+
+        $test2 = array( 'str'=>'1',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0),
+                        'length'=>array(0=>1,1=>1));
+
+        $test3 = array( 'str'=>'1abcde',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>6),
+                        'ext_index_first'=>array(0=>0,1=>0),
+                        'ext_length'=>array(0=>1,1=>1),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        $test4 = array( 'str'=>'1abcdef',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0),
+                        'length'=>array(0=>7,1=>7));
+
+        return array('regex'=>'^((?(R1)abcdef|1)(?1)?)$',
+                     'tests'=>array($test1, $test2, $test3, $test4),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+    }
+
     /*function data_for_test_leaf_assert_G() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
