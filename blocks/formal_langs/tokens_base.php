@@ -93,12 +93,12 @@ class block_formal_langs_node_position {
     protected $colstart;
     protected $colend;
     /** A starting position in string, as sequence of characters
-     *	@var int
-     */	
+     *  @var int
+     */
     protected $stringstart;
     /** An end position in string, as sequence of characters
-     *	@var int
-     */	    
+     *  @var int
+     */
     protected $stringend;
 
     public function linestart(){
@@ -108,15 +108,15 @@ class block_formal_langs_node_position {
     public function lineend(){
         return $this->lineend;
     }
-    
+
     public function colstart(){
         return $this->colstart;
     }
-    
+
     public function colend(){
         return $this->colend;
     }
-    
+
     public function stringstart() {
         return $this->stringstart;
     }
@@ -124,7 +124,7 @@ class block_formal_langs_node_position {
     public function stringend() {
         return $this->stringend;
     }
-    
+
     public function __construct($linestart, $lineend, $colstart, $colend, $stringstart = 0, $stringend = 0) {
         $this->linestart = $linestart;
         $this->lineend = $lineend;
@@ -212,8 +212,8 @@ class block_formal_langs_ast_node_base {
      * @var string
      */
     protected $description;
-	
-	public $rule;
+
+    public $rule;
 
     public function __construct($type, $position, $number, $needuserdescription) {
         $this->number = $number;
@@ -302,8 +302,8 @@ class block_formal_langs_ast_node_base {
         }
         return false;
     }
-	
-	/**
+
+    /**
      * Returns value for node
      * @return string value for text of node
      */
@@ -323,8 +323,8 @@ class block_formal_langs_ast_node_base {
 
         return implode(' ', $values);
     }
-	
-	/**
+
+    /**
      * Returns list of tokens, covered by AST node. Tokens determined as not having any children
      * @return array list of tokens
      */
@@ -383,13 +383,13 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      */
     protected $tokenindex;
 
-	public function number() {
+    public function number() {
         if ($this->number === null) {
             $this->number = $this->tokenindex;
         }
         return $this->number;
     }
-	
+
     public function value() {
         return $this->value;
     }
@@ -822,16 +822,17 @@ class block_formal_langs_scanning_error extends block_formal_langs_lexical_error
  *   language, lexer and parser objects stateless.
  */
 class block_formal_langs_processed_string {
-   
+
     /**
      * @var string table, where string belongs
      */
     protected $tablename;
+
     /**
      *@var integer an id to load/store user descriptions
      */
     protected $tableid;
-    
+
     /**
      *@var string a string to process
      */
@@ -864,7 +865,7 @@ class block_formal_langs_processed_string {
     public function __construct($lang) {
         $this->language = $lang;
     }
-    
+
     /**
      *  Called, when user assigns field to a class
      *  @param string $name   name of field
@@ -882,8 +883,8 @@ class block_formal_langs_processed_string {
             $error  = 'Unknown property: ' . $name . ' in file: ' . $trace[0]['file'] . ', line: ' . $trace[0]['line'];
             trigger_error($error, E_USER_NOTICE);
         }
-        
     }
+
     /**
      *  Called when need to determine, whether field exists
      *  @param string $name   name of field
@@ -893,6 +894,7 @@ class block_formal_langs_processed_string {
         $getters = array('string', 'stream', 'syntaxtree', 'descriptions');
         return in_array($name, $getters);
     }
+
     /**
      *  Called when need to get field
      *  @param string $name   name of field
@@ -910,8 +912,7 @@ class block_formal_langs_processed_string {
             trigger_error($error, E_USER_NOTICE);
         }
     }
-    
-    
+
     /** Removes a descriptions from a DB
       * @param string $tablename  name of source table
       * @param mixed $tableid    id or ids in table      
@@ -928,7 +929,7 @@ class block_formal_langs_processed_string {
         }
         return $DB->delete_records_select('block_formal_langs_node_dscr', implode(' AND ', $conditions));
     }
-    
+
     /** Returns a descriptions from a DB
       * @param string $tablename  name of source table
       * @param mixed $tableid     ids in table
@@ -951,16 +952,16 @@ class block_formal_langs_processed_string {
         }
         return $result;
     }
-    
+
     /**
      *  Sets an inner string. Also flushes any other dependent fields (token stream, syntax tree, descriptions) 
      *  @param string $string inner string
      */
     protected function set_string($string)  {
         $this->string=$string;
-        $this->tokenstream=null;
-        $this->syntaxtree=null;
-        $this->descriptions=null;
+        $this->tokenstream = null;
+        $this->syntaxtree = null;
+        $this->descriptions = null;
     }
     /**
      * Sets a token stream. Must be used by lexical analyzer, to set a corrected stream for a string
@@ -970,14 +971,16 @@ class block_formal_langs_processed_string {
         //TODO - define, how it should differs from set_stream
         $this->tokenstream = $stream;
     }
+
     /**
      * Sets a token stream. Must be used by lexer, to set a stream for scan
      * @param block_formal_langs_token_stream $stream stream of lexemes     
      */
     protected function set_stream($stream) {
         $this->tokenstream = $stream;
-        $this->syntaxtree=null;
+        $this->syntaxtree = null;
     }
+
     /**
      *  Sets a syntax tree.
      *  @param object $tree syntax tree 
@@ -985,7 +988,7 @@ class block_formal_langs_processed_string {
     public function set_syntax_tree($tree) {
          $this->syntaxtree = $tree;
     }
-    
+
     /**
      *  Sets a descriptions for a string. 
      *  @param array $descriptions descriptions array
@@ -1066,7 +1069,7 @@ class block_formal_langs_processed_string {
             
             $index = $index + 1;
         }
-        
+
         // If some old descriptions left - delete it.
         if ($oldrecords != null) {
             $oldrecordids = array();
@@ -1077,7 +1080,7 @@ class block_formal_langs_processed_string {
             $DB->delete_records_select('block_formal_langs_node_dscr', " id IN ({$oldrecordin}) AND tablename = '{$this->tablename}' ");
         }
     }
-    
+
     /**
      *  Set table parameters for string. Used by language.
      *  @param string $tablename source table name
@@ -1087,7 +1090,7 @@ class block_formal_langs_processed_string {
         $this->tablename=$tablename;
         $this->tableid=$tableid;
     }
-    
+
     /**
      * Returns count of nodes which needs description or special name.
      *
@@ -1115,8 +1118,8 @@ class block_formal_langs_processed_string {
             return $this->tokenstream->tokens;
         }
     }
-	
-	/**
+
+    /**
      * Returns node by number
      * @param $nodenumber
      * @param array|block_formal_langs_ast_node_base $root a root node
@@ -1139,17 +1142,17 @@ class block_formal_langs_processed_string {
         }
         $children = $root->childs();
         $result = null;
-		if (count($children)) {
+        if (count($children)) {
             foreach($children as $child) {
                 if ($result == null) {
                     $result = $this->find_node($nodenumber, $child);
                 }
             }
-		}
+        }
         return $result;
     }
-	
-	/**
+
+    /**
      * Returns tree, converted to list and sorted by number
      * @param null|block_formal_langs_ast_node_base $root a root node
      * @return array array of nodes, sorted by number
@@ -1281,6 +1284,7 @@ class block_formal_langs_processed_string {
     public function set_descriptions_from_array($descriptions) {
         $this->descriptions = $descriptions;
     }
+
     /** Test, whether we have a lexeme descriptions for token with specified index
      *  @param int $index index of token
      */
@@ -1291,6 +1295,7 @@ class block_formal_langs_processed_string {
         }
        return false;
     }
+
     /**
      *  Returns a stream of tokens.
      *  @return stream of tokens
@@ -1300,6 +1305,7 @@ class block_formal_langs_processed_string {
             $this->language->scan($this);
         return $this->tokenstream;
     }
+
     /**
      *  Returns a syntax tree
      *  @return syntax tree
