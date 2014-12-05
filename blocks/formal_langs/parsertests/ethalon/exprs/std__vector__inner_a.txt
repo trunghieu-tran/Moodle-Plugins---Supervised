@@ -1,0 +1,17 @@
+[
+ (scoped_idetifier) {
+  (namespace_resolve) {
+   (namespace_resolve) {
+    (namespace_resolve) {
+     std
+     ::
+    }
+    vector
+    ::
+   }
+   inner
+   ::
+  }
+  a
+ }
+]

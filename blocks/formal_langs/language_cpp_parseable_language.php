@@ -282,9 +282,9 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
             'string'    =>  array( $any => 'STRING'),
             'comma'     =>  array( $any => 'COMMA' ),
             'preprocessor' => array(
-                '#' => 'PREPROCESSOR_CONCAT',
+                '##' => 'PREPROCESSOR_CONCAT',
                 '#define'  => 'PREPROCESSOR_DEFINE',
-                '##' => 'PREPROCESSOR_STRINGIFY',
+                '#' => 'PREPROCESSOR_STRINGIFY',
                 '#if' => 'PREPROCESSOR_IF',
                 '#ifdef' => 'PREPROCESSOR_IFDEF',
                 '#elif'  => 'PREPROCESSOR_ELIF',
