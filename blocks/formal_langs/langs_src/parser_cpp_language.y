@@ -72,13 +72,13 @@ require_once($CFG->dirroot.'/blocks/formal_langs/descriptions/descriptionrule.ph
 
 %nonassoc THENKWD .
 %left    ELSEKWD.
+%left    NOTEQUAL EQUAL.
 %left    LOGICALAND.
 %left    BINARYAND.
 %left    BINARYOR.
 %left    LOGICALOR.
 %left    AMPERSAND.
 %left    BINARYXOR.
-%left    NOTEQUAL EQUAL.
 %right   UINDIRECTION UADRESS.
 %left    NAMESPACE_RESOLVE.
 %nonassoc UMINUS UPLUS UBRACKET.
@@ -946,43 +946,51 @@ expr_prec_10(R) ::= expr_prec_9(A) . {
 
 /* EXPRESSIONS OF NINTH PRECEDENCE */
 
-expr_prec_9(R) ::= expr_prec_9(A) BINARYOR(B) expr_prec_8(C) . {
-	$this->currentrule = new block_formal_langs_description_rule("операция \"побитового ИЛИ\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция логического ИЛИ", "%ur(именительный)"));
-	R = $this->create_node('expr_binary_or', array( A, B, C ));
-}
-
-expr_prec_9(R) ::= expr_prec_9(A) LOGICALAND(B) expr_prec_8(C) . {
+expr_prec_9(R) ::= expr_prec_9(A) LOGICALAND(B) expr_binary_ops(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"логического И\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция логического И", "%ur(именительный)"));
 	R = $this->create_node('expr_logical_and', array( A, B, C ));
 }
 
-expr_prec_9(R) ::= expr_prec_9(A) LOGICALOR(B) expr_prec_8(C) . {
+expr_prec_9(R) ::= expr_prec_9(A) LOGICALOR(B) expr_binary_ops(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"логического ИЛИ\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция логического ИЛИ", "%ur(именительный)"));
 	R = $this->create_node('expr_logical_or', array( A, B, C ));
 }
 
-expr_prec_9(R) ::= expr_prec_9(A) BINARYXOR(B) expr_prec_8(C) . {
+expr_prec_9(R) ::= expr_binary_ops(A) . {
+	R  = A;
+}
+
+expr_binary_ops(R) ::= expr_binary_ops(A) BINARYXOR(B) expr_or_equal(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"исключающего ИЛИ\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция исключающего ИЛИ", "%ur(именительный)"));
 	R = $this->create_node('expr_binary_xor', array( A, B, C ));
 }
 
-expr_prec_9(R) ::= expr_prec_9(A) AMPERSAND(B) expr_prec_8(C) . {
+expr_binary_ops(R) ::= expr_binary_ops(A) BINARYOR(B) expr_or_equal(C) . {
+	$this->currentrule = new block_formal_langs_description_rule("операция \"побитового ИЛИ\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция логического ИЛИ", "%ur(именительный)"));
+	R = $this->create_node('expr_binary_or', array( A, B, C ));
+}
+
+expr_binary_ops(R) ::= expr_binary_ops(A) AMPERSAND(B) expr_or_equal(C) . {
 	// Well, that's what you get when you mix binary and and adress taking
 	$this->currentrule = new block_formal_langs_description_rule("операция \"побитового И\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция побитового И", "%ur(именительный)"));
 	R = $this->create_node('expr_binary_and', array( A, B, C ));
 }
 
-expr_prec_9(R) ::= expr_prec_9(A) NOT_EQUAL(B) expr_prec_8(C) . {
+expr_binary_ops(R) ::= expr_or_equal(A) . {
+	R  = A;
+}
+
+expr_or_equal(R) ::= expr_or_equal(A) NOT_EQUAL(B) expr_prec_8(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"не равно\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция не равно", "%ur(именительный)"));
 	R = $this->create_node('expr_notequal', array( A, B, C ));
 }
 
-expr_prec_9(R) ::= expr_prec_9(A) EQUAL(B) expr_prec_8(C) . {
+expr_or_equal(R) ::= expr_or_equal(A) EQUAL(B) expr_prec_8(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"равно\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция равно", "%ur(именительный)"));
 	R = $this->create_node('expr_equal', array( A, B, C ));
 }
 
-expr_prec_9(R) ::= expr_prec_8(A) . {
+expr_or_equal(R) ::= expr_prec_8(A) . {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
 	R = A;
 }
