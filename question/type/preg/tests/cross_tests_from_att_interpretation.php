@@ -1107,8 +1107,7 @@ class qtype_preg_cross_tests_from_att_interpretation {
     }
 
     function data_for_test_att_interpretation_92() {
-        $test1 = array('str'=>"
-A",
+        $test1 = array('str'=>"\nA",
                        'is_match'=>true,
                        'full'=>true,
                        'index_first'=>array(0=>0),

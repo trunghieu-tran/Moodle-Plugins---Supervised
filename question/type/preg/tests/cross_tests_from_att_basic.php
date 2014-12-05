@@ -688,34 +688,31 @@ class qtype_preg_cross_tests_from_att_basic {
     }
 
     function data_for_test_att_basic_57() {
-        $test1 = array('str'=>"
-",
+        $test1 = array('str'=>"\n",
                        'is_match'=>true,
                        'full'=>true,
                        'index_first'=>array(0=>0),
                        'length'=>array(0=>1));
 
-        return array('regex'=>"\\n",
+        return array('regex'=>"\n",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_basic_58() {
-        $test1 = array('str'=>"
-",
+        $test1 = array('str'=>"\n",
                        'is_match'=>true,
                        'full'=>true,
                        'index_first'=>array(0=>0),
                        'length'=>array(0=>1));
 
-        return array('regex'=>"\\n",
+        return array('regex'=>"\n",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_basic_59() {
-        $test1 = array('str'=>"
-",
+        $test1 = array('str'=>"\n",
                        'is_match'=>true,
                        'full'=>true,
                        'index_first'=>array(0=>0),
@@ -727,14 +724,13 @@ class qtype_preg_cross_tests_from_att_basic {
     }
 
     function data_for_test_att_basic_60() {
-        $test1 = array('str'=>"
-a",
+        $test1 = array('str'=>"\na",
                        'is_match'=>true,
                        'full'=>true,
                        'index_first'=>array(0=>0),
                        'length'=>array(0=>2));
 
-        return array('regex'=>"\\na",
+        return array('regex'=>"\na",
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }

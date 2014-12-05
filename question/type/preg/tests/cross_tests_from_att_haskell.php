@@ -795,8 +795,7 @@ class qtype_preg_cross_tests_from_att_haskell {
     }
 
     function data_for_test_att_haskell_66() {
-        $test1 = array('str'=>"ac
-",
+        $test1 = array('str'=>"ac\\n",
                        'is_match'=>true,
                        'full'=>true,
                        'index_first'=>array(0=>0,2=>0),
@@ -808,8 +807,7 @@ class qtype_preg_cross_tests_from_att_haskell {
     }
 
     function data_for_test_att_haskell_67() {
-        $test1 = array('str'=>"ac
-",
+        $test1 = array('str'=>"ac\\n",
                        'is_match'=>true,
                        'full'=>true,
                        'index_first'=>array(0=>0,1=>0),
