@@ -1212,8 +1212,7 @@ expr_atom(R) ::= NUMERIC(A) . {
 	R =  A;
 }
 
-expr_atom(R) ::= IDENTIFIER(A) . {
-	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%s"));
+expr_atom(R) ::= assignable(A) . {
 	R =  A;
 }
 
@@ -1227,6 +1226,17 @@ expr_atom(R) ::= STRING(A) . {
 	R =  A;
 }
 
+assignable(R) ::= IDENTIFIER(A) . {
+	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%s"));
+	R =  A;
+}
+
+assignable(R) ::= namespace_resolve(A) IDENTIFIER(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)"));
+	R =  $this->create_node('scoped_idetifier', array( A, B));
+}
+
+/* TODO: Test this type of expression later */
 expr_atom(R) ::= LEFTROUNDBRACKET(A) expr_prec_11(B) RIGHTROUNDBRACKET(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("левая круглая скобка", "%s", "провая круглая скобка"));
 	R =  $this->create_node('expr_brackets', array( A, B, C));
@@ -1234,44 +1244,53 @@ expr_atom(R) ::= LEFTROUNDBRACKET(A) expr_prec_11(B) RIGHTROUNDBRACKET(C) . {
 
 expr_atom(R) ::= PREPROCESSOR_STRINGIFY(A) IDENTIFIER(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
-	R =  $this->create_node('expr_preprocessor_stringify', array( A, B));
+	R =  $this->create_node('preprocessor_stringify', array( A, B));
 }
 
-expr_atom(R) ::= expr_atom(A) PREPROCESSOR_CONCAT(B) IDENTIFIER(C) . {
+expr_atom(R) ::= PREPROCESSOR_STRINGIFY(A) TYPENAME(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R =  $this->create_node('preprocessor_stringify', array( A, B));
+}
+
+expr_atom(R) ::= IDENTIFIER(A) PREPROCESSOR_CONCAT(B) IDENTIFIER(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%s"));
-	R =  $this->create_node('expr_preprocessor_concat', array( A, B, C));
+	R =  $this->create_node('preprocessor_concat', array( A, B, C));
 }
 
-expr_atom(R) ::= SIZEOF(A) LEFTROUNDBRACKET(B)  type(C) RIGHTROUNDBRACKET(D) . {
+expr_atom(R) ::= IDENTIFIER(A) PREPROCESSOR_CONCAT(B) TYPENAME(C) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%s"));
+	R =  $this->create_node('preprocessor_concat', array( A, B, C));
+}
+
+expr_atom(R) ::= TYPENAME(A) PREPROCESSOR_CONCAT(B) IDENTIFIER(C) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%s"));
+	R =  $this->create_node('preprocessor_concat', array( A, B, C));
+}
+
+expr_atom(R) ::= TYPENAME(A) PREPROCESSOR_CONCAT(B) TYPENAME(C) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%s"));
+	R =  $this->create_node('preprocessor_concat', array( A, B, C));
+}
+
+/* ================================= VALIDATED PART ================================= */
+
+expr_atom(R) ::= SIZEOF(A) LEFTROUNDBRACKET(B)  type_or_type_ref_or_with_ptr(C) RIGHTROUNDBRACKET(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("операция взятия размера структуры", "левая круглая скобка", "%ur(именительный)", "правая круглая скобка"));
-	R =  $this->create_node('expr_sizeof', array( A, B, C, D));
+	R =  $this->create_node('sizeof', array( A, B, C, D));
 }
 
 expr_atom(R) ::= SIZEOF(A) LEFTROUNDBRACKET(B)  IDENTIFIER(C) RIGHTROUNDBRACKET(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("операция взятия размера структуры", "левая круглая скобка", "%s", "правая круглая скобка"));
-	R =  $this->create_node('expr_sizeof', array( A, B, C, D));
+	R =  $this->create_node('sizeof', array( A, B, C, D));
 }
 
 /* TYPECAST */
 
-typecast(R) ::= LEFTROUNDBRACKET(A)  type(B) RIGHTROUNDBRACKET(C) . {
+typecast(R) ::= LEFTROUNDBRACKET(A)  type_or_type_ref_or_with_ptr(B) RIGHTROUNDBRACKET(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция приведения к типу %2(именительный) ", array("левая круглая скобка", "%ur(именительный)", "правая круглая скобка"));
-	$result = $this->create_node('typecast', array( A, B, C ));
+	$result = $this->create_node('c_style_typecast_operator', array( A, B, C ));
 	R = $result;
 }
-
-/* LIST OF TYPES */
-/*
-type_list(R) ::= type(A) .  {
-	$this->currentrule = new block_formal_langs_description_rule("список типов", array("%ur(именительный)"));
-	R = $this->create_node('type_list', array( A ) );
-}
-
-type_list(R) ::= type_list(A) COMMA(B) type(C) . {
-	$this->currentrule = new block_formal_langs_description_rule("%l(type)", array("список типов", "запятая", "%n-ый тип"));
-	R = $this->create_node('type_list', array( A, B, C ) );
-}
-*/
 
 /* TYPE DEFINITIONS */
 
@@ -1438,8 +1457,6 @@ template_instantiation_arguments(R) ::= template_instantiation_arguments_begin(A
 	$this->currentrule = new block_formal_langs_description_rule("список аргументов инстанцирования шаблона", array("начало списка аргументов инстанцирования шаблона", "%ur(именительный)", "конец списка аргументов инстанцирования шаблона"));
 	R = $this->create_node('template_instantiation_arguments', array( A, B, C));
 }
-
-/* ================================= VALIDATED PART ================================= */
 
 /* VOID */
 
