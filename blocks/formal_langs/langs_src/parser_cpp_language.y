@@ -1279,7 +1279,7 @@ expr_atom(R) ::= SIZEOF(A) LEFTROUNDBRACKET(B)  type_or_type_ref_or_with_ptr(C) 
 	R =  $this->create_node('sizeof', array( A, B, C, D));
 }
 
-expr_atom(R) ::= SIZEOF(A) LEFTROUNDBRACKET(B)  IDENTIFIER(C) RIGHTROUNDBRACKET(D) . {
+expr_atom(R) ::= SIZEOF(A) LEFTROUNDBRACKET(B)  expr_atom(C) RIGHTROUNDBRACKET(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("операция взятия размера структуры", "левая круглая скобка", "%s", "правая круглая скобка"));
 	R =  $this->create_node('sizeof', array( A, B, C, D));
 }
