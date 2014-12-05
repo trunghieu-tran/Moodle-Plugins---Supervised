@@ -871,7 +871,6 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
         $topitem = end($this->opt_stack);
         $modJ = $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_DUPNAMES);
 
-
         if ($modJ) {
             // Just keep on increasing numbers.
             $this->lastsubexpr++;
@@ -879,11 +878,12 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
             return $this->lastsubexpr;
         } else {
             // Check if the number is correct.
-            if ($number == $this->lastsubexpr) {
+            if ($number !== $this->lastsubexpr + 1) {
                 // Two subexpressions with same number in a row is error.
                 $error = $this->form_error(qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBEXPR_NAMES, $name, '');
                 return $error;
             }
+            $this->lastsubexpr = $number;
             return $number;
         }
     }
@@ -960,9 +960,6 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
 
 %%
 
-<YYINITIAL> \n {
-    // Newlines are totally ignored independent on the 'x' option.
-}
 <YYINITIAL> {WHITESPACE} {                       /* Whitespace */
     $topitem = end($this->opt_stack);
     if (!$topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED)) {
