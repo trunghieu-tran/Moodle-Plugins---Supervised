@@ -318,24 +318,51 @@ enum_value(R) ::= IDENTIFIER(A) ASSIGN(B) expr_atom(C). {
 
 /* FUNCTIONS */
 
-stmt_or_defined_macro(R) ::= type(A) possible_function_name(B) formal_args_list_with_or_without_const(C) function_body(D) . {
-	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)", "%ur(именительный)", "%ur(именительный)"));
-	R = $this->create_node('stmt_or_defined_macro', array(A, B, C, D));
+stmt_or_defined_macro(R) ::= type_or_type_with_qualifier(A) function_definition_without_type(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)"));
+	R = $this->create_node('stmt_or_defined_macro', array(A, B));
 }
 
-stmt_or_defined_macro(R) ::= type_with_qualifier(A) possible_function_name(C) formal_args_list_with_or_without_const(D) function_body(E) . {
-	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)", "%ur(именительный)", "%ur(именительный)"));
-	R = $this->create_node('stmt_or_defined_macro', array(A, C, D, E));
+stmt_or_defined_macro(R) ::= template_def(A) type(B) function_definition_without_type(C) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)", "%ur(именительный)"));
+	R = $this->create_node('stmt_or_defined_macro', array(A, B, C));
 }
 
-stmt_or_defined_macro(R) ::= template_def(A) type_with_qualifier(B) possible_function_name(C) formal_args_list_with_or_without_const(D) function_body(E) . {
-	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)", "%ur(именительный)", "%ur(именительный)", "%ur(именительный)"));
-	R = $this->create_node('stmt_or_defined_macro', array(A, B, C, D, E));
+function_definition_without_type(R) ::= lvalue(A) formal_args_list_with_or_without_const(B) function_body(C) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)", "%ur(именительный)"));
+	R = $this->create_node('function_definition_without_type', array(A, B, C));
 }
 
-stmt_or_defined_macro(R) ::= template_def(A) type(B) possible_function_name(C) formal_args_list_with_or_without_const(D) function_body(E) . {
-	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)", "%ur(именительный)", "%ur(именительный)", "%ur(именительный)"));
-	R = $this->create_node('stmt_or_defined_macro', array(A, B, C, D, E));
+function_definition_without_type(R) ::= operator_overload_declaration_type_modificators(A) . {
+	R = A;
+}
+
+operator_overload_declaration_type_modificators(R) ::= AMPERSAND(A) operator_overload_declaration_ptr(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%ur(именительный)"));
+	R = $this->create_node('operator_overload_declaration', array(A, B));
+}
+
+operator_overload_declaration_type_modificators(R) ::= operator_overload_declaration_ptr(A) . {
+	R = A;
+}
+
+operator_overload_declaration_ptr(R) ::= CONSTKWD(A) MULTIPLY(B) operator_overload_declaration_ptr(C) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)", "%ur(именительный)"));
+	R = $this->create_node('operator_overload_declaration', array(A, B, C));
+}
+
+operator_overload_declaration_ptr(R) ::= MULTIPLY(A) operator_overload_declaration_ptr(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)"));
+	R = $this->create_node('operator_overload_declaration', array(A, B));
+}
+
+operator_overload_declaration_ptr(R) ::= operator_overload_declaration_without_type(A) . {
+	R = A;
+}
+
+operator_overload_declaration_without_type(R) ::= OPERATOROVERLOADDECLARATION(A) formal_args_list_with_or_without_const(B) function_body(C) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)", "%ur(именительный)"));
+	R = $this->create_node('function_definition_without_type', array(A, B, C));
 }
 
 /* CONSTRUCTORS */
@@ -441,17 +468,6 @@ function_body(R) ::= LEFTFIGUREBRACKET(A)  RIGHTFIGUREBRACKET(B) . {
 function_body(R) ::= SEMICOLON(A) . {
     $this->currentrule = new block_formal_langs_description_rule("тело функции", array("точка с запятой"));
 	R = $this->create_node('function_body', array(A));
-}
-
-
-possible_function_name(R) ::= IDENTIFIER(A) . {
-	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%s"));
-	R = $this->create_node('possible_function_name', array(A));
-}
-
-possible_function_name(R) ::= OPERATOROVERLOADDECLARATION(A) . {
-	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%s"));
-	R = $this->create_node('possible_function_name', array(A));
 }
 
 
@@ -573,7 +589,7 @@ stmt(R) ::= PREPROCESSOR_INCLUDE(A) . {
 
 stmt(R) ::= WHILEKWD(A)
 			LEFTROUNDBRACKET(B)
-			expr_prec_11(C)		
+			expr_prec_10(C)		
 			RIGHTROUNDBRACKET(D)
 			stmt(E) 
 			. {
@@ -803,38 +819,37 @@ expr_prec_11(R) ::= DELETE(A) expr_prec_10(B) . {
 	R = $this->create_node('delete_pointer', array( A, B ));
 } 
 
-expr_prec_11(R) ::= type(A) expr_atom(B) ASSIGN(C) expr_prec_9(D) . {
-	$this->currentrule = new block_formal_langs_description_rule("объявление переменной %2(имя переменной)", array("%ur(именительный)", "%s", "оператор присваивания", "%ur(именительный)"));
-	R = $this->create_node('variable_declaration_with_assignment', array( A, B, C, D ));
-}
 
-expr_prec_11(R) ::= type(A) IDENTIFIER(B) . {
-	$this->currentrule = new block_formal_langs_description_rule("объявление переменной %2(имя переменной)", array("%ur(именительный)", "%s"));
+expr_prec_11(R) ::= type_or_type_with_qualifier(A)  lvalue_or_assignment_list(B)  . {
+	$this->currentrule = new block_formal_langs_description_rule("объявление переменных", array("%ur(именительный)", "%ur(именительный)"));
 	R = $this->create_node('variable_declaration', array( A, B ));
 }
 
-expr_prec_11(R) ::= type_with_qualifier(A) IDENTIFIER(C) ASSIGN(D) expr_prec_9(E) . {
-	$this->currentrule = new block_formal_langs_description_rule("объявление переменной %2(имя переменной)", array("%ur(именительный)", "%s", "оператор присваивания", "%ur(именительный)"));
-	R = $this->create_node('variable_declaration_with_assignment', array( A,  C, D, E ));
+expr_prec_11(R) ::= expr_list(A) . {
+	R = A;
 }
 
+/* LIST OF EXPRESSIONS */
 
-expr_prec_11(R) ::= type_with_qualifier(A)  IDENTIFIER(C)  . {
-	$this->currentrule = new block_formal_langs_description_rule("объявление переменной %2(имя переменной)", array("%ur(именительный)", "%s"));
-	R = $this->create_node('variable_declaration', array( A, C ));
-}
-
-expr_prec_11(R) ::= expr_prec_11(A) COMMA(B)  expr_prec_10(C) . {
+expr_list(R) ::= expr_list(A) COMMA(B)  expr_prec_10(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("список выражений %l(expr_prec_10)", array("%ur(именительный)", "запятая", "%ur(именительный)"));
-	R = $this->create_node('expr_comma', array( A, B, C ));
+	R = $this->create_node('expr_list', array( A, B, C ));
 }
 
-expr_prec_11(R) ::= expr_prec_10(A) . {
+expr_list(R) ::= expr_prec_10(A) . {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
 	R = A;
 }
 
 /* VARIABLE QUALIFIERS */
+
+type_or_type_with_qualifier(R) ::= type_with_qualifier(A) . {
+	R = A;
+}
+
+type_or_type_with_qualifier(R) ::= type(A) . {
+	R = A;
+}
 
 type_with_qualifier(R) ::= varqualifier(A) type(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("тип с квалифицирующим словом", array("%ur(именительный)", "%ur(именительный)"));
@@ -1146,7 +1161,7 @@ expr_prec_2(R) ::= expr_prec_2(A)  LEFTSQUAREBRACKET(B) expr_prec_10(C)  RIGHTSQ
 	R = $this->create_node('expr_array_access', array( A, B, C, D));
 }
 
-expr_prec_2(R) ::= expr_prec_2(A)  LEFTROUNDBRACKET(B) expr_prec_11(C)  RIGHTROUNDBRACKET(D) . [UBRACKET] {
+expr_prec_2(R) ::= expr_prec_2(A)  LEFTROUNDBRACKET(B) expr_list(C)  RIGHTROUNDBRACKET(D) . [UBRACKET] {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "левая круглая скобка", "%ur(именительный)", "правая круглая скобка"));
 	R = $this->create_node('expr_function_call', array( A, B, C, D));
 }
@@ -1185,25 +1200,112 @@ try_pointer_access(R) ::= expr_prec_2(A) RIGHTARROW(B) . {
 
 /* C++ STYLE CASTS */
 
-cpp_style_cast(R) ::= CONST_CAST(A)  LESSER(B) type(C) GREATER(D) . {
+cpp_style_cast(R) ::= CONST_CAST(A)  LESSER(B) type_or_type_ref_or_with_ptr(C) GREATER(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("приведение со снятием константности к %3(родительный) типу ", array("ключевое слово приведения типа", "знак \"меньше\"", "%ur(именительный)", "знак \"больше\""));
 	R = $this->create_node('expr_const_cast', array(A, B, C, D));
 }
 
-cpp_style_cast(R) ::= STATIC_CAST(A)  LESSER(B) type(C) GREATER(D) . {
+cpp_style_cast(R) ::= STATIC_CAST(A)  LESSER(B) type_or_type_ref_or_with_ptr(C) GREATER(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("статическое приведение к %3(родительный) типу ", array("ключевое слово приведения типа", "знак \"меньше\"", "%ur(именительный)", "знак \"больше\""));
 	R = $this->create_node('expr_static_cast', array(A, B, C, D));
 }
 
-cpp_style_cast(R) ::= DYNAMIC_CAST(A)  LESSER(B) type(C) GREATER(D) . {
+cpp_style_cast(R) ::= DYNAMIC_CAST(A)  LESSER(B) type_or_type_ref_or_with_ptr(C) GREATER(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("динамическое приведение к %3(родительный) типу ", array("ключевое слово приведения типа", "знак \"меньше\"", "%ur(именительный)", "знак \"больше\""));
 	R = $this->create_node('expr_dynamic_cast', array(A, B, C, D));
 }
 
-cpp_style_cast(R) ::= REINTERPRET_CAST(A)  LESSER(B) type(C) GREATER(D) . {
+cpp_style_cast(R) ::= REINTERPRET_CAST(A)  LESSER(B) type_or_type_ref_or_with_ptr(C) GREATER(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("побайтовое приведение к %3(родительный) типу ", array("ключевое слово приведения типа", "знак \"меньше\"", "%ur(именительный)", "знак \"больше\""));
 	R = $this->create_node('expr_reinterpret_cast', array(A, B, C, D));
 }
+
+/* LVALUE FOR LOCAL DEFINITIONS */
+
+lvalue_or_assignment_list(R) ::= lvalue_or_assignment(A) . {
+	R = A;
+}
+
+lvalue_or_assignment_list(R) ::= lvalue_or_assignment_list(A) COMMA(B) lvalue_or_assignment(C). {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%ur(именительный)"));
+	R =  $this->create_node('lvalue_or_assignment_list', array( A, B, C));
+}
+
+lvalue_or_assignment(R) ::= lvalue(A) . {
+	R = A;
+}
+
+lvalue_or_assignment(R) ::= lvalue(A) ASSIGN(B) expr_prec_10(C). {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%ur(именительный)"));
+	R =  $this->create_node('assign', array( A, B, C));
+}
+
+lvalue_or_assignment(R) ::= lvalue(A) ASSIGN(B) initialization_list(C). {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%ur(именительный)"));
+	R =  $this->create_node('assign', array( A, B, C));
+}
+
+initialization_list(R) ::= LEFTFIGUREBRACKET(A) RIGHTFIGUREBRACKET(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R =  $this->create_node('initialization_list', array( A, B));
+}
+
+initialization_list(R) ::= LEFTFIGUREBRACKET(A) initialization_list_argument_list(B) RIGHTFIGUREBRACKET(C) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%ur(именительный)", "%s"));
+	R =  $this->create_node('initialization_list', array( A, B, C));
+}
+
+
+initialization_list_argument_list(R) ::= expr_prec_10(A) . {
+	R = A;
+}
+
+initialization_list_argument_list(R) ::= initialization_list(A) . {
+	R = A;
+}
+
+initialization_list_argument_list(R) ::= initialization_list_argument_list(A) COMMA(B) expr_prec_10(A) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%ur(именительный)"));
+	R =  $this->create_node('initialization_list_argument_list', array( A, B, C));
+}
+
+initialization_list_argument_list(R) ::= initialization_list_argument_list(A) COMMA(B) initialization_list(A) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%ur(именительный)"));
+	R =  $this->create_node('initialization_list_argument_list', array( A, B, C));
+}
+
+lvalue(R) ::= possibly_identifier_preceded_ref(A) . {
+	R = A;
+}
+
+lvalue(R) ::= lvalue(A) LEFTSQUAREBRACKET(B) expr_prec_9(C) RIGHTSQUAREBRACKET(D) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%ur(именительный)", "%s"));
+	R =  $this->create_node('lvalue', array( A, B, C, D));
+}
+
+possibly_identifier_preceded_ref(R) ::= AMPERSAND(A) possibly_idenitifer_preceded_ptrs(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%ur(именительный)"));
+	R =  $this->create_node('lvalue', array( A, B));
+}
+
+possibly_identifier_preceded_ref(R) ::= possibly_idenitifer_preceded_ptrs(A) . {
+	R = A;
+}
+
+possibly_idenitifer_preceded_ptrs(R) ::= IDENTIFIER(A) . {
+	R = A;
+}
+
+possibly_idenitifer_preceded_ptrs(R) ::= MULTIPLY(A) possibly_idenitifer_preceded_ptrs(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R =  $this->create_node('lvalue', array( A, B));
+}
+
+possibly_idenitifer_preceded_ptrs(R) ::= CONSTKWD(A) MULTIPLY(B) possibly_idenitifer_preceded_ptrs(C) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s", "%s"));
+	R =  $this->create_node('lvalue', array( A, B, C));
+}
+
 
 /* EXPRESSIONS OF FIRST PRECEDENCE */
 
@@ -1232,12 +1334,12 @@ assignable(R) ::= IDENTIFIER(A) . {
 }
 
 assignable(R) ::= namespace_resolve(A) IDENTIFIER(B) . {
-	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)"));
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s"));
 	R =  $this->create_node('scoped_idetifier', array( A, B));
 }
 
 /* TODO: Test this type of expression later */
-expr_atom(R) ::= LEFTROUNDBRACKET(A) expr_prec_11(B) RIGHTROUNDBRACKET(C) . {
+expr_atom(R) ::= LEFTROUNDBRACKET(A) expr_list(B) RIGHTROUNDBRACKET(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("левая круглая скобка", "%s", "провая круглая скобка"));
 	R =  $this->create_node('expr_brackets', array( A, B, C));
 }
@@ -1386,14 +1488,22 @@ typename_or_instantiated_template_type(R) ::= TYPENAME(A) template_instantiation
 
 /* TYPE WITH POINTER OR REFERENCE */
 
-type_ref(R) ::= type(A) AMPERSAND(B) . {
+type_ref_one(R) ::= type(A) AMPERSAND(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("ссылка на %1(именительный)", array("%ur(именительный)", "признак  ссылки"));
 	R = $this->create_node('type_ref', array( A, B));
 }
 
-type_ref(R) ::= type(A) AMPERSAND(B) AMPERSAND(C) . {
-	$this->currentrule = new block_formal_langs_description_rule("ссылка на %1(именительный)", array("%ur(именительный)", "признак  ссылки",  "признак  ссылки"));
-	R = $this->create_node('type_ref', array( A, B, C));
+type_ref_two(R) ::= type_ref_one(A) AMPERSAND(B) . {
+	A->add_child(B);
+	R = A;
+}
+
+type_ref(R) ::= type_ref_one(A) . {
+	R = A;
+}
+
+type_ref(R) ::= type_ref_two(A) . {
+	R = A;
 }
 
 type_or_type_ref(R) ::= type(A) . {
