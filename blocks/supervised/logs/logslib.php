@@ -40,10 +40,12 @@ function supervisedblock_build_logs_array($sessionid, $timefrom, $timeto, $useri
 
     $logs = $DB->get_records_sql('SELECT * FROM {logstore_standard_log} WHERE
 								timecreated < ? AND timecreated > ? AND courseid = ?', array($timeto,$timefrom,$session->courseid));
-    // Filter logs by classroom's ip subnet.
+    // Filter logs by classroom's ip subnet, student's group and user's id.
     $logsfiltered = array();
     foreach ($logs as $id => $log) {
-        if (address_in_subnet($log->ip, $session->iplist)) {
+		$teacher = $DB->record_exists_sql('SELECT * FROM {block_supervised_session} WHERE id = ? AND teacherid = ?', array($sessionid,$log->userid));
+		$student = $DB->record_exists_sql('SELECT * FROM {block_supervised_user} WHERE sessionid = ? AND userid = ?', array($sessionid,$log->userid));
+        if (address_in_subnet($log->ip, $session->iplist) && ($teacher || $student ) && (($log->userid == $userid) || $userid == 0)) {
             $logsfiltered[$id] = $log;
         }
     }
