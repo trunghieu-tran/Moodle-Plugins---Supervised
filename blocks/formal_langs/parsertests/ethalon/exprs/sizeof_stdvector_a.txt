@@ -1,0 +1,18 @@
+[
+ (sizeof) {
+  sizeof
+  (
+  (scoped_idetifier) {
+   (namespace_resolve) {
+    (namespace_resolve) {
+     std
+     ::
+    }
+    vector
+    ::
+   }
+   a
+  }
+  )
+ }
+]
