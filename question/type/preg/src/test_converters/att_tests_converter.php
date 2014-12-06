@@ -90,11 +90,31 @@ function expand_esc_sequences($string) {
     return $string;
 }
 
+function convert_left_right_regex($regex, $left, $right) {
+    if ($left && $right) {
+        return "^(?:$regex)$";
+    } else if ($left) {
+        return "^(?:$regex)";
+    } else if ($right) {
+        return "(?:$regex)$";
+    } else {
+        return $regex;
+    }
+}
+
 function convert_bre_regex($regex) {
     $result = str_replace('\\(', '(', $regex);
     $result = str_replace('\\)', ')', $result);
     $result = str_replace('\\{', '{', $result);
     $result = str_replace('\\}', '}', $result);
+    $result = str_replace('(^*', '(^\\*', $result);
+    $result = str_replace('(*', '(\\*', $result);
+    // Special ^
+    $result = preg_replace('/(?<!^|[\\\\[(])\\^/', '\\^', $result);
+    // Special $
+    $result = preg_replace('/(?<![\\\\])\\$(?!$|\\))/', '\\\\$', $result);
+    // Special *
+    //$result = preg_replace('/^(\\^?)\\*/', '$1\\*', $result);
     return $result;
 }
 
@@ -114,40 +134,40 @@ function has_unsupported_flags($flags_str) {
 
         //'B',//    basic           BRE (grep, ed, sed)
         //'E',//    REG_EXTENDED        ERE (egrep)
-        'A',//    REG_AUGMENTED       ARE (egrep with negation)
-        'S',//    REG_SHELL       SRE (sh glob)
+        //'A',//    REG_AUGMENTED       ARE (egrep with negation)
+        //'S',//    REG_SHELL       SRE (sh glob)
         'K',//    REG_SHELL|REG_AUGMENTED KRE (ksh glob)
         //'L',//    REG_LITERAL     LRE (fgrep)
 
-        'a',//    REG_LEFT|REG_RIGHT  implicit ^...$
-        'b',//    REG_NOTBOL      lhs does not match ^
-        //'c',//    REG_COMMENT     ignore space and #...\\n
+        //'a',//  REG_LEFT|REG_RIGHT  implicit ^...$
+        'b',//    REG_NOTBOL          lhs does not match ^
+        //'c',//  REG_COMMENT         ignore space and #...\\n                                  x
         'd',//    REG_SHELL_DOT       explicit leading . match
-        'e',//    REG_NOTEOL      rhs does not match $
+        'e',//    REG_NOTEOL          rhs does not match $
         'f',//    REG_MULTIPLE        multiple \\n separated patterns
         'g',//    FNM_LEADING_DIR     testfnmatch only -- match until /
         'h',//    REG_MULTIREF        multiple digit backref
-        //'i',//    REG_ICASE       ignore case
-        //'j',//    REG_SPAN        . matches \\n
-        'k',//    REG_ESCAPE      \\ to ecape [...] delimiter
-        'l',//    REG_LEFT        implicit ^...
-        'm',//    REG_MINIMAL     minimal match
-        //'n',//    REG_NEWLINE     explicit \\n match
+        //'i',//  REG_ICASE           ignore case                                               i
+        //'j',//  REG_SPAN            . matches \\n                                             s
+        'k',//    REG_ESCAPE          \\ to ecape [...] delimiter
+        'l',//    REG_LEFT            implicit ^...
+        'm',//    REG_MINIMAL         minimal match
+        //'n',//  REG_NEWLINE         explicit \\n match
         'o',//    REG_ENCLOSED        (|&) magic inside [@|&](...)
         'p',//    REG_SHELL_PATH      explicit / match
         'q',//    REG_DELIMITED       delimited pattern
-        'r',//    REG_RIGHT       implicit ...$
+        //'r',//  REG_RIGHT           implicit ...$
         's',//    REG_SHELL_ESCAPED   \\ not special
         't',//    REG_MUSTDELIM       all delimiters must be specified
-        //'u',//    standard unspecified behavior -- errors not counted
-        'v',//    REG_CLASS_ESCAPE    \\ special inside [...]
-        'w',//    REG_NOSUB       no subexpression match array
-        'x',//    REG_LENIENT     let some errors slide
-        'y',//    REG_LEFT        regexec() implicit ^...
-        //'z',//    REG_NULL        NULL subexpressions ok
-        //'$',//                            expand C \\c escapes in fields 2 and 3
-        '/',//                            field 2 is a regsubcomp() expression
-        '=',//                            field 3 is a regdecomp() expression
+        //'u',//                      standard unspecified behavior -- errors not counted
+        //'v',//  REG_CLASS_ESCAPE    \\ special inside [...]                                   always on in PCRE mode
+        'w',//    REG_NOSUB           no subexpression match array
+        'x',//    REG_LENIENT         let some errors slide
+        //'y',//  REG_LEFT            regexec() implicit ^...
+        //'z',//  REG_NULL            NULL subexpressions ok
+        //'$',//                      expand C \\c escapes in fields 2 and 3
+        '/',//                        field 2 is a regsubcomp() expression
+        '=',//                        field 3 is a regdecomp() expression
     );
     foreach ($unsupported as $flag) {
         if (strpos($flags_str, $flag) !== false) {
@@ -172,6 +192,11 @@ function pcre_modifiers_from_flags($flags_str) {
             $modifiers .= $modmap[$key];
         }
     }
+    // BRE and ERE tests are always dotall and multiline.
+    if (strstr($modifiers, 's') === false) {
+        $modifiers .= 's';
+    }
+    //$modifiers .= 'm';
     return $modifiers;
 }
 
@@ -199,6 +224,10 @@ function do_correction($regex, $string, &$index2write, &$length2write) {
     if ($regex == "((((((((((((((((((((((((((((((x))))))))))))))))))))))))))))))*" && $string == 'xx') {
         $index2write = 'array(0=>0,1=>1,2=>1,3=>1,4=>1,5=>1,6=>1,7=>1,8=>1,9=>1,10=>1,11=>1,12=>1,13=>1,14=>1,15=>1,16=>1,17=>1,18=>1,19=>1,20=>1,21=>1,22=>1,23=>1,24=>1,25=>1,26=>1,27=>1,28=>1,29=>1,30=>1)';
         $length2write = 'array(0=>2,1=>1,2=>1,3=>1,4=>1,5=>1,6=>1,7=>1,8=>1,9=>1,10=>1,11=>1,12=>1,13=>1,14=>1,15=>1,16=>1,17=>1,18=>1,19=>1,20=>1,21=>1,22=>1,23=>1,24=>1,25=>1,26=>1,27=>1,28=>1,29=>1,30=>1)';
+    }
+    if ($regex == "((((((((((((((((((((a))))))))))))))))))))" && $string == 'a') {
+        $index2write = 'array(0=>0,1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0,13=>0,14=>0,15=>0,16=>0,17=>0,18=>0,19=>0,20=>0)';
+        $length2write = 'array(0=>1,1=>1,2=>1,3=>1,4=>1,5=>1,6=>1,7=>1,8=>1,9=>1,10=>1,11=>1,12=>1,13=>1,14=>1,15=>1,16=>1,17=>1,18=>1,19=>1,20=>1)';
     }
 }
 
@@ -272,30 +301,47 @@ function process_file($filename) {
         // Get the flags.
         $flags = $parts[0];
 
-        $BRE = strstr($flags, 'B') !== false;
+        $flag_basic = strstr($flags, 'B') !== false;
+        $flag_REG_EXTENDED = strstr($flags, 'E') !== false;
+        $flag_REG_AUGMENTED = strstr($flags, 'A') !== false;
+        $flag_REG_SHELL = strstr($flags, 'S') !== false;
+
+        $flag_REG_LEFT = strstr($flags, 'a') !== false || strstr($flags, 'l') !== false || strstr($flags, 'y') !== false;
+        $flag_REG_RIGHT = strstr($flags, 'a') !== false || strstr($flags, 'r') !== false;
         $expand = strstr($flags, '$') !== false;
 
         // Check if this test is supported.
         $skip = has_unsupported_flags($flags);
+        if (!$flag_basic && !$flag_REG_EXTENDED) {
+            $skip = true;
+        }
 
         // Get regex despite possibly unsupported flags, cuz there can be 'SAME' reference in the next lines.
         $regex = $parts[1];
         if ($regex == 'SAME') {
             $regex = $lastregex;
+        } else if ($regex == 'NULL') {
+            $regex = '';
+            $skip = true;
         } else {
-            if ($regex == 'NULL') {
-                $regex = '';
-                $skip = true;
+            // Convert syntax if needed BRE to PCRE syntax.
+            if (!$flag_REG_EXTENDED) {
+                if ($flag_basic) {
+                    $regex = convert_bre_regex($regex);
+                }
             }
-            if ($BRE) {
-                // Convert BRE to PCRE syntax.
-                $regex = convert_bre_regex($regex);
-            }
+            $regex = convert_left_right_regex($regex, $flag_REG_LEFT, $flag_REG_RIGHT);
             if ($expand) {
                 $regex = expand_esc_sequences($regex);
             }
             $regex = php_escape($regex);
-            $lastregex = $regex;
+
+        }
+        $lastregex = $regex;
+
+        // GNU and POSIX wordboundaries are not supported.
+        if (strstr($regex, '\<') !== false || strstr($regex, '\>') !== false || strstr($regex, '[[:<:]]') !== false || strstr($regex, '[[:>:]]') !== false) {
+            $skip = true;
         }
 
         // Now can skip the unsupported test.
@@ -303,8 +349,6 @@ function process_file($filename) {
             echo "skipping unsupported test: $line\n";
             continue;
         }
-
-
 
         // Convert to PCRE modifiers.
         $modifiers = pcre_modifiers_from_flags($flags);
