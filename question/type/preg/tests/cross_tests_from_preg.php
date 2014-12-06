@@ -4927,7 +4927,7 @@ class qtype_preg_cross_tests_from_preg {
                         'length'=>array(0=>3),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
 
-        return array('regex'=>"a\n\\nb",
+        return array('regex'=>"a\nb",
                      'tests'=>array($test1));
     }
 

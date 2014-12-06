@@ -152,7 +152,7 @@ function has_unsupported_flags($flags_str) {
         'k',//    REG_ESCAPE          \\ to ecape [...] delimiter
         'l',//    REG_LEFT            implicit ^...
         'm',//    REG_MINIMAL         minimal match
-        //'n',//  REG_NEWLINE         explicit \\n match
+        //'n',//  REG_NEWLINE         explicit \\n match                                        m
         'o',//    REG_ENCLOSED        (|&) magic inside [@|&](...)
         'p',//    REG_SHELL_PATH      explicit / match
         'q',//    REG_DELIMITED       delimited pattern
@@ -183,8 +183,12 @@ function has_unsupported_flags($flags_str) {
 function pcre_modifiers_from_flags($flags_str) {
     static $modmap = array('c' => 'x',
                            'i' => 'i',
-                           'j' => 's'
+                           'j' => 's',
+                           'n' => 'm'
             );
+    if (strstr($flags_str, 'n') !== false && strstr($flags_str, 'j') !== false) {
+        //$flags_str = str_replace('j', '', $flags_str);
+    }
     $modifiers = '';
     for ($i = 0; $i < strlen($flags_str); $i++) {
         $key = $flags_str[$i];
@@ -192,11 +196,15 @@ function pcre_modifiers_from_flags($flags_str) {
             $modifiers .= $modmap[$key];
         }
     }
-    // BRE and ERE tests are always dotall and multiline.
-    if (strstr($modifiers, 's') === false) {
-        $modifiers .= 's';
+
+    if (strstr($flags_str, 'n') === false) {
+        // Dollar matches only at the end of the string.
+        $modifiers .= 'D';
+        // BRE and ERE tests are dotall if 'n' is not set.
+        if (strstr($modifiers, 's') === false) {
+            $modifiers .= 's';
+        }
     }
-    //$modifiers .= 'm';
     return $modifiers;
 }
 

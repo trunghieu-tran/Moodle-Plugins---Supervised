@@ -651,7 +651,12 @@ class qtype_preg_lexer extends JLexBase  {
             $curord = core_text::utf8ord($startchar);
             $endord = core_text::utf8ord($endchar);
             while ($curord <= $endord) {
-                $this->charset_set .= qtype_preg_unicode::code2utf8($curord++);
+                $tmp = qtype_preg_unicode::code2utf8($curord++);
+                if ($tmp == '-') {
+                    $this->charset_set = $tmp . $this->charset_set;
+                } else {
+                    $this->charset_set .= $tmp;
+                }
                 $this->charset_count++;
             }
         } else {
