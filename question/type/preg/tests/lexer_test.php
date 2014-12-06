@@ -74,6 +74,10 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertFalse($token->value->flags[0][0]->negative);
         $token = $lexer->nextToken();
         $this->assertTrue(count($token->value->flags) > 0);
+        $lexer = $this->create_lexer('[*--Z]+');    // taken from TRE tests
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->value->flags[0][0]->data->string() === '-*+,Z');
+
     }
     function test_charset_misc() {
         $lexer = $this->create_lexer('[^-\w\D][\Q][?\E][]a][^]a]');
