@@ -53,7 +53,7 @@ class StringStream {
 
     function stream_open($path, $mode, $options, &$opened_path) {
         $this->_currentstring = StringStreamController::getRef(str_replace('string://','',$path));
-        if($this->_currentstring) {
+        if($this->_currentstring !== false) {
             $this->_len = strlen($this->_currentstring);
             $this->_pos = 0;
             return true;
