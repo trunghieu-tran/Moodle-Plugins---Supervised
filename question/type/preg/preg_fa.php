@@ -432,29 +432,33 @@ class qtype_preg_fa_transition {
         } else if ($this->origin == self::ORIGIN_TRANSITION_INTER) {
             $color = 'red';
         }
-        $lab = '"';
+        $lab = '';
         foreach ($this->mergedbefore as $before) {
             $open = $before->tags_before_transition();
             $close = $before->tags_after_transition();
             $label = $before->pregleaf->leaf_tohr();
-            $lab .= $open . ' ' . str_replace('"', '\"', $label) . ' ' . $close;
+            $lab .= $open . ' ' . $label . ' ' . $close;
             $lab .= '(' . $before->from . ',' . $before->to . ')';
             $lab .= "\n";
         }
         $open = $this->tags_before_transition();
         $close = $this->tags_after_transition();
         $label = $this->pregleaf->leaf_tohr();
-        $lab .= $open . ' ' . str_replace('"', '\"', $label) . ' ' . $close;
+        $lab .= $open . ' ' . $label . ' ' . $close;
 
         foreach ($this->mergedafter as $after) {
             $lab .= "\n";
             $open = $after->tags_before_transition();
             $close = $after->tags_after_transition();
             $label = $after->pregleaf->leaf_tohr();
-            $lab .= $open . ' ' . str_replace('"', '\"', $label) . ' ' . $close ;
+            $lab .= $open . ' ' . $label . ' ' . $close;
             $lab .= '(' . $after->from . ',' . $after->to . ')';
         }
-        $lab .= '"';
+
+        $lab = str_replace('\\', '\\\\', $lab);
+        $lab = str_replace('"', '\"', $lab);
+        $lab = '"' . $lab . '"';
+
         $thickness = 2;
         if ($this->greediness == self::GREED_LAZY) {
             $thickness = 1;
@@ -1250,7 +1254,10 @@ class qtype_preg_fa {
         }
         $this->adjacencymatrix[$transition->from][$transition->to][] = $transition;
 
-        // TODO: toolargefa exception?
+        $this->transitioncount++;
+        if ($this->transitioncount > $this->transitionlimit) {
+            throw new qtype_preg_toolargefa_exception('');
+        }
     }
 
     /**
@@ -1259,6 +1266,7 @@ class qtype_preg_fa {
     public function remove_transition($transition) {
         $key = array_search($transition, $this->adjacencymatrix[$transition->from][$transition->to]);
         unset($this->adjacencymatrix[$transition->from][$transition->to][$key]);
+        $this->transitioncount--;
     }
 
     /**
