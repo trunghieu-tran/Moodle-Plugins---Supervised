@@ -431,10 +431,6 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
     }
 
     protected function last_subexpr_match($subexpr) {
-        if ($subexpr === 0) {
-            return array($this->startpos, $this->length);
-        }
-
         $array = array_reverse($this->stack);
 
         $hasattempts = false;
@@ -489,6 +485,7 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
         for ($subexpr = 0; $subexpr <= $this->matcher->get_max_subexpr(); $subexpr++) {
             $subexprs[] = $subexpr;
         }
+        // The following loop will set all subexpre to either full match or no match.
         foreach ($subexprs as $subexpr) {
             $match = $this->last_subexpr_match($subexpr);
             if ($match !== null && self::is_completely_captured($match[0], $match[1])) {
@@ -499,15 +496,24 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
                 $length[$subexpr] = qtype_preg_matching_results::NO_MATCH_FOUND;
             }
         }
-        if ($length[-2] === qtype_preg_matching_results::NO_MATCH_FOUND) {
+
+        // Some stuff for partial matches.
+        $firstskippedcount = 0;
+        if ($length[0] === qtype_preg_matching_results::NO_MATCH_FOUND) {
+            $cur = $this->current_match(0);
+            if ($cur !== null && $cur[0] !== qtype_preg_matching_results::NO_MATCH_FOUND) {
+                $firstskippedcount = $cur[0] - $this->startpos;
+                $index[0] = $cur[0];
+                $length[0] = $this->length - $firstskippedcount;
+            }
+        }
+        /*if ($length[-2] === qtype_preg_matching_results::NO_MATCH_FOUND) {
             $cur = $this->current_match(-2);
             if ($cur !== null && $cur[0] !== qtype_preg_matching_results::NO_MATCH_FOUND) {
                 $index[-2] = $cur[0];
                 $length[-2] = $this->length - $cur[0];
             }
-        }
-        $index[0] = $this->startpos;
-        $length[0] = $this->length;
+        }*/
         $result = new qtype_preg_matching_results($this->is_full(), $index, $length, $this->left, $this->extendedmatch);
         $result->set_source_info($this->str, $this->matcher->get_max_subexpr(), $this->matcher->get_subexpr_name_to_number_map());
         return $result;
