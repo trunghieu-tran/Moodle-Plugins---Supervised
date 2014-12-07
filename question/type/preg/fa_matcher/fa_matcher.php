@@ -134,29 +134,44 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         return $result;
     }
 
+    protected function generate_char_by_transition($curstate, $transition, $str, $curpos, $length) {
+        // Generate a next character.
+        list($flag, $newchr) = $transition->next_character($str, $curstate->str, $curpos, 0, $curstate);
+        if ($flag === qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE) {
+            return null;
+        }
+
+        $newstate = clone $curstate;
+        $newstate->str->concatenate($newchr);
+        foreach ($transition->mergedbefore as $tr) {
+            $this->after_transition_matched($newstate, $tr, $curpos, 0);
+        }
+        $this->after_transition_matched($newstate, $transition, $curpos, $length);
+        foreach ($transition->mergedafter as $tr) {
+            $this->after_transition_matched($newstate, $tr, $curpos, 0);
+        }
+
+        //$recursionlevel = $curstate->recursion_level();
+        //echo "level $recursionlevel: generated char '$newchr' by $transition. length changed {$curstate->length} : {$newstate->length}\n";
+        //echo "new string is {$newstate->str}\n\n";
+
+        return $newstate;
+    }
+
     protected function match_transitions($curstate, $transitions, $str, $curpos, &$length) {
         $newstate = clone $curstate;
         $length = 0;
 
         foreach ($transitions as $tr) {
             $tmplength = 0;
-            $result = $tr->pregleaf->match($str, $curpos, $tmplength, $newstate);
-            if (!$tr->consumeschars) {
-                $tmplength = 0;
+            if (!$tr->pregleaf->match($str, $curpos, $tmplength, $newstate)) {
+                return null;
             }
-
-            if ($result) {
-                $this->after_transition_matched($newstate, $tr, $curpos, $tmplength);
-            }
+            $this->after_transition_matched($newstate, $tr, $curpos, $tmplength);
 
             // Increase curpos and length anyways, even if the match is partial (backrefs)
             $curpos += $tmplength;
             $length += $tmplength;
-
-            // Break after a partial match
-            if (!$result) {
-                return null;
-            }
         }
 
         return $newstate;
@@ -329,7 +344,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         while (!empty($curstates)) {
             $curstate = array_pop($curstates);
             $curpos = $curstate->startpos + $curstate->length;
-            //$recursionlevel = $curstate->recursion_level();
             if ($curstate->is_full() && ($result === null || $curstate->leftmost_shortest($result))) {
                 $result = $curstate;
             }
@@ -356,18 +370,11 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 }
 
                 // Create a new state.
-                $newstate = clone $curstate;
-                $this->after_transition_matched($newstate, $transition, $curpos, $length);
-
-                // Generate a next character.
-                list($flag, $newchr) = $transition->next_character($str, $newstate->str, $curpos, 0, $curstate);
-                if ($flag === qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE) {
+                $newstate = $this->generate_char_by_transition($curstate, $transition, $str, $curpos, $length);
+                if ($newstate === null) {
                     continue;
                 }
-                $newstate->str->concatenate($newchr);
 
-                //echo "level $recursionlevel: generated char '$newchr' by $transition. length changed {$curstate->length} : {$newstate->length}\n";
-                //echo "new string is {$newstate->str}\n\n";
 
                 // This could be the end of a recursive call.
                 while ($newstate !== null && $newstate->recursion_level() > 0 && $newstate->is_full()) {
@@ -428,7 +435,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 // Get the current state and iterate over all transitions.
                 $curstate = $states[array_pop($curstates)];
                 $curpos = $curstate->startpos + $curstate->length;
-                //$recursionlevel = $curstate->recursion_level();
                 if ($curstate->is_full() && ($result === null || $curstate->leftmost_shortest($result))) {
                     $result = $curstate;
                 }
@@ -458,18 +464,10 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                     }
 
                     // Create a new state.
-                    $newstate = clone $curstate;
-                    $this->after_transition_matched($newstate, $transition, $curpos, $length);
-
-                    // Generate a next character.
-                    list($flag, $newchr) = $transition->next_character($str, $newstate->str, $curpos, 0, $curstate);
-                    if ($flag === qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE) {
+                    $newstate = $this->generate_char_by_transition($curstate, $transition, $str, $curpos, $length);
+                    if ($newstate === null) {
                         continue;
                     }
-                    $newstate->str->concatenate($newchr);
-
-                    //echo "level $recursionlevel: generated char '$newchr' by $transition. length changed {$curstate->length} : {$newstate->length}\n";
-                    //echo "new string is {$newstate->str}\n\n";
 
                     // This could be the end of a recursive call.
                     while ($newstate !== null && $newstate->recursion_level() > 0 && $newstate->is_full()) {
