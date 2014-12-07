@@ -57,22 +57,28 @@ abstract class qtype_preg_fa_node {
         $this->pregnode = $node;
     }
 
+    /**
+     * Adds the opening tag for this node. Tricky when $transform == true.
+     */
     protected function add_open_tag($transition, $transform) {
         //echo "\nthis node: {$this->pregnode->subpattern}\n";
         //echo "main transition: {$transition->pregleaf->subpattern}\n";
         $thetransition = $transition;
-        $thedelta = $thetransition->pregleaf->subpattern - $this->pregnode->subpattern;
 
         if ($transform) {
-            // Look through all merged transitions and fine one with minimal subpattern number
-            foreach ($transition->mergedbefore as $merged) {
+            $thedelta = null;
+
+            $search = $transition->consumeschars
+                    ? array_merge($transition->mergedbefore, array($transition))
+                    : $transition->mergedafter;
+
+            // Look through all merged transitions and find one with minimal subpattern number
+            foreach ($search as $merged) {
                 if (/*$merged->pregleaf->subpattern < $this->pregnode->subpattern/*/$merged->pregleaf->subpattern == -1) {
                    // continue;
                 }
                 $newdelta = $merged->pregleaf->subpattern - $this->pregnode->subpattern;
-                if ($newdelta < $thedelta) {
-                    //echo "merged transition: {$merged->pregleaf->subpattern} $thedelta : $newdelta\n";
-                    //var_dump($merged->pregleaf->subtype);
+                if ($thedelta === null || $newdelta < $thedelta) {
                     $thetransition = $merged;
                     $thedelta = $newdelta;
                 }
@@ -86,11 +92,15 @@ abstract class qtype_preg_fa_node {
         }
     }
 
+    /**
+     * Adds the closing tag for this node. Tricky when $transform == true.
+     */
     protected function add_close_tag($transition, $transform) {
         $thetransition = $transition;
-        $thedelta = $thetransition->pregleaf->subpattern - $this->pregnode->subpattern;
 
         if ($transform) {
+            $thedelta = $thetransition->pregleaf->subpattern - $this->pregnode->subpattern;
+
             // Look through all merged transitions and fine one with maximal subpattern number
             foreach ($transition->mergedafter as $merged) {
                 if (/*$merged->pregleaf->subpattern > */$merged->pregleaf->subpattern == -1) {
