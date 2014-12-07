@@ -504,6 +504,9 @@ class qtype_preg_fa_transition {
         if ($this->is_eps() && $other->consumeschars == false) {
             $resulttran = new qtype_preg_fa_transition(0, $other->pregleaf, 1, self::ORIGIN_TRANSITION_INTER, $other->consumeschars);
             $this->unite_tags($other, $resulttran);
+            $assert = $this->intersect_asserts($other);
+            $resulttran->mergedbefore = $assert->mergedbefore;
+            $resulttran->mergedafter = $assert->mergedafter;
             return $resulttran;
         }
         if ($other->is_eps() && $this->consumeschars == false) {
@@ -574,6 +577,17 @@ class qtype_preg_fa_transition {
             $this->type = self::TYPE_TRANSITION_ASSERT;
         } else {
             $this->type = self::TYPE_TRANSITION_CAPTURE;
+        }
+    }
+
+    public function redirect_merged_transitions() {
+        foreach ($this->mergedbefore as &$merged) {
+            $merged->from = $this->from;
+            $merged->to = $this->to;
+        }
+        foreach ($this->mergedafter as &$merged) {
+            $merged->from = $this->from;
+            $merged->to = $this->to;
         }
     }
 
@@ -1217,20 +1231,14 @@ class qtype_preg_fa {
                 $transition->to = $newstateid;
             }
             // Redirect merged transitions too.
-            foreach ($transition->mergedbefore as &$merged) {
-                $merged->from = $transition->from;
-                $merged->to = $transition->to;
-            }
-            foreach ($transition->mergedafter as &$merged) {
-                $merged->from = $transition->from;
-                $merged->to = $transition->to;
-            }
+            $transition->redirect_merged_transitions();
             $this->add_transition($transition);
         }
 
         // Delete the old state.
         $this->remove_state($oldstateid);
     }
+
 
     /**
      * Adds a transition.
