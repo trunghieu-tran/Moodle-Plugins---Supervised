@@ -1834,14 +1834,20 @@ class qtype_preg_cross_tests_from_preg_merging {
                         'index_first'=>array(0=>1, 1=>3),
                         'length'=>array(0=>5, 1=>2));
 
-        $test3 = array( 'str'=>'s!bab!bc',
+        $test3 = array( 'str'=>'  ababc',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>1, 1=>4),
+                        'index_first'=>array(0=>2, 1=>4),
+                        'length'=>array(0=>5, 1=>2));
+
+        $test4 = array( 'str'=>'s!bab!bc',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>1, 1=>5),
                         'length'=>array(0=>7, 1=>2));
 
         return array('regex'=>'\b([a!]b)+c',
-                     'tests'=>array($test1, $test2, $test3),
+                     'tests'=>array($test1, $test2, $test3, $test4),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
