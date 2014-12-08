@@ -612,27 +612,17 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * @return array - array of block_formal_langs_matched_tokens_pair objects with blank
      * $answertokens or $responsetokens field inside (it is filling from outside)
      */
-    public function look_for_matches($other, $threshold, $iscorrect, block_formal_langs_comparing_options $options, $bypass) {      
-	if ($bypass == true) {
+    public function look_for_matches($other, $threshold, $iscorrect, block_formal_langs_comparing_options $options, $bypass) {
+        if ($bypass == true) {
             $possiblepairs = array();
             if($options->usecase == true){
                 for ($k=0; $k < count($other); $k++) {
-                    if($other[$k]->value == $this->value) {
+                    if($other[$k] == $this->value) {
                         $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), 0, false, '');
                         $possiblepairs[] = $pair;
                     }
                 }
-            } else {
-		//если usecase false
-		for ($k=0; $k < count($other); $k++) {
-		$str1 = strtolower($other[$k]->value);
-		$str2 = strtolower($this->value);
-                    if($str1 == $str2) {
-                        $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), 0, false, '');
-                        $possiblepairs[] = $pair;
-                    }
-                }
-	     }
+            }
         } else {
             // TODO: generic mistakes handling
             $result = textlib::strlen($this->value) - textlib::strlen($this->value) * $threshold;
@@ -2047,7 +2037,7 @@ class block_formal_langs_string_pair {
     }
 
     public function pairs_between_corrected_compared() {
-       /* $arraysets = array();
+        $arraysets = array();
         // $i - compared
         // $j - corrected
         $j=0;
@@ -2077,8 +2067,6 @@ class block_formal_langs_string_pair {
             $arraysets[]=$arraypairs;
         }
         return $arraysets;
-*/
-	return $this->matches();
     }
     
     /**
