@@ -4290,7 +4290,7 @@ static public $yy_action = array(
 #line 787 "langs_src/parser_cpp_language.y"
     function yy_r121(){ 
 	$this->currentrule = new block_formal_langs_description_rule("объявление синонима типа", array("ключевое слово объявления синонима типа", "%s", "%s", "точка с запятой"));
-	$this->_retvalue = $this->create_node('stmt', array($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
+	$this->_retvalue = $this->create_node('typedef_declaration', array($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor));
 	$this->mapper->introduce_type($this->yystack[$this->yyidx + -1]->minor->value());
     }
 #line 4302 "langs_src/parser_cpp_language.php"

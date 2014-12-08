@@ -99,7 +99,23 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
      * @param string $typename a name for type
      */
     public function introduce_type($typename) {
-        $this->stack[count($this->stack) - 1][]= (string)$typename;
+        $root = &$this->namespacetree;
+        $exists = true;
+        if (count($this->introducednamespacestack)) {
+            $introducednamespacestack = $this->introducednamespacestack[count($this->introducednamespacestack) - 1];
+            $tree = $this->namespacetree;
+            for($i = 0; $i < count($this->introducednamespacestack) && $exists; $i++) {
+                if (array_key_exists($this->introducednamespacestack[$i], $root)) {
+                    $root = &$root[$this->introducednamespacestack[$i]];
+                } else {
+                    $exists = false;
+                }
+                
+            }
+        }
+        if ($exists) {
+            $root[(string)$typename] = array(); 
+        }
     }
 
     
