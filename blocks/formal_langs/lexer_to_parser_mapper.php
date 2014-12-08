@@ -1,4 +1,4 @@
-<?
+<?php
 // This file is part of Formal Languages block - https://code.google.com/p/oasychev-moodle-plugins/
 //
 // Formal Languages block is free software: you can redistribute it and/or modify

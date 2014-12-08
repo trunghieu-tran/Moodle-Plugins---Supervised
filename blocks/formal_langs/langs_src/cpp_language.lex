@@ -355,7 +355,7 @@ INC = "#include"
 <YYINITIAL> operator("^"|"^="|"="|".")             { return $this->create_token('keyword',$this->yytext()); }
 <YYINITIAL> (union|volatile|while)       { return $this->create_token('keyword',$this->yytext()); }
 <YYINITIAL> (char|double|float|int)      { return $this->create_token('typename',$this->yytext()); }
-<YYINITIAL> (long|signed|unsigned|void)  { return $this->create_token('typename',$this->yytext()); }
+<YYINITIAL> (short|long|signed|unsigned|void)  { return $this->create_token('typename',$this->yytext()); }
 <YYINITIAL> {L}({L}|{D})*                { return $this->create_token('identifier',$this->yytext()); }
 <YYINITIAL> 0[xX]{H}+{IS}?               { return $this->create_token('numeric',$this->yytext()); }
 <YYINITIAL> 0{D}+{IS}?                   { return $this->create_token('numeric',$this->yytext()); }
