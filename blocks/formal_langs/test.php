@@ -11,7 +11,7 @@ require_once($CFG->dirroot.'/lib/classes/text.php');
 require_once($CFG->dirroot .'/blocks/formal_langs/language_cpp_parseable_language.php');
 
 $lang = new block_formal_langs_language_cpp_parseable_language();
-$result = $lang->create_from_string('11 + (11 * 11) % 11 << 11 >> 11;');
+$result = $lang->create_from_string('int main(int  argc, char ** argv) { for(i = 0; i < argc; i++) printf("%d", argv[i]); return 0;}');
 
 function print_node($node, $paddingcount)
 {
@@ -84,6 +84,6 @@ function optimize_tree($nodes) {
     }
     return $nodes;
 }
-//optimize_tree($result);
+optimize_tree($result);
 echo print_node($result->syntaxtree, 0);
 
