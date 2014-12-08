@@ -1,0 +1,36 @@
+[
+ (program) {
+  (stmt_list) {
+   (stmt_or_defined_macro) {
+    (stmt) {
+     (expr_rightshift) {
+      (expr_leftshift) {
+       (expr_plus) {
+        11
+        +
+        (expr_modulosign) {
+         (expr_brackets) {
+          (
+          (expr_multiply) {
+           11
+           *
+           11
+          }
+          )
+         }
+         %
+         11
+        }
+       }
+       <<
+       11
+      }
+      >>
+      11
+     }
+     ;
+    }
+   }
+  }
+ }
+]
