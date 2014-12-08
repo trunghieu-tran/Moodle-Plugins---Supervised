@@ -1,0 +1,68 @@
+[
+ (program) {
+  (stmt_list) {
+   (stmt_or_defined_macro) {
+    (stmt) {
+     (if_then_else) {
+      (if_then) {
+       if
+       (
+       (expr_greater) {
+        a
+        >
+        22
+       }
+       )
+       (stmt) {
+        (expr_plus_assign) {
+         a
+         +=
+         5
+        }
+        ;
+       }
+      }
+      else
+      (stmt) {
+       {
+       (stmt_list) {
+        (stmt_list) {
+         (stmt_or_defined_macro) {
+          (stmt) {
+           (variable_declaration) {
+            (builtintype) {
+             int
+            }
+            (assign) {
+             b
+             =
+             (expr_function_call) {
+              rand
+              (
+              )
+             }
+            }
+           }
+           ;
+          }
+         }
+        }
+        (stmt_or_defined_macro) {
+         (stmt) {
+          (expr_plus_assign) {
+           a
+           +=
+           b
+          }
+          ;
+         }
+        }
+       }
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+]

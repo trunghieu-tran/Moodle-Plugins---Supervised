@@ -1,0 +1,82 @@
+[
+ (stmt_list) {
+  (stmt_or_defined_macro) {
+   (stmt) {
+    typedef
+    (builtintype) {
+     int
+    }
+    Exception
+    ;
+   }
+  }
+ }
+,
+ (try) {
+  try
+  {
+  (stmt_list) {
+   (stmt_or_defined_macro) {
+    (stmt) {
+     (expr_assign) {
+      a
+      =
+      (expr_function_call) {
+       unescaped_call
+       (
+       )
+      }
+     }
+     ;
+    }
+   }
+  }
+  }
+ }
+,
+ catch
+,
+ (
+,
+ (expr_prec_11_or_ellipsis) {
+  Exception
+ }
+,
+ ex
+,
+ )
+,
+ {
+,
+ (stmt_list) {
+  (stmt_or_defined_macro) {
+   (stmt) {
+    (variable_declaration) {
+     (builtintype) {
+      int
+     }
+     (assign) {
+      a
+      =
+      2
+     }
+    }
+    ;
+   }
+  }
+ }
+,
+ }
+,
+ catch
+,
+ (
+,
+ ...
+,
+ )
+,
+ {
+,
+ }
+]

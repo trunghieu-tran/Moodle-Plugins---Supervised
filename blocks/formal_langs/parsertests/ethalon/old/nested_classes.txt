@@ -1,0 +1,89 @@
+[
+ (stmt_list) {
+  (stmt_or_defined_macro) {
+   (class_or_union_or_struct) {
+    (class_or_union_or_struct) {
+     (type_meta_specifier_with_template_def) {
+      (type_meta_specifier) {
+       class
+      }
+     }
+     A
+     (structure_body) {
+      {
+      (stmt_or_visibility_spec_list) {
+       (stmt_or_visibility_spec_list) {
+        (stmt_or_visibility_spec_list) {
+         (visibility_spec_full) {
+          (visibility_spec) {
+           public
+          }
+          :
+         }
+        }
+        (stmt_or_visibility_spec) {
+         (stmt_or_defined_macro) {
+          (class_or_union_or_struct) {
+           (class_or_union_or_struct) {
+            (type_meta_specifier_with_template_def) {
+             (type_meta_specifier) {
+              class
+             }
+            }
+            B
+            (structure_body) {
+             {
+             }
+            }
+            ;
+           }
+          }
+         }
+        }
+       }
+       (stmt_or_visibility_spec) {
+        (stmt_or_defined_macro) {
+         (builtintype) {
+          void
+         }
+         (function_definition_without_type) {
+          f
+          (formal_args_list_with_or_without_const) {
+           (args_list) {
+            (
+            )
+           }
+          }
+          (function_body) {
+           {
+           }
+          }
+         }
+        }
+       }
+      }
+      }
+     }
+     ;
+    }
+   }
+  }
+ }
+,
+ A
+,
+ ::
+,
+ B
+,
+ (program) {
+  (stmt_list) {
+   (stmt_or_defined_macro) {
+    (stmt) {
+     k
+     ;
+    }
+   }
+  }
+ }
+]

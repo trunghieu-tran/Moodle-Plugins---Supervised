@@ -1,0 +1,82 @@
+[
+ (stmt_list) {
+  (stmt_or_defined_macro) {
+   (stmt) {
+    namespace
+    A
+    (namespace_body) {
+     {
+     (stmt_list) {
+      (stmt_or_defined_macro) {
+       (stmt) {
+        namespace
+        B
+        (namespace_body) {
+         {
+         (stmt_list) {
+          (stmt_or_defined_macro) {
+           (stmt) {
+            namespace
+            C
+            (namespace_body) {
+             {
+             (stmt_list) {
+              (stmt_or_defined_macro) {
+               (class_or_union_or_struct) {
+                (class_or_union_or_struct) {
+                 (type_meta_specifier_with_template_def) {
+                  (type_meta_specifier) {
+                   class
+                  }
+                 }
+                 D
+                 (structure_body) {
+                  {
+                  }
+                 }
+                 ;
+                }
+               }
+              }
+             }
+             }
+            }
+           }
+          }
+         }
+         }
+        }
+       }
+      }
+     }
+     }
+    }
+   }
+  }
+ }
+,
+ A
+,
+ ::
+,
+ B
+,
+ ::
+,
+ C
+,
+ ::
+,
+ D
+,
+ (program) {
+  (stmt_list) {
+   (stmt_or_defined_macro) {
+    (stmt) {
+     k
+     ;
+    }
+   }
+  }
+ }
+]

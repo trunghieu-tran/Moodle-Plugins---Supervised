@@ -1,0 +1,55 @@
+[
+ (program) {
+  (stmt_list) {
+   (stmt_list) {
+    (stmt_or_defined_macro) {
+     (builtintype) {
+      void
+     }
+     (function_definition_without_type) {
+      test
+      (formal_args_list_with_or_without_const) {
+       (args_list) {
+        (
+        )
+       }
+      }
+      (function_body) {
+       {
+       (stmt_list) {
+        (stmt_or_defined_macro) {
+         (stmt) {
+          (expr_function_call) {
+           test
+           (
+           )
+          }
+          ;
+         }
+        }
+       }
+       }
+      }
+     }
+    }
+   }
+   (stmt_or_defined_macro) {
+    (builtintype) {
+     void
+    }
+    (function_definition_without_type) {
+     test
+     (formal_args_list_with_or_without_const) {
+      (args_list) {
+       (
+       )
+      }
+     }
+     (function_body) {
+      ;
+     }
+    }
+   }
+  }
+ }
+]

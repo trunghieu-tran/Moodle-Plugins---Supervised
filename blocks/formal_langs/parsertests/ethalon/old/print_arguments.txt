@@ -1,0 +1,97 @@
+[
+ (builtintype) {
+  int
+ }
+,
+ main
+,
+ (
+,
+ (arg_list) {
+  (arg) {
+   (builtintype) {
+    int
+   }
+   argc
+  }
+ }
+,
+ ,
+,
+ (builtintype) {
+  char
+ }
+,
+ (expr_dereference) {
+  *
+  (expr_dereference) {
+   *
+   argv
+  }
+ }
+,
+ )
+,
+ (program) {
+  (stmt_list) {
+   (stmt_or_defined_macro) {
+    (stmt) {
+     {
+     (stmt_list) {
+      (stmt_list) {
+       (stmt_or_defined_macro) {
+        (for) {
+         for
+         (
+         (expr_assign) {
+          i
+          =
+          0
+         }
+         ;
+         (expr_lesser) {
+          i
+          <
+          argc
+         }
+         ;
+         (expr_postfix_increment) {
+          i
+          ++
+         }
+         )
+         (stmt) {
+          (expr_function_call) {
+           printf
+           (
+           (expr_list) {
+            "%d"
+            ,
+            (expr_array_access) {
+             argv
+             [
+             i
+             ]
+            }
+           }
+           )
+          }
+          ;
+         }
+        }
+       }
+      }
+      (stmt_or_defined_macro) {
+       (stmt) {
+        return
+        0
+        ;
+       }
+      }
+     }
+     }
+    }
+   }
+  }
+ }
+]
