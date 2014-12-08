@@ -1,0 +1,26 @@
+[
+ (stmt_list) {
+  (stmt_or_defined_macro) {
+   enum
+   K
+   (enum_body) {
+    {
+    }
+   }
+   ;
+  }
+ }
+,
+ K
+,
+ (program) {
+  (stmt_list) {
+   (stmt_or_defined_macro) {
+    (stmt) {
+     a
+     ;
+    }
+   }
+  }
+ }
+]

@@ -1,0 +1,31 @@
+[
+ (stmt_list) {
+  (stmt_or_defined_macro) {
+   enum
+   K
+   (enum_body) {
+    {
+    (enum_value_list) {
+     (enum_value) {
+      MY_VALUE
+     }
+    }
+    }
+   }
+   ;
+  }
+ }
+,
+ K
+,
+ (program) {
+  (stmt_list) {
+   (stmt_or_defined_macro) {
+    (stmt) {
+     a
+     ;
+    }
+   }
+  }
+ }
+]
