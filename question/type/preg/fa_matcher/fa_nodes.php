@@ -99,15 +99,19 @@ abstract class qtype_preg_fa_node {
         $thetransition = $transition;
 
         if ($transform) {
-            $thedelta = $thetransition->pregleaf->subpattern - $this->pregnode->subpattern;
+            $thedelta = null;
+
+            $search = $transition->consumeschars
+                    ? array_merge(array($transition), $transition->mergedafter)
+                    : $transition->mergedbefore;
 
             // Look through all merged transitions and fine one with maximal subpattern number
-            foreach ($transition->mergedafter as $merged) {
+            foreach ($search as $merged) {
                 if (/*$merged->pregleaf->subpattern > */$merged->pregleaf->subpattern == -1) {
                   //  continue;
                 }
                 $newdelta = $merged->pregleaf->subpattern - $this->pregnode->subpattern;
-                if ($newdelta > $thedelta) {
+                if ($thedelta === null || $newdelta > $thedelta) {
                     $thetransition = $merged;
                     $thedelta = $newdelta;
                 }

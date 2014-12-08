@@ -941,9 +941,11 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             if ($mergeassertions) {
                 $result->remove_unreachable_states();
             }
-            //printf($result->fa_to_dot() . "\n");
-            //var_dump($result->start_states());
-            //var_dump($result->end_states());
+
+            /*global $CFG;
+            $CFG->pathtodot = '/usr/bin/dot';
+            $result->fa_to_dot('svg', '/home/user/fa.svg');*/
+
         //} catch (Exception $e) {
           //  $result = null;
         //}
