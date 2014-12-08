@@ -516,6 +516,9 @@ class qtype_preg_fa_transition {
         if ($other->is_eps() && $this->consumeschars == false) {
             $resulttran = new qtype_preg_fa_transition(0, $this->pregleaf, 1, self::ORIGIN_TRANSITION_INTER, $this->consumeschars);
             $this->unite_tags($other, $resulttran);
+            $assert = $this->intersect_asserts($other);
+            $resulttran->mergedbefore = $assert->mergedbefore;
+            $resulttran->mergedafter = $assert->mergedafter;
             return $resulttran;
         }
         if ($this->is_unmerged_assert() && $this->consumeschars == false && (!$other->is_eps() && !$other->is_unmerged_assert())
