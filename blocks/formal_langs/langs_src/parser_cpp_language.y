@@ -1,5 +1,8 @@
-%name lock_formal_langs_parser_cpp_language
+%name block_formal_langs_parser_cpp_language
 %declare_class {class block_formal_langs_parser_cpp_language}
+%include {
+require_once($CFG->dirroot.'/blocks/formal_langs/descriptions/descriptionrule.php');
+}
 %include_class {
     // Root of the Abstract Syntax Tree (AST).
     public $root;
@@ -69,11 +72,12 @@
 
 %nonassoc THENKWD .
 %left    ELSEKWD.
+%left    LOGICALAND.
+%left    BINARYAND.
 %left    BINARYOR.
 %left    LOGICALOR.
-%left    LOGICALAND.
+%left    AMPERSAND.
 %left    BINARYXOR.
-%left    BINARYAND.
 %left    NOTEQUAL EQUAL.
 %right   UINDIRECTION UADRESS.
 %left    NAMESPACE_RESOLVE.
@@ -951,14 +955,14 @@ expr_prec_9(R) ::= expr_prec_9(A) BINARYOR(B) expr_prec_8(C) . {
 	R = $this->create_node('expr_binary_or', array( A, B, C ));
 }
 
-expr_prec_9(R) ::= expr_prec_9(A) LOGICALOR(B) expr_prec_8(C) . {
-	$this->currentrule = new block_formal_langs_description_rule("операция \"логического ИЛИ\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция логического ИЛИ", "%ur(именительный)"));
-	R = $this->create_node('expr_logical_or', array( A, B, C ));
-}
-
 expr_prec_9(R) ::= expr_prec_9(A) LOGICALAND(B) expr_prec_8(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"логического И\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция логического И", "%ur(именительный)"));
 	R = $this->create_node('expr_logical_and', array( A, B, C ));
+}
+
+expr_prec_9(R) ::= expr_prec_9(A) LOGICALOR(B) expr_prec_8(C) . {
+	$this->currentrule = new block_formal_langs_description_rule("операция \"логического ИЛИ\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция логического ИЛИ", "%ur(именительный)"));
+	R = $this->create_node('expr_logical_or', array( A, B, C ));
 }
 
 expr_prec_9(R) ::= expr_prec_9(A) BINARYXOR(B) expr_prec_8(C) . {
@@ -1358,32 +1362,140 @@ primitive_or_complex_type(R) ::= primitive_or_complex_type(A)  NAMESPACE_RESOLVE
 	R = $this->create_node('primitive_or_complex_type', array( A, B, C, D, E, F));
 }
 
-builtintype(R) ::= SIGNED(A) TYPENAME(B) . {
-    $this->currentrule = new block_formal_langs_description_rule("знаковое %2(именительный)", array("признак присутствия знака", "%ur(именительный)"));
-	R = $this->create_node('builtintype', array( A, B ));
-}
-
-builtintype(R) ::= UNSIGNED(A) TYPENAME(B) . {
-    $this->currentrule = new block_formal_langs_description_rule("беззнаковое %2(именительный)", array("признак беззнаковости", "%ur(именительный)"));
-	R = $this->create_node('builtintype', array( A, B ));
-}
-
-builtintype(R) ::= LONG(A) TYPENAME(B) . {
-    $this->currentrule = new block_formal_langs_description_rule("длинное %2(именительный)", array("признак длинного целого", "%ur(именительный)"));
-	R = $this->create_node('builtintype', array( A, B ));
-}
-
-builtintype(R) ::= LONG(A) LONG(B) TYPENAME(C) . {
-    $this->currentrule = new block_formal_langs_description_rule("длинное %3(именительный)", array("признак длинного целого", "признак длинного целого", "%ur(именительный)"));
-	R = $this->create_node('builtintype', array( A, B, C ));
-}
-
-builtintype(R) ::= UNSIGNED(A) LONG(B) LONG(C) TYPENAME(D) . {
-    $this->currentrule = new block_formal_langs_description_rule("беззнаковое длинное %4(именительный)", array("признак беззнаковости", "признак длинного целого", "признак длинного целого", "%ur(именительный)"));
-	R = $this->create_node('builtintype', array( A, B, C, D ));
-}
-
 builtintype(R) ::= TYPENAME(A) . {
     $this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%s"));
 	R = $this->create_node('builtintype', array( A ));
+}
+
+/*  CHAR VARIATIONS */
+
+builtintype(R) ::= CHAR(A) . {
+    $this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("имя символьного типа"));
+	R = $this->create_node('builtintype', array( A ));
+}
+
+builtintype(R) ::= SIGNED CHAR(A) . {
+    $this->currentrule = new block_formal_langs_description_rule("знаковый символьный тип", array("признак знаковости", "%ur(именительный)"));
+	R = $this->create_node('builtintype', array( A, B ));
+}
+
+builtintype(R) ::= UNSIGNED CHAR(A) . {
+    $this->currentrule = new block_formal_langs_description_rule("беззнаковый символьный тип", array("признак беззнаковости", "%ur(именительный)"));
+	R = $this->create_node('builtintype', array( A, B ));
+}
+
+
+/* INT VARIATIONS */
+
+builtintype(R) ::= INT(A) . {
+    $this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("имя целого типа"));
+	R = $this->create_node('builtintype', array( A ));
+}
+
+builtintype(R) ::= SIGNED(A) INT(B) . {
+    $this->currentrule = new block_formal_langs_description_rule("знаковый целый тип", array("признак знаковости", "имя целого типа"));
+	R = $this->create_node('builtintype', array( A, B ));
+}
+
+builtintype(R) ::= UNSIGNED(A) INT(B) . {
+    $this->currentrule = new block_formal_langs_description_rule("беззнаковый целый тип", array("признак беззнаковости", "имя целого типа"));
+	R = $this->create_node('builtintype', array( A, B ));
+}
+
+builtintype(R) ::= SHORT(A) INT(B) . {
+    $this->currentrule = new block_formal_langs_description_rule("короткий целый тип", array("признак короткого целого типа", "имя целого типа"));
+	R = $this->create_node('builtintype', array( A, B ));
+}
+
+builtintype(R) ::= SIGNED(A) SHORT(B) INT(C) . {
+    $this->currentrule = new block_formal_langs_description_rule("знаковый короткий целый тип", array("признак знаковости", "признак короткого целого типа", "имя целого типа"));
+	R = $this->create_node('builtintype', array( A, B, C ));
+}
+
+builtintype(R) ::= UNSIGNED(A) SHORT(B) INT(C) . {
+    $this->currentrule = new block_formal_langs_description_rule("беззнаковый короткий целый тип", array("признак беззнаковости", "признак короткого целого типа", "имя целого типа"));
+	R = $this->create_node('builtintype', array( A, B, C ));
+}
+
+builtintype(R) ::= LONG(A) INT(B) . {
+    $this->currentrule = new block_formal_langs_description_rule("длинный целый тип", array("признак длинного целого типа", "имя целого типа"));
+	R = $this->create_node('builtintype', array( A, B ));
+}
+
+builtintype(R) ::= SIGNED(A) LONG(B) INT(C) . {
+    $this->currentrule = new block_formal_langs_description_rule("знаковый длинный целый тип", array("признак знаковости", "признак длинного целого типа", "имя целого типа"));
+	R = $this->create_node('builtintype', array( A, B, C ));
+}
+
+builtintype(R) ::= UNSIGNED(A) LONG(B) INT(C) . {
+    $this->currentrule = new block_formal_langs_description_rule("беззнаковый длинный целый тип", array("признак беззнаковости", "признак длинного целого типа", "имя целого типа"));
+	R = $this->create_node('builtintype', array( A, B, C ));
+}
+
+builtintype(R) ::= LONG(A) LONG(B) INT(C) . {
+    $this->currentrule = new block_formal_langs_description_rule("64-битный целый тип", array("признак длинного целого типа", "признак длинного целого типа", "имя целого типа"));
+	R = $this->create_node('builtintype', array( A, B, C ));
+}
+
+
+builtintype(R) ::=  SIGNED(A) LONG(B) LONG(C) INT(D) . {
+    $this->currentrule = new block_formal_langs_description_rule("знаковый 64-битный целый тип", array("признак знаковости", "признак длинного целого типа", "признак длинного целого типа", "имя целого типа"));
+	R = $this->create_node('builtintype', array( A, B, C, D ));
+}
+
+builtintype(R) ::=  UNSIGNED(A) LONG(B) LONG(C) INT(D) . {
+    $this->currentrule = new block_formal_langs_description_rule("беззнаковый 64-битный целый тип", array("признак беззнаковости", "признак длинного целого типа", "признак длинного целого типа", "имя целого типа"));
+	R = $this->create_node('builtintype', array( A, B, C, D ));
+}
+
+
+/* SHORT VARIATIONS */
+
+builtintype(R) ::= SHORT(A) . {
+    $this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("короткий целый тип"));
+	R = $this->create_node('builtintype', array( A ));
+}
+
+builtintype(R) ::= SIGNED(A) SHORT(B) . {
+    $this->currentrule = new block_formal_langs_description_rule("знаковый короткий целый тип", array("признак знаковости", "короткий целый тип"));
+	R = $this->create_node('builtintype', array( A, B ));
+}
+
+builtintype(R) ::= UNSIGNED(A) SHORT(B) . {
+    $this->currentrule = new block_formal_langs_description_rule("беззнаковый короткий целый тип", array("признак беззнаковости", "короткий целый тип"));
+	R = $this->create_node('builtintype', array( A, B ));
+}
+
+/* LONG VARIATIONS */ 
+
+builtintype(R) ::= LONG(A) . {
+    $this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("длинный целый тип"));
+	R = $this->create_node('builtintype', array( A ));
+}
+
+builtintype(R) ::= SIGNED(A) LONG(B) . {
+    $this->currentrule = new block_formal_langs_description_rule("знаковый длинный целвый тип", array("признак знаковости", "длинный целый тип"));
+	R = $this->create_node('builtintype', array( A, B ));
+}
+
+builtintype(R) ::= UNSIGNED(A) LONG(B) . {
+    $this->currentrule = new block_formal_langs_description_rule("беззнаковый длинный целвый тип", array("признак беззнаковости", "длинный целый тип"));
+	R = $this->create_node('builtintype', array( A, B ));
+}
+
+/* LONG LONG VARIATIONS */
+
+builtintype(R) ::= LONG(A) LONG(B) . {
+    $this->currentrule = new block_formal_langs_description_rule("64-битный целый тип", array("признак длинного целого", "длинный целый тип"));
+	R = $this->create_node('builtintype', array( A, B ));
+}
+
+builtintype(R) ::= SIGNED(A) LONG(B) LONG(C) . {
+    $this->currentrule = new block_formal_langs_description_rule("знаковый 64-битный целый тип", array("признак знаковости", "признак длинного целого", "длинный целый тип"));
+	R = $this->create_node('builtintype', array( A, B, C ));
+}
+
+builtintype(R) ::= UNSIGNED(A) LONG(B) LONG(C) . {
+    $this->currentrule = new block_formal_langs_description_rule("беззнаковый 64-битный целый тип", array("признак беззнаковости", "признак длинного целого", "длинный целый тип"));
+	R = $this->create_node('builtintype', array( A, B, C ));
 }
