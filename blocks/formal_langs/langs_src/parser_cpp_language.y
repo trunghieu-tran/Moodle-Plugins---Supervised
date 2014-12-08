@@ -787,7 +787,7 @@ stmt(R) ::= LEFTFIGUREBRACKET(A) stmt_list(B) RIGHTFIGUREBRACKET(C) . {
 
 stmt(R) ::=  TYPEDEF(A) type(B) IDENTIFIER(C) SEMICOLON(D) . { 
 	$this->currentrule = new block_formal_langs_description_rule("объявление синонима типа", array("ключевое слово объявления синонима типа", "%s", "%s", "точка с запятой"));
-	R = $this->create_node('stmt', array(A, B, C, D));
+	R = $this->create_node('typedef_declaration', array(A, B, C, D));
 	$this->mapper->introduce_type(C->value());
 }
 
