@@ -1,4 +1,4 @@
-<?
+<?php
 // This file is part of CorrectWriting question type - https://code.google.com/p/oasychev-moodle-plugins/
 //
 // CorrectWriting question type is free software: you can redistribute it and/or modify
