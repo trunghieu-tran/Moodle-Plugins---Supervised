@@ -134,27 +134,31 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         return $result;
     }
 
-    protected function generate_char_by_transition($curstate, $transition, $str, $curpos, $length) {
-        // Generate a next character.
-        list($flag, $newchr) = $transition->next_character($str, $curstate->str, $curpos, 0, $curstate);
-        if ($flag === qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE) {
-            return null;
-        }
-
+    /**
+     * Generates character(s) by the transition and returns new state.
+     */
+    protected function generate_char_by_transition($curstate, $transition, $str, $curpos) {
         $newstate = clone $curstate;
-        $newstate->str->concatenate($newchr);
-        foreach ($transition->mergedbefore as $tr) {
-            $this->after_transition_matched($newstate, $tr, $curpos, 0);
-        }
-        $this->after_transition_matched($newstate, $transition, $curpos, $length);
-        foreach ($transition->mergedafter as $tr) {
-            $this->after_transition_matched($newstate, $tr, $curpos, 0);
-        }
+        $transitions = array_merge($transition->mergedbefore, array($transition), $transition->mergedafter);
+        foreach ($transitions as $tr) {
+            $length = $tr->pregleaf->consumes($newstate);
+            if ($length === qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT) {
+                return null;
+            }
+            if ($length > 0 && $newstate->is_flag_set(qtype_preg_fa_exec_state::FLAG_VISITED_END_ANCHOR)) {
+                return null;
+            }
+            list($flag, $newchr) = $tr->next_character($str, $newstate->str, $curpos, 0, $newstate);
+            if ($flag === qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE) {
+                return null;
+            }
+            $newstate->str->concatenate($newchr);
+            $this->after_transition_matched($newstate, $tr, $curpos, $length);
 
-        //$recursionlevel = $curstate->recursion_level();
-        //echo "level $recursionlevel: generated char '$newchr' by $transition. length changed {$curstate->length} : {$newstate->length}\n";
-        //echo "new string is {$newstate->str}\n\n";
-
+            /*$recursionlevel = $newstate->recursion_level();
+            echo "level $recursionlevel: generated char '$newchr' by $tr. length changed {$newstate->length} : {$newstate->length}\n";
+            echo "new string is {$newstate->str}\n\n";*/
+        }
         return $newstate;
     }
 
@@ -358,29 +362,18 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                     continue;
                 }
 
-                // Only generated subpatterns can be passed.
-                $length = $transition->pregleaf->consumes($curstate);
-                if ($length == qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT) {
-                    continue;
-                }
-
-                if ($length > 0 && $curstate->is_flag_set(qtype_preg_fa_exec_state::FLAG_VISITED_END_ANCHOR)) {
-                    continue;
-                }
-
-                // Is it longer than existing one?
-                if ($result !== null && $curstate->length + $length > $result->length) {
-                    continue;
-                }
-
                 // Create a new state.
-                $newstate = $this->generate_char_by_transition($curstate, $transition, $str, $curpos, $length);
+                $newstate = $this->generate_char_by_transition($curstate, $transition, $str, $curpos);
                 if ($newstate === null) {
                     continue;
                 }
-
+                // Is it longer than existing one?
+                if ($result !== null && $newstate->length > $result->length) {
+                    continue;
+                }
 
                 // This could be the end of a recursive call.
+                $length = $transition->pregleaf->consumes($curstate);
                 while ($newstate !== null && $newstate->recursion_level() > 0 && $newstate->is_full()) {
                     $topitem = array_pop($newstate->stack);
                     $recursionmatch = $topitem->last_subexpr_match($this->get_options()->mode, $topitem->subexpr);
@@ -452,28 +445,18 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                         continue;
                     }
 
-                    // Only generated subpatterns can be passed.
-                    $length = $transition->pregleaf->consumes($curstate);
-                    if ($length == qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT) {
-                        continue;
-                    }
-
-                    if ($length > 0 && $curstate->is_flag_set(qtype_preg_fa_exec_state::FLAG_VISITED_END_ANCHOR)) {
-                        continue;
-                    }
-
-                    // Is it longer than existing one?
-                    if ($result !== null && $curstate->length + $length > $result->length) {
-                        continue;
-                    }
-
                     // Create a new state.
-                    $newstate = $this->generate_char_by_transition($curstate, $transition, $str, $curpos, $length);
+                    $newstate = $this->generate_char_by_transition($curstate, $transition, $str, $curpos);
                     if ($newstate === null) {
+                        continue;
+                    }
+                    // Is it longer than existing one?
+                    if ($result !== null && $newstate->length > $result->length) {
                         continue;
                     }
 
                     // This could be the end of a recursive call.
+                    $length = $transition->pregleaf->consumes($curstate);
                     while ($newstate !== null && $newstate->recursion_level() > 0 && $newstate->is_full()) {
                         $topitem = array_pop($newstate->stack);
                         $recursionmatch = $topitem->last_subexpr_match($this->get_options()->mode, $topitem->subexpr);
