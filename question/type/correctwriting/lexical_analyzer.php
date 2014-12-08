@@ -68,10 +68,7 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
      */
     protected function analyze() {
         if ($this->question->are_lexeme_sequences_equal($this->basestringpair)) {
-		parent::bypass();
-		//$this->bypass();
-		$this->resultstringpairs[0]->assert_that_strings_are_equal();
-		//var_dump ($this->resultstringpairs[0]);
+            parent::bypass();
             return;
         }
 
@@ -81,6 +78,7 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
         // 1. Compute self code - Mamontov
         // 1.1. Replace result with fixed strings
         $this->resultstringpairs = block_formal_langs_string_pair::best_string_pairs(
+            $this->question->get_used_language(),
             $this->basestringpair->correctstring(),
             $this->basestringpair->comparedstring(),
             $this->question->lexicalerrorthreshold,
@@ -94,7 +92,7 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
             $pair->tokenmappings[get_class($this)] = $pair->pairs_between_corrected_compared();
             $pair->analyzersequence[] = get_class($this);
 
-            $setmatches = $pair->matches();
+            $setmatches = $pair->matches;
             $lexmistakes=array();
             foreach ($setmatches as $onematch) {
                 if ($onematch->mistakeweight > 0) {
@@ -108,7 +106,6 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
             }
             $pair->append_mistakes($lexmistakes);
         }
-
     }
 
 
@@ -119,16 +116,6 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
         // with ::is_same
         $pairs = $this->result_pairs();
         $string = $pairs[0];
-	/*
-        $this->resultstringpairs = block_formal_langs_string_pair::best_string_pairs_for_bypass(
-            $this->basestringpair->correctstring(),
-            $this->basestringpair->comparedstring(),
-            $this->question->lexicalerrorthreshold,
-            $this->question->token_comparing_options(),
-            'qtype_correctwriting_string_pair'
-        );
-var_dump($this->resultstringpairs);
-*/
         /** @var qtype_correctwriting_string_pair $string */
         $string->set_mistakes($this->convert_lexer_errors_to_mistakes());
     }
