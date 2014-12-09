@@ -2151,15 +2151,15 @@ class qtype_preg_cross_tests_from_preg_merging {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0, 1=>0),
-                        'length'=>array(0=>3, 1=>2));
+                        'length'=>array(0=>2, 1=>1));
 
         $test2 = array( 'str'=>"ab",
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0, 1=>0),
                         'length'=>array(0=>1, 1=>1),
-                        'left'=>array(0=>1),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+                        'left'=>array(0=>2),
+                        'next'=>'\\n');
 
         return array('regex'=>'(?m)(\n|a)^b',
                      'tests'=>array($test1, $test2),
