@@ -181,6 +181,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             $result = $tr->pregleaf->match($str, $curpos, $tmplength, $newstate);
             if ($result) {
                 $this->after_transition_passed($newstate, $tr, $curpos, $tmplength);
+            } else {
+                $newstate->length += $tmplength;
             }
 
             // Increase curpos and length anyways, even if the match is partial (backrefs)
