@@ -741,14 +741,14 @@ class qtype_preg_fa {
      * Returns the start states for automaton.
      */
     public function start_states($subpattern = 0) {
-        return $this->startstates[$subpattern];
+        return isset($this->startstates[$subpattern]) ? $this->startstates[$subpattern] : array();
     }
 
     /**
      * Return the end states of the automaton.
      */
     public function end_states($subpattern = 0) {
-        return $this->endstates[$subpattern];
+        return isset($this->endstates[$subpattern]) ? $this->endstates[$subpattern] : array();
     }
 
     public function is_empty() {
@@ -1057,11 +1057,11 @@ class qtype_preg_fa {
                             ? $id
                             : $this->statenumbers[$id];
                 $tmp = '"' . $realnumber . '"';
-               /* if (in_array($id, $this->start_states())) {
+                if (in_array($id, $this->start_states())) {
                     $start .= "{$tmp}[shape=rarrow];\n";
                 } else if (in_array($id, $this->end_states())) {
-                    $end .= "   {$tmp}[shape=doublecircle];\n";
-                }*/
+                    $end .= "{$tmp}[shape=doublecircle];\n";
+                }
 
                 $outgoing = $this->get_adjacent_transitions($id, true);
                 foreach ($outgoing as $transition) {
