@@ -159,6 +159,8 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
             $result = $result || $this->is_type_in_tree($name, $tree);
         }
         $result = $result || $this->is_type_in_tree($name, $this->namespacetree);
+		//$f = ($result ? " a " : " not ");
+		//echo (string) $name . " is "  . $f . "a type\n";
         return $result;
     }
 

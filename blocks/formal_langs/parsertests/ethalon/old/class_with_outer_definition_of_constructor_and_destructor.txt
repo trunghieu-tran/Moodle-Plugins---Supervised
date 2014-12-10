@@ -3,40 +3,40 @@
   (stmt_or_defined_macro) {
    (class_or_union_or_struct) {
     (class_or_union_or_struct) {
-     (type_meta_specifier_with_template_def) {
-      (type_meta_specifier) {
-       class
+     (identified_type_meta_specifier_with_template_def) {
+      (type_meta_specifier_with_template_def) {
+       (type_meta_specifier) {
+        class
+       }
       }
+      A
      }
-     A
      (structure_body) {
       {
       (stmt_or_visibility_spec_list) {
        (stmt_or_visibility_spec_list) {
         (stmt_or_visibility_spec) {
-         (stmt_or_defined_macro) {
-          (stmt) {
-           (expr_function_call) {
-            A
-            (
-            )
-           }
+         (constructor) {
+          A
+          (args_list) {
+           (
+           )
+          }
+          (function_body) {
            ;
           }
          }
         }
        }
        (stmt_or_visibility_spec) {
-        (stmt_or_defined_macro) {
-         (stmt) {
-          (expr_binary_not) {
-           ~
-           (expr_function_call) {
-            A
-            (
-            )
-           }
-          }
+        (destructor) {
+         ~
+         A
+         (args_list) {
+          (
+          )
+         }
+         (function_body) {
           ;
          }
         }
@@ -50,12 +50,14 @@
   }
  }
 ,
- A
-,
- ::
-,
  (expr_function_call) {
-  A
+  (scoped_idetifier) {
+   (namespace_resolve) {
+    A
+    ::
+   }
+   A
+  }
   (
   )
  }
