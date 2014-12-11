@@ -2,23 +2,29 @@
  (program) {
   (stmt_list) {
    (stmt_or_defined_macro) {
-    (stmt) {
-     namespace
-     A
+    (namespace) {
+     (namespace_definition_start) {
+      namespace
+      A
+     }
      (namespace_body) {
       {
       (stmt_list) {
        (stmt_or_defined_macro) {
-        (stmt) {
-         namespace
-         B
+        (namespace) {
+         (namespace_definition_start) {
+          namespace
+          B
+         }
          (namespace_body) {
           {
           (stmt_list) {
            (stmt_or_defined_macro) {
-            (stmt) {
-             namespace
-             C
+            (namespace) {
+             (namespace_definition_start) {
+              namespace
+              C
+             }
              (namespace_body) {
               {
               (stmt_list) {

@@ -1,34 +1,28 @@
 [
- (stmt_list) {
-  (stmt_or_defined_macro) {
-   (class_or_union_or_struct) {
-    (class_or_union_or_struct) {
-     (type_meta_specifier_with_template_def) {
-      (type_meta_specifier) {
+ (program) {
+  (stmt_list) {
+   (stmt_list) {
+    (stmt_or_defined_macro) {
+     (class_or_union_or_struct) {
+      (identified_type_meta_specifier_with_template_def) {
        union
+       A
       }
-     }
-     A
-     (structure_body) {
-      {
-      (stmt_or_visibility_spec_list) {
+      (structure_body) {
+       {
        (stmt_or_visibility_spec_list) {
         (stmt_or_visibility_spec_list) {
-         (stmt_or_visibility_spec) {
-          (stmt_or_defined_macro) {
-           (stmt) {
-            (variable_declaration) {
-             (builtintype) {
-              int
-             }
-             k
+         (stmt_or_defined_macro) {
+          (stmt) {
+           (variable_declaration) {
+            (builtintype) {
+             int
             }
-            ;
+            k
            }
+           ;
           }
          }
-        }
-        (stmt_or_visibility_spec) {
          (stmt_or_defined_macro) {
           (stmt) {
            (variable_declaration) {
@@ -41,8 +35,6 @@
           }
          }
         }
-       }
-       (stmt_or_visibility_spec) {
         (stmt_or_defined_macro) {
          (stmt) {
           (variable_declaration) {
@@ -55,22 +47,18 @@
          }
         }
        }
+       }
       }
-      }
+      ;
      }
-     ;
     }
    }
-  }
- }
-,
- A
-,
- (program) {
-  (stmt_list) {
    (stmt_or_defined_macro) {
     (stmt) {
-     k
+     (variable_declaration) {
+      A
+      k
+     }
      ;
     }
    }
