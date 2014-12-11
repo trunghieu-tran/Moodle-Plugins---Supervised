@@ -1,106 +1,102 @@
 [
- (stmt_list) {
-  (stmt_or_defined_macro) {
-   (class_or_union_or_struct) {
-    (class_or_union_or_struct) {
-     (identified_type_meta_specifier_with_template_def) {
-      (type_meta_specifier_with_template_def) {
-       (type_meta_specifier) {
-        class
+ (program) {
+  (stmt_list) {
+   (stmt_list) {
+    (stmt_list) {
+     (stmt_or_defined_macro) {
+      (class_or_union_or_struct) {
+       (class_or_union_or_struct) {
+        (identified_type_meta_specifier_with_template_def) {
+         (type_meta_specifier_with_template_def) {
+          (type_meta_specifier) {
+           class
+          }
+         }
+         A
+        }
+        (structure_body) {
+         {
+         (stmt_or_visibility_spec_list) {
+          (stmt_or_visibility_spec_list) {
+           (stmt_or_visibility_spec) {
+            (constructor) {
+             A
+             (args_list) {
+              (
+              )
+             }
+             (function_body) {
+              ;
+             }
+            }
+           }
+          }
+          (stmt_or_visibility_spec) {
+           (destructor) {
+            ~
+            A
+            (args_list) {
+             (
+             )
+            }
+            (function_body) {
+             ;
+            }
+           }
+          }
+         }
+         }
+        }
+        ;
        }
+      }
+     }
+    }
+    (constructor) {
+     (outer_constructor_name) {
+      (namespace_resolve) {
+       A
+       ::
       }
       A
      }
-     (structure_body) {
+     (args_list) {
+      (
+      )
+     }
+     (function_body) {
       {
-      (stmt_or_visibility_spec_list) {
-       (stmt_or_visibility_spec_list) {
-        (stmt_or_visibility_spec) {
-         (constructor) {
-          A
-          (args_list) {
-           (
-           )
-          }
-          (function_body) {
-           ;
-          }
-         }
-        }
-       }
-       (stmt_or_visibility_spec) {
-        (destructor) {
-         ~
-         A
-         (args_list) {
+      (stmt_list) {
+       (stmt_or_defined_macro) {
+        (stmt) {
+         (expr_function_call) {
+          construct
           (
+          this
           )
          }
-         (function_body) {
-          ;
-         }
+         ;
         }
        }
       }
       }
      }
-     ;
     }
    }
-  }
- }
-,
- (expr_function_call) {
-  (scoped_idetifier) {
-   (namespace_resolve) {
-    A
-    ::
-   }
-   A
-  }
-  (
-  )
- }
-,
- (stmt_list) {
-  (stmt_or_defined_macro) {
-   (stmt) {
-    {
-    (stmt_list) {
-     (stmt_or_defined_macro) {
-      (stmt) {
-       (expr_function_call) {
-        construct
-        (
-        this
-        )
-       }
-       ;
-      }
+   (constructor) {
+    (outer_destructor_name) {
+     (namespace_resolve) {
+      A
+      ::
      }
+     ~
+     A
     }
+    (args_list) {
+     (
+     )
     }
-   }
-  }
- }
-,
- A
-,
- ::
-,
- (expr_binary_not) {
-  ~
-  (expr_function_call) {
-   A
-   (
-   )
-  }
- }
-,
- (program) {
-  (stmt_list) {
-   (stmt_or_defined_macro) {
-    (stmt) {
+    (function_body) {
      {
      (stmt_list) {
       (stmt_or_defined_macro) {
