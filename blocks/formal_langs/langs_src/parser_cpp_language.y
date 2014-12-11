@@ -112,10 +112,16 @@ stmt_list(R) ::= stmt_or_defined_macro(A) . {
 	R = $this->create_node('stmt_list', array(A));
 }
 
-stmt(R) ::= NAMESPACEKWD(A) IDENTIFIER(B) namespace_body(C) . {
-	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово объявления пространства имен", "идентификатор", "%ur(именительный)"));
+namespace_definition_start(R) ::=  NAMESPACEKWD(A) IDENTIFIER(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово объявления пространства имен", "%s"));
 	$this->mapper->introduce_type(B->value());
-	R = $this->create_node('stmt', array(A, B, C));
+	R = $this->create_node('namespace_definition_start', array(A, B));
+}
+
+stmt(R) ::= namespace_definition_start(A) namespace_body(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)"));
+	$this->mapper->introduce_type(B->value());
+	R = $this->create_node('namespace', array(A, B));
 }
 
 namespace_body(R) ::= LEFTFIGUREBRACKET(A) RIGHTFIGUREBRACKET(B) . {
@@ -137,7 +143,7 @@ stmt(R) ::= class_or_union_or_struct(A) . {
 
 identified_type_meta_specifier_with_template_def(R) ::=  type_meta_specifier_with_template_def(A) IDENTIFIER(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s"));
-	$this->mapper->introduce_type(B->value());
+	$this->mapper->introduce_constructable(B->value());
 	R = $this->create_node('identified_type_meta_specifier_with_template_def', array(A, B));
 }
 
@@ -448,20 +454,26 @@ stmt_or_defined_macro(R) ::= BINARYNOT(A) TYPENAME(B) formal_args_list(C) functi
 
 /* An outer template constructor for class */
 
-stmt_or_defined_macro(R) ::= template_def(A) scoped_identifier(B) formal_args_list(C) function_body(D) . {
+outer_constructor_name(R) ::= namespace_resolve(A) OUTER_CONSTRUCTOR_NAME(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s"));
+	$this->mapper->clear_lookup_namespace();
+	R = $this->create_node('outer_constructor_name', array(A, B));
+}
+
+stmt_or_defined_macro(R) ::= template_def(A) outer_constructor_name(B) formal_args_list(C) function_body(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)", "%ur(именительный)", "%ur(именительный)"));
 	$this->mapper->clear_lookup_namespace();
 	R = $this->create_node('constructor', array(A, B, C, D, E));
 }
 
 /* An outer constructor for class */
-stmt_or_defined_macro(R) ::=  scoped_identifier(A)  formal_args_list(C) function_body(D) . {
+stmt_or_defined_macro(R) ::=  outer_constructor_name(A)  formal_args_list(B) function_body(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)", "%ur(именительный)"));
 	$this->mapper->clear_lookup_namespace();
-	R = $this->create_node('constructor', array(A, B, C, D));
+	R = $this->create_node('constructor', array(A, B, C));
 }
 
-outer_destructor_name(R) ::= namespace_resolve(A) BINARYNOT(B) IDENTIFIER(C) . {
+outer_destructor_name(R) ::= namespace_resolve(A) BINARYNOT(B) OUTER_CONSTRUCTOR_NAME(C) . {
 	$this->mapper->clear_lookup_namespace();
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%s"));
 	R = $this->create_node('outer_destructor_name', array(A, B, C));

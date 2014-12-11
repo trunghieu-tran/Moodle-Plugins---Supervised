@@ -2,7 +2,7 @@
  (sizeof) {
   sizeof
   (
-  (scoped_idetifier) {
+  (scoped_identifier) {
    (namespace_resolve) {
     (namespace_resolve) {
      std

@@ -34,9 +34,12 @@ require_once($CFG->dirroot .'/blocks/formal_langs/lexer_to_parser_mapper.php');
 class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_parser_mapper {
 
     /*! An array, where keys are namespaces and class names and values are nested namespaces.
-        If calsss has no nested namespaces, he should not get it
+        If class has no nested namespaces, he should not get it
      */
     protected $namespacetree;
+	/*! An array of constructable types
+	 */
+	protected $constructabletypestree;
     /*! A stack, which should be used for looking up 
      */
     protected $lookupnamespacestack;
@@ -51,6 +54,7 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
         $this->namespacetree = array();
         $this->lookupnamespacestack = array();
         $this->instroducednamespacestack = array();
+		$this->constructabletypestree = array();
     }
     
     public function push_lookup_entry($name) {
@@ -117,6 +121,25 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
             $root[(string)$typename] = array(); 
         }
     }
+	/**
+	 * Adds new constructable type to a tree
+	 * @param string $typename name of type
+	 */
+	public function introduce_constructable($typename) {
+		$this->introduce_type($typename);
+		$root = &$this->constructabletypestree;
+        $exists = true;
+        if (count($this->introducednamespacestack)) {
+            $introducednamespacestack = $this->introducednamespacestack[count($this->introducednamespacestack) - 1];
+            for($i = 0; $i < count($this->introducednamespacestack) && $exists; $i++) {
+                if (array_key_exists($this->introducednamespacestack[$i], $root) == false) {
+                    $root[$this->introducednamespacestack[$i]] = array();
+                } 
+				$root = &$root[$this->introducednamespacestack[$i]];                
+            }
+        }
+		$root[(string)$typename] = array();
+	}
 
     
     public function is_type_in_tree($name, $tree) {
@@ -137,14 +160,13 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
     }
 
     /**
-     * Returns true, whether token value is string
+     * Returns true, whether token value is type
      * @param string $name token value
      * @return boolean whether token value is type
      */
     public function is_type($name) {
         $result = false;
         $name = (string)$name;
-        $result = false;
 		//var_dump($this->lookupnamespacestack);
         for($i = count($this->introducednamespacestack) - 1; $i > -1; $i--) { 
             $tree = $this->namespacetree;
@@ -163,6 +185,77 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
 		//echo (string) $name . " is "  . $f . "a type\n";
         return $result;
     }
+	/**
+     * Returns true, whether type is constructable in current tree
+     * @param string $name token value
+     * @return boolean whether token value is type
+     */
+	public function is_constructable_type_in_tree($tree) {
+        $currentlookupnamespace = array();
+        if (count($this->lookupnamespacestack) != 0) {
+            $currentlookupnamespace = $this->lookupnamespacestack[count($this->lookupnamespacestack) - 1];
+        }
+		if (count($currentlookupnamespace) == 0) {
+			return false;
+		}
+		//echo "Looking for a $name in tree, while stack is " . implode($currentlookupnamespace, ",") . "\n";
+        $nspace = $tree;
+        for($i = 0; $i < count($currentlookupnamespace); $i++) {
+            $space = $currentlookupnamespace[$i];
+            if (array_key_exists($space, $nspace) == false) {
+                return false;
+            }            
+            $nspace = $nspace[$space];
+        }
+        return true;
+    }
+	
+	/**
+     * Returns true, whether type is constructable
+     * @param string $name token value
+     * @return boolean whether token value is type
+     */
+    public function is_constructable_type() {
+        $result = false;
+		//var_dump($this->lookupnamespacestack);
+        for($i = count($this->introducednamespacestack) - 1; $i > -1; $i--) { 
+            $tree = $this->constructabletypestree;
+            $exists = true;
+            for($j = 0; $j <= $i && $exists; $j++) {
+                if (array_key_exists($this->introducednamespacestack[$j], $tree)) {
+                    $tree = $tree[$this->introducednamespacestack[$j]];
+                } else {
+                    $exists = false;
+                }
+            }
+            $result = $result || $this->is_constructable_type_in_tree($tree);
+        }
+        $result = $result || $this->is_constructable_type_in_tree($this->constructabletypestree);
+		//$f = ($result ? " a " : " not ");
+		//echo (string) $name . " is "  . $f . "a type\n";
+        return $result;
+    }
+	/** Tests, whether this is outer constructor name
+	 *  @param string $name name of type
+	 *  @return bool
+	 */
+	public function is_outer_constructor_name($name) {
+		$name = (string)$name;
+		$result = false;
+		$currentlookupnamespace = array();
+        if (count($this->lookupnamespacestack) != 0) {
+            $currentlookupnamespace = $this->lookupnamespacestack[count($this->lookupnamespacestack) - 1];
+        }
+		// If lookup namespace is not empty
+		if (count($currentlookupnamespace) != 0) {
+			// If constructor name is equal to last name of type
+			if ($name == $currentlookupnamespace[count($currentlookupnamespace) - 1]) {
+				// Check, whether type is constructable
+				$result = $this->is_constructable_type();
+			}
+		}
+		return $result;
+	}
 
     /**
      * Returns name of parser class
@@ -344,10 +437,13 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
             }
         }
         if ($token->type() == 'identifier') {
+			if ($this->is_outer_constructor_name($token->value())) {
+				return 'OUTER_CONSTRUCTOR_NAME';
+			}
             if ($this->is_type($token->value())) {
                 //echo $token->value() . " is type \n";
 				return 'TYPENAME';
-            }
+            }			
         }
 		//echo $token->value() . " is not a type \n";
         return parent::map($token);
