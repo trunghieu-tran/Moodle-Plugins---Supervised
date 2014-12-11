@@ -46,6 +46,9 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
     /*! A stack for introducted type namespace
      */
     protected $introducednamespacestack;
+	/*! A stack, that determine, whether we should pop introduced namespace stack or not
+	 */
+	protected $shoulclosenamespacestack;
     /**
      * Construcs mapper
      */
@@ -53,9 +56,43 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
         parent::__construct();
         $this->namespacetree = array();
         $this->lookupnamespacestack = array();
-        $this->instroducednamespacestack = array();
+        $this->introducednamespacestack = array();
 		$this->constructabletypestree = array();
+		$this->shoulclosenamespacestack = array();
     }
+	
+	/** Pushed introduced type
+	 *  @param[in] string $name a name of type
+	 */
+	public function push_introduced_type($name) {
+		$this->introducednamespacestack[] = (string)$name;
+		$this->shoulclosenamespacestack[] = true;
+	}
+	
+	/**
+	 * Pushes anonynous type on stack
+	 */
+	public function push_anonymous_type() {
+		$this->shoulclosenamespacestack[] = false;	
+	}
+	
+	/**
+	 * Pops introduced type from stack
+	 */
+	public function try_pop_introduced_type() {
+		if (count($this->shoulclosenamespacestack)) {
+			$flag = $this->shoulclosenamespacestack[count($this->shoulclosenamespacestack) - 1];
+			unset($this->shoulclosenamespacestack[count($this->shoulclosenamespacestack) - 1]);
+			// Fix atrocious behaviour, when unsetting made indexes be preserved.
+			$this->shoulclosenamespacestack = array_values($this->shoulclosenamespacestack);
+			
+			if ($flag) {
+				unset($this->introducednamespacestack[count($this->introducednamespacestack) - 1]);
+				// Fix atrocious behaviour, when unsetting made indexes be preserved.
+				$this->introducednamespacestack = array_values($this->introducednamespacestack);
+			}
+		}
+	}
     
     public function push_lookup_entry($name) {
         if (count($this->lookupnamespacestack) == 0) {
@@ -105,6 +142,7 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
     public function introduce_type($typename) {
         $root = &$this->namespacetree;
         $exists = true;
+		//var_dump($this->introducednamespacestack);
         if (count($this->introducednamespacestack)) {
             $introducednamespacestack = $this->introducednamespacestack[count($this->introducednamespacestack) - 1];
             $tree = $this->namespacetree;

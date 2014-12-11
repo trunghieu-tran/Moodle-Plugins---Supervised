@@ -1,47 +1,35 @@
 [
- (stmt_list) {
-  (stmt_or_defined_macro) {
-   (class_or_union_or_struct) {
-    (class_or_union_or_struct) {
-     (type_meta_specifier_with_template_def) {
-      (type_meta_specifier) {
+ (program) {
+  (stmt_list) {
+   (stmt_list) {
+    (stmt_or_defined_macro) {
+     (class_or_union_or_struct) {
+      (identified_type_meta_specifier_with_template_def) {
        class
+       A
       }
-     }
-     A
-     (structure_body) {
-      {
-      (stmt_or_visibility_spec_list) {
+      (structure_body) {
+       {
        (stmt_or_visibility_spec_list) {
         (stmt_or_visibility_spec_list) {
          (visibility_spec_full) {
-          (visibility_spec) {
-           public
-          }
+          public
           :
          }
-        }
-        (stmt_or_visibility_spec) {
          (stmt_or_defined_macro) {
           (class_or_union_or_struct) {
-           (class_or_union_or_struct) {
-            (type_meta_specifier_with_template_def) {
-             (type_meta_specifier) {
-              class
-             }
-            }
+           (identified_type_meta_specifier_with_template_def) {
+            class
             B
-            (structure_body) {
-             {
-             }
-            }
-            ;
            }
+           (structure_body) {
+            {
+            }
+           }
+           ;
           }
          }
         }
-       }
-       (stmt_or_visibility_spec) {
         (stmt_or_defined_macro) {
          (builtintype) {
           void
@@ -61,26 +49,24 @@
          }
         }
        }
+       }
       }
-      }
+      ;
      }
-     ;
     }
    }
-  }
- }
-,
- A
-,
- ::
-,
- B
-,
- (program) {
-  (stmt_list) {
    (stmt_or_defined_macro) {
     (stmt) {
-     k
+     (variable_declaration) {
+      (scoped_type) {
+       (namespace_resolve) {
+        A
+        ::
+       }
+       B
+      }
+      k
+     }
      ;
     }
    }

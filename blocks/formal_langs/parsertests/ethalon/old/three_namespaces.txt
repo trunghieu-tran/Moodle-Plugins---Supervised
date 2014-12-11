@@ -4,23 +4,21 @@
    (stmt_list) {
     (stmt_list) {
      (stmt_or_defined_macro) {
-      (stmt) {
-       namespace
-       A
+      (namespace) {
+       (namespace_definition_start) {
+        namespace
+        A
+       }
        (namespace_body) {
         {
         (stmt_list) {
          (stmt_or_defined_macro) {
           (class_or_union_or_struct) {
-           (class_or_union_or_struct) {
-            (type_meta_specifier_with_template_def) {
-             (type_meta_specifier) {
-              class
-             }
-            }
+           (identified_type_meta_specifier_with_template_def) {
+            class
             B
-            ;
            }
+           ;
           }
          }
         }
@@ -30,9 +28,11 @@
      }
     }
     (stmt_or_defined_macro) {
-     (stmt) {
-      namespace
-      C
+     (namespace) {
+      (namespace_definition_start) {
+       namespace
+       C
+      }
       (namespace_body) {
        {
        }
@@ -41,9 +41,11 @@
     }
    }
    (stmt_or_defined_macro) {
-    (stmt) {
-     namespace
-     D
+    (namespace) {
+     (namespace_definition_start) {
+      namespace
+      D
+     }
      (namespace_body) {
       {
       }

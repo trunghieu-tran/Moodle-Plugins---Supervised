@@ -112,9 +112,15 @@ stmt_list(R) ::= stmt_or_defined_macro(A) . {
 	R = $this->create_node('stmt_list', array(A));
 }
 
+namespace_definition_start(R) ::= NAMESPACEKWD(A) . {
+	$this->mapper->push_anonymous_type();
+	R = $this->create_node('namespace_definition_start', array(A));
+}
+
 namespace_definition_start(R) ::=  NAMESPACEKWD(A) IDENTIFIER(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово объявления пространства имен", "%s"));
 	$this->mapper->introduce_type(B->value());
+	$this->mapper->push_introduced_type(B->value());
 	R = $this->create_node('namespace_definition_start', array(A, B));
 }
 
@@ -123,12 +129,22 @@ stmt(R) ::= namespace_definition_start(A) namespace_body(B) . {
 	R = $this->create_node('namespace', array(A, B));
 }
 
-namespace_body(R) ::= LEFTFIGUREBRACKET(A) RIGHTFIGUREBRACKET(B) . {
+start_of_empty_namespace(R) ::= LEFTFIGUREBRACKET(A) . {
+	$this->mapper->try_pop_introduced_type();
+	R = A;
+}
+
+namespace_body(R) ::= start_of_empty_namespace(A) RIGHTFIGUREBRACKET(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("левая фигурная скобка", "правая фигурная скобка"));
 	R = $this->create_node('namespace_body', array( A, B ));
 }
 
-namespace_body(R) ::= LEFTFIGUREBRACKET(A) stmt_list(B) RIGHTFIGUREBRACKET(C) . {
+namespace_statements(R) ::= stmt_list(A) . {
+	$this->mapper->try_pop_introduced_type();
+	R = A;
+}
+
+namespace_body(R) ::= LEFTFIGUREBRACKET(A) namespace_statements(B) RIGHTFIGUREBRACKET(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("левая фигурная скобка", "%ur(именительный)", "правая фигурная скобка"));
 	R = $this->create_node('namespace_body', array( A, B, C ));
 }
@@ -136,13 +152,13 @@ namespace_body(R) ::= LEFTFIGUREBRACKET(A) stmt_list(B) RIGHTFIGUREBRACKET(C) . 
 /* CLASES, UNIONS, STRUCTURES */
 
 stmt(R) ::= class_or_union_or_struct(A) . {
-	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
-	R = $this->create_node('class_or_union_or_struct', array(A));
+	R = A;
 }
 
 identified_type_meta_specifier_with_template_def(R) ::=  type_meta_specifier_with_template_def(A) IDENTIFIER(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s"));
 	$this->mapper->introduce_constructable(B->value());
+	$this->mapper->push_introduced_type(B->value());
 	R = $this->create_node('identified_type_meta_specifier_with_template_def', array(A, B));
 }
 
@@ -158,16 +174,20 @@ class_or_union_or_struct(R) ::= identified_type_meta_specifier_with_template_def
 
 class_or_union_or_struct(R) ::= identified_type_meta_specifier_with_template_def(A) SEMICOLON(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "точка с запятой"));
-	$this->mapper->introduce_type(B->value());
 	R = $this->create_node('class_or_union_or_struct', array(A, B));
 }
 
-class_or_union_or_struct(R) ::= type_meta_specifier_with_template_def(A) structure_body(B) IDENTIFIER(C) SEMICOLON(D) . {
+nonidentified_type_meta_specifier_with_template_def(R) ::= type_meta_specifier_with_template_def(A) . {
+	$this->mapper->push_anonymous_type();
+	R = A;
+}
+
+class_or_union_or_struct(R) ::= nonidentified_type_meta_specifier_with_template_def(A) structure_body(B) IDENTIFIER(C) SEMICOLON(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)", "%s", "точка с запятой"));
 	R = $this->create_node('class_or_union_or_struct', array(A, B, C, D));
 }
 
-class_or_union_or_struct(R) ::= type_meta_specifier_with_template_def(A) structure_body(B) SEMICOLON(C) . {
+class_or_union_or_struct(R) ::= nonidentified_type_meta_specifier_with_template_def(A) structure_body(B) SEMICOLON(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)", "точка с запятой"));
 	R = $this->create_node('class_or_union_or_struct', array(A, B, C));
 }
@@ -182,8 +202,7 @@ template_spec_list(R) ::= template_spec_list(A) COMMA(B) template_spec(C) . {
 }
 
 template_spec_list(R) ::= template_spec(A) . {
-	$this->currentrule = new block_formal_langs_description_rule("список параметров шаблона", array("%ur(именительный)"));
-	R = $this->create_node('template_spec_list', array(A));
+	R = A;
 }
 
 template_spec(R) ::= template_typename(A)  IDENTIFIER(B) . {
@@ -193,23 +212,19 @@ template_spec(R) ::= template_typename(A)  IDENTIFIER(B) . {
 }
 
 template_typename(R) ::= TYPENAMEKWD(A) . {
-	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово имени типа"));
-	R = $this->create_node('template_typename', array(A));
+	R = A;
 }
 
 template_typename(R) ::= CLASSKWD(A) . {
-	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово объявления класса"));
-	R = $this->create_node('template_typename', array(A));
+	R = A;
 }
 
 template_typename(R) ::= STRUCTKWD(A) . {
-	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово объявления структуры"));
-	R = $this->create_node('template_typename', array(A));
+	R = A;
 }
 
 template_typename(R) ::= ENUMKWD(A) . {
-	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово перечисления"));
-	R = $this->create_node('template_typename', array(A));
+	R = A;
 }
 
 template_def(R) ::= TEMPLATEKWD(A) LESSER(B) GREATER(C) . {
@@ -229,38 +244,35 @@ type_meta_specifier_with_template_def(R) ::=  template_def(a) type_meta_specifie
 }
 
 type_meta_specifier_with_template_def(R) ::= type_meta_specifier(A) . {
-	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
-	R = $this->create_node('type_meta_specifier_with_template_def', array(A));
+	R = A;
 }
 
 type_meta_specifier(R) ::= CLASSKWD(A) . {
-	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово объявления класса"));
-	R = $this->create_node('type_meta_specifier', array(A));
+	R = A;
 }
 
 type_meta_specifier(R) ::= STRUCTKWD(A) . {
-	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово объявления структуры"));
-	R = $this->create_node('type_meta_specifier', array(A));
+	R = A;
 }
 
 type_meta_specifier(R) ::= UNIONKWD(A) . {
-	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово объявления объединения"));
-	R = $this->create_node('type_meta_specifier', array(A));
+	R = A;
 }
 
 structure_body(R) ::= LEFTFIGUREBRACKET(A) RIGHTFIGUREBRACKET(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("левая фигурная скобка", "правая фигурная скобка"));
+	$this->mapper->try_pop_introduced_type();
 	R = $this->create_node('structure_body', array( A, B ));
 }
 
 structure_body(R) ::= LEFTFIGUREBRACKET(A) stmt_or_visibility_spec_list(B) RIGHTFIGUREBRACKET(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("левая фигурная скобка", "%ur(именительный)", "правая фигурная скобка"));
+	$this->mapper->try_pop_introduced_type();
 	R = $this->create_node('structure_body', array( A, B, C ));
 }
 
 stmt_or_visibility_spec_list(R) ::= stmt_or_visibility_spec(A) . {
-	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
-	R = $this->create_node('stmt_or_visibility_spec_list', array(A));
+	R = A;
 }
 
 stmt_or_visibility_spec_list(R) ::= stmt_or_visibility_spec_list(A) stmt_or_visibility_spec(B) . {
@@ -271,14 +283,11 @@ stmt_or_visibility_spec_list(R) ::= stmt_or_visibility_spec_list(A) stmt_or_visi
 /* VISIBILITY FOR METHODS AND FIELDS OF STRUCTS AND CLASSES*/
 
 stmt_or_visibility_spec(R) ::= visibility_spec_full(A) . {
-	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
-	R = $this->create_node('stmt_or_visibility_spec', array(A));
 	R  = A;
 }
 
 stmt_or_visibility_spec(R) ::= stmt_or_defined_macro(A) . {
-	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
-	R = $this->create_node('stmt_or_visibility_spec', array(A));
+	R = A;
 }
 
 visibility_spec_full(R) ::= visibility_spec(A) COLON(B) . {
@@ -292,28 +301,23 @@ visibility_spec_full(R) ::= visibility_spec(A) signal_slots(B) COLON(C). {
 }
 
 visibility_spec(R) ::= PUBLICKWD(A) . {
-	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово открытой видимости"));
-	R = $this->create_node('visibility_spec', array(A));
+	R = A;
 }
 
 visibility_spec(R) ::= PROTECTEDKWD(A) . {
-	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово защищенной видимости"));
-	R = $this->create_node('visibility_spec', array(A));
+	R = A;
 }
 
 visibility_spec(R) ::= PRIVATEKWD(A) . {
-	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово скрытой видимости"));
-	R = $this->create_node('visibility_spec', array(A));
+	R = A;
 }
 
 signal_slots(R) ::= SIGNALSKWD(A) . {
-	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово объявления сигнала"));
-	R = $this->create_node('signal_slots', array(A));
+	R = A;
 }
 
 signal_slots(R) ::= SLOTSKWD(A) . {
-    $this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово объявления слота"));
-	R = $this->create_node('signal_slots', array(A));
+    R = A;
 }
 
 /* ENUM */
@@ -335,8 +339,7 @@ enum_value_list(R) ::= enum_value_list(A) COMMA(B) enum_value(C) . {
 }
 
 enum_value_list(R) ::= enum_value(A) . {
-	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)"));
-	R = $this->create_node('enum_value_list', array(A));
+	R = A;
 }
 
 enum_value(R) ::= IDENTIFIER(A) . {
@@ -1515,6 +1518,11 @@ namespace_resolve(R) ::= instantiated_template_type_on_start_of_namespace_resolv
 namespace_resolve(R) ::= typename_on_start_of_namespace_resolve(A) NAMESPACE_RESOLVE(B) .  {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "операция разрешения видимости"));
 	R = $this->create_node('namespace_resolve', array( A, B));
+}
+
+namespace_resolve(R) ::= NAMESPACE_RESOLVE(A) typename_on_start_of_namespace_resolve(B) NAMESPACE_RESOLVE(C) .  {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "операция разрешения видимости"));
+	R = $this->create_node('namespace_resolve', array( A, B, C));
 }
 
 instantiated_template_type_on_start_of_namespace_resolve(R) ::= TYPENAME(A) template_instantiation_arguments(B) . {

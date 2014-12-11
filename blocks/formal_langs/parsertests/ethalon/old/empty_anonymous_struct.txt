@@ -3,19 +3,13 @@
   (stmt_list) {
    (stmt_or_defined_macro) {
     (class_or_union_or_struct) {
-     (class_or_union_or_struct) {
-      (type_meta_specifier_with_template_def) {
-       (type_meta_specifier) {
-        struct
-       }
+     struct
+     (structure_body) {
+      {
       }
-      (structure_body) {
-       {
-       }
-      }
-      A
-      ;
      }
+     A
+     ;
     }
    }
   }
