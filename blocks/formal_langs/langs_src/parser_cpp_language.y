@@ -120,7 +120,6 @@ namespace_definition_start(R) ::=  NAMESPACEKWD(A) IDENTIFIER(B) . {
 
 stmt(R) ::= namespace_definition_start(A) namespace_body(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)"));
-	$this->mapper->introduce_type(B->value());
 	R = $this->create_node('namespace', array(A, B));
 }
 
