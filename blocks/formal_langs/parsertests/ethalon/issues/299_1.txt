@@ -1,0 +1,27 @@
+[
+ (expr_logical_and) {
+  (expr_lesser) {
+   a
+   <
+   (expr_multiply) {
+    (expr_brackets) {
+     (
+     (expr_plus) {
+      2
+      +
+      3
+     }
+     )
+    }
+    *
+    3.6E5
+   }
+  }
+  &&
+  (expr_binary_or) {
+   b
+   |
+   7
+  }
+ }
+]

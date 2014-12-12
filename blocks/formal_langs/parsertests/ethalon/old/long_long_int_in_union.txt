@@ -1,0 +1,46 @@
+[
+ (program) {
+  (stmt_list) {
+   (stmt_or_defined_macro) {
+    (class_or_union_or_struct) {
+     (identified_type_meta_specifier_with_template_def) {
+      union
+      Variant
+     }
+     (structure_body) {
+      {
+      (stmt_or_visibility_spec_list) {
+       (stmt_or_defined_macro) {
+        (stmt) {
+         (variable_declaration) {
+          (builtintype) {
+           unsigned
+           int
+          }
+          A
+         }
+         ;
+        }
+       }
+       (stmt_or_defined_macro) {
+        (stmt) {
+         (variable_declaration) {
+          (builtintype) {
+           long
+           long
+           int
+          }
+          A
+         }
+         ;
+        }
+       }
+      }
+      }
+     }
+     ;
+    }
+   }
+  }
+ }
+]

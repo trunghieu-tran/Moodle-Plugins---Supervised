@@ -1,0 +1,57 @@
+[
+ (scoped_type) {
+  (namespace_resolve) {
+   (namespace_resolve) {
+    std
+    ::
+   }
+   (instantiated_template_type) {
+    vector
+    (template_instantiation_arguments) {
+     <
+     (scoped_type) {
+      (namespace_resolve) {
+       (namespace_resolve) {
+        std
+        ::
+       }
+       (instantiated_template_type) {
+        vector
+        (template_instantiation_arguments) {
+         <
+         (template_instantiation_argument_list) {
+          (type_with_ptr) {
+           (builtintype) {
+            int
+           }
+           *
+          }
+          ,
+          (type_with_ptr) {
+           (type_ref) {
+            std
+            &
+           }
+           *
+          }
+         }
+         >
+        }
+       }
+       ::
+      }
+      inner
+     }
+     >
+    }
+   }
+   ::
+  }
+  inner
+  (template_instantiation_arguments) {
+   <
+   2
+   >
+  }
+ }
+]

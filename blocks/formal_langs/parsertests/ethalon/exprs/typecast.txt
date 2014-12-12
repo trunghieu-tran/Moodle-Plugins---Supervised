@@ -1,0 +1,27 @@
+[
+ (c_style_typecast_operator) {
+  (
+  (type_with_ptr) {
+   (type_with_ptr) {
+    (scoped_type) {
+     (namespace_resolve) {
+      std
+      ::
+     }
+     vector
+     (template_instantiation_arguments) {
+      <
+      (builtintype) {
+       int
+      }
+      >
+     }
+    }
+    *
+   }
+   const
+   *
+  }
+  )
+ }
+]

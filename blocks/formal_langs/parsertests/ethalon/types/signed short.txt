@@ -1,0 +1,6 @@
+[
+ (builtintype) {
+  signed
+  short
+ }
+]

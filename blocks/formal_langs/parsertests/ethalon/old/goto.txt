@@ -1,0 +1,95 @@
+[
+ (program) {
+  (stmt_list) {
+   (stmt_list) {
+    (stmt_list) {
+     (stmt_list) {
+      (stmt_list) {
+       (stmt_list) {
+        (stmt_list) {
+         (stmt_or_defined_macro) {
+          (goto_label) {
+           label
+           :
+          }
+         }
+        }
+        (stmt_or_defined_macro) {
+         (stmt) {
+          (variable_declaration) {
+           (builtintype) {
+            int
+           }
+           (assign) {
+            a
+            =
+            2
+           }
+          }
+          ;
+         }
+        }
+       }
+       (stmt_or_defined_macro) {
+        (stmt) {
+         (if_then_else) {
+          (if_then) {
+           if
+           (
+           (expr_lesser) {
+            b
+            <
+            0
+           }
+           )
+           (goto) {
+            goto
+            exit
+            ;
+           }
+          }
+         }
+        }
+       }
+      }
+      (stmt_or_defined_macro) {
+       (stmt) {
+        (expr_function_call) {
+         printf
+         (
+         (expr_list) {
+          "%d"
+          ,
+          22
+         }
+         )
+        }
+        ;
+       }
+      }
+     }
+     (stmt_or_defined_macro) {
+      (goto) {
+       goto
+       label
+       ;
+      }
+     }
+    }
+    (stmt_or_defined_macro) {
+     (goto_label) {
+      exit
+      :
+     }
+    }
+   }
+   (stmt_or_defined_macro) {
+    (stmt) {
+     return
+     0
+     ;
+    }
+   }
+  }
+ }
+]

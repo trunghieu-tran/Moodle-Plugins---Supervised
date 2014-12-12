@@ -1,0 +1,61 @@
+[
+ (program) {
+  (stmt_list) {
+   (stmt_list) {
+    (stmt_or_defined_macro) {
+     (stmt) {
+      (switch_stmt) {
+       switch
+       (
+       a
+       )
+       {
+       (switch_case_list) {
+        (case) {
+         case
+         1
+         :
+         (stmt_list) {
+          (stmt_or_defined_macro) {
+           (stmt) {
+            {
+            (stmt_list) {
+             (stmt_or_defined_macro) {
+              (stmt) {
+               (variable_declaration) {
+                (builtintype) {
+                 int
+                }
+                (assign) {
+                 test
+                 =
+                 (expr_plus) {
+                  a
+                  +
+                  b
+                 }
+                }
+               }
+               ;
+              }
+             }
+            }
+            }
+           }
+          }
+         }
+        }
+       }
+       }
+      }
+     }
+    }
+   }
+   (stmt_or_defined_macro) {
+    (stmt) {
+     ;
+    }
+   }
+  }
+ }
+]

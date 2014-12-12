@@ -1,0 +1,36 @@
+[
+ (program) {
+  (stmt_list) {
+   (stmt_or_defined_macro) {
+    (do_while) {
+     do
+     (stmt) {
+      (expr_function_call) {
+       perform_random_actions
+       (
+       (expr_take_adress) {
+        &
+        a
+       }
+       )
+      }
+      ;
+     }
+     while
+     (
+     (expr_logical_not) {
+      !
+      (expr_function_call) {
+       acceptable
+       (
+       a
+       )
+      }
+     }
+     )
+     ;
+    }
+   }
+  }
+ }
+]

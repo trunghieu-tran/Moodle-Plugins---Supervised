@@ -1,0 +1,35 @@
+[
+ (program) {
+  (stmt_list) {
+   (stmt_list) {
+    (stmt_or_defined_macro) {
+     (typedef_declaration) {
+      typedef
+      (builtintype) {
+       int
+      }
+      __int32
+      ;
+     }
+    }
+   }
+   (stmt_or_defined_macro) {
+    (stmt) {
+     (variable_declaration) {
+      __int32
+      (assign) {
+       A
+       =
+       (expr_plus) {
+        32
+        +
+        64
+       }
+      }
+     }
+     ;
+    }
+   }
+  }
+ }
+]
