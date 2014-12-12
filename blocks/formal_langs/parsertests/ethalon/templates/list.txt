@@ -1,0 +1,83 @@
+[
+ (program) {
+  (stmt_list) {
+   (stmt_list) {
+    (stmt_or_defined_macro) {
+     (class_or_union_or_struct) {
+      (identified_type_meta_specifier_with_template_def) {
+       (type_meta_specifier_with_template_def) {
+        (template_def) {
+         template
+         <
+         (template_spec) {
+          typename
+          T
+         }
+         >
+        }
+        class
+       }
+       List
+      }
+      (structure_body) {
+       {
+       (stmt_or_visibility_spec_list) {
+        (stmt_or_defined_macro) {
+         (stmt) {
+          (variable_declaration) {
+           T
+           (lvalue) {
+            *
+            data
+           }
+          }
+          ;
+         }
+        }
+        (stmt_or_defined_macro) {
+         (stmt) {
+          (variable_declaration) {
+           (instantiated_template_type) {
+            List
+            (template_instantiation_arguments) {
+             <
+             T
+             >
+            }
+           }
+           (lvalue) {
+            *
+            next
+           }
+          }
+          ;
+         }
+        }
+       }
+       }
+      }
+      ;
+     }
+    }
+   }
+   (stmt_or_defined_macro) {
+    (stmt) {
+     (variable_declaration) {
+      (instantiated_template_type) {
+       List
+       (template_instantiation_arguments) {
+        <
+        (builtintype) {
+         int
+        }
+        >
+       }
+      }
+      a
+     }
+     ;
+    }
+   }
+  }
+ }
+]

@@ -64,16 +64,16 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
 	/** Pushed introduced type
 	 *  @param[in] string $name a name of type
 	 */
-	public function push_introduced_type($name) {
+	public function push_introduced_type($name, $templateargs = array()) {
 		$this->introducednamespacestack[] = (string)$name;
-		$this->shoulclosenamespacestack[] = true;
+		$this->shoulclosenamespacestack[] = array('anonymous' => false, 'classes' => $templateargs);
 	}
 	
 	/**
 	 * Pushes anonynous type on stack
 	 */
-	public function push_anonymous_type() {
-		$this->shoulclosenamespacestack[] = false;	
+	public function push_anonymous_type($templateargs = array()) {
+		$this->shoulclosenamespacestack[] =  array('anonymous' => true, 'classes' => $templateargs);	
 	}
 	
 	/**
@@ -81,12 +81,12 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
 	 */
 	public function try_pop_introduced_type() {
 		if (count($this->shoulclosenamespacestack)) {
-			$flag = $this->shoulclosenamespacestack[count($this->shoulclosenamespacestack) - 1];
+			$flag = $this->shoulclosenamespacestack[count($this->shoulclosenamespacestack) - 1]['anonymous'];
 			unset($this->shoulclosenamespacestack[count($this->shoulclosenamespacestack) - 1]);
 			// Fix atrocious behaviour, when unsetting made indexes be preserved.
 			$this->shoulclosenamespacestack = array_values($this->shoulclosenamespacestack);
 			
-			if ($flag) {
+			if ($flag == false) {
 				unset($this->introducednamespacestack[count($this->introducednamespacestack) - 1]);
 				// Fix atrocious behaviour, when unsetting made indexes be preserved.
 				$this->introducednamespacestack = array_values($this->introducednamespacestack);
@@ -184,7 +184,7 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
         $currentlookupnamespace = array();
         if (count($this->lookupnamespacestack) != 0) {
             $currentlookupnamespace = $this->lookupnamespacestack[count($this->lookupnamespacestack) - 1];
-        }
+        }        
 		//echo "Looking for a $name in tree, while stack is " . implode($currentlookupnamespace, ",") . "\n";
         $nspace = $tree;
         for($i = 0; $i < count($currentlookupnamespace); $i++) {
@@ -196,6 +196,65 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
         }
         return array_key_exists($name, $nspace);
     }
+    
+    /** Finds template spec for a node
+     *  @param block_formal_langs_ast_base $node a node
+     *  @return array     
+     */
+    public function find_template_spec($node) {
+        $result = array();
+        $type = (string)($node->type());
+        if ($type == 'template_spec') {
+            $result = array( $node );
+        }
+        if (count($node->childs())) {
+            $children = $node->childs();
+            for($i = 0; $i < count($children); $i++) {
+                $k = $this->find_template_spec($children[$i]);
+                if (count($result)) {
+                    if (count($k)) {
+                        $result = array_merge($result, $k);
+                    }
+                } else {
+                    $result = $k;
+                }
+            }
+        }
+        return $result;
+    }
+    /** Extracts template parameters from node as argument 
+     *  @param block_formal_langs_ast_base $node a node
+     *  @param array
+     */
+    public function extract_template_parameters($node) {
+        $specs = $this->find_template_spec($node);
+        $result = array();
+        $types = array(
+            'struct' => 1,
+            'enum' => 1,
+            'class' => 1,
+            'typename' => 1
+        ); 
+        for($i = 0; $i < count($specs); $i++) {
+            $children = $specs[$i]->childs();
+            $istype = false;
+            if (method_exists($children[0], 'value')) {
+                $type = $children[0]->value();
+                $type = (string)$type;
+                $istype = array_key_exists($type, $types);
+            }
+            if ($istype)
+            {
+                $value = $children[1]->value();
+                $value = (string)$value;
+                $result[] = $value;
+            }
+        }
+        if (count($result)) {
+            $result = array_flip($result);
+        }
+        return $result;
+    }
 
     /**
      * Returns true, whether token value is type
@@ -205,6 +264,11 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
     public function is_type($name) {
         $result = false;
         $name = (string)$name;
+        for($i = 0; $i < count($this->shoulclosenamespacestack); $i++) {
+            if (array_key_exists($name, $this->shoulclosenamespacestack[$i]['classes'])) {
+                return true;
+            }
+        }
 		//var_dump($this->lookupnamespacestack);
         for($i = count($this->introducednamespacestack) - 1; $i > -1; $i--) { 
             $tree = $this->namespacetree;

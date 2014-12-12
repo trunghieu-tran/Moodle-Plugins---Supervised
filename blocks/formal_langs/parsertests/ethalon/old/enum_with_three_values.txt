@@ -11,10 +11,8 @@
       {
       (enum_value_list) {
        (enum_value_list) {
-        (enum_value_list) {
-         (enum_value) {
-          MY_VALUE
-         }
+        (enum_value) {
+         MY_VALUE
         }
         ,
         (enum_value) {

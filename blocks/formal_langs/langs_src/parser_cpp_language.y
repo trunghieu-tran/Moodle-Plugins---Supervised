@@ -158,7 +158,7 @@ stmt(R) ::= class_or_union_or_struct(A) . {
 identified_type_meta_specifier_with_template_def(R) ::=  type_meta_specifier_with_template_def(A) IDENTIFIER(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s"));
 	$this->mapper->introduce_constructable(B->value());
-	$this->mapper->push_introduced_type(B->value());
+	$this->mapper->push_introduced_type(B->value(), $this->mapper->extract_template_parameters(A));
 	R = $this->create_node('identified_type_meta_specifier_with_template_def', array(A, B));
 }
 
@@ -178,7 +178,7 @@ class_or_union_or_struct(R) ::= identified_type_meta_specifier_with_template_def
 }
 
 nonidentified_type_meta_specifier_with_template_def(R) ::= type_meta_specifier_with_template_def(A) . {
-	$this->mapper->push_anonymous_type();
+	$this->mapper->push_anonymous_type($this->mapper->extract_template_parameters(A));
 	R = A;
 }
 
@@ -211,6 +211,19 @@ template_spec(R) ::= template_typename(A)  IDENTIFIER(B) . {
 	R = $this->create_node('template_spec', array(A, B));
 }
 
+template_spec(R) ::= template_typename(A)  IDENTIFIER(B) ASSIGN(C) type_or_type_ref_or_with_ptr(D) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%s", "%ur(именительный)"));
+	$this->mapper->introduce_type(B->value());
+	R = $this->create_node('template_spec', array(A, B, C, D));
+}
+
+template_spec(R) ::= template_typename(A)  IDENTIFIER(B) ASSIGN(C) expr_prec_7(D) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%s", "%ur(именительный)"));
+	$this->mapper->introduce_type(B->value());
+	R = $this->create_node('template_spec', array(A, B, C, D));
+}
+
+
 template_typename(R) ::= TYPENAMEKWD(A) . {
 	R = A;
 }
@@ -227,6 +240,10 @@ template_typename(R) ::= ENUMKWD(A) . {
 	R = A;
 }
 
+template_typename(R) ::= builtintype(A) . {
+	R = A;
+}
+
 template_def(R) ::= TEMPLATEKWD(A) LESSER(B) GREATER(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("определение шаблона", array("ключевое слово определения шаблона", "начало аргументов шаблона", "конец аргументов шаблона"));
 	R = $this->create_node('template_def', array(A, B, C));
@@ -238,7 +255,7 @@ template_def(R) ::= TEMPLATEKWD(A) LESSER(B) template_spec_list(C) GREATER(D) . 
 }
 
 
-type_meta_specifier_with_template_def(R) ::=  template_def(a) type_meta_specifier(B) . {
+type_meta_specifier_with_template_def(R) ::=  template_def(A) type_meta_specifier(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный) и %2(именительный)", array("%ur(именительный)", "%ur(именительный)"));
 	R = $this->create_node('type_meta_specifier_with_template_def', array(A, B));
 }
