@@ -151,7 +151,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 return null;
             }
             if ($length > 0 && $newstate->is_flag_set(qtype_preg_fa_exec_state::FLAG_VISITED_END_ANCHOR)) {
-                return null;
+                //return null;
             }
             list($flag, $newchr) = $tr->next_character($str, $newstate->str, $curpos, 0, $newstate);
             if ($flag === qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE) {
