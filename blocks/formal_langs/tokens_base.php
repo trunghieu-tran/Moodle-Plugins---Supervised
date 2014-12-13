@@ -337,12 +337,13 @@ class block_formal_langs_ast_node_base {
      */
     public function tokens_list() {
         $childcount = count($this->childs());
+        $children = $this->childs();
         $result = array();
-        if (count($childcount) == 0) {
+        if (count($childcount) == 0 || $children === null || !is_array($children)) {
             $result[] = $this;
         } else {
             /** @var block_formal_langs_ast_node_base $child */
-            foreach($this->childs() as $child) {
+            foreach($children as $child) {
                 $tmp = $child->tokens_list();
                 if (count($result) == 0) {
                     $result = $tmp;
@@ -2115,16 +2116,18 @@ class block_formal_langs_string_pair {
     }
 
 
-    private function count_indexs_correct($nodenumber) {
+    private function count_indexes_correct($nodenumber) {
         $count = 0;
         return $count;
     }
     
-    private function count_indexs_incorrect($nodenumber) {
+    private function count_indexes_incorrect($nodenumber) {
+		$count = 0;
         return $count;
     }
     
-    private function index_pair_from_lexem($nodenumber) {
+    private function index_pair_from_lexeme($nodenumber) {
+		$index = 0;
         return $index;
     }
     /**
@@ -2137,11 +2140,11 @@ class block_formal_langs_string_pair {
      * @return string - description of node if present, quoted node value otherwise.
      */
     public function node_description($nodenumber, $quotevalue = true, $at = false) {
-        $correctindexs = $this->count_indexs_correct($nodenumber);
+        $correctindexs = $this->count_indexes_incorrect($nodenumber);
         $comparedindexs = $this->count_indexs_incorrect($nodenumber);
         // typo
         if (count($correctindexs)==1 && count($comparedindexs)==1) {
-            $index = $this->index_pair_from_lexem($nodenumber);
+            $index = $this->index_pair_from_lexeme($nodenumber);
             if($this->correctstring()->has_description($nodenumber)) {
                 return $this->correctstring()->node_description($nodenumber, false, true);
             } else {
@@ -2151,7 +2154,7 @@ class block_formal_langs_string_pair {
         }
         // extra separator
         if(count($correctindexs)==1 && count($comparedindexs)==2) {
-            $index = $this->index_pair_from_lexem($nodenumber);
+            $index = $this->index_pair_from_lexeme($nodenumber);
             if($this->correctstring()->has_description($nodenumber)) {
                 return $this->correctstring()->node_description($nodenumber, false, true);
             } else {
@@ -2162,7 +2165,7 @@ class block_formal_langs_string_pair {
             }
         }
         if(count($correctindexs)==2 && count($comparedindexs)==1) {
-            $index = $this->index_pair_from_lexem($nodenumber);
+            $index = $this->index_pair_from_lexeme($nodenumber);
             if($this->correctstring()->has_description($nodenumber) && !$this->correctstring()->has_description($nodenumber+1)) {
                 $value=$this->comparedstring()->stream->tokens[$index+1]->value();
                 return $this->correctstring()->node_description($nodenumber, false, true).' and '.get_string('quote', 'block_formal_langs', $value);
