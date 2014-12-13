@@ -451,13 +451,6 @@ abstract class qtype_preg_fa_node {
  */
 class qtype_preg_fa_leaf extends qtype_preg_fa_node {
 
-    public function accept() {
-        if ($this->pregnode->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_G) {
-            return get_string($this->pregnode->subtype, 'qtype_preg');
-        }
-        return true;
-    }
-
     protected function create_automaton_inner(&$automaton, &$stack, $transform) {
         // Create start and end states of the resulting automaton.
         $start = $automaton->add_state();

@@ -232,6 +232,8 @@ interface qtype_preg_matcher_state {
      */
     public function is_full();
 
+    public function start_pos();
+
     /**
      * Returns index of the first character matched for the given subexpression.
      */
@@ -1310,11 +1312,14 @@ class qtype_preg_leaf_assert_esc_g extends qtype_preg_leaf_assert {
 
     public function match($str, $pos, &$length, $matcherstateobj = null) {
         $length = 0;
-        return false; // TODO
+        return $pos === $matcherstateobj->start_pos();
     }
 
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
-        return array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''));  // TODO
+        if ($pos == $matcherstateobj->start_pos()) {
+            return array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''));
+        }
+        return array(self::NEXT_CHAR_CANNOT_GENERATE, null);
     }
 
     public function tohr() {

@@ -250,11 +250,13 @@ class qtype_preg_fa_stack_item {
 class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
 
     // Indicates that this state is a full match state.
-    const FLAG_FULL = 0x01;
-    // Indicates that this state had \A or ^ transition.
-    const FLAG_VISITED_START_ANCHOR = 0x02;
-    // Indicates that this state had \Z \z or $ transition.
-    const FLAG_VISITED_END_ANCHOR   = 0x04;
+    const FLAG_FULL                    = 0x01;
+    const FLAG_VISITED_SLASH_A         = 0x02;
+    const FLAG_VISITED_SLASH_Z_SMALL   = 0x04;
+    const FLAG_VISITED_SLASH_Z_CAPITAL = 0x08;
+    const FLAG_VISITED_SLASH_G         = 0x10;
+    const FLAG_VISITED_CIRCUMFLEX      = 0x20;
+    const FLAG_VISITED_DOLLAR          = 0x40;
 
     // FA being executed.
     public $matcher;
@@ -452,6 +454,10 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
             return true;
         }
         return $end->is_subexpr_match_started($subexpr);
+    }
+
+    public function start_pos() {
+        return $this->startpos;
     }
 
     public function index_first($subexpr = 0) {
