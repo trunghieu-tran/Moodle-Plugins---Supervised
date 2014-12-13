@@ -146,18 +146,28 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $newstate = clone $curstate;
         $transitions = array_merge($transition->mergedbefore, array($transition), $transition->mergedafter);
         foreach ($transitions as $tr) {
-            $length = $tr->pregleaf->consumes($newstate);
-            if ($length === qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT) {
-                return null;
-            }
-            if ($length > 0 && $newstate->is_flag_set(qtype_preg_fa_exec_state::FLAG_VISITED_END_ANCHOR)) {
-                //return null;
-            }
             list($flag, $newchr) = $tr->next_character($str, $newstate->str, $curpos, 0, $newstate);
             if ($flag === qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE) {
                 return null;
             }
-            $newstate->str->concatenate($newchr);
+
+            $length = 0;
+
+            // TODO: ^ \A \z and \Z?
+
+            if ($newchr === "\n") {
+                $newstate->unset_flag(qtype_preg_fa_exec_state::FLAG_VISITED_DOLLAR);
+            }
+            if (is_object($newchr)) {
+                if ($newchr->length() > 0 && ($newstate->is_flag_set(qtype_preg_fa_exec_state::FLAG_VISITED_SLASH_Z_SMALL) ||
+                                              $newstate->is_flag_set(qtype_preg_fa_exec_state::FLAG_VISITED_SLASH_Z_CAPITAL) ||
+                                              $newstate->is_flag_set(qtype_preg_fa_exec_state::FLAG_VISITED_DOLLAR))) {
+                    return null;
+                }
+                $newstate->str->concatenate($newchr);
+                $length = $newchr->length();
+            }
+
             $this->after_transition_passed($newstate, $tr, $curpos, $length);
 
             /*$recursionlevel = $newstate->recursion_level();
@@ -236,14 +246,31 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
         $newstate->set_state($transition->to);
         $newstate->set_full(in_array($newstate->state(), $endstates));
-        if ($transition->is_start_anchor()) {
-            $newstate->set_flag(qtype_preg_fa_exec_state::FLAG_VISITED_START_ANCHOR);
-        }
-        if ($transition->is_end_anchor()) {
-            $newstate->set_flag(qtype_preg_fa_exec_state::FLAG_VISITED_END_ANCHOR);
-        }
-        $newstate->left = $newstate->is_full() ? 0 : qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
 
+        switch ($transition->pregleaf->subtype) {
+        case qtype_preg_leaf_assert::SUBTYPE_ESC_A:
+            $newstate->set_flag(qtype_preg_fa_exec_state::FLAG_VISITED_SLASH_A);
+            break;
+        case qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z:
+            $newstate->set_flag(qtype_preg_fa_exec_state::FLAG_VISITED_SLASH_Z_SMALL);
+            break;
+        case qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z:
+            $newstate->set_flag(qtype_preg_fa_exec_state::FLAG_VISITED_SLASH_Z_CAPITAL);
+            break;
+        case qtype_preg_leaf_assert::SUBTYPE_ESC_G:
+            $newstate->set_flag(qtype_preg_fa_exec_state::FLAG_VISITED_SLASH_G);
+            break;
+        case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
+            $newstate->set_flag(qtype_preg_fa_exec_state::FLAG_VISITED_CIRCUMFLEX);
+            break;
+        case qtype_preg_leaf_assert::SUBTYPE_DOLLAR:
+            $newstate->set_flag(qtype_preg_fa_exec_state::FLAG_VISITED_DOLLAR);
+            break;
+        default:
+            break;
+        }
+
+        $newstate->left = $newstate->is_full() ? 0 : qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
         $newstate->length += $length;
         $newstate->write_tag_values($transition, $curpos, $length);
 
