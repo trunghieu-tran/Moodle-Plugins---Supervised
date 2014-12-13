@@ -84,10 +84,12 @@ function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $
     $table->align = array('right', 'left', 'left');
     $table->head = array(
         get_string('time'),
-        get_string('ip_address'),
         get_string('fullnameuser'),
+        get_string('eventcontext', 'report_log'),
+        get_string('eventname'),
         get_string('action'),
-        get_string('info')
+        get_string('info'),
+        get_string('ip_address'),
     );
     $table->data = array();
 
