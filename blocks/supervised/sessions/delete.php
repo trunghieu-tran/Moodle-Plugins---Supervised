@@ -81,9 +81,9 @@ if ($mform->is_cancelled()) {
     redirect($url);
 } else if ($fromform = $mform->get_data()) {
     // Delete session.
-	$event = \block_supervised\event\delete_session::create(array('context' => $context,
-		'userid' => $USER->id,'other' => array('courseid' => $courseid)));
-	$event->trigger();
+    $event = \block_supervised\event\delete_session::create(array('context' => $context,
+        'userid' => $USER->id, 'other' => array('courseid' => $courseid)));
+    $event->trigger();
     $DB->delete_records('block_supervised_session', array('id' => $id));
     $DB->delete_records('block_supervised_user', array('sessionid' => $id));
     // Send e-mail to teacher.

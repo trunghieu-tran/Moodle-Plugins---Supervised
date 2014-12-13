@@ -54,14 +54,16 @@ if (!$DB->update_record('block_supervised_classroom', $classroom)) {
 
 $context = context_course::instance($courseid);
 if ($classroom->active) {
-	$event = \block_supervised\event\unhide_classroom::create(array('context' => $context,
-		'userid' => $USER->id,'other' => array('classroomname' => $classroom->name, 'courseid' => $courseid, 'classroomid' => $classroom->id)));
-	$event->trigger();
-    } else {
-	$event = \block_supervised\event\hide_classroom::create(array('context' => $context,
-		'userid' => $USER->id,'other' => array('classroomname' => $classroom->name, 'courseid' => $courseid, 'classroomid' => $classroom->id)));
-	$event->trigger();
-    }
+    $event = \block_supervised\event\unhide_classroom::create(array('context' => $context,
+        'userid' => $USER->id, 'other' => array('classroomname' => $classroom->name,
+        'courseid' => $courseid, 'classroomid' => $classroom->id)));
+    $event->trigger();
+} else {
+    $event = \block_supervised\event\hide_classroom::create(array('context' => $context,
+        'userid' => $USER->id, 'other' => array('classroomname' => $classroom->name,
+        'courseid' => $courseid, 'classroomid' => $classroom->id)));
+    $event->trigger();
+}
 
 // Redirect.
 $url = new moodle_url('/blocks/supervised/classrooms/view.php', array('courseid' => $courseid));
