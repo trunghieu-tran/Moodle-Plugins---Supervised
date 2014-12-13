@@ -1725,14 +1725,14 @@ class qtype_preg_cross_tests_from_preg_merging {
         $test4 = array( 'str'=>'a!a!!',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>4),
-                        'length'=>array(0=>5, 1=>1));
+                        'index_first'=>array(0=>0, 1=>2),
+                        'length'=>array(0=>3, 1=>1));
 
         $test5 = array( 'str'=>'!a!aa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>4),
-                        'length'=>array(0=>5, 1=>1));
+                        'index_first'=>array(0=>0, 1=>2),
+                        'length'=>array(0=>3, 1=>1));
 
         return array('regex'=>'([a!]\b)+',
                      'tests'=>array($test1, $test2, $test3, $test4, $test5),
@@ -1749,8 +1749,8 @@ class qtype_preg_cross_tests_from_preg_merging {
         $test2 = array( 'str'=>'aaaa',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>3),
-                        'length'=>array(0=>4, 1=>1));
+                        'index_first'=>array(0=>0, 1=>2),
+                        'length'=>array(0=>3, 1=>1));
 
         return array('regex'=>'(a\B)+',
                      'tests'=>array($test1, $test2),
@@ -1795,8 +1795,8 @@ class qtype_preg_cross_tests_from_preg_merging {
         $test3 = array( 'str'=>'d',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>0),
-                        'length'=>array(0=>1, 1=>0));
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1));
 
         return array('regex'=>'d(\tcat\B)*',
                      'tests'=>array($test1, $test2, $test3),
@@ -1867,14 +1867,14 @@ class qtype_preg_cross_tests_from_preg_merging {
         $test3 = array( 'str'=>"a\tgf",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>1),
-                        'length'=>array(0=>4, 1=>2));
+                        'index_first'=>array(0=>0, 1=>1,2=>1),
+                        'length'=>array(0=>4, 1=>2,2=>1));
 
         $test4 = array( 'str'=>"a\tg\tgf",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>3),
-                        'length'=>array(0=>6, 1=>2));
+                        'index_first'=>array(0=>0, 1=>3,2=>3),
+                        'length'=>array(0=>6, 1=>2,2=>1));
 
         return array('regex'=>'a((\b\t|bde)g)+f',
                      'tests'=>array($test1, $test2, $test3, $test4),
@@ -1906,7 +1906,7 @@ class qtype_preg_cross_tests_from_preg_merging {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3));
 
-        return array('regex'=>'a*\Bt',
+        return array('regex'=>'a*\bt',
                      'tests'=>array($test1, $test2),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
