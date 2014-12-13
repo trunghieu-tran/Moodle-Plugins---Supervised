@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
  * The supervised add lessontype event.
  *
@@ -33,24 +33,22 @@ defined('MOODLE_INTERNAL') || die();
  **/
 class add_lessontype extends  add_object {
 
-	protected function init() {
-		parent::init();
-    }
- 
     public static function get_name() {
         return get_string('eventaddlessontype', 'block_supervised');
     }
- 
+
     public function get_description() {
         return "The user with id '$this->userid' added lessontype with id '{$this->other['newlessontypeid']}'.";
     }
- 
+
     public function get_url() {
-        return new \moodle_url('/blocks/supervised/lessontypes/addedit.php', array('id' => $this->other['newlessontypeid'], 'courseid' => $this->other['courseid']));
+        return new \moodle_url('/blocks/supervised/lessontypes/addedit.php',
+                                array('id' => $this->other['newlessontypeid'], 'courseid' => $this->other['courseid']));
     }
- 
+
     public function get_legacy_logdata() {
         return array($this->other['courseid'], 'role', 'add lessontype',
-		"blocks/supervised/lessontypes/addedit.php?id={$this->other['newlessontypeid']}&courseid={$this->other['courseid']}", $this->other['fromform_name']);
+            "blocks/supervised/lessontypes/addedit.php?id={$this->other['newlessontypeid']}&courseid={$this->other['courseid']}",
+            $this->other['fromform_name']);
     }
 }

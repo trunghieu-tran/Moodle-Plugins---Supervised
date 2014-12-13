@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
  * The supervised add object event.
  *
@@ -33,7 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  **/
 class add_object extends \core\event\base {
     protected function init() {
-		$this->data['crud'] = 'c';
+        $this->data['crud'] = 'c';
         $this->data['edulevel'] = self::LEVEL_OTHER;
     }
 }

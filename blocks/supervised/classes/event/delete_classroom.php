@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
  * The supervised add classroom event.
  *
@@ -21,7 +21,7 @@
  * @copyright  2014 YOUR NAME
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace block_supervised\event; //block_supervised\event\add_object_event;
+namespace block_supervised\event;
 
 defined('MOODLE_INTERNAL') || die();
 /**
@@ -32,24 +32,20 @@ defined('MOODLE_INTERNAL') || die();
  **/
 class delete_classroom extends  delete_object {
 
-	protected function init() {
-		parent::init();
-    }
- 
     public static function get_name() {
         return get_string('eventdeleteclassroom', 'block_supervised');
     }
- 
+
     public function get_description() {
         return "The user with id '$this->userid' deleted classroom with id {$this->other['deletedid']}.";
     }
- 
+
     public function get_url() {
         return new \moodle_url('/blocks/supervised/classrooms/view.php', array('courseid' => $this->other['courseid']));
     }
- 
+
     public function get_legacy_logdata() {
         return array($this->other['courseid'], 'role', 'delete classroom',
-		"blocks/supervised/classrooms/view.php?courseid={$this->other['courseid']}", $this->other['classroomname']);
+        "blocks/supervised/classrooms/view.php?courseid={$this->other['courseid']}", $this->other['classroomname']);
     }
 }

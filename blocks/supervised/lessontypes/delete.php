@@ -80,7 +80,8 @@ if (!confirm_sesskey()) {
 $DB->delete_records('block_supervised_lessontype', array('id' => $id));
 
 $event = \block_supervised\event\delete_lessontype::create(array('context' => $context,
-	'userid' => $USER->id,'other' => array('courseid' => $courseid, 'deletedid' => $lessontype->id, 'lessontypename' => $lessontype->name)));
+    'userid' => $USER->id, 'other' => array('courseid' => $courseid, 'deletedid' => $lessontype->id,
+    'lessontypename' => $lessontype->name)));
 $event->trigger();
 
 // Redirect to lessontypes page.

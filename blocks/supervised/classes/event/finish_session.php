@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
  * The supervised finish session event.
  *
@@ -33,24 +33,20 @@ defined('MOODLE_INTERNAL') || die();
  **/
 class finish_session extends  update_object {
 
-	protected function init() {
-		parent::init();
-    }
- 
     public static function get_name() {
         return get_string('eventfinishsession', 'block_supervised');
     }
- 
+
     public function get_description() {
         return "The user with id '$this->userid' finished session.";
     }
- 
+
     public function get_url() {
         return new \moodle_url('/blocks/supervised/sessions/view.php', array('courseid' => $this->other['courseid']));
     }
- 
+
     public function get_legacy_logdata() {
         return array($this->other['courseid'], 'role', 'finish session',
-		"blocks/supervised/sessions/view.php?&courseid={$this->other['courseid']}", '');
+                    "blocks/supervised/sessions/view.php?&courseid={$this->other['courseid']}", '');
     }
 }

@@ -88,17 +88,18 @@ if ($mform->is_cancelled()) {
         if (!$newid = $DB->insert_record('block_supervised_classroom', $fromform)) {
             print_error('insertclassroomerror', 'block_supervised');
         }
-		$event = \block_supervised\event\add_classroom::create(array('context' => $context,
-			'userid' => $USER->id,'other' => array('fromform_name' => ($fromform->name), 'courseid' => $courseid, 'newclassid' => $newid)));
-		$event->trigger();
-        } else {     // Edit mode.
+        $event = \block_supervised\event\add_classroom::create(array('context' => $context, 'userid' => $USER->id,
+                'other' => array('fromform_name' => ($fromform->name), 'courseid' => $courseid, 'newclassid' => $newid)));
+        $event->trigger();
+    } else {     // Edit mode.
 
         if (!$DB->update_record('block_supervised_classroom', $fromform)) {
             print_error('insertclassroomerror', 'block_supervised');
         }
         $event = \block_supervised\event\update_classroom::create(array('context' => $context,
-			'userid' => $USER->id,'other' => array('fromform_name' => ($fromform->name), 'courseid' => $courseid, 'fromform_id' => $fromform->id)));
-		$event->trigger();
+            'userid' => $USER->id, 'other' => array('fromform_name' => ($fromform->name),
+            'courseid' => $courseid, 'fromform_id' => $fromform->id)));
+        $event->trigger();
         // Find all Active and Planned sessions and update their ip lists.
         $select = "SELECT * FROM {block_supervised_session}
                     WHERE classroomid = :classroomid

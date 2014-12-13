@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
  * The supervised delete lessontype event.
  *
@@ -33,24 +33,20 @@ defined('MOODLE_INTERNAL') || die();
  **/
 class delete_lessontype extends delete_object {
 
-	protected function init() {
-		parent::init();
-    }
- 
     public static function get_name() {
         return get_string('eventdeletelessontype', 'block_supervised');
     }
- 
+
     public function get_description() {
         return "The user with id '$this->userid' deleted lessontype with id {$this->other['deletedid']}.";
     }
- 
+
     public function get_url() {
         return new \moodle_url('/blocks/supervised/lessontype/view.php', array('courseid' => $this->other['courseid']));
     }
- 
+
     public function get_legacy_logdata() {
         return array($this->other['courseid'], 'role', 'delete lessontype',
-		"blocks/supervised/lessontype/view.php?courseid={$this->other['courseid']}", $this->other['lessontypename']);
+        "blocks/supervised/lessontype/view.php?courseid={$this->other['courseid']}", $this->other['lessontypename']);
     }
 }

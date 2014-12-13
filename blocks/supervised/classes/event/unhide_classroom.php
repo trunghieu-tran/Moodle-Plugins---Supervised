@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
  * The supervised unhide classroom event.
  *
@@ -33,24 +33,22 @@ defined('MOODLE_INTERNAL') || die();
  **/
 class unhide_classroom extends  update_object {
 
-	protected function init() {
-		parent::init();
-    }
- 
     public static function get_name() {
         return get_string('eventunhideclassroom', 'block_supervised');
     }
- 
+
     public function get_description() {
         return "The user with id '$this->userid' unhid classroom with id '{$this->other['classroomid']}'.";
     }
- 
+
     public function get_url() {
-        return new \moodle_url('/blocks/supervised/classrooms/addedit.php', array('id' => $this->other['classroomid'], 'courseid' => $this->other['courseid']));
+        return new \moodle_url('/blocks/supervised/classrooms/addedit.php',
+                                array('id' => $this->other['classroomid'], 'courseid' => $this->other['courseid']));
     }
- 
+
     public function get_legacy_logdata() {
         return array($this->other['courseid'], 'role', 'show classroom',
-		"blocks/supervised/classrooms/addedit.php?id={$this->other['classroomid']}&courseid={$this->other['courseid']}", $this->other['classroomname']);
+            "blocks/supervised/classrooms/addedit.php?id={$this->other['classroomid']}&courseid={$this->other['courseid']}",
+            $this->other['classroomname']);
     }
 }

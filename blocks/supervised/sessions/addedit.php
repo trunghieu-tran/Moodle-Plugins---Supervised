@@ -163,9 +163,9 @@ if ($mform->is_cancelled()) {
         }
         update_users_in_session($fromform->groupid, $fromform->courseid, $newid);
         $event = \block_supervised\event\add_session::create(array('context' => $context,
-			'userid' => $USER->id,'other' => array('courseid' => $courseid)));
-		$event->trigger();
-		// Send e-mail to teacher.
+            'userid' => $USER->id, 'other' => array('courseid' => $courseid)));
+        $event->trigger();
+        // Send e-mail to teacher.
         if ($fromform->sendemail) {
             mail_newsession(get_session($newid), $USER);
         }
@@ -178,9 +178,9 @@ if ($mform->is_cancelled()) {
         }
         update_users_in_session($fromform->groupid, $fromform->courseid, $fromform->id);
          $event = \block_supervised\event\update_session::create(array('context' => $context,
-			'userid' => $USER->id,'other' => array('courseid' => $courseid)));
-		$event->trigger();
-		// Send e-mail to teacher(s).
+            'userid' => $USER->id, 'other' => array('courseid' => $courseid)));
+        $event->trigger();
+        // Send e-mail to teacher(s).
         if ($fromform->sendemail) {
             $oldteacherid = $session->teacherid;
             $newteacherid = $fromform->teacherid;

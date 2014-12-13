@@ -79,7 +79,7 @@ if (!confirm_sesskey()) {
 
 $context = context_course::instance($courseid);
 $event = \block_supervised\event\delete_classroom::create(array('context' => $context,
-	'userid' => $USER->id,'other' => array('courseid' => $courseid , 'deletedid' => $id, 'classroomname' => $classroom->name)));
+    'userid' => $USER->id, 'other' => array('courseid' => $courseid , 'deletedid' => $id, 'classroomname' => $classroom->name)));
 $event->trigger();
 $DB->delete_records('block_supervised_classroom', array('id' => $id));
 // Redirect to classrooms page.

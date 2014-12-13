@@ -39,13 +39,17 @@ function supervisedblock_build_logs_array($sessionid, $timefrom, $timeto, $useri
     $session = $DB->get_record('block_supervised_session', array('id' => $sessionid));
 
     $logs = $DB->get_records_sql('SELECT * FROM {logstore_standard_log} WHERE
-								timecreated < ? AND timecreated > ? AND courseid = ?', array($timeto,$timefrom,$session->courseid));
+                                timecreated < ? AND timecreated > ? AND courseid = ?',
+                                array($timeto, $timefrom, $session->courseid));
     // Filter logs by classroom's ip subnet, student's group and user's id.
     $logsfiltered = array();
     foreach ($logs as $id => $log) {
-		$teacher = $DB->record_exists_sql('SELECT * FROM {block_supervised_session} WHERE id = ? AND teacherid = ?', array($sessionid,$log->userid));
-		$student = $DB->record_exists_sql('SELECT * FROM {block_supervised_user} WHERE sessionid = ? AND userid = ?', array($sessionid,$log->userid));
-        if (address_in_subnet($log->ip, $session->iplist) && ($teacher || $student ) && (($log->userid == $userid) || $userid == 0)) {
+        $teacher = $DB->record_exists_sql('SELECT * FROM {block_supervised_session} WHERE id = ? AND teacherid = ?',
+                                            array($sessionid, $log->userid));
+        $student = $DB->record_exists_sql('SELECT * FROM {block_supervised_user} WHERE sessionid = ? AND userid = ?',
+                                            array($sessionid, $log->userid));
+        if (address_in_subnet($log->ip, $session->iplist) && ($teacher || $student )
+            && (($log->userid == $userid) || $userid == 0)) {
             $logsfiltered[$id] = $log;
         }
     }
@@ -96,84 +100,78 @@ function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $
     $strftimedatetime = get_string('strftimerecent');
     foreach ($logs['logs'] as $log) {
         $manager = get_log_manager();
-		$logreaders = $manager->get_readers();
-        //Getting the event description
-		$select = "id=:logid"; //Log id is the same with event id
-		$params = array();
-		$params['logid']=$log->id;
-        //Creating a new table row
-		$row = array();
-		//Getting the time of triggered event
-		$row[] = userdate($log->timecreated, '%a').' '.userdate($log->timecreated, $strftimedatetime);
-		//Getting the full username and connecting it with user's info page
-		$user = $DB->get_record_sql('SELECT * FROM {user} WHERE id=?', array($log->userid),IGNORE_MISSING);
-		$fullname = fullname($user);
-		$row[] = html_writer::link(new moodle_url("/user/view.php?id={$log->userid}&course={$log->courseid}"),$fullname);
-        //Getting event context 
-        foreach ($logreaders as $reader){
-			if($reader instanceof \core\log\sql_select_reader){
-				$events = $reader->get_events_select($select,$params,'timecreated',0,$perpage);
-				foreach ($events as $event) {
-                        $context = context::instance_by_id($event->contextid, IGNORE_MISSING);
-                        if($context) {
-                           $contextname = $context->get_context_name(true);
-                            if ($url = $context->get_url()) {
+        $logreaders = $manager->get_readers();
+        // Getting the event description.
+        $select = "id=:logid"; // Log id is the same with event id.
+        $params = array();
+        $params['logid'] = $log->id;
+        // Creating a new table row.
+        $row = array();
+        // Getting the time of triggered event.
+        $row[] = userdate($log->timecreated, '%a').' '.userdate($log->timecreated, $strftimedatetime);
+        // Getting the full username and connecting it with user's info page.
+        $user = $DB->get_record_sql('SELECT * FROM {user} WHERE id=?', array($log->userid), IGNORE_MISSING);
+        $fullname = fullname($user);
+        $row[] = html_writer::link(new moodle_url("/user/view.php?id={$log->userid}&course={$log->courseid}"), $fullname);
+        // Getting event context.
+        foreach ($logreaders as $reader) {
+            if ($reader instanceof \core\log\sql_select_reader) {
+                $events = $reader->get_events_select($select, $params, 'timecreated', 0, $perpage);
+                foreach ($events as $event) {
+                    $context = context::instance_by_id($event->contextid, IGNORE_MISSING);
+                    if ($context) {
+                        $contextname = $context->get_context_name(true);
+                        if ($url = $context->get_url()) {
                             $contextname = html_writer::link($url, $contextname);
-                            }
-                        } else {
-                            $contextname = get_string('other');
                         }
-					$row[] = $contextname;
-				}
-			}
-		}
-        //Getting event name
-        foreach ($logreaders as $reader){
-			if($reader instanceof \core\log\sql_select_reader){
-				$events = $reader->get_events_select($select,$params,'timecreated',0,$perpage);
-				foreach ($events as $event) {
-                        $eventname = $event->get_name();
-                        if ($url = $event->get_url()) {
-                            $eventname = html_writer::link($url, $eventname);
-                        }
-					$row[] = $eventname;
-				}
-			}
-		}
-        //Getting the type of event (read, update, create or delete)
-		switch ($log->crud ){
-			case ('r'):
-				$row[] = 'Read';
-			break;
-			case ('u'):
-				$row[] = 'Update';
-			break;
-			case ('d'):
-				$row[] = 'Delete';
-			break;
-			case ('c'):
-				$row[] = 'Create';
-			break;
-		}
-		//Getting the event description
-		$select = "id=:logid"; //Log id is the same with event id
-		$params = array();
-		$params['logid']=$log->id;
-		$manager = get_log_manager();
-		$logreaders = $manager->get_readers();
-		//Choosing the reader, which works with events
-		foreach ($logreaders as $reader){
-			if($reader instanceof \core\log\sql_select_reader){
-				$events = $reader->get_events_select($select,$params,'timecreated',0,$perpage);
-				foreach ($events as $event) {
-					$row[] = $event->get_description();
-				}
-			}
-		}
-        //Connecting the ip of user with iplookup
-		$link = new moodle_url("/iplookup/index.php?ip=$log->ip&user=$log->userid");
-		$row[] = $OUTPUT->action_link($link, $log->ip, new popup_action('click', $link, 'iplookup',array('height' => 440, 'width' => 700)));
-		
+                    } else {
+                        $contextname = get_string('other');
+                    }
+                    $row[] = $contextname;
+                }
+            }
+        }
+        // Getting event name.
+        foreach ($logreaders as $reader) {
+            if ($reader instanceof \core\log\sql_select_reader) {
+                $events = $reader->get_events_select($select, $params, 'timecreated', 0, $perpage);
+                foreach ($events as $event) {
+                    $eventname = $event->get_name();
+                    if ($url = $event->get_url()) {
+                        $eventname = html_writer::link($url, $eventname);
+                    }
+                    $row[] = $eventname;
+                }
+            }
+        }
+        // Getting the type of event (read, update, create or delete).
+        switch ($log->crud ) {
+            case ('r'):
+                $row[] = 'Read';
+            break;
+            case ('u'):
+                $row[] = 'Update';
+            break;
+            case ('d'):
+                $row[] = 'Delete';
+            break;
+            case ('c'):
+                $row[] = 'Create';
+            break;
+        }
+        // Getting the event description.
+        foreach ($logreaders as $reader) {
+            if ($reader instanceof \core\log\sql_select_reader) {
+                $events = $reader->get_events_select($select, $params, 'timecreated', 0, $perpage);
+                foreach ($events as $event) {
+                    $row[] = $event->get_description();
+                }
+            }
+        }
+        // Connecting the ip of user with iplookup.
+        $link = new moodle_url("/iplookup/index.php?ip=$log->ip&user=$log->userid");
+        $row[] = $OUTPUT->action_link($link, $log->ip, new popup_action('click', $link,
+                'iplookup', array('height' => 440, 'width' => 700)));
         $table->data[] = $row;
     }
 
