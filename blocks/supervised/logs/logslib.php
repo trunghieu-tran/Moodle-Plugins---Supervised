@@ -95,7 +95,12 @@ function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $
 
     $strftimedatetime = get_string('strftimerecent');
     foreach ($logs['logs'] as $log) {
-
+        $manager = get_log_manager();
+		$logreaders = $manager->get_readers();
+        //Getting the event description
+		$select = "id=:logid"; //Log id is the same with event id
+		$params = array();
+		$params['logid']=$log->id;
         //Creating a new table row
 		$row = array();
 		//Getting the time of triggered event
