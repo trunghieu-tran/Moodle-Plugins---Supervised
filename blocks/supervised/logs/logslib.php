@@ -109,7 +109,38 @@ function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $
 		$user = $DB->get_record_sql('SELECT * FROM {user} WHERE id=?', array($log->userid),IGNORE_MISSING);
 		$fullname = fullname($user);
 		$row[] = html_writer::link(new moodle_url("/user/view.php?id={$log->userid}&course={$log->courseid}"),$fullname);
-		//Getting the type of event (read, update, create or delete)
+        //Getting event context 
+        foreach ($logreaders as $reader){
+			if($reader instanceof \core\log\sql_select_reader){
+				$events = $reader->get_events_select($select,$params,'timecreated',0,$perpage);
+				foreach ($events as $event) {
+                        $context = context::instance_by_id($event->contextid, IGNORE_MISSING);
+                        if($context) {
+                           $contextname = $context->get_context_name(true);
+                            if ($url = $context->get_url()) {
+                            $contextname = html_writer::link($url, $contextname);
+                            }
+                        } else {
+                            $contextname = get_string('other');
+                        }
+					$row[] = $contextname;
+				}
+			}
+		}
+        //Getting event name
+        foreach ($logreaders as $reader){
+			if($reader instanceof \core\log\sql_select_reader){
+				$events = $reader->get_events_select($select,$params,'timecreated',0,$perpage);
+				foreach ($events as $event) {
+                        $eventname = $event->get_name();
+                        if ($url = $event->get_url()) {
+                            $eventname = html_writer::link($url, $eventname);
+                        }
+					$row[] = $eventname;
+				}
+			}
+		}
+        //Getting the type of event (read, update, create or delete)
 		switch ($log->crud ){
 			case ('r'):
 				$row[] = 'Read';
