@@ -105,9 +105,6 @@ function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $
 		$row = array();
 		//Getting the time of triggered event
 		$row[] = userdate($log->timecreated, '%a').' '.userdate($log->timecreated, $strftimedatetime);
-		//Connecting the ip of user with iplookup
-		$link = new moodle_url("/iplookup/index.php?ip=$log->ip&user=$log->userid");
-		$row[] = $OUTPUT->action_link($link, $log->ip, new popup_action('click', $link, 'iplookup',array('height' => 440, 'width' => 700)));
 		//Getting the full username and connecting it with user's info page
 		$user = $DB->get_record_sql('SELECT * FROM {user} WHERE id=?', array($log->userid),IGNORE_MISSING);
 		$fullname = fullname($user);
@@ -142,6 +139,10 @@ function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $
 				}
 			}
 		}
+        //Connecting the ip of user with iplookup
+		$link = new moodle_url("/iplookup/index.php?ip=$log->ip&user=$log->userid");
+		$row[] = $OUTPUT->action_link($link, $log->ip, new popup_action('click', $link, 'iplookup',array('height' => 440, 'width' => 700)));
+		
         $table->data[] = $row;
     }
 
