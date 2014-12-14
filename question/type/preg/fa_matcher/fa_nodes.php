@@ -233,29 +233,13 @@ abstract class qtype_preg_fa_node {
             if (!($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor()) && !($del->is_eps() && in_array($del->to, $endstates))) {
                 foreach ($clonetransitions as &$tran) {
                     $tran->from = $del->from;
-                    $tran->make_merged();
-                    foreach ($tran->mergedbefore as $before) {
-                        $before->from = $tran->from;
-                        $before->to = $tran->to;
-                    }
-                    foreach ($tran->mergedafter as $after) {
-                        $after->from = $tran->from;
-                        $after->to = $tran->to;
-                    }
+                    $tran->redirect_merged_transitions();
                     $automaton->add_transition($tran);
                 }
             } else {
                 foreach ($clonetransitions as &$tran) {
                     $tran->to = $del->to;
-                    $tran->make_merged();
-                    foreach ($tran->mergedbefore as $before) {
-                        $before->from = $tran->from;
-                        $before->to = $tran->to;
-                    }
-                    foreach ($tran->mergedafter as $after) {
-                        $after->from = $tran->from;
-                        $after->to = $tran->to;
-                    }
+                    $tran->redirect_merged_transitions();
                     $automaton->add_transition($tran);
 
                 }
@@ -768,6 +752,7 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
             $transition->greediness = $realgreediness;        // Set this field for transitions, including original body.
             $newtransition = clone $transition;
             $newtransition->from = $body['end'];
+            $newtransition->redirect_merged_transitions();
             $newtransition->loopsback = true;
             $newtransition->set_transition_type();
             $automaton->add_transition($newtransition);
@@ -795,6 +780,7 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
                 // Add transitions for coming from cycle without intersection with wordbreak
                 $newend = $automaton->add_state();
                 $prev->to = $newend;
+                $prev->redirect_merged_transitions();
                 $automaton->add_transition($prev);
             }
             $body['end'] = $newend;
@@ -828,6 +814,7 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
                     $newtransition->greediness = $realgreediness; // Set this field only for the last repetition.
                     $newtransition->from = $cur['end'];
                     $newtransition->loopsback = true;
+                    $newtransition->redirect_merged_transitions();
                     $automaton->add_transition($newtransition);
                     $newtransition->set_transition_type();
                     if ($transform && $newtransition->is_wordbreak()) {
