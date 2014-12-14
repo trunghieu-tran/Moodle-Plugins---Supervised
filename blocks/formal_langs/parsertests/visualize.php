@@ -165,17 +165,6 @@ div div .source-text {
         });
 
 
-        // sort the tree according to the node names
-        /*
-        function sortTree() {
-            tree.sort(function(a, b) {
-                return b.name.toLowerCase() < a.name.toLowerCase() ? 1 : -1;
-            });
-        }
-        // Sort the tree initially incase the JSON isn't in a sorted order.
-        sortTree();
-        */
-
         // TODO: Pan function, can be better implemented.
 
         function pan(domNode, direction) {
@@ -213,47 +202,6 @@ div div .source-text {
         // define the zoomListener which calls the zoom function on the "zoom" event constrained within the scaleExtents
         var zoomListener = d3.behavior.zoom().scaleExtent([0.1, 3]).on("zoom", zoom);
 
-        function initiateDrag(d, domNode) {
-            draggingNode = d;
-            d3.select(domNode).select('.ghostCircle').attr('pointer-events', 'none');
-            d3.selectAll('.ghostCircle').attr('class', 'ghostCircle show');
-            d3.select(domNode).attr('class', 'node activeDrag');
-
-            svgGroup.selectAll("g.node").sort(function(a, b) { // select the parent and sort the path's
-                if (a.id != draggingNode.id) return 1; // a is not the hovered element, send "a" to the back
-                else return -1; // a is the hovered element, bring "a" to the front
-            });
-            // if nodes has children, remove the links and nodes
-            if (nodes.length > 1) {
-                // remove link paths
-                links = tree.links(nodes);
-                nodePaths = svgGroup.selectAll("path.link")
-                    .data(links, function(d) {
-                        return d.target.id;
-                    }).remove();
-                // remove child nodes
-                nodesExit = svgGroup.selectAll("g.node")
-                    .data(nodes, function(d) {
-                        return d.id;
-                    }).filter(function(d, i) {
-                        if (d.id == draggingNode.id) {
-                            return false;
-                        }
-                        return true;
-                    }).remove();
-            }
-
-            // remove parent link
-            parentLink = tree.links(tree.nodes(draggingNode.parent));
-            svgGroup.selectAll('path.link').filter(function(d, i) {
-                if (d.target.id == draggingNode.id) {
-                    return true;
-                }
-                return false;
-            }).remove();
-
-            dragStarted = null;
-        }
 
         // define the baseSvg, attaching a class for styling and the zoomListener
         var baseSvg = d3.select("#myDiagram").append("svg")
@@ -270,7 +218,7 @@ div div .source-text {
                     return;
                 }
                 dragStarted = true;
-                nodes = tree.nodes(d);
+                //nodes = tree.nodes(d);
                 d3.event.sourceEvent.stopPropagation();
                 // it's important that we suppress the mouseover event on the node being dragged. Otherwise it will absorb the mouseover event and the underlying node will not detect it d3.select(this).attr('pointer-events', 'none');
             })
@@ -280,7 +228,6 @@ div div .source-text {
                 }
                 if (dragStarted) {
                     domNode = this;
-                    initiateDrag(d, domNode);
                 }
 
                 // get coords of mouseEvent relative to svg container to allow for panning
@@ -289,7 +236,6 @@ div div .source-text {
                     panTimer = true;
                     pan(this, 'left');
                 } else if (relCoords[0] > ($('svg').width() - panBoundary)) {
-
                     panTimer = true;
                     pan(this, 'right');
                 } else if (relCoords[1] < panBoundary) {
@@ -305,12 +251,6 @@ div div .source-text {
 
                     }
                 }
-
-                d.x0 += d3.event.dy;
-                d.y0 += d3.event.dx;
-                var node = d3.select(this);
-                node.attr("transform", "translate(" + d.y0 + "," + d.x0 + ")");
-                updateTempConnector();
             }).on("dragend", function(d) {
                 if (d == root) {
                     return;
@@ -334,7 +274,6 @@ div div .source-text {
                     }
                     // Make sure that the node being added to is expanded so user can see added node is correctly moved
                     expand(selectedNode);
-                    sortTree();
                     endDrag();
                 } else {
                     endDrag();
@@ -352,24 +291,6 @@ div div .source-text {
                 update(root);
                 centerNode(draggingNode);
                 draggingNode = null;
-            }
-        }
-
-        // Helper functions for collapsing and expanding nodes.
-
-        function collapse(d) {
-            if (d.children) {
-                d._children = d.children;
-                d._children.forEach(collapse);
-                d.children = null;
-            }
-        }
-
-        function expand(d) {
-            if (d._children) {
-                d.children = d._children;
-                d.children.forEach(expand);
-                d._children = null;
             }
         }
 
@@ -416,35 +337,12 @@ div div .source-text {
             scale = zoomListener.scale();
             x = -source.y0;
             y = -source.x0;
-            x = x * scale + viewerWidth / 2;
-            y = y * scale + viewerHeight / 2;
-            d3.select('g').transition()
-                .duration(duration)
-                .attr("transform", "translate(" + x + "," + y + ")scale(" + scale + ")");
+            x = (x + 10 + root.leftdistance) * scale ;
+            y = y * scale + 10;
+            d3.select('g')
+              .attr("transform", "translate(" + x + "," + y + ")scale(" + scale + ")");
             zoomListener.scale(scale);
             zoomListener.translate([x, y]);
-        }
-
-        // Toggle children function
-
-        function toggleChildren(d) {
-            if (d.children) {
-                d._children = d.children;
-                d.children = null;
-            } else if (d._children) {
-                d.children = d._children;
-                d._children = null;
-            }
-            return d;
-        }
-
-        // Toggle children on click.
-
-        function click(d) {
-            if (d3.event.defaultPrevented) return; // click suppressed
-            d = toggleChildren(d);
-            update(d);
-            centerNode(d);
         }
 
         function update(source) {
@@ -483,10 +381,10 @@ div div .source-text {
                 }
             };
             var computepos = function(node) {
-                var i = 0, totalwidth, totalheight;
+                var i = 0, totalwidth, totalheight, middleindex;
                 node.x = node.depth * 30;
                 node.y = 0;
-                node.width = (node.name.length + 1) * 5;
+                node.width = (node.name.length + 1) * 8;
                 node.height = 30;
                 node.leftdistance = node.width / 2;
                 node.rightdistance = node.width / 2;
@@ -510,29 +408,42 @@ div div .source-text {
                 node.height = totalheight;
                 var ypos = -totalwidth / 2;
                 if (node.children.length % 2 == 0) {
+                    middleindex = parseInt(Math.floor(node.children.length / 2));
+                    ypos = 0;
+                    for(i = middleindex - 1; i>= 0; i--) {
+                        ypos -= node.children[i].rightdistance;
+                        movenode(node.children[i], 0, ypos);
+                        ypos -= node.children[i].leftdistance;
+                    }
                     node.leftdistance = ypos * -1;
-                    for(i = 0; i < node.children.length; i++) {
+                    ypos = 0;
+                    for(i = middleindex; i < node.children.length; i++) {
                         ypos += node.children[i].leftdistance;
                         movenode(node.children[i], 0, ypos);
                         ypos += node.children[i].rightdistance;
                     }
                     node.rightdistance = ypos;
                 } else {
-                   var middleindex =  parseInt(Math.floor(node.children.length / 2));
-                   var pos = node.children[middleindex].leftdistance * - 1;
-                   for(i = middleindex; i >= 0; i--) {
-                      pos -= node.children[i].rightdistance;
-                      movenode(node.children[i], 0, pos);
-                      pos -= node.children[i].leftdistance;
+                   if (node.children.length == 1) {
+                       node.leftdistance = Math.max(node.leftdistance, node.children[0].leftdistance);
+                       node.rightdistance = Math.max(node.rightdistance, node.children[0].rightdistance);
+                   } else {
+                       middleindex =  parseInt(Math.floor(node.children.length / 2));
+                       var pos = node.children[middleindex].leftdistance * - 1;
+                       for(i = middleindex-1; i >= 0; i--) {
+                          pos -= node.children[i].rightdistance;
+                          movenode(node.children[i], 0, pos);
+                          pos -= node.children[i].leftdistance;
+                       }
+                       node.leftdistance = pos * -1;
+                       pos = node.children[middleindex].rightdistance;
+                       for(i = middleindex+1; i < node.children.length; i++) {
+                           pos += node.children[i].leftdistance;
+                           movenode(node.children[i], 0, pos);
+                           pos += node.children[i].rightdistance;
+                       }
+                       node.rightdistance = pos;
                    }
-                   node.leftdistance = pos * -1;
-                   pos = node.children[middleindex].rightdistance;
-                   for(i = middleindex; i < node.children.length; i++) {
-                       pos += node.children[i].leftdistance;
-                       movenode(node.children[i], 0, pos);
-                       pos += node.children[i].rightdistance;
-                   }
-                   node.rightdistance = pos;
                 }
             };
             nodes.forEach(function(d) {
@@ -553,8 +464,7 @@ div div .source-text {
                 .attr("class", "node")
                 .attr("transform", function(d) {
                     return "translate(" + source.y0 + "," + source.x0 + ")";
-                })
-                .on('click', click);
+                });
 
             nodeEnter.append("circle")
                 .attr('class', 'nodeCircle')
@@ -615,20 +525,17 @@ div div .source-text {
                 });
 
             // Transition nodes to their new position.
-            var nodeUpdate = node.transition()
-                .duration(duration)
-                .attr("transform", function(d) {
+
+            var nodeUpdate = node.attr("transform", function(d) {
                     return "translate(" + d.y + "," + d.x + ")";
                 });
 
             // Fade the text in
             nodeUpdate.select("text")
-                .style("fill-opacity", 1);
+                      .style("fill-opacity", 1);
 
             // Transition exiting nodes to the parent's new position.
-            var nodeExit = node.exit().transition()
-                .duration(duration)
-                .attr("transform", function(d) {
+            var nodeExit = node.exit().attr("transform", function(d) {
                     return "translate(" + source.y + "," + source.x + ")";
                 })
                 .remove();
@@ -660,14 +567,10 @@ div div .source-text {
                 });
 
             // Transition links to their new position.
-            link.transition()
-                .duration(duration)
-                .attr("d", diagonal);
+            link.attr("d", diagonal);
 
             // Transition exiting nodes to the parent's new position.
-            link.exit().transition()
-                .duration(duration)
-                .attr("d", function(d) {
+            link.exit().attr("d", function(d) {
                     var o = {
                         x: source.x,
                         y: source.y
