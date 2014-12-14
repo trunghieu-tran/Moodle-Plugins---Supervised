@@ -153,19 +153,32 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
             $length = 0;
 
-            // TODO: ^ \A \z and \Z?
+            // TODO: ^ and \A
 
-            if ($newchr === "\n") {
+            // $ matches before any \n and at the end of the string.
+            // Reset the dollar flag after every \n.
+            if (is_object($newchr) && $newchr->string() === "\n") {
                 $newstate->unset_flag(qtype_preg_fa_exec_state::FLAG_VISITED_DOLLAR);
             }
-            if (is_object($newchr)) {
-                if ($newchr->length() > 0 && ($newstate->is_flag_set(qtype_preg_fa_exec_state::FLAG_VISITED_SLASH_Z_SMALL) ||
-                                              $newstate->is_flag_set(qtype_preg_fa_exec_state::FLAG_VISITED_SLASH_Z_CAPITAL) ||
-                                              $newstate->is_flag_set(qtype_preg_fa_exec_state::FLAG_VISITED_DOLLAR))) {
+
+            if (is_object($newchr) && $newchr->length() > 0) {
+                // \z matches only at the end of the string
+                if ($newstate->is_flag_set(qtype_preg_fa_exec_state::FLAG_VISITED_SLASH_Z_SMALL)) {
                     return null;
                 }
+                // \Z matches at the end of the string or before the very last \n (meaning that \n is the last char)
+                if ($newstate->is_flag_set(qtype_preg_fa_exec_state::FLAG_VISITED_SLASH_Z_CAPITAL) && $newchr->string() !== "\n") {
+                    return null;
+                }
+                if ($newstate->is_flag_set(qtype_preg_fa_exec_state::FLAG_VISITED_DOLLAR)) {
+                    return null;
+                }
+                //var_dump($newstate->is_flag_set(qtype_preg_fa_exec_state::FLAG_VISITED_SLASH_Z_CAPITAL));
                 $newstate->str->concatenate($newchr);
                 $length = $newchr->length();
+                //var_dump($newstate->str->string());
+                //var_dump($newchr->string());
+                //echo "\n";
             }
 
             $this->after_transition_passed($newstate, $tr, $curpos, $length);
