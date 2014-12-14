@@ -92,9 +92,6 @@ class qtype_preg_fa_transition {
     /** Array of qtype_preg_fa_transition objects merged to this transition and matched after it. */
     public $mergedafter;
 
-    /** @var bool - is the transition result of merging? */
-    private $ismerged;
-
     public function __toString() {
         return $this->from . ' -> ' . $this->pregleaf->leaf_tohr() . ' -> ' . $this->to;
     }
@@ -116,7 +113,6 @@ class qtype_preg_fa_transition {
         $this->loopsback = false;
         $this->mergedbefore = array();
         $this->mergedafter = array();
-        $this->ismerged = false;
     }
 
     public function __clone() {
@@ -371,14 +367,6 @@ class qtype_preg_fa_transition {
      */
     public static function min_greediness($g1, $g2) {
         return min($g1, $g2);   // This actually works
-    }
-
-    public function is_merged() {
-        return $this->ismerged;
-    }
-
-    public function make_merged() {
-        $this->ismerged = true;
     }
 
     public function all_open_tags() {
