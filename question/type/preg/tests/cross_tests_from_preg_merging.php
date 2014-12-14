@@ -812,8 +812,8 @@ class qtype_preg_cross_tests_from_preg_merging {
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(2),
-                        'next'=>'b');
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         return array('regex'=>'a\bc',
                      'tests'=>array($test1, $test2),
@@ -906,8 +906,8 @@ class qtype_preg_cross_tests_from_preg_merging {
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(2),
-                        'next'=>'a');
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         return array('regex'=>'\t\Bc',
                      'tests'=>array($test1, $test2),
@@ -928,8 +928,8 @@ class qtype_preg_cross_tests_from_preg_merging {
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(2),
-                        'next'=>'a');
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         return array('regex'=>'c\B\t',
                      'tests'=>array($test1, $test2),
@@ -937,7 +937,7 @@ class qtype_preg_cross_tests_from_preg_merging {
     }
 
     function data_for_test_assertions_wordboundary_10() {
-        $test1 = array( 'str'=>'ab',
+        $test1 = array( 'str'=>'ac',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
@@ -988,8 +988,8 @@ class qtype_preg_cross_tests_from_preg_merging {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>1),
-                        'left'=>array(2),
-                        'next'=>'c');
+                        'left'=>array(3),
+                        'next'=>'a');
 
         return array('regex'=>'cat\B',
                      'tests'=>array($test1, $test2),
@@ -1146,7 +1146,7 @@ class qtype_preg_cross_tests_from_preg_merging {
         $test2 = array( 'str'=>' c',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>1, 1=>1, 2=>1),
+                        'index_first'=>array(0=>1, 1=>0, 2=>1),
                         'length'=>array(0=>1, 1=>0, 2=>1));
 
         $test3 = array( 'str'=>'c',
@@ -1158,7 +1158,7 @@ class qtype_preg_cross_tests_from_preg_merging {
         $test4 = array( 'str'=>'b+',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>1, 1=>1, 2=>1),
+                        'index_first'=>array(0=>1, 1=>0, 2=>1),
                         'length'=>array(0=>1, 1=>0, 2=>1));
 
         $test5 = array( 'str'=>'b ',
@@ -1189,13 +1189,13 @@ class qtype_preg_cross_tests_from_preg_merging {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0, 1=>0, 2=>1),
-                        'length'=>array(0=>1, 1=>1, 2=>1));
+                        'length'=>array(0=>2, 1=>1, 2=>1));
 
         $test10 = array( 'str'=>'a+',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0, 1=>0, 2=>1),
-                        'length'=>array(0=>1, 1=>1, 2=>1));
+                        'length'=>array(0=>2, 1=>1, 2=>1));
 
         return array('regex'=>'([a!?]|)\b([c+]|)',
                      'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6, $test7, $test8, $test9, $test10),
@@ -1472,7 +1472,7 @@ class qtype_preg_cross_tests_from_preg_merging {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0, 1=>1),
-                        'length'=>array(0=>4, 1=>2));
+                        'length'=>array(0=>3, 1=>2));
 
         $test2 = array( 'str'=>'cow',
                         'is_match'=>true,
@@ -1484,7 +1484,7 @@ class qtype_preg_cross_tests_from_preg_merging {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0, 1=>1),
-                        'length'=>array(0=>4, 1=>2));
+                        'length'=>array(0=>3, 1=>2));
 
         $test4 = array( 'str'=>'cat',
                         'is_match'=>true,
@@ -1623,8 +1623,8 @@ class qtype_preg_cross_tests_from_preg_merging {
         $test4 = array( 'str'=>"dbca!cat\tca!",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>9),
-                        'length'=>array(0=>12, 1=>3));
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>12, 1=>8));
 
         return array('regex'=>'d([b\t]ca[t!]\b)+',
                      'tests'=>array($test1, $test2, $test3, $test4),
