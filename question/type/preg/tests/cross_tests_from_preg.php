@@ -702,6 +702,28 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING));
     }
 
+    function data_for_test_assertions_simple_7_1() {
+        $test1 = array('str'=>'ac',
+                       'is_match'=>true,
+                       'full'=>false,
+                       'index_first'=>array(0=>0),
+                       'length'=>array(0=>1),
+                       'ext_index_first'=>array(0=>0),
+                       'ext_length'=>array(0=>2),
+                       'left'=>array(1),
+                       'next'=>'\n');
+
+        $test2 = array('str'=>"a\n",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0),
+                       'length'=>array(0=>2));
+
+        return array('regex'=>'a\Z[c\n]',
+                     'tests'=>array($test1, $test2),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING));
+    }
+
     function data_for_test_assertions_simple_8() {
         $test1 = array('str'=>'abca',
                        'is_match'=>false,
