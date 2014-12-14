@@ -580,9 +580,9 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
             if (!$hasintersect && $charset != null && $charsetuncapturering != null) {
                 $unreachable = new qtype_preg_fa_transition($charset->from, $charset->pregleaf->intersect($charsetuncapturering->pregleaf), $charsetuncapturering->to);
                 $automaton->add_transition($unreachable);
-                foreach ($uncapturing as $tran) {
+                /*foreach ($uncapturing as $tran) {
                     $automaton->remove_transition($tran);
-                }
+                }*/
             }
             return $changed;
         }
@@ -634,11 +634,11 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                 }
             }
             if (!$hasintersect && $charset != null && $charsetuncapturering != null) {
-                $unreachable = new qtype_preg_fa_transition($charset->from, $charset->pregleaf->intersect($charsetuncapturering->pregleaf), $charsetuncapturering->to);
+                $unreachable = new qtype_preg_fa_transition($charsetuncapturering->from, $charset->pregleaf->intersect($charsetuncapturering->pregleaf), $charset->to);
                 $automaton->add_transition($unreachable);
-                foreach ($uncapturing as $tran) {
+                /*foreach ($uncapturing as $tran) {
                     $automaton->remove_transition($tran);
-                }
+                }*/
             }
             return $changed;
         }
