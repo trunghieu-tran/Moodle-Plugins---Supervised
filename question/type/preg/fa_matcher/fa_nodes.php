@@ -536,7 +536,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
         foreach ($outgoing as $tran) {
             //printf($tran->get_label_for_dot($tran->from, $tran->to));
             if (!$tran->consumeschars) {
-                $uncapturing[] = $tran;
+                $uncapturing[] = clone $tran;
                 if ($tran->pregleaf->type == qtype_preg_node::TYPE_LEAF_CHARSET ) {
                     $charsetuncapturering = $tran;
                 }
@@ -595,7 +595,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
         foreach ($incoming as $tran) {
             //printf($tran->get_label_for_dot($tran->from, $tran->to));
             if (!$tran->consumeschars) {
-                $uncapturing[] = $tran;
+                $uncapturing[] = clone $tran;
                 if ($tran->pregleaf->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
                     $charsetuncapturering = $tran;
                 }
