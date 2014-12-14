@@ -118,6 +118,31 @@ class qtype_poasquestion_string extends core_text implements ArrayAccess {
     }
 
     /**
+     *
+     */
+    public function startsWith($needle) {
+        if ($needle == '') {
+            return true;
+        }
+        return strncmp($this->fstring, $needle, strlen($needle)) === 0;
+    }
+
+    /**
+     *
+     */
+    public function endsWith($needle) {
+        if ($needle == '') {
+            return true;
+        }
+        $len = self::strlen($needle);
+        if ($len > $this->flength) {
+            return false;
+        }
+        $substr = self::substr($this->fstring, $this->flength - $len);
+        return $substr === $needle;
+    }
+
+    /**
      * Concatenates a string to this string.
      * @param mixed a string to concatenate (can be either an instance of qtype_poasquestion_string or a simple native string).
      */

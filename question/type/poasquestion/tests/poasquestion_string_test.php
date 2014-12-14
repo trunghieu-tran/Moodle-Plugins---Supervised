@@ -89,4 +89,21 @@ class qtype_poasquestion_string_test extends PHPUnit_Framework_TestCase {
         $result = qtype_poasquestion_string::replace('abcdef', 'abcdef', 'abcdefabcdef');
         $this->assertTrue($result === 'abcdefabcdef');
     }
+
+    public function test_starts_ends() {
+        $str = new qtype_poasquestion_string('');
+        $this->assertTrue($str->startsWith(''));
+        $this->assertTrue($str->endsWith(''));
+        $this->assertFalse($str->startsWith('й'));
+        $this->assertFalse($str->endsWith('й'));
+        $str = new qtype_poasquestion_string('абвй');
+        $this->assertTrue($str->startsWith(''));
+        $this->assertTrue($str->startsWith('а'));
+        $this->assertTrue($str->startsWith('абвй'));
+        $this->assertFalse($str->startsWith('абвйй'));
+        $this->assertTrue($str->endsWith(''));
+        $this->assertTrue($str->endsWith('й'));
+        $this->assertTrue($str->endsWith('абвй'));
+        $this->assertFalse($str->endsWith('абвйй'));
+    }
 }
