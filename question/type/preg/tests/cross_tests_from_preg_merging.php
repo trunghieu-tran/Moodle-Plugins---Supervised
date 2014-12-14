@@ -315,7 +315,7 @@ class qtype_preg_cross_tests_from_preg_merging {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>1),
                         'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
-                        'next'=> 'NEXT_CHAR_CANNOT_GENERATE ');
+                        'next'=> qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         return array('regex'=>'(?D)a$\n',
                      'tests'=>array($test1),
@@ -390,7 +390,7 @@ class qtype_preg_cross_tests_from_preg_merging {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>1),
                         'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
-                        'next'=>' NEXT_CHAR_CANNOT_GENERATE ');
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
         return array('regex'=>'(?m)a$[ab0-9]^b',
                      'tests'=>array($test1),
@@ -1894,10 +1894,10 @@ class qtype_preg_cross_tests_from_preg_merging {
     }
 
     function data_for_test_assertions_wordboundary_50() {
-        $test1 = array( 'str'=>'t',
+        $test1 = array( 'str'=>'kt',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0),
+                        'index_first'=>array(0=>1),
                         'length'=>array(0=>1));
 
         $test2 = array( 'str'=>'aat',
@@ -1906,7 +1906,7 @@ class qtype_preg_cross_tests_from_preg_merging {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3));
 
-        return array('regex'=>'a*\bt',
+        return array('regex'=>'a*\Bt',
                      'tests'=>array($test1, $test2),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
