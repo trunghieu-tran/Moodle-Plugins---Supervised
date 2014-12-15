@@ -46,6 +46,9 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
      */
     private $floatfields = array('hintgradeborder' => array('default' => 0.9, 'advanced' => true, 'min' => 0, 'max' => 1),           // Hint grade border.
                                  'maxmistakepercentage' => array('default' => 0.7, 'advanced' => true, 'min' => 0, 'max' => 1),      // Max mistake percentage.
+                                 'lexicalerrorthreshold' =>  array('default' => 0.33, 'advanced' => true, 'required' => false, 'min' => 0, 'max' => 1), //Lexical error threshold field
+                                 'absentmistakeweight' => array('default' => 0.1, 'advanced' => true, 'min' => 0, 'max' => 1, 'required' => true),  //Absent token mistake weight field
+                                 'addedmistakeweight' => array('default' => 0.1, 'advanced' => true, 'min' => 0, 'max' => 1, 'required' => true),    //Extra token mistake weight field
                                 );
 
     private $hintfloatfields = array('whatishintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2),       // "What is" hint penalty.
