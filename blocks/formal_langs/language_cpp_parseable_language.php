@@ -384,6 +384,8 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
      */
     public function maptable($any) {
         $table = array(
+            'singleline_comment' => array( $any => 'COMMENT' ),
+            'multiline_comment' => array( $any => 'COMMENT' ),            
             'identifier' => array( $any => 'IDENTIFIER' ),
             'typename'   => array( 
 				$any => 'TYPENAME', 
