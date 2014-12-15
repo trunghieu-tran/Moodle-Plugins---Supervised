@@ -14,18 +14,29 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+
+namespace qtype_poasquestion;
+defined('MOODLE_INTERNAL') || die();
+global $CFG;
+require_once($CFG->dirroot . '/question/type/questionbase.php');
 /**
- * Version information for the POAS abstract question type.
+ * Interface for behaviours, supporting specific hints.
  *
- * @package    qtype_poasquestion
  * @copyright  2012 Oleg Sychev, Volgograd State Technical University
+ * @author     Oleg Sychev <oasychev@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+interface behaviour_with_hints {
+    /**
+     * Adjust hintkey, adding current number for sequential multiple instance hints.
+     *
+     * Passed hintkey should ends with # character to be appended with number.
+     */
+    public function adjust_hintkey($hintkey);
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->component = 'qtype_poasquestion';
-$plugin->version = 2014121700;
-$plugin->requires = 2013110500;
-$plugin->release = 'Abstract Poasquestion 2.8';
-$plugin->maturity = MATURITY_STABLE;
+    /**
+     * Adjust hints array, replacing every hintkey that ends with # with a whole 
+     * bunch of hint numbers for hints, that should be shown in this step.
+     */
+    public function adjust_hints($hints);
+}

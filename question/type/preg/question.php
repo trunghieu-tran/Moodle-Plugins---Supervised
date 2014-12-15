@@ -27,7 +27,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/question/type/poasquestion/hints.php');
 require_once($CFG->dirroot . '/question/type/questionbase.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');
 
@@ -38,7 +37,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_preg_question extends question_graded_automatically
-        implements question_automatically_gradable, question_with_qtype_specific_hints {
+        implements question_automatically_gradable, qtype_poasquestion\question_with_hints {
 
     // Fields defining a question.
     /** @var array of question_answer objects. */
