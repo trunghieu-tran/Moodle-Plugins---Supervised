@@ -465,7 +465,7 @@ stmt_or_defined_macro(R) ::= typename(A) formal_args_list(B) function_body(C) . 
 }
 
 /* Destructor, within a class */
-stmt_or_defined_macro(R) ::= BINARYNOT(A) typename(B) formal_args_list(C) function_body(D) . {
+stmt_or_defined_macro(R) ::= binarynot(A) typename(B) formal_args_list(C) function_body(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s", "%ur(именительный)", "%ur(именительный)"));
 	R = $this->create_node('destructor', array(A, B, C, D));
 }
@@ -492,7 +492,7 @@ stmt_or_defined_macro(R) ::=  outer_constructor_name(A)  formal_args_list(B) fun
 	R = $this->create_node('constructor', array(A, B, C));
 }
 
-outer_destructor_name(R) ::= namespace_resolve(A) BINARYNOT(B) OUTER_CONSTRUCTOR_NAME(C) . {
+outer_destructor_name(R) ::= namespace_resolve(A) binarynot(B) OUTER_CONSTRUCTOR_NAME(C) . {
 	$this->mapper->clear_lookup_namespace();
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%s"));
 	R = $this->create_node('outer_destructor_name', array(A, B, C));
@@ -510,12 +510,12 @@ stmt_or_defined_macro(R) ::=  outer_destructor_name(A) formal_args_list(B) funct
 	R = $this->create_node('constructor', array(A, B, C));
 }
 
-function_body(R) ::= LEFTFIGUREBRACKET(A) stmt_list(B) RIGHTFIGUREBRACKET(C) . {
+function_body(R) ::= leftfigurebracket(A) stmt_list(B) rightfigurebracket(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("тело функции", array("левая фигурная скобка", "%ur(именительный)", "правая фигурная скобка"));
 	R = $this->create_node('function_body', array(A, B, C));
 }
 
-function_body(R) ::= LEFTFIGUREBRACKET(A)  RIGHTFIGUREBRACKET(B) . {
+function_body(R) ::= leftfigurebracket(A)  rightfigurebracket(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("тело функции", array("левая фигурная скобка", "правая фигурная скобка"));
 	R = $this->create_node('function_body', array(A, B));
 }
@@ -523,6 +523,11 @@ function_body(R) ::= LEFTFIGUREBRACKET(A)  RIGHTFIGUREBRACKET(B) . {
 function_body(R) ::= SEMICOLON(A) . {
     $this->currentrule = new block_formal_langs_description_rule("тело функции", array("точка с запятой"));
 	R = $this->create_node('function_body', array(A));
+}
+
+function_body(R) ::= SEMICOLON(A) comment_list(B). {
+    $this->currentrule = new block_formal_langs_description_rule("тело функции", array("точка с запятой"));
+	R = $this->create_node('function_body', array(A, B));
 }
 
 
@@ -574,12 +579,12 @@ arg(R) ::= type_or_type_ref_or_with_ptr(A) . {
 
 /* PREPROCESSOR */
 
-stmt_or_defined_macro(R) ::=  preprocessor_cond(A) stmt_list(B) PREPROCESSOR_ENDIF(C).  {
+stmt_or_defined_macro(R) ::=  preprocessor_cond(A) stmt_list(B) preprocessor_endif(C).  {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)", "ключевое слово конца условного блока препроцессора"));
 	R = $this->create_node('stmt_or_defined_macro', array(A, B, C));
 }
 
-stmt_or_defined_macro(R) ::=  preprocessor_cond(A) stmt_list(B) preprocessor_else_clauses(C) PREPROCESSOR_ENDIF(D).  {
+stmt_or_defined_macro(R) ::=  preprocessor_cond(A) stmt_list(B) preprocessor_else_clauses(C) preprocessor_endif(D).  {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)", "%ur(именительный)", "ключевое слово конца условного блока препроцессора"));
 	R = $this->create_node('stmt_or_defined_macro', array(A, B, C, D));
 }
@@ -609,32 +614,32 @@ preprocessor_elif_list(R) ::= preprocessor_elif(A) .  {
 	R = $this->create_node('preprocessor_elif_list', array(A));
 }
  
-preprocessor_elif(R) ::= PREPROCESSOR_ELIF(A) stmt_list(B) . {
+preprocessor_elif(R) ::= preprocessor_elif_terminal(A) stmt_list(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое-слово \"если-то\" препроцессора", "%ur(именительный)"));
 	R = $this->create_node('preprocessor_elif', array(A, B));
 }
 
-preprocessor_else(R) ::= PREPROCESSOR_ELSE(A) stmt_list(B) . {
+preprocessor_else(R) ::= preprocessor_else_terminal(A) stmt_list(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое-слово \"если\" препроцессора", "%ur(именительный)"));
 	R = $this->create_node('preprocessor_else', array(A, B));
 }
 
-preprocessor_cond(R)  ::= PREPROCESSOR_IFDEF(A) IDENTIFIER(B)   . {
+preprocessor_cond(R)  ::= preprocessor_ifdef(A) identifier(B)   . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("условная директива препроцессора с условием что макроопределение определено", "%s"));
 	R = $this->create_node('preprocessor_cond', array(A, B, C));
 }
 
-preprocessor_cond(R)  ::= PREPROCESSOR_IFDEF(A) CUSTOMTYPENAME(B) . {
+preprocessor_cond(R)  ::= preprocessor_ifdef(A) typename(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("условная директива препроцессора с условием что макроопределение определено", "%s"));
 	R = $this->create_node('preprocessor_cond', array(A, B, C));
 }
 
-preprocessor_cond(R) ::= PREPROCESSOR_IF(A) . {
+preprocessor_cond(R) ::= preprocessor_if(A) . {
     $this->currentrule = new block_formal_langs_description_rule("%s", array("условная директива препроцессора вида \"если\""));
 	R = $this->create_node('preprocessor_cond', array(A, B));
 }
 
-stmt_or_defined_macro(R) ::= PREPROCESSOR_DEFINE(A) . {
+stmt_or_defined_macro(R) ::= preprocessor_define(A) . {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%s"));
 	R = $this->create_node('stmt_or_defined_macro', array(A, B));
 }
@@ -644,14 +649,14 @@ stmt_or_defined_macro(R) ::= stmt(A) . {
 	R = $this->create_node('stmt_or_defined_macro', array(A));
 }
 
-stmt(R) ::= PREPROCESSOR_INCLUDE(A) . {
+stmt(R) ::= preprocessor_include(A) . {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%s"));
 	R = $this->create_node('stmt', array(A));
 }
 
 /* LOOPS */
 
-stmt(R) ::= WHILEKWD(A)
+stmt(R) ::= whilekwd(A)
 			leftroundbracket(B)
 			expr_prec_10(C)		
 			rightroundbracket(D)
@@ -661,13 +666,13 @@ stmt(R) ::= WHILEKWD(A)
 	R = $this->create_node('while', array(A, B, C, D, E));
 }
 
-stmt(R) ::= DOKWD(A)
+stmt(R) ::= dokwd(A)
             stmt(B)
-			WHILEKWD(C)
+			whilekwd(C)
 			leftroundbracket(D)
 			expr_prec_11(E)		
 			rightroundbracket(F)
-			SEMICOLON(G)
+			semicolon(G)
 			. {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово  объявления цикла с постусловием", "%ur(именительный)", "ключевое слово начала условия в цикле с постусловием", "левая круглая скобка", "%ur(именительный)", "правая круглая скобка", "точка с запятой"));
 	R = $this->create_node('do_while', array(A, B, C, D, E, F, G));
@@ -676,8 +681,8 @@ stmt(R) ::= DOKWD(A)
 			
 stmt(R) ::= FORKWD(A) 
 			leftroundbracket(B) 
-			expr_prec_11(C) SEMICOLON(D)  
-			expr_prec_11(E) SEMICOLON(F) 
+			expr_prec_11(C) semicolon(D)  
+			expr_prec_11(E) semicolon(F) 
 			expr_prec_11(G)
 			rightroundbracket(H)
 			stmt(I)
@@ -689,37 +694,63 @@ stmt(R) ::= FORKWD(A)
 
 /* RETURN */
 
-stmt(R) ::= RETURNKWD(A) expr_prec_11(B) SEMICOLON(C) . {
+stmt(R) ::= returnkwd(A) expr_prec_11(B) SEMICOLON(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово возврата результата", "%ur(именительный)", "точка с запятой"));
 	R = $this->create_node('stmt', array(A, B, C));
 }
 
-stmt(R) ::= RETURNKWD(A) SEMICOLON(B) . {
+stmt(R) ::= returnkwd(A) expr_prec_11(B) SEMICOLON(C) comment_list(D) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово возврата результата", "%ur(именительный)", "точка с запятой"));
+	R = $this->create_node('stmt', array(A, B, C, D));
+}
+
+
+stmt(R) ::= returnkwd(A) SEMICOLON(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово возврата результата", "точка с запятой"));
 	R = $this->create_node('stmt', array(A, B));
+}
+
+stmt(R) ::= returnkwd(A) SEMICOLON(B) comment_list(C) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово возврата результата", "точка с запятой"));
+	R = $this->create_node('stmt', array(A, B, C));
 }
 
 
 /* CONTINUE */
 
-stmt(R) ::= CONTINUEKWD(A) SEMICOLON(B) . {
+stmt(R) ::= continuekwd(A) SEMICOLON(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово пропуска итерации цикла", "точка с запятой"));
 	R = $this->create_node('continue', array(A, B));
 }
 
+stmt(R) ::= continuekwd(A) SEMICOLON(B) comment_list(C) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово пропуска итерации цикла", "точка с запятой"));
+	R = $this->create_node('continue', array(A, B, C));
+}
+
 /* GOTO-STATEMENTS */
 
-stmt(R) ::= GOTOKWD(A) identifier(B) SEMICOLON(C) . {
+stmt(R) ::= gotokwd(A) identifier(B) SEMICOLON(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово безусловного перехода", "имя метки перехода для  операции %ul(именительный)", "точка с запятой"));
 	R = $this->create_node('goto', array(A, B, C));
 }
 
-stmt(R) ::= GOTOKWD(A) typename(B) SEMICOLON(C) . {
+stmt(R) ::= gotokwd(A) identifier(B) SEMICOLON(C) comment_list(D) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово безусловного перехода", "имя метки перехода для  операции %ul(именительный)", "точка с запятой"));
+	R = $this->create_node('goto', array(A, B, C, D));
+}
+
+stmt(R) ::= gotokwd(A) typename(B) SEMICOLON(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово безусловного перехода", "имя метки перехода для  операции %ul(именительный)", "точка с запятой"));
 	R = $this->create_node('goto', array(A, B, C));
 }
 
-stmt(R) ::= IDENTIFIER(A) COLON(B) . {
+stmt(R) ::= gotokwd(A) typename(B) SEMICOLON(C) comment_list(D) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово безусловного перехода", "имя метки перехода для  операции %ul(именительный)", "точка с запятой"));
+	R = $this->create_node('goto', array(A, B, C, D));
+}
+
+stmt(R) ::= identifier(A) colon(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("имя метки", "двоеточие"));
 	R = $this->create_node('goto_label', array(A, B));
 }
@@ -736,12 +767,12 @@ try_catch(R) ::= try(A) catch_list(B) . {
 	R = $this->create_node('try_catch', array(A, B));
 }
 
-try(R) ::= TRYKWD(A) LEFTFIGUREBRACKET(B) RIGHTFIGUREBRACKET(C) . {
+try(R) ::= trykwd(A) leftfigurebracket(B) rightfigurebracket(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово начала небезопасного блока", "левая фигурная скобка", "правая фигурная скобка"));
 	R = $this->create_node('try', array(A, B, C));
 }
 
-try(R) ::= TRYKWD(A) LEFTFIGUREBRACKET(B) stmt_list(C) RIGHTFIGUREBRACKET(D) . {
+try(R) ::= trykwd(A) leftfigurebracket(B) stmt_list(C) rightfigurebracket(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово начала небезопасного блока", "левая фигурная скобка", "%ur(именительный)", "правая фигурная скобка"));
 	R = $this->create_node('try', array(A, B, C, D));
 }
@@ -756,12 +787,12 @@ catch_list(R) ::= catch(A) . {
 	R = $this->create_node('catch_list', array(A));
 }
 
-catch(R) ::=  CATCHKWD(A) LEFTROUNDBRACKET(B) expr_prec_11_or_ellipsis(C) RIGHTROUNDBRACKET(D) LEFTFIGUREBRACKET(E) RIGHTFIGUREBRACKET(F) . {
+catch(R) ::=  catchkwd(A) leftroundbracket(B) expr_prec_11_or_ellipsis(C) rightroundbracket(D) leftfigurebracket(E) rightfigurebracket(F) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово ветки исключения", "левая круглая скобка", "%ur(именительный)", "правая круглая скобка", "левая фигурная скобка", "правая фигурная скобка"));
 	R = $this->create_node('catch', array(A, B, C, D, E, F));
 }
 
-catch(R) ::=  CATCHKWD(A) LEFTROUNDBRACKET(B) expr_prec_11_or_ellipsis(C) RIGHTROUNDBRACKET(D) LEFTFIGUREBRACKET(E) stmt_list(F) RIGHTFIGUREBRACKET(G) . {
+catch(R) ::=  catchkwd(A) leftroundbracket(B) expr_prec_11_or_ellipsis(C) rightroundbracket(D) leftfigurebracket(E) stmt_list(F) rightfigurebracket(G) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово ветки исключения", "левая круглая скобка", "%ur(именительный)", "правая круглая скобка", "левая фигурная скобка", "%ur(именительный)", "правая фигурная скобка"));
 	R = $this->create_node('catch', array(A, B, C, D, E, F, G));
 }
@@ -771,7 +802,7 @@ expr_prec_11_or_ellipsis(R) ::= expr_prec_11(A) . {
 	R = $this->create_node('expr_prec_11_or_ellipsis', array( A ));
 }
 
-expr_prec_11_or_ellipsis(R) ::= ELLIPSIS(A) . {
+expr_prec_11_or_ellipsis(R) ::= ellipsis(A) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("эллипсис"));
 	R = $this->create_node('expr_prec_11_or_ellipsis', array( A ));
 }
@@ -783,6 +814,11 @@ stmt(R) ::= SEMICOLON(A) .  {
 	R = $this->create_node('stmt', array( A ));
 }
 
+stmt(R) ::= SEMICOLON(A) comment_list(B) .  {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("точка с запятой"));
+	R = $this->create_node('stmt', array( A, B ));
+}
+
 /* SWITCH-CASE-STATEMENTS */
  
 stmt(R) ::= switch_stmt(A) .  {
@@ -790,12 +826,12 @@ stmt(R) ::= switch_stmt(A) .  {
 	R = $this->create_node('stmt', array( A ));
 }
 
-switch_stmt(R) ::= SWITCHKWD(A) LEFTROUNDBRACKET(B) expr_prec_11(C) RIGHTROUNDBRACKET(D) LEFTFIGUREBRACKET(E) RIGHTFIGUREBRACKET(F) . {
+switch_stmt(R) ::= switchkwd(A) leftroundbracket(B) expr_prec_11(C) rightroundbracket(D) leftfigurebracket(E) rightfigurebracket(F) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово ветвления", "левая круглая скобка", "%ur(именительный)", "правая круглая скобка", "левая фигурная скобка", "правая фигурная скобка"));
 	R = $this->create_node('switch_stmt', array(A, B, C, D, E, F));
 }
 
-switch_stmt(R) ::= SWITCHKWD(A) LEFTROUNDBRACKET(B) expr_prec_11(C) RIGHTROUNDBRACKET(D) LEFTFIGUREBRACKET(E) switch_case_list(F) RIGHTFIGUREBRACKET(G) . {
+switch_stmt(R) ::= switchkwd(A) leftroundbracket(B) expr_prec_11(C) rightroundbracket(D) leftfigurebracket(E) switch_case_list(F) rightfigurebracket(G) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово ветвления", "левая круглая скобка", "%ur(именительный)", "правая круглая скобка", "левая фигурная скобка", "%ur(именительный)", "правая фигурная скобка"));
 	R = $this->create_node('switch_stmt', array(A, B, C, D, E, F, G));
 }
@@ -810,12 +846,12 @@ switch_case_list(R) ::= switch_case_list(A) case(B) . {
 	R = $this->create_node('switch_case_list', array(A, B));
 }
 
-case(R) ::= CASEKWD(A) expr_atom(B) COLON(C) stmt_list(D) . {
+case(R) ::= casekwd(A) expr_atom(B) colon(C) stmt_list(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово, обозначающее ветку ветвления", "%ur(именительный)", "двоеточие", "%ur(именительный)"));
 	R = $this->create_node('case', array(A, B, C, D));
 }
 
-case(R) ::= DEFAULTKWD(A) COLON(B) stmt_list(C) . {
+case(R) ::= defaultkwd(A) colon(B) stmt_list(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("ветка по умолчанию", array("ключевое слово, обозначающее ветку ветвления по умолчанию", "двоеточие", "%ur(именительный)"));
 	R = $this->create_node('case', array(A, B, C));
 }
@@ -832,33 +868,44 @@ if_then_else(R) ::=  if_then(A) . [THENKWD] {
 	R = $this->create_node('if_then_else', array(A));
 }
 
-if_then_else(R) ::=  if_then(A) ELSEKWD(B) stmt(C).  {
+if_then_else(R) ::=  if_then(A) elsekwd(B) stmt(C).  {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "ключевое слово \"иначе\"", "%ur(именительный)"));
 	R = $this->create_node('if_then_else', array(A, B, C));
 }
 
-if_then(R) ::= IFKWD(A) LEFTROUNDBRACKET(B) expr_prec_11(C) RIGHTROUNDBRACKET(D) stmt(E) .  {
+if_then(R) ::= ifkwd(A) leftroundbracket(B) expr_prec_11(C) rightroundbracket(D) stmt(E) .  {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("ключевое слово \"если\"", "левая круглая скобка", "%ur(именительный)", "правая круглая скобка", "%ur(именительный)"));
 	R = $this->create_node('if_then', array(A, B, C, D, E));
 }
 
 /* STATEMENTS */
 
-stmt(R) ::= LEFTFIGUREBRACKET(A) stmt_list(B) RIGHTFIGUREBRACKET(C) . {
+stmt(R) ::= leftfigurebracket(A) stmt_list(B) rightfigurebracket(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("левая фигурная скобка", "%s", "правая фигурная скобка"));
 	R = $this->create_node('stmt', array( A, B, C ));
 }
 
-stmt(R) ::=  TYPEDEF(A) type(B) IDENTIFIER(C) SEMICOLON(D) . { 
+stmt(R) ::=  typedef(A) type(B) identifier(C) SEMICOLON(D) . { 
 	$this->currentrule = new block_formal_langs_description_rule("объявление синонима типа", array("ключевое слово объявления синонима типа", "%s", "%s", "точка с запятой"));
 	R = $this->create_node('typedef_declaration', array(A, B, C, D));
 	$this->mapper->introduce_type(C->value());
 }
 
+stmt(R) ::=  typedef(A) type(B) identifier(C) SEMICOLON(D) comment_list(E) . { 
+	$this->currentrule = new block_formal_langs_description_rule("объявление синонима типа", array("ключевое слово объявления синонима типа", "%s", "%s", "точка с запятой"));
+	R = $this->create_node('typedef_declaration', array(A, B, C, D, E));
+	$this->mapper->introduce_type(C->value());
+}
 
-stmt(R) ::= BREAKKWD(A) SEMICOLON(B) . {
+
+stmt(R) ::= breakkwd(A) SEMICOLON(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("прерывание работы", array("ключевое слово прерывания работы", "точка с запятой"));
 	R = $this->create_node('stmt', array(A, B));
+}
+
+stmt(R) ::= breakkwd(A) SEMICOLON(B) comment_list(C) . {
+	$this->currentrule = new block_formal_langs_description_rule("прерывание работы", array("ключевое слово прерывания работы", "точка с запятой"));
+	R = $this->create_node('stmt', array(A, B, C));
 }
 
 stmt(R) ::= expr_prec_11(A) SEMICOLON(B) . {
@@ -866,19 +913,24 @@ stmt(R) ::= expr_prec_11(A) SEMICOLON(B) . {
 	R = $this->create_node('stmt', array(A, B));
 }
 
+stmt(R) ::= expr_prec_11(A) SEMICOLON(B) comment_list(C). {
+	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%ur(именительный)", "точка с запятой"));
+	R = $this->create_node('stmt', array(A, B, C));
+}
+
 /* EXPRESSIONS OF ELEVENTH PRECEDENCE */
 
-expr_prec_11(R) ::= NEWKWD(A) expr_prec_10(B)  . {
+expr_prec_11(R) ::= newkwd(A) expr_prec_10(B)  . {
 	$this->currentrule = new block_formal_langs_description_rule("выделение памяти", array("ключевое слово выделения памяти", "%ur(именительный)"));
 	R = $this->create_node('new_kwd', array( A, B ));
 } 
 
-expr_prec_11(R) ::= DELETE(A) LEFTSQUAREBRACKET(B)  RIGHTSQUAREBRACKET(C)  expr_prec_10(D) . {
+expr_prec_11(R) ::= delete(A) leftsquarebracket(B)  rightsquarebracket(C)  expr_prec_10(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("освобождение памяти", array("ключевое слово освобождения памяти", "левая квадратная скобка", "правая квадратная скобка", "%ur(именительный)"));
 	R = $this->create_node('delete_array', array( A, B, C, D ));
 } 
 
-expr_prec_11(R) ::= DELETE(A) expr_prec_10(B) . {
+expr_prec_11(R) ::= delete(A) expr_prec_10(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("освобождение памяти", array("ключевое слово освобождения памяти", "%ur(именительный)"));
 	R = $this->create_node('delete_pointer', array( A, B ));
 } 
@@ -921,84 +973,84 @@ type_with_qualifier(R) ::= varqualifier(A) type(B) . {
 	R = $result;
 }
 
-varqualifier(R) ::= STATICKWD(A) .  {
+varqualifier(R) ::= statickwd(A) .  {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово для статичности значения"));
 	R = A;
 }
 
-varqualifier(R) ::= EXTERNKWD(A) .  {
+varqualifier(R) ::= externkwd(A) .  {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово импорта из внешней части"));
 	R = A;
 }
 
-varqualifier(R) ::= REGISTERKWD(A) .  {
+varqualifier(R) ::= registerkwd(A) .  {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово, указания, что переменная должна содержаться в регистре процессора"));
 	R = A;
 }
 
-varqualifier(R) ::= VOLATILEKWD(A) .  {
+varqualifier(R) ::= volatilekwd(A) .  {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово изменяемости"));
 	R = A;
 }
 
-varqualifier(R) ::= FRIENDKWD(A) .  {
+varqualifier(R) ::= friendkwd(A) .  {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("ключевое слово дружественности"));
 	R = A;
 }
 
 /* EXPRESSIONS OF TENTH PRECEDENCE */
 
-expr_prec_10(R) ::= expr_prec_9(A) BINARYXOR_ASSIGN(B) expr_prec_10(C) . {
+expr_prec_10(R) ::= expr_prec_9(A) binaryxor_assign(B) expr_prec_10(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание с побитовым исключающим ИЛИ\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция побитового исключающего ИЛИ с присваиванием", "%ur(именительный)"));
 	R = $this->create_node('expr_binaryxor_assign', array( A, B, C ));
 }
 
-expr_prec_10(R) ::= expr_prec_9(A) BINARYOR_ASSIGN(B) expr_prec_10(C) . {
+expr_prec_10(R) ::= expr_prec_9(A) binaryor_assign(B) expr_prec_10(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание с побитовым ИЛИ\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция побитового ИЛИ  с присваиванием", "%ur(именительный)"));
 	R = $this->create_node('expr_binaryor_assign', array( A, B, C ));
 }
 
-expr_prec_10(R) ::= expr_prec_9(A) BINARYAND_ASSIGN(B) expr_prec_10(C) . {
+expr_prec_10(R) ::= expr_prec_9(A) binaryand_assign(B) expr_prec_10(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание с побитовым И\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция побитового И  с присваиванием", "%ur(именительный)"));
 	R = $this->create_node('expr_binaryand_assign', array( A, B, C ));
 }
 
-expr_prec_10(R) ::= expr_prec_9(A) RIGHTSHIFT_ASSIGN(B) expr_prec_10(C) . {
+expr_prec_10(R) ::= expr_prec_9(A) rightshift_assign(B) expr_prec_10(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание со сдвигом вправо\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция присваивания со сдвигом вправо", "%ur(именительный)"));
 	R = $this->create_node('expr_rightshift_assign', array( A, B, C ));
 }
 
-expr_prec_10(R) ::= expr_prec_9(A) LEFTSHIFT_ASSIGN(B) expr_prec_10(C) . {
+expr_prec_10(R) ::= expr_prec_9(A) leftshift_assign(B) expr_prec_10(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание со сдвигом влево\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция присваивания со сдвигом влево", "%ur(именительный)"));
 	R = $this->create_node('expr_leftshift_assign', array( A, B, C ));
 }
 
-expr_prec_10(R) ::= expr_prec_9(A) MODULO_ASSIGN(B) expr_prec_10(C) . {
+expr_prec_10(R) ::= expr_prec_9(A) modulo_assign(B) expr_prec_10(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание с получением остатка от деления\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция присваивания с получением остатка от модуля", "%ur(именительный)"));
 	R = $this->create_node('expr_modulo_assign', array( A, B, C ));
 }
 
-expr_prec_10(R) ::= expr_prec_9(A) DIVISION_ASSIGN(B) expr_prec_10(C) . {
+expr_prec_10(R) ::= expr_prec_9(A) division_assign(B) expr_prec_10(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание с делением\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция присваивания с делением", "%ur(именительный)"));
 	R = $this->create_node('expr_division_assign', array( A, B, C ));
 }
 
-expr_prec_10(R) ::= expr_prec_9(A) MULTIPLY_ASSIGN(B) expr_prec_10(C) . {
+expr_prec_10(R) ::= expr_prec_9(A) multiply_assign(B) expr_prec_10(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание с умножением\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция присваивания с умножением", "%ur(именительный)"));
 	R = $this->create_node('expr_multiply_assign', array( A, B, C ));
 }
 
-expr_prec_10(R) ::= expr_prec_9(A) PLUS_ASSIGN(B) expr_prec_10(C) . {
+expr_prec_10(R) ::= expr_prec_9(A) plus_assign(B) expr_prec_10(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание с суммированием\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция присваивания с суммированием", "%ur(именительный)"));
 	R = $this->create_node('expr_plus_assign', array( A, B, C ));
 }
 
-expr_prec_10(R) ::= expr_prec_9(A) MINUS_ASSIGN(B) expr_prec_10(C) . {
+expr_prec_10(R) ::= expr_prec_9(A) minus_assign(B) expr_prec_10(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание с вычитанием\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция присваивания с вычитанием", "%ur(именительный)"));
 	R = $this->create_node('expr_minus_assign', array( A, B, C ));
 }
 
-expr_prec_10(R) ::= expr_prec_9(A) ASSIGN(B) expr_prec_10(C) . {
+expr_prec_10(R) ::= expr_prec_9(A) assign(B) expr_prec_10(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"присваивание\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция присваивания", "%ur(именительный)"));
 	R = $this->create_node('expr_assign', array( A, B, C ));
 }
@@ -1010,12 +1062,12 @@ expr_prec_10(R) ::= expr_prec_9(A) . {
 
 /* EXPRESSIONS OF NINTH PRECEDENCE */
 
-expr_prec_9(R) ::= expr_prec_9(A) LOGICALAND(B) expr_binary_ops(C) . {
+expr_prec_9(R) ::= expr_prec_9(A) logicaland(B) expr_binary_ops(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"логического И\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция логического И", "%ur(именительный)"));
 	R = $this->create_node('expr_logical_and', array( A, B, C ));
 }
 
-expr_prec_9(R) ::= expr_prec_9(A) LOGICALOR(B) expr_binary_ops(C) . {
+expr_prec_9(R) ::= expr_prec_9(A) logicalor(B) expr_binary_ops(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"логического ИЛИ\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция логического ИЛИ", "%ur(именительный)"));
 	R = $this->create_node('expr_logical_or', array( A, B, C ));
 }
@@ -1024,12 +1076,12 @@ expr_prec_9(R) ::= expr_binary_ops(A) . {
 	R  = A;
 }
 
-expr_binary_ops(R) ::= expr_binary_ops(A) BINARYXOR(B) expr_or_equal(C) . {
+expr_binary_ops(R) ::= expr_binary_ops(A) binaryxor(B) expr_or_equal(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"исключающего ИЛИ\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция исключающего ИЛИ", "%ur(именительный)"));
 	R = $this->create_node('expr_binary_xor', array( A, B, C ));
 }
 
-expr_binary_ops(R) ::= expr_binary_ops(A) BINARYOR(B) expr_or_equal(C) . {
+expr_binary_ops(R) ::= expr_binary_ops(A) binaryor(B) expr_or_equal(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"побитового ИЛИ\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция логического ИЛИ", "%ur(именительный)"));
 	R = $this->create_node('expr_binary_or', array( A, B, C ));
 }
@@ -1044,12 +1096,12 @@ expr_binary_ops(R) ::= expr_or_equal(A) . {
 	R  = A;
 }
 
-expr_or_equal(R) ::= expr_or_equal(A) NOT_EQUAL(B) expr_prec_8(C) . {
+expr_or_equal(R) ::= expr_or_equal(A) not_equal(B) expr_prec_8(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"не равно\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция не равно", "%ur(именительный)"));
 	R = $this->create_node('expr_notequal', array( A, B, C ));
 }
 
-expr_or_equal(R) ::= expr_or_equal(A) EQUAL(B) expr_prec_8(C) . {
+expr_or_equal(R) ::= expr_or_equal(A) equal(B) expr_prec_8(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"равно\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция равно", "%ur(именительный)"));
 	R = $this->create_node('expr_equal', array( A, B, C ));
 }
@@ -1061,12 +1113,12 @@ expr_or_equal(R) ::= expr_prec_8(A) . {
 
 /* EXPRESSIONS OF EIGHTH PRECEDENCE */
 
-expr_prec_8(R) ::= expr_prec_8(A) LESSER_OR_EQUAL(B) expr_prec_7(C) . {
+expr_prec_8(R) ::= expr_prec_8(A) lesser_or_equal(B) expr_prec_7(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"меньше или равно\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция меньше или равно", "%ur(именительный)"));
 	R = $this->create_node('expr_lesser_or_equal', array( A, B, C ));
 }
 
-expr_prec_8(R) ::= expr_prec_8(A) GREATER_OR_EQUAL(B) expr_prec_7(C) . {
+expr_prec_8(R) ::= expr_prec_8(A) greater_or_equal(B) expr_prec_7(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"больше или равно\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция больше или равно", "%ur(именительный)"));
 	R = $this->create_node('expr_greater_or_equal', array( A, B, C ));
 }
@@ -1088,12 +1140,12 @@ expr_prec_8(R) ::= expr_prec_7(A) . {
 
 /* EXPRESSIONS OF SEVENTH PRECEDENCE */
 
-expr_prec_7(R) ::= expr_prec_7(A) LEFTSHIFT(B) expr_prec_6(C) . {
+expr_prec_7(R) ::= expr_prec_7(A) leftshift(B) expr_prec_6(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("сдвиг влево выражения %1(именительный) на число байт, заданное выражением %3(именительный)", array("%ur(именительный)", "операция сдвига влево", "%ur(именительный)"));
 	R = $this->create_node('expr_leftshift', array( A, B, C ));
 }
 
-expr_prec_7(R) ::= expr_prec_7(A) RIGHTSHIFT(B) expr_prec_6(C) . {
+expr_prec_7(R) ::= expr_prec_7(A) rightshift(B) expr_prec_6(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("сдвиг вправо выражения %1(именительный) на число байт, заданное выражением %3(именительный)", array("%ur(именительный)", "операция сдвига вправо", "%ur(именительный)"));
 	R = $this->create_node('expr_rightshift', array( A, B, C ));
 }
@@ -1105,12 +1157,12 @@ expr_prec_7(R) ::= expr_prec_6(A) . {
 
 /* EXPRESSIONS OF SIXTH PRECEDENCE */
 
-expr_prec_6(R) ::= expr_prec_6(A) MINUS(B) expr_prec_5(C) . {
+expr_prec_6(R) ::= expr_prec_6(A) minus(B) expr_prec_5(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("разность выражений \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция вычитания", "%ur(именительный)"));
 	R = $this->create_node('expr_minus', array( A, B, C ));
 }
 
-expr_prec_6(R) ::= expr_prec_6(A) PLUS(B) expr_prec_5(C) . {
+expr_prec_6(R) ::= expr_prec_6(A) plus(B) expr_prec_5(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("сумма %1(именительный) и %3(именительный)", array("%ur(именительный)", "операция суммирования", "%ur(именительный)"));
 	R = $this->create_node('expr_plus', array( A, B, C ));
 }
@@ -1122,12 +1174,12 @@ expr_prec_6(R) ::= expr_prec_5(A) . {
 
 /* EXPRESSIONS OF FIFTH PRECEDENCE */
 
-expr_prec_5(R) ::= expr_prec_5(A)  MODULOSIGN(B) expr_prec_4(C) . {
+expr_prec_5(R) ::= expr_prec_5(A)  modulosign(B) expr_prec_4(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("получение остатка от деления выражений %1(именительный) и %3(именительный)", array("%ur(именительный)", "операция получения остатка от деления", "%ur(именительный)"));
 	R = $this->create_node('expr_modulosign', array( A, B, C ));
 }
 
-expr_prec_5(R) ::= expr_prec_5(A)  DIVISION(B) expr_prec_4(C) . {
+expr_prec_5(R) ::= expr_prec_5(A)  division(B) expr_prec_4(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("деление %1(именительный) и %3(именительный)", array("%ur(именительный)", "операция деления", "%ur(именительный)"));
 	R = $this->create_node('expr_division', array( A, B, C ));
 }
@@ -1176,32 +1228,32 @@ expr_prec_3(R) ::= typecast(A) expr_prec_3(B) . {
 	R = $this->create_node('expr_typecast', array( A, B));
 }
 
-expr_prec_3(R) ::= LOGICALNOT(A) expr_prec_3(B) .  {
+expr_prec_3(R) ::= logicalnot(A) expr_prec_3(B) .  {
 	$this->currentrule = new block_formal_langs_description_rule("логическое отрицание на выражении %2(именительный)", array("операция логического отрицания", "%ur(именительный)"));
 	R = $this->create_node('expr_logical_not', array( A, B));
 }
 
-expr_prec_3(R) ::= BINARYNOT(A) expr_prec_3(B) . {
+expr_prec_3(R) ::= binarynot(A) expr_prec_3(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("побитовое отрицание на выражении %2(именительный)", array("операция побитового отрицания", "%ur(именительный)"));
 	R = $this->create_node('expr_binary_not', array( A, B));
 }
 
-expr_prec_3(R) ::= MINUS(A) expr_prec_2(B)   . [UMINUS] {
+expr_prec_3(R) ::= minus(A) expr_prec_2(B)   . [UMINUS] {
 	$this->currentrule = new block_formal_langs_description_rule("операция унарного минуса на выражении %2(именительный)", array("операция унарного минуса", "%ur(именительный)"));
 	R = $this->create_node('expr_unary_minus', array( A, B));
 }
 
-expr_prec_3(R) ::= PLUS(A) expr_prec_2(B)   . [UPLUS] {
+expr_prec_3(R) ::= plus(A) expr_prec_2(B)   . [UPLUS] {
 	$this->currentrule = new block_formal_langs_description_rule("операция унарного плюса на выражении %2(именительный)", array("операция унарного плюса", "%ur(именительный)"));
 	R = $this->create_node('expr_unary_plus', array( A, B));
 }
 
-expr_prec_3(R) ::= DECREMENT(A) expr_prec_3(B)   . {
+expr_prec_3(R) ::= decrement(A) expr_prec_3(B)   . {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("операция декремента", "%ur(именительный)"));
 	R = $this->create_node('expr_prefix_decrement', array( A, B));
 }
 
-expr_prec_3(R) ::= INCREMENT(A) expr_prec_3(B)   . {
+expr_prec_3(R) ::= increment(A) expr_prec_3(B)   . {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("операция инкремента", "%ur(именительный)"));
 	R = $this->create_node('expr_prefix_decrement', array( A, B));
 }
@@ -1228,7 +1280,7 @@ expr_prec_2(R) ::= cpp_style_cast(A)  leftroundbracket(B) expr_prec_11(C)  right
 	R = $this->create_node('expr_array_access', array( A, B, C, D));
 }
 
-expr_prec_2(R) ::= expr_prec_2(A)  LEFTSQUAREBRACKET(B) expr_prec_10(C)  RIGHTSQUAREBRACKET(D) . {
+expr_prec_2(R) ::= expr_prec_2(A)  leftsquarebracket(B) expr_prec_10(C)  rightsquarebracket(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "левая квадратная скобка", "%ur(именительный)", "правая квадратная скобка"));
 	R = $this->create_node('expr_array_access', array( A, B, C, D));
 }
@@ -1243,12 +1295,12 @@ expr_prec_2(R) ::= expr_prec_2(A)  leftroundbracket(B) rightroundbracket(D) . [U
 	R = $this->create_node('expr_function_call', array( A, B, D));
 }
 
-expr_prec_2(R) ::= expr_prec_2(A)  INCREMENT(B) . {
+expr_prec_2(R) ::= expr_prec_2(A)  increment(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "операция инкремента"));
 	R = $this->create_node('expr_postfix_increment', array( A, B));
 }
 
-expr_prec_2(R) ::= expr_prec_2(A)  DECREMENT(B) . {
+expr_prec_2(R) ::= expr_prec_2(A)  decrement(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "операция декремента"));
 	R = $this->create_node('expr_postfix_decrement', array( A, B));
 }
@@ -1260,34 +1312,34 @@ expr_prec_2(R) ::= expr_atom(A) . {
 
 /* SPECIAL PRODUCTIONS, NEEDED TO SUPPORT ACCESS BY POINTERS TO MEMBERS */
 
-try_value_access(R) ::= expr_prec_2(A) DOT(B) . {
+try_value_access(R) ::= expr_prec_2(A) dot(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция разыменования указателя на метод или переменной", array("%ur (именительный)", "операция взятия указателя на метод или поля переменной"));
 	R = $this->create_node('try_value_access', array( A , B) );
 }
 
-try_pointer_access(R) ::= expr_prec_2(A) RIGHTARROW(B) . {
+try_pointer_access(R) ::= expr_prec_2(A) rightarrow(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция разыменования указателя на метод или переменной", array("%ur (именительный)", "операция взятия указателя на метод или переменной"));
 	R = $this->create_node('try_pointer_access', array( A , B) );
 }
 
 /* C++ STYLE CASTS */
 
-cpp_style_cast(R) ::= CONST_CAST(A)  lesser(B) type_or_type_ref_or_with_ptr(C) greater(D) . {
+cpp_style_cast(R) ::= const_cast(A)  lesser(B) type_or_type_ref_or_with_ptr(C) greater(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("приведение со снятием константности к %3(родительный) типу ", array("ключевое слово приведения типа", "знак \"меньше\"", "%ur(именительный)", "знак \"больше\""));
 	R = $this->create_node('expr_const_cast', array(A, B, C, D));
 }
 
-cpp_style_cast(R) ::= STATIC_CAST(A)  lesser(B) type_or_type_ref_or_with_ptr(C) greater(D) . {
+cpp_style_cast(R) ::= static_cast(A)  lesser(B) type_or_type_ref_or_with_ptr(C) greater(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("статическое приведение к %3(родительный) типу ", array("ключевое слово приведения типа", "знак \"меньше\"", "%ur(именительный)", "знак \"больше\""));
 	R = $this->create_node('expr_static_cast', array(A, B, C, D));
 }
 
-cpp_style_cast(R) ::= DYNAMIC_CAST(A)  lesser(B) type_or_type_ref_or_with_ptr(C) greater(D) . {
+cpp_style_cast(R) ::= dynamic_cast(A)  lesser(B) type_or_type_ref_or_with_ptr(C) greater(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("динамическое приведение к %3(родительный) типу ", array("ключевое слово приведения типа", "знак \"меньше\"", "%ur(именительный)", "знак \"больше\""));
 	R = $this->create_node('expr_dynamic_cast', array(A, B, C, D));
 }
 
-cpp_style_cast(R) ::= REINTERPRET_CAST(A)  lesser(B) type_or_type_ref_or_with_ptr(C) greater(D) . {
+cpp_style_cast(R) ::= reinterpret_cast(A)  lesser(B) type_or_type_ref_or_with_ptr(C) greater(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("побайтовое приведение к %3(родительный) типу ", array("ключевое слово приведения типа", "знак \"меньше\"", "%ur(именительный)", "знак \"больше\""));
 	R = $this->create_node('expr_reinterpret_cast', array(A, B, C, D));
 }
@@ -1298,7 +1350,7 @@ lvalue_or_assignment_list(R) ::= lvalue_or_assignment(A) . {
 	R = A;
 }
 
-lvalue_or_assignment_list(R) ::= lvalue_or_assignment_list(A) COMMA(B) lvalue_or_assignment(C). {
+lvalue_or_assignment_list(R) ::= lvalue_or_assignment_list(A) comma(B) lvalue_or_assignment(C). {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%ur(именительный)"));
 	R =  $this->create_node('lvalue_or_assignment_list', array( A, B, C));
 }
@@ -1307,22 +1359,22 @@ lvalue_or_assignment(R) ::= lvalue(A) . {
 	R = A;
 }
 
-lvalue_or_assignment(R) ::= lvalue(A) ASSIGN(B) expr_prec_10(C). {
+lvalue_or_assignment(R) ::= lvalue(A) assign(B) expr_prec_10(C). {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%ur(именительный)"));
 	R =  $this->create_node('assign', array( A, B, C));
 }
 
-lvalue_or_assignment(R) ::= lvalue(A) ASSIGN(B) initialization_list(C). {
+lvalue_or_assignment(R) ::= lvalue(A) assign(B) initialization_list(C). {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%ur(именительный)"));
 	R =  $this->create_node('assign', array( A, B, C));
 }
 
-initialization_list(R) ::= LEFTFIGUREBRACKET(A) RIGHTFIGUREBRACKET(B) . {
+initialization_list(R) ::= leftfigurebracket(A) rightfigurebracket(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
 	R =  $this->create_node('initialization_list', array( A, B));
 }
 
-initialization_list(R) ::= LEFTFIGUREBRACKET(A) initialization_list_argument_list(B) RIGHTFIGUREBRACKET(C) . {
+initialization_list(R) ::= leftfigurebracket(A) initialization_list_argument_list(B) rightfigurebracket(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%ur(именительный)", "%s"));
 	R =  $this->create_node('initialization_list', array( A, B, C));
 }
@@ -1350,7 +1402,7 @@ lvalue(R) ::= possibly_identifier_preceded_ref(A) . {
 	R = A;
 }
 
-lvalue(R) ::= lvalue(A) LEFTSQUAREBRACKET(B) expr_prec_9(C) RIGHTSQUAREBRACKET(D) . {
+lvalue(R) ::= lvalue(A) leftsquarebracket(B) expr_prec_9(C) rightsquarebracket(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%ur(именительный)", "%s"));
 	R =  $this->create_node('lvalue', array( A, B, C, D));
 }
@@ -1381,7 +1433,7 @@ possibly_idenitifer_preceded_ptrs(R) ::= constkwd(A) multiply(B) possibly_idenit
 
 /* EXPRESSIONS OF FIRST PRECEDENCE */
 
-expr_atom(R) ::= NUMERIC(A) . {
+expr_atom(R) ::= numeric(A) . {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%s"));
 	R =  A;
 }
@@ -1390,12 +1442,12 @@ expr_atom(R) ::= assignable(A) . {
 	R =  A;
 }
 
-expr_atom(R) ::= CHARACTER(A) . {
+expr_atom(R) ::= character(A) . {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%s"));
 	R =  A;
 }
 
-expr_atom(R) ::= STRING(A) . {
+expr_atom(R) ::= string(A) . {
 	$this->currentrule = new block_formal_langs_description_rule("%1(именительный)", array("%s"));
 	R =  A;
 }
@@ -2020,6 +2072,672 @@ preprocessor_stringify(R) ::= PREPROCESSOR_STRINGIFY(A) comment_list(B) . {
 }
 
 
+string(R) ::= STRING(A) . {
+	R = A;
+}
+
+string(R) ::= STRING(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('string', array( A, B));
+}
+
+string(R) ::= string(A) STRING(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('string', array( A, B));
+}
+
+string(R) ::= string(A) STRING(B) comment_list(C) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s", "%s"));
+	R = $this->create_node('string', array( A, B, C));
+}
+
+character(R) ::= CHARACTER(A) . {
+	R = A;
+}
+
+character(R) ::= CHARACTER(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('character', array( A, B));
+}
+
+numeric(R) ::= NUMERIC(A) . {
+	R = A;
+}
+
+numeric(R) ::= NUMERIC(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('numeric', array( A, B));
+}
+
+leftsquarebracket(R) ::= LEFTSQUAREBRACKET(A) . {
+	R = A;
+}
+
+leftsquarebracket(R) ::= LEFTSQUAREBRACKET(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('leftsquarebracket', array( A, B));
+}
+
+rightsquarebracket(R) ::= RIGHTSQUAREBRACKET(A) . {
+	R = A;
+}
+
+rightsquarebracket(R) ::= RIGHTSQUAREBRACKET(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('rightsquarebracket', array( A, B));
+}
+
+leftfigurebracket(R) ::= LEFTFIGUREBRACKET(A) . {
+	R = A;
+}
+
+leftfigurebracket(R) ::= LEFTFIGUREBRACKET(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('leftfigurebracket', array( A, B));
+}
+
+rightfigurebracket(R) ::= RIGHTFIGUREBRACKET(A) . {
+	R = A;
+}
+
+rightfigurebracket(R) ::= RIGHTFIGUREBRACKET(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('rightfigurebracket', array( A, B));
+}
+
+assign(R) ::= ASSIGN(A) . {
+	R = A;
+}
+
+assign(R) ::= ASSIGN(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('assign', array( A, B));
+}
+
+reinterpret_cast(R) ::= REINTERPRET_CAST(A) . {
+	R = A;
+}
+
+reinterpret_cast(R) ::= REINTERPRET_CAST(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('reinterpret_cast', array( A, B));
+}
+
+dynamic_cast(R) ::= DYNAMIC_CAST(A) . {
+	R = A;
+}
+
+dynamic_cast(R) ::= DYNAMIC_CAST(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('dynamic_cast', array( A, B));
+}
+
+static_cast(R) ::= STATIC_CAST(A) . {
+	R = A;
+}
+
+static_cast(R) ::= STATIC_CAST(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('static_cast', array( A, B));
+}
+
+const_cast(R) ::= CONST_CAST(A) . {
+	R = A;
+}
+
+const_cast(R) ::= CONST_CAST(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('const_cast', array( A, B));
+}
+
+rightarrow(R) ::= RIGHTARROW(A) . {
+	R = A;
+}
+
+rightarrow(R) ::= RIGHTARROW(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('rightarrow', array( A, B));
+}
+
+dot(R) ::= DOT(A) . {
+	R = A;
+}
+
+dot(R) ::= DOT(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('dot', array( A, B));
+}
+
+decrement(R) ::= DECREMENT(A) . {
+	R = A;
+}
+
+decrement(R) ::= DECREMENT(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('decrement', array( A, B));
+}
+
+increment(R) ::= INCREMENT(A) . {
+	R = A;
+}
+
+increment(R) ::= INCREMENT(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('decrement', array( A, B));
+}
+
+plus(R) ::= PLUS(A) . {
+	R = A;
+}
+
+plus(R) ::= PLUS(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('plus', array( A, B));
+}
+
+minus(R) ::= MINUS(A) . {
+	R = A;
+}
+
+minus(R) ::= MINUS(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('minus', array( A, B));
+}
+
+binarynot(R) ::= BINARYNOT(A) . {
+	R = A;
+}
+
+binarynot(R) ::= BINARYNOT(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('binarynot', array( A, B));
+}
+
+logicalnot(R) ::= LOGICALNOT(A) . {
+	R = A;
+}
+
+logicalnot(R) ::= LOGICALNOT(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('logicalnot', array( A, B));
+}
+
+division(R) ::= DIVISION(A) . {
+	R = A;
+}
+
+division(R) ::= DIVISION(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('division', array( A, B));
+}
+
+modulosign(R) ::= MODULOSIGN(A) . {
+	R = A;
+}
+
+modulosign(R) ::= MODULOSIGN(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('modulosign', array( A, B));
+}
+
+rightshift(R) ::= RIGHTSHIFT(A) . {
+	R = A;
+}
+
+rightshift(R) ::= RIGHTSHIFT(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('rightshift', array( A, B));
+}
+
+leftshift(R) ::= LEFTSHIFT(A) . {
+	R = A;
+}
+
+leftshift(R) ::= LEFTSHIFT(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('leftshift', array( A, B));
+}
+
+greater_or_equal(R) ::= GREATER_OR_EQUAL(A) . {
+	R = A;
+}
+
+greater_or_equal(R) ::= GREATER_OR_EQUAL(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('greater_or_equal', array( A, B));
+}
+
+lesser_or_equal(R) ::= LESSER_OR_EQUAL(A) . {
+	R = A;
+}
+
+lesser_or_equal(R) ::= LESSER_OR_EQUAL(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('lesser_or_equal', array( A, B));
+}
+
+equal(R) ::= EQUAL(A) . {
+	R = A;
+}
+
+equal(R) ::= EQUAL(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('equal', array( A, B));
+}
+
+not_equal(R) ::= NOT_EQUAL(A) . {
+	R = A;
+}
+
+not_equal(R) ::= NOT_EQUAL(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('not_equal', array( A, B));
+}
+
+binaryor(R) ::= BINARYOR(A) . {
+	R = A;
+}
+
+binaryor(R) ::= BINARYOR(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('binaryor', array( A, B));
+}
+
+binaryxor(R) ::= BINARYXOR(A) . {
+	R = A;
+}
+
+binaryxor(R) ::= BINARYXOR(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('binaryor', array( A, B));
+}
+
+logicalor(R) ::= LOGICALOR(A) . {
+	R  = A;
+}
+
+logicalor(R) ::= LOGICALOR(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('logicalor', array( A, B));
+}
+
+logicaland(R) ::= LOGICALAND(A) . {
+	R  = A;
+}
+
+logicaland(R) ::= LOGICALAND(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('logicaland', array( A, B));
+}
+
+minus_assign(R) ::= MINUS_ASSIGN(A) . {
+	R  = A;
+}
+
+minus_assign(R) ::= MINUS_ASSIGN(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('minus_assign', array( A, B));
+}
+
+plus_assign(R) ::= PLUS_ASSIGN(A) . {
+	R  = A;
+}
+
+plus_assign(R) ::= PLUS_ASSIGN(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('plus_assign', array( A, B));
+}
+
+multiply_assign(R) ::= MULTIPLY_ASSIGN(A) . {
+	R  = A;
+}
+
+multiply_assign(R) ::= MULTIPLY_ASSIGN(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('multiply_assign', array( A, B));
+}
+
+division_assign(R) ::= DIVISION_ASSIGN(A) . {
+	R  = A;
+}
+
+division_assign(R) ::= DIVISION_ASSIGN(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('division_assign', array( A, B));
+}
+
+modulo_assign(R) ::= MODULO_ASSIGN(A) . {
+	R  = A;
+}
+
+modulo_assign(R) ::= MODULO_ASSIGN(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('modulo_assign', array( A, B));
+}
+
+leftshift_assign(R) ::= LEFTSHIFT_ASSIGN(A) . {
+	R  = A;
+}
+
+leftshift_assign(R) ::= LEFTSHIFT_ASSIGN(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('leftshift_assign', array( A, B));
+}
+
+rightshift_assign(R) ::= RIGHTSHIFT_ASSIGN(A) . {
+	R  = A;
+}
+
+rightshift_assign(R) ::= RIGHTSHIFT_ASSIGN(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('rightshift_assign', array( A, B));
+}
+
+binaryand_assign(R) ::= BINARYAND_ASSIGN(A) . {
+	R  = A;
+}
+
+binaryand_assign(R) ::= BINARYAND_ASSIGN(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('binaryand_assign', array( A, B));
+}
+
+binaryor_assign(R) ::= BINARYOR_ASSIGN(A) . {
+	R  = A;
+}
+
+binaryor_assign(R) ::= BINARYOR_ASSIGN(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('binaryor_assign', array( A, B));
+}
+
+binaryxor_assign(R) ::= BINARYXOR_ASSIGN(A) . {
+	R  = A;
+}
+
+binaryxor_assign(R) ::= BINARYXOR_ASSIGN(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('binaryxor_assign', array( A, B));
+}
+
+friendkwd(R) ::= FRIENDKWD(A) . {
+	R  = A;
+}
+
+friendkwd(R) ::= FRIENDKWD(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('friendkwd', array( A, B));
+}
+
+volatilekwd(R) ::= VOLATILEKWD(A) . {
+	R  = A;
+}
+
+volatilekwd(R) ::= VOLATILEKWD(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('volatilekwd', array( A, B));
+}
+
+registerkwd(R) ::= REGISTERKWD(A) . {
+	R  = A;
+}
+
+registerkwd(R) ::= REGISTERKWD(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('volatilekwd', array( A, B));
+}
+
+externkwd(R) ::= EXTERNKWD(A) . {
+	R  = A;
+}
+
+externkwd(R) ::= EXTERNKWD(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('volatilekwd', array( A, B));
+}
+
+statickwd(R) ::= STATICKWD(A) . {
+	R  = A;
+}
+
+statickwd(R) ::= STATICKWD(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('statickwd', array( A, B));
+}
+
+delete(R) ::= DELETE(A) . {
+	R  = A;
+}
+
+delete(R) ::= DELETE(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('delete', array( A, B));
+}
+
+newkwd(R) ::= NEWKWD(A) . {
+	R  = A;
+}
+
+newkwd(R) ::= NEWKWD(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('delete', array( A, B));
+}
+
+breakkwd(R) ::= BREAKKWD(A) . {
+	R = A;
+} 
+
+breakkwd(R) ::= BREAKKWD(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('breakkwd', array( A, B));
+}
+
+typedef(R) ::= TYPEDEF(A) . {
+	R = A;
+} 
+
+typedef(R) ::= TYPEDEF(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('typedef', array( A, B));
+}
+
+ifkwd(R) ::= IFKWD(A) . {
+	R = A;
+} 
+
+ifkwd(R) ::= IFKWD(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('ifkwd', array( A, B));
+}
+
+elsekwd(R) ::= ELSEKWD(A) . {
+	R = A;
+} 
+
+elsekwd(R) ::= ELSEKWD(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('elsekwd', array( A, B));
+}
+
+defaultkwd(R) ::= DEFAULTKWD(A) . {
+	R = A;
+} 
+
+defaultkwd(R) ::= DEFAULTKWD(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('defaultkwd', array( A, B));
+}
+
+casekwd(R) ::= CASEKWD(A) . {
+	R = A;
+} 
+
+casekwd(R) ::= CASEKWD(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('casekwd', array( A, B));
+}
+
+colon(R) ::= COLON(A) . {
+	R = A;
+} 
+
+colon(R) ::= COLON(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('colon', array( A, B));
+}
+
+switchkwd(R) ::= SWITCHKWD(A) . {
+	R = A;
+} 
+
+switchkwd(R) ::= SWITCHKWD(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('switchkwd', array( A, B));
+}
+
+ellipsis(R) ::= ELLIPSIS(A) . {
+	R = A;
+}
+
+ellipsis(R) ::= ELLIPSIS(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('ellipsis', array( A, B));
+}
+
+catchkwd(R) ::= CATCHKWD(A) . {
+	R = A;
+}
+
+catchkwd(R) ::= CATCHKWD(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('catchkwd', array( A, B));
+}
+
+trykwd(R) ::= TRYKWD(A) . {
+	R = A;
+}
+
+trykwd(R) ::= TRYKWD(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('trykwd', array( A, B));
+}
+
+gotokwd(R) ::= GOTOKWD(A) . {
+	R = A;
+}
+
+gotokwd(R) ::= GOTOKWD(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('gotokwd', array( A, B));
+}
+
+continuekwd(R) ::= CONTINUEKWD(A) . {
+	R = A;
+}
+
+continuekwd(R) ::= CONTINUEKWD(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('continuekwd', array( A, B));
+}
+
+returnkwd(R) ::= RETURNKWD(A) . {
+	R = A;
+}
+
+returnkwd(R) ::= RETURNKWD(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('returnkwd', array( A, B));
+}
+
+semicolon(R) ::= SEMICOLON(A) . {
+	R = A;
+}
+
+semicolon(R) ::= SEMICOLON(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('semicolon', array( A, B));
+}
+
+dokwd(R) ::= DOKWD(A) . {
+	R = A;
+}
+
+dokwd(R) ::= DOKWD(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('dokwd', array( A, B));
+}
+
+whilekwd(R) ::= WHILEKWD(A) . {
+	R = A;
+}
+
+whilekwd(R) ::= WHILEKWD(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('whilekwd', array( A, B));
+}
+
+preprocessor_include(R) ::= PREPROCESSOR_INCLUDE(A) . {
+	R = A;
+}
+
+preprocessor_include(R) ::= PREPROCESSOR_INCLUDE(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('preprocessor_include', array( A, B));
+}
+
+preprocessor_define(R) ::= PREPROCESSOR_DEFINE(A) . {
+	R = A;
+}
+
+preprocessor_define(R) ::= PREPROCESSOR_DEFINE(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('preprocessor_define', array( A, B));
+}
+
+preprocessor_if(R) ::= PREPROCESSOR_IF(A) . {
+	R = A;
+}
+
+preprocessor_if(R) ::= PREPROCESSOR_IF(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('preprocessor_if', array( A, B));
+}
+
+preprocessor_ifdef(R) ::= PREPROCESSOR_IFDEF(A) . {
+	R = A;
+}
+
+preprocessor_ifdef(R) ::= PREPROCESSOR_IFDEF(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('preprocessor_ifdef', array( A, B));
+}
+
+preprocessor_else_terminal(R) ::= PREPROCESSOR_ELSE(A) . {
+	R = A;
+}
+
+preprocessor_else_terminal(R) ::= PREPROCESSOR_ELSE(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('preprocessor_else_terminal', array( A, B));
+}
+
+preprocessor_elif_terminal(R) ::= PREPROCESSOR_ELIF(A) . {
+	R = A;
+}
+
+preprocessor_elif_terminal(R) ::= PREPROCESSOR_ELIF(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('preprocessor_elif_terminal', array( A, B));
+}
+
+preprocessor_endif(R) ::= PREPROCESSOR_ENDIF(A) . {
+	R = A;
+}
+
+preprocessor_endif(R) ::= PREPROCESSOR_ENDIF(A) comment_list(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
+	R = $this->create_node('preprocessor_endif', array( A, B));
+}
 
 /* COMMENTS */
 
