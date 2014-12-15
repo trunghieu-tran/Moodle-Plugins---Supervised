@@ -113,7 +113,7 @@ class qtype_preg extends qtype_shortanswer {
 
     /** Overload hints functions to be able to work with interactivehints*/
     protected function make_hint($hint) {
-        return qtype_poasquestion_moodlehint_adapter::load_from_record($hint);
+        return qtype_poasquestion\moodle_hint_adapter::load_from_record($hint);
     }
 
     protected function save_hint_options($formdata, $number, $withparts) {
