@@ -27,7 +27,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
-require_once($CFG->dirroot . '/question/type/poasquestion/hints.php');
 require_once($CFG->dirroot . '/question/type/correctwriting/question.php');
 require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 
@@ -38,7 +37,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
  * @copyright  2013 Sychev Oleg
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_correctwriting_hintwhatis extends qtype_specific_hint {
+class qtype_correctwriting_hintwhatis extends qtype_poasquestion\hint {
 
     /** @var mistake, with which this hint is associated. */
     protected $mistake;
@@ -108,7 +107,7 @@ class qtype_correctwriting_hintwhatis extends qtype_specific_hint {
  * @copyright  2013 Sychev Oleg
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_correctwriting_hintwheretxt extends qtype_specific_hint {
+class qtype_correctwriting_hintwheretxt extends qtype_poasquestion\hint {
 
     /**
      * @var qtype_correctwriting_response_mistake, with which this hint is associated.
@@ -192,7 +191,7 @@ class qtype_correctwriting_hintwheretxt extends qtype_specific_hint {
  * @copyright  2013 Sychev Oleg
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qtype_correctwriting_hintwherepic extends qtype_specific_hint {
+class qtype_correctwriting_hintwherepic extends qtype_poasquestion\hint {
 
     /**
      * @var qtype_correctwriting_sequence_mistake
