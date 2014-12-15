@@ -43,13 +43,12 @@ defined('MOODLE_INTERNAL') || die();
  */
 
 require_once($CFG->dirroot . '/question/behaviour/interactive/behaviour.php');
-require_once($CFG->dirroot . '/question/type/poasquestion/hints.php');//Contains question_with_specific_hints and behaviour_with_hints interfaces for now
 
-class qbehaviour_interactivehints extends qbehaviour_interactive implements behaviour_with_hints {
+class qbehaviour_interactivehints extends qbehaviour_interactive implements qtype_poasquestion\behaviour_with_hints {
     const IS_ARCHETYPAL = false;
 
     public function is_compatible_question(question_definition $question) {
-        return (parent::is_compatible_question($question)) && ($question instanceof question_with_qtype_specific_hints);
+        return (parent::is_compatible_question($question)) && ($question instanceof qtype_poasquestion\question_with_hints);
     }
 
     public function process_submit(question_attempt_pending_step $pendingstep) {

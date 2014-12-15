@@ -37,14 +37,13 @@ defined('MOODLE_INTERNAL') || die();
  */
 
 require_once($CFG->dirroot . '/question/behaviour/adaptive/behaviour.php');
-require_once($CFG->dirroot . '/question/type/poasquestion/hints.php');// Contains question_with_specific_hints and behaviour_with_hints interfaces for now.
 
-class qbehaviour_adaptivehints extends qbehaviour_adaptive implements behaviour_with_hints {
+class qbehaviour_adaptivehints extends qbehaviour_adaptive implements qtype_poasquestion\behaviour_with_hints {
     const IS_ARCHETYPAL = false;
 
 
     public function is_compatible_question(question_definition $question) {
-        return ($question instanceof question_automatically_gradable) && ($question instanceof question_with_qtype_specific_hints);
+        return ($question instanceof question_automatically_gradable) && ($question instanceof qtype_poasquestion\question_with_hints);
     }
 
     public function get_expected_data() {
