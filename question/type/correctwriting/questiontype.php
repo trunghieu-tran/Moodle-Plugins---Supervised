@@ -285,7 +285,7 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
 
     /** Overload hints functions to be able to work with interactivehints*/
     protected function make_hint($hint) {
-        return qtype_poasquestion_moodlehint_adapter::load_from_record($hint);
+        return qtype_poasquestion\moodle_hint_adapter::load_from_record($hint);
     }
 
     /** Removes a symbols from tables and everything about question.

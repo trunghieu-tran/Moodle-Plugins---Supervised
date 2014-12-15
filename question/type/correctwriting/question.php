@@ -657,7 +657,7 @@ class qtype_correctwriting_question extends question_graded_automatically
     public function hint_object($hintkey, $response = null) {
         //Moodle-specific hints.
         if (substr($hintkey, 0, 11) == 'hintmoodle#') {
-            return new qtype_poasquestion_hintmoodle($this, $hintkey);
+            return new qtype_poasquestion\hintmoodle($this, $hintkey);
         }
 
         //CorrectWriting specific hints.
