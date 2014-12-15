@@ -26,7 +26,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
-require_once($CFG->dirroot . '/question/type/poasquestion/hints.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 
@@ -34,10 +33,10 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
  * Hint class for showing matching part of a response (along with unmatched head and tail).
  * Also contains some methods common to the all hints, based on $matchresults.
  */
-class qtype_preg_hintmatchingpart extends qtype_specific_hint {
+class qtype_preg_hintmatchingpart extends qtype_poasquestion\hint {
 
     public function hint_type() {
-        return qtype_specific_hint::SINGLE_INSTANCE_HINT;
+        return qtype_poasquestion\hint::SINGLE_INSTANCE_HINT;
     }
 
     public function hint_description() {

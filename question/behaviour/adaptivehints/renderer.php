@@ -59,7 +59,7 @@ class qbehaviour_adaptivehints_renderer extends qbehaviour_adaptive_renderer {
                     $showhintbtn = $laststep->has_behaviour_var('_nonresp_hintbtns');
                 }
                 // Hide hint button if such hint buttons should not shown at all or hint unavailable or hint already rendered.
-                if (!$showhintbtn || !$hintobj->hint_available() || ($laststep->has_behaviour_var('_render_'.$hintkey) && $hintobj->hint_type() !== qtype_specific_hint::SEQENTIAL_MULTIPLE_INSTANCE_HINT)) {
+                if (!$showhintbtn || !$hintobj->hint_available() || ($laststep->has_behaviour_var('_render_'.$hintkey) && $hintobj->hint_type() !== qtype_poasquestion\hint::SEQENTIAL_MULTIPLE_INSTANCE_HINT)) {
                     // Should not pass $response to hint_available, since response could be changed in adaptive.
                     continue;
                 }
