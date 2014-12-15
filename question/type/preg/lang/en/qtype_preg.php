@@ -10,7 +10,7 @@
 
 $string['answersinstruct'] = '<p>Enter (at least one) regular expressions in the chosen notation as answers. If a correct answer is given, it should match at least one regular expression with 100% grade.</p><p>You can use placeholders like {$0} in the feedback to insert captured parts of a student\'s response. {$0} will be replaced by the whole match, {$1} with the first subpattern match etc. If the chosen engine doesn\'t support subpattern capturing you should use only {$0}.</p>';
 $string['assertfailmodeasis'] = 'Fast';
-$string['assertfailmodedescription'] = 'Full mode lets the FA engine work 100% correctly with simple assertions and enables support of complex assertions, but it works roughtly 2 times slower than the fast mode. Fast mode may rarely yield a wrong hint in complex regexes with \b or \B assertions.';
+$string['assertfailmodedescription'] = 'Full mode lets the finite state automata engine work 100% correctly with simple assertions and enables support of complex assertions, but it works roughtly 2 times slower than the fast mode. Fast mode may rarely yield a wrong hint in complex regexes with \b or \B assertions.';
 $string['assertfailmodelabel'] = 'Assertion support mode';
 $string['assertfailmodemerge'] = 'Full';
 $string['answerno'] = 'Answer {$a}';
@@ -19,7 +19,7 @@ $string['charhintpenalty_help'] = 'Penalty for getting the one-character hint. T
 $string['lexemhintpenalty'] = 'Penalty for the next lexem hint';
 $string['lexemhintpenalty_help'] = 'Penalty for getting the next lexem hint. Typically will be greater than usual Moodle question penalty (which applies to any new attempt to answer question without hints) and next character one. These penalties are mutually exclusive.';
 $string['correctanswer'] = 'Correct answer';
-$string['correctanswer_help'] = 'Enter a correct answer (not a regular expression) to be shown to students. If you leave it empty the matching engine will try to generate a correct answer itself, taking heed to get the closest one to the student\'s response. For now only FA engine can generate correct answers.';
+$string['correctanswer_help'] = 'Enter a correct answer (not a regular expression) to be shown to students. If you leave it empty the matching engine will try to generate a correct answer itself, taking heed to get the closest one to the student\'s response. For now only finite state automata engine can generate correct answers.';
 $string['debugheading'] = 'Debug settings';
 $string['defaultenginedescription'] = 'Matching engine selected by default when creating a new question';
 $string['defaultenginelabel'] = 'Default matching engine';

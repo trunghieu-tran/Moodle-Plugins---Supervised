@@ -573,8 +573,8 @@ class qtype_preg_explaining_graph_node_subexpr extends qtype_preg_explaining_gra
         $label = '';
         if ($this->pregnode->number != -1) {
             $label = get_string($this->pregnode->lang_key(true), 'qtype_preg', $this->pregnode);
-            $label = qtype_poasquestion_string::replace(': [ {$a->firstoperand} ]', '', $label);
-            $label = qtype_poasquestion_string::replace('"', '\\"', $label);
+            $label = qtype_poasquestion\string::replace(': [ {$a->firstoperand} ]', '', $label);
+            $label = qtype_poasquestion\string::replace('"', '\\"', $label);
         }
 
         $generated = $this->handler->is_node_generated($this->pregnode);

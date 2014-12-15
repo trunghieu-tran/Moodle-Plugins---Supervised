@@ -182,15 +182,15 @@ class qtype_preg_fa_transition {
             // There are end string assertions.
             if (qtype_preg_unicode::is_in_range("\n", $ranges)) {
                 return $capz['before']
-                    ? array(qtype_preg_leaf::NEXT_CHAR_END_HERE, new qtype_poasquestion_string("\n"))
-                    : array(qtype_preg_leaf::NEXT_CHAR_OK, new qtype_poasquestion_string("\n"));
+                    ? array(qtype_preg_leaf::NEXT_CHAR_END_HERE, new qtype_poasquestion\string("\n"))
+                    : array(qtype_preg_leaf::NEXT_CHAR_OK, new qtype_poasquestion\string("\n"));
             } else {
                 return array(qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, null);
             }
         } else if ($circumflex['after']) {
             // There are start string assertions.
             if (qtype_preg_unicode::is_in_range("\n", $ranges)) {
-                return array(qtype_preg_leaf::NEXT_CHAR_OK, new qtype_poasquestion_string("\n"));
+                return array(qtype_preg_leaf::NEXT_CHAR_OK, new qtype_poasquestion\string("\n"));
             } else {
                 return array(qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, null);
             }
@@ -227,7 +227,7 @@ class qtype_preg_fa_transition {
             }
         }
 
-        return array(qtype_preg_leaf::NEXT_CHAR_OK, new qtype_poasquestion_string(core_text::code2utf8($result_ranges[0][0])));
+        return array(qtype_preg_leaf::NEXT_CHAR_OK, new qtype_poasquestion\string(core_text::code2utf8($result_ranges[0][0])));
     }
 
     public function is_start_anchor() {

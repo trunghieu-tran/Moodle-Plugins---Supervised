@@ -28,7 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/shortanswer/renderer.php');
-require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 
 /**
@@ -93,7 +92,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
             $hintobj = $question->hint_object('hintmatchingpart');
             if ($hintobj->hint_available(array('answer' => $currentanswer))) {
                 $hintmessage = $hintobj->render_hint($this, $qa, $options, array('answer' => $currentanswer));
-                if (qtype_poasquestion_string::strlen($hintmessage) > 0) {
+                if (core_text::strlen($hintmessage) > 0) {
                     $hintmessage .= $br;
                 }
             }

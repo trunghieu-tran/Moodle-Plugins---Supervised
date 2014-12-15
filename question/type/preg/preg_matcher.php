@@ -67,7 +67,7 @@ class qtype_preg_matching_results {
     public $extensionstart;
 
     //      Source data.
-    /** @var qtype_poasquestion_string A string being matched. */
+    /** @var qtype_poasquestion\string A string being matched. */
     protected $str;
     /** @var integer Max number of a subexpression available in regular expression. */
     protected $maxsubexpr;
@@ -276,7 +276,7 @@ class qtype_preg_matching_results {
             $str2 = $this->extendedmatch->str;
             for ($i = 0; $i <= $this->length[0]; $i++) {
                 // One of the string ended or characters are different.
-                if ($this->extendedmatch->indexfirst[0] + $i >= qtype_poasquestion_string::strlen($str2) ||
+                if ($this->extendedmatch->indexfirst[0] + $i >= core_text::strlen($str2) ||
                         $this->indexfirst[0] + $i >= $str1->length() || $str1[$this->indexfirst[0] + $i] != $str2[$this->extendedmatch->indexfirst[0] + $i]) {
                     $this->extensionstart = $this->indexfirst[0] + $i;
                     $this->extendedmatch->extensionstart = $this->extendedmatch->indexfirst[0] + $i;
@@ -297,7 +297,7 @@ class qtype_preg_matching_results {
      */
     public function match_heading($subexpression = 0) {
         $subexpression = $this->subexpression_number($subexpression);
-        $wronghead = new qtype_poasquestion_string('');
+        $wronghead = new qtype_poasquestion\string('');
         if ($this->is_match()) {// There is match.
             if ($this->indexfirst[$subexpression] > 0) {// If there is wrong heading.
                 $wronghead = $this->str->substring(0, $this->indexfirst[$subexpression]);
@@ -313,7 +313,7 @@ class qtype_preg_matching_results {
      */
     public function matched_part($subexpression = 0) {
         $subexpression = $this->subexpression_number($subexpression);
-        $correctpart = new qtype_poasquestion_string('');
+        $correctpart = new qtype_poasquestion\string('');
         if ($this->is_match()) {// There is match.
             if (isset($this->indexfirst[$subexpression]) && $this->indexfirst[$subexpression] !== self::NO_MATCH_FOUND) {
                 $correctpart = $this->str->substring($this->indexfirst[$subexpression], $this->length[$subexpression]);
@@ -327,9 +327,9 @@ class qtype_preg_matching_results {
      */
     public function match_tail($subexpression = 0) {
         $subexpression = $this->subexpression_number($subexpression);
-        $wrongtail = new qtype_poasquestion_string('');
+        $wrongtail = new qtype_poasquestion\string('');
         if ($this->is_match()) {// There is match.
-            if ($this->indexfirst[$subexpression] + $this->length[$subexpression] < qtype_poasquestion_string::strlen($this->str) &&
+            if ($this->indexfirst[$subexpression] + $this->length[$subexpression] < core_text::strlen($this->str) &&
                 $this->length[$subexpression]!== self::NO_MATCH_FOUND) {// If there is wrong tail.
                 $wrongtail = $this->str->substring($this->indexfirst[$subexpression] + $this->length[$subexpression], $this->str->length() -
                         $this->indexfirst[$subexpression] - $this->length[$subexpression]);
@@ -342,7 +342,7 @@ class qtype_preg_matching_results {
      * Returns correct part before hint.
      */
     public function correct_before_hint() {
-        $correctbeforehint = new qtype_poasquestion_string('');
+        $correctbeforehint = new qtype_poasquestion\string('');
         if ($this->is_match()) {// There is match.
             $correctbeforehint = $this->str->substring($this->indexfirst[0], $this->extensionstart - $this->indexfirst[0]);
         }
@@ -353,7 +353,7 @@ class qtype_preg_matching_results {
      * Returns tail after point where extension is started.
      */
     public function tail_to_delete() {
-        $wrongtail = new qtype_poasquestion_string('');
+        $wrongtail = new qtype_poasquestion\string('');
         if ($this->is_match()) {// There is match.
             if ($this->extensionstart < $this->str->length() && $this->length[0]!== self::NO_MATCH_FOUND) {// If there is wrong tail.
                 $wrongtail = $this->str->substring($this->extensionstart, $this->str->length() - $this->extensionstart);
@@ -366,13 +366,13 @@ class qtype_preg_matching_results {
      * Returns part of the string, added by matcher.
      */
     public function string_extension() {
-        $extension = new qtype_poasquestion_string('');
+        $extension = new qtype_poasquestion\string('');
         if ($this->extendedmatch !== null) {
             $extendedstr = $this->extendedmatch->str();
             if ($this->extendedmatch->extensionstart < $extendedstr->length()) {
                 $extension = $extendedstr->substring($this->extendedmatch->extensionstart, $extendedstr->length() - $this->extendedmatch->extensionstart);
             } else {
-                $extension = new qtype_poasquestion_string('');
+                $extension = new qtype_poasquestion\string('');
             }
         }
         return $extension->string();
@@ -482,7 +482,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         }
 
         // Invalidate match called later to allow parser to count subexpression.
-        $this->matchresults->set_source_info(new qtype_poasquestion_string(''), $this->get_max_subexpr(), $this->get_subexpr_name_to_number_map());
+        $this->matchresults->set_source_info(new qtype_poasquestion\string(''), $this->get_max_subexpr(), $this->get_subexpr_name_to_number_map());
         $this->matchresults->invalidate_match();
     }
 
@@ -539,7 +539,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
         if (isset($this->resultcache[$str])) {
             $this->matchresults = $this->resultcache[$str];
         } else {
-            $str = new qtype_poasquestion_string($str);
+            $str = new qtype_poasquestion\string($str);
             // Reset match data and perform matching.
             $this->matchresults = $this->match_inner($str);
             // Save source data for the match.
@@ -596,7 +596,7 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
      *
      * This function should be re-implemented in child classes using standard matching functions.
      * that already contains starting positions loop inside. Implement match_from_pos otherwise.
-     * @param qtype_poasquestion_string str a string to match.
+     * @param qtype_poasquestion\string str a string to match.
      * @return qtype_preg_matching_results object.
      */
     protected function match_inner($str) {
@@ -616,11 +616,11 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
             $rightborders = array(0);
             if ($this->anchor->startlinebreak) {// Looking for line breaks.
                 $offset = 0;
-                $pos = qtype_poasquestion_string::strpos($str, "\n", $offset);
+                $pos = core_text::strpos($str, "\n", $offset);
                 while ($pos !== false) {
                     $rightborders[] = $pos + 1;// Starting matching after line break.
                     $offset = $pos + 1;
-                    $pos = qtype_poasquestion_string::strpos($str, "\n", $offset);
+                    $pos = core_text::strpos($str, "\n", $offset);
                 }
             }
             // Starting positions loop.

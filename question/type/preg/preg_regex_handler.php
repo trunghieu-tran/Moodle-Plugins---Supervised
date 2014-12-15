@@ -28,7 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/poasquestion/stringstream/stringstream.php');
-require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/poasquestion/questiontype.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_notations.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
@@ -242,7 +241,7 @@ class qtype_preg_handling_options {
 
 class qtype_preg_regex_handler {
 
-    /** Regular expression as an object of qtype_poasquestion_string. */
+    /** Regular expression as an object of qtype_poasquestion\string. */
     protected $regex;
     /** Regular expression handling options, may be different for different handlers. */
     protected $options;
@@ -276,7 +275,7 @@ class qtype_preg_regex_handler {
         }
 
         if ($regex == '' || $regex === null) {
-            $this->regex = new qtype_poasquestion_string('');
+            $this->regex = new qtype_poasquestion\string('');
             $this->options = $options;
             return;
         }
@@ -301,7 +300,7 @@ class qtype_preg_regex_handler {
             }
         }
 
-        $this->regex = new qtype_poasquestion_string($regex);
+        $this->regex = new qtype_poasquestion\string($regex);
         $this->options = $options;
 
         // Do parsing.

@@ -217,7 +217,7 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
             $wholepattern = '<span style="background: white">%s</span>';
         }
         if ($wholepattern !== '%%tests%%') {
-            $string = qtype_poasquestion_string::replace('%s', $string, $wholepattern);
+            $string = qtype_poasquestion\string::replace('%s', $string, $wholepattern);
         }
         $this->options = $backupoptions; // restore original options
         return $string;

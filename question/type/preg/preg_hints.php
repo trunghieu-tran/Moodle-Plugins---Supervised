@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
+global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 
@@ -89,7 +89,7 @@ class qtype_preg_hintmatchingpart extends qtype_poasquestion\hint {
                     $hint .= $renderer->render_tobecontinued();
                 }
                 $wrongtail = '';
-                if (qtype_poasquestion_string::strlen($hint) == 0) {
+                if (core_text::strlen($hint) == 0) {
                     $wrongtail = $renderer->render_deleted($matchresults->tail_to_delete());
                 }
                 return $wronghead.$correctpart.$hint.$wrongtail;
@@ -112,7 +112,7 @@ class qtype_preg_hintmatchingpart extends qtype_poasquestion\hint {
      */
     public function to_be_continued($matchresults) {
         return $matchresults->is_match() && !$matchresults->full &&
-                $matchresults->index_first() + $matchresults->length() == qtype_poasquestion_string::strlen($matchresults->str()) &&
+                $matchresults->index_first() + $matchresults->length() == core_text::strlen($matchresults->str()) &&
                 $matchresults->length() !== qtype_preg_matching_results::NO_MATCH_FOUND;
     }
 
@@ -224,15 +224,15 @@ class qtype_preg_hintnextchar extends qtype_preg_hintmatchingpart {
     public function hinted_string($matchresults) {
         // One-character hint.
         $hintedstring = $matchresults->string_extension();
-        if (qtype_poasquestion_string::strlen($hintedstring) > 0) {
-            return qtype_poasquestion_string::substr($hintedstring, 0, 1);
+        if (core_text::strlen($hintedstring) > 0) {
+            return core_text::substr($hintedstring, 0, 1);
         }
         return '';
     }
 
     public function to_be_continued($matchresults) {
         $hintedstring = $matchresults->string_extension();
-        return qtype_poasquestion_string::strlen($hintedstring) > 1 || (is_object($matchresults->extendedmatch) && $matchresults->extendedmatch->full === false);
+        return core_text::strlen($hintedstring) > 1 || (is_object($matchresults->extendedmatch) && $matchresults->extendedmatch->full === false);
     }
 
 }
@@ -323,14 +323,14 @@ class qtype_preg_hintnextlexem extends qtype_preg_hintmatchingpart {
         $this->endmatchindx = $endmatchindx;
 
         if ($hinttoken !== null) {// Found hint token.
-            return qtype_poasquestion_string::substr($extendedmatch->str(), $endmatchindx, $hinttoken->position()->colend() - $endmatchindx + 1);
+            return core_text::substr($extendedmatch->str(), $endmatchindx, $hinttoken->position()->colend() - $endmatchindx + 1);
         } else {// There are some non-matched separators after end of last token. Just hint the end of generated string.
-            return qtype_poasquestion_string::substr($extendedmatch->str(), $endmatchindx,  qtype_poasquestion_string::strlen($extendedmatch->str()) - $endmatchindx);
+            return core_text::substr($extendedmatch->str(), $endmatchindx,  core_text::strlen($extendedmatch->str()) - $endmatchindx);
         }
     }
 
     public function to_be_continued($matchresults) {
-        return  $this->hinttoken->position()->colend() + 1 < qtype_poasquestion_string::strlen($matchresults->extendedmatch->str())
+        return  $this->hinttoken->position()->colend() + 1 < core_text::strlen($matchresults->extendedmatch->str())
                 || $matchresults->extendedmatch->full === false;
     }
 }

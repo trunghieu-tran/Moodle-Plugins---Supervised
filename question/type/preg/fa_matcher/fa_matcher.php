@@ -395,7 +395,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
     /**
      * Returns the minimal path to complete a partial match.
-     * @param qtype_poasquestion_string str - original string that was matched.
+     * @param qtype_poasquestion\string str - original string that was matched.
      * @param qtype_preg_fa_exec_state laststate - the last state matched.
      * @return object of qtype_preg_fa_exec_state.
      */
@@ -454,7 +454,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
     /**
      * Returns the minimal path to complete a partial match.
-     * @param qtype_poasquestion_string str - original string that was matched.
+     * @param qtype_poasquestion\string str - original string that was matched.
      * @param qtype_preg_fa_exec_state laststate - the last state matched.
      * @return object of qtype_preg_fa_exec_state.
      */

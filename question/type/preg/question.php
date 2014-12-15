@@ -27,7 +27,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/poasquestion/hints.php');
 require_once($CFG->dirroot . '/question/type/questionbase.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');
@@ -181,7 +180,7 @@ class qtype_preg_question extends question_graded_automatically
             if ($matchresults->full) {// Don't need to look more if we find full match.
                 $bestfitanswer = $answer;
                 $bestmatchresult = $matchresults;
-                $fitness = qtype_poasquestion_string::strlen($response['answer']);
+                $fitness = core_text::strlen($response['answer']);
                 break;
             }
 
@@ -399,7 +398,7 @@ class qtype_preg_question extends question_graded_automatically
     public function insert_subexpressions($subject, $response, $matchresults) {
 
         // Sanity check.
-        if (qtype_poasquestion_string::strpos($subject, '{$') === false || qtype_poasquestion_string::strpos($subject, '}') === false) {
+        if (core_text::strpos($subject, '{$') === false || core_text::strpos($subject, '}') === false) {
             // There are no placeholders for sure.
             return $subject;
         }
@@ -411,7 +410,7 @@ class qtype_preg_question extends question_graded_automatically
             $startindex = $matchresults->index_first($i);
             $length = $matchresults->length($i);
             if ($startindex != qtype_preg_matching_results::NO_MATCH_FOUND) {
-                $replace = qtype_poasquestion_string::substr($answer, $startindex, $length);
+                $replace = core_text::substr($answer, $startindex, $length);
             } else {
                 $replace = '';
             }

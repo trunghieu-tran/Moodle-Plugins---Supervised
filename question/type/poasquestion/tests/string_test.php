@@ -25,17 +25,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
-require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
-
 class qtype_poasquestion_string_test extends PHPUnit_Framework_TestCase {
 
     public function test_string() {
-        $str1 = new qtype_poasquestion_string('аzб');
-        $str2 = new qtype_poasquestion_string('йц者');
-        $str3 = new qtype_poasquestion_string($str1 . $str2);
+        $str1 = new qtype_poasquestion\string('аzб');
+        $str2 = new qtype_poasquestion\string('йц者');
+        $str3 = new qtype_poasquestion\string($str1 . $str2);
 
-        $this->assertTrue(is_a($str3, 'qtype_poasquestion_string'));
+        $this->assertTrue(is_a($str3, 'qtype_poasquestion\string'));
         $this->assertTrue($str3->string() === 'аzбйц者');
         $this->assertTrue($str3->length() === 6);
         $this->assertTrue($str3[-1] === null);
@@ -53,7 +50,7 @@ class qtype_poasquestion_string_test extends PHPUnit_Framework_TestCase {
         $str3[4] = '者';
         $str3[6] = 'ه';
         $str3->concatenate('ab');
-        $str3->concatenate(new qtype_poasquestion_string('ёя'));
+        $str3->concatenate(new qtype_poasquestion\string('ёя'));
 
         $this->assertTrue($str3->length() === 11);
         $this->assertTrue($str3[-1] === null);
@@ -72,31 +69,31 @@ class qtype_poasquestion_string_test extends PHPUnit_Framework_TestCase {
     }
 
     public function test_replace() {
-        $result = qtype_poasquestion_string::replace('abcdef', 'qwe', 'abcdef');
+        $result = qtype_poasquestion\string::replace('abcdef', 'qwe', 'abcdef');
         $this->assertTrue($result === 'qwe');
-        $result = qtype_poasquestion_string::replace('xyz', 'абв', 'abcdef');
+        $result = qtype_poasquestion\string::replace('xyz', 'абв', 'abcdef');
         $this->assertTrue($result === 'abcdef');
-        $result = qtype_poasquestion_string::replace('й', 'Ё', 'йж');
+        $result = qtype_poasquestion\string::replace('й', 'Ё', 'йж');
         $this->assertTrue($result === 'Ёж');
-        $result = qtype_poasquestion_string::replace('abcdef', '', 'abcdef');
+        $result = qtype_poasquestion\string::replace('abcdef', '', 'abcdef');
         $this->assertTrue($result === '');
-        $result = qtype_poasquestion_string::replace('', 'qwe', 'abcdef');
+        $result = qtype_poasquestion\string::replace('', 'qwe', 'abcdef');
         $this->assertTrue($result === 'abcdef');
-        $result = qtype_poasquestion_string::replace('abcdef', 'abcdef', 'abcdef');
+        $result = qtype_poasquestion\string::replace('abcdef', 'abcdef', 'abcdef');
         $this->assertTrue($result === 'abcdef');
-        $result = qtype_poasquestion_string::replace('abcdefabcdef', 'abcdef', 'abcdefabcdef');
+        $result = qtype_poasquestion\string::replace('abcdefabcdef', 'abcdef', 'abcdefabcdef');
         $this->assertTrue($result === 'abcdef');
-        $result = qtype_poasquestion_string::replace('abcdef', 'abcdef', 'abcdefabcdef');
+        $result = qtype_poasquestion\string::replace('abcdef', 'abcdef', 'abcdefabcdef');
         $this->assertTrue($result === 'abcdefabcdef');
     }
 
     public function test_starts_ends() {
-        $str = new qtype_poasquestion_string('');
+        $str = new qtype_poasquestion\string('');
         $this->assertTrue($str->startsWith(''));
         $this->assertTrue($str->endsWith(''));
         $this->assertFalse($str->startsWith('й'));
         $this->assertFalse($str->endsWith('й'));
-        $str = new qtype_poasquestion_string('абвй');
+        $str = new qtype_poasquestion\string('абвй');
         $this->assertTrue($str->startsWith(''));
         $this->assertTrue($str->startsWith('а'));
         $this->assertTrue($str->startsWith('абвй'));

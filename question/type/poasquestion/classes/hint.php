@@ -22,18 +22,17 @@
  */
 namespace qtype_poasquestion;
 defined('MOODLE_INTERNAL') || die();
-global $CFG;
 
 abstract class hint {
 
-    /** 
-     *  Single instance hint allows exactly one hint for each question state. 
+    /**
+     *  Single instance hint allows exactly one hint for each question state.
      *  Example is next character or next lexem hint in preg question type.
      */
     const SINGLE_INSTANCE_HINT = 1;
-    /** 
+    /**
      *  Choosen multiple instance hint allows several hint buttons, from which the user
-     *  (either teacher or student, depending on behaviour) could choose one they want. 
+     *  (either teacher or student, depending on behaviour) could choose one they want.
      *  Example is hint, that would show how you should place misplaced lexem in correct writing question type.
      *
      *  In the hint options for interactive mode (save_hint_options function) available choosen multiple instance
@@ -41,8 +40,8 @@ abstract class hint {
      *  starting from the prefixes from save_hint_options.
      */
     const CHOOSEN_MULTIPLE_INSTANCE_HINT = 2;
-    /** 
-     *  Sequential multuple instance hint allows several hints, that could be used only in sequence. 
+    /**
+     *  Sequential multuple instance hint allows several hints, that could be used only in sequence.
      *  Current moodle text hints are example of this ones since there are no way to allow students to choose between them.
      *
      *  Hintkeys for sequential multiple instance hints should be returned ending with '#' character. Behaviour will expand
