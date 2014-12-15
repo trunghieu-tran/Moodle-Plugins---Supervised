@@ -25,9 +25,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
-require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
-
 class qtype_preg_unicode extends core_text {
 
     public static function min_possible_code() {
@@ -8509,7 +8506,7 @@ class qtype_preg_unicode extends core_text {
     }
 
     /**
-     * @param $charset object of qtype_poasquestion_string.
+     * @param $charset object of qtype_poasquestion\string.
      * @return a sorted array of trivial ranges corresponding to the given charset.
      */
     public static function get_ranges_from_charset($charset, $caseless = false) {

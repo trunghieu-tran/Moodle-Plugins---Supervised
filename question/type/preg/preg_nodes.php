@@ -27,7 +27,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
 /**
@@ -478,7 +477,7 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
     public function intersect_leafs($other, $thishastags, $otherhastags) {
         $result = null;
         $length = 0;
-        $str = new qtype_poasquestion_string("\n");
+        $str = new qtype_poasquestion\string("\n");
         if ($this->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
             if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
                 $result = $this->intersect_with_ranges($other);
@@ -753,8 +752,8 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         $ranges = $this->ranges();
         $char = $str[$pos];
         if ($this->caseless) {
-            $charlower = qtype_poasquestion_string::strtolower($char);
-            $charupper = qtype_poasquestion_string::strtoupper($char);
+            $charlower = core_text::strtolower($char);
+            $charupper = core_text::strtoupper($char);
             $result = qtype_preg_unicode::is_in_range($charlower, $ranges) || qtype_preg_unicode::is_in_range($charupper, $ranges);
         } else {
             $result = qtype_preg_unicode::is_in_range($char, $ranges);
@@ -770,7 +769,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         	return array(self::NEXT_CHAR_CANNOT_GENERATE, null);
         }
 
-        return array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(qtype_preg_unicode::code2utf8($ranges[0][0])));
+        return array(self::NEXT_CHAR_OK, new qtype_poasquestion\string(qtype_preg_unicode::code2utf8($ranges[0][0])));
     }
 
     /*public function tohr() {
@@ -1133,7 +1132,7 @@ class qtype_preg_leaf_meta extends qtype_preg_leaf {
     }
 
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
-        return array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''));
+        return array(self::NEXT_CHAR_OK, new qtype_poasquestion\string(''));
     }
 
     public function tohr() {
@@ -1221,7 +1220,7 @@ class qtype_preg_leaf_assert_esc_b extends qtype_preg_leaf_assert {
     }
 
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
-        return array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''));  // TODO
+        return array(self::NEXT_CHAR_OK, new qtype_poasquestion\string(''));  // TODO
     }
 
     public function tohr() {
@@ -1246,7 +1245,7 @@ class qtype_preg_leaf_assert_esc_a extends qtype_preg_leaf_assert {
 
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
         if ($pos == 0) {
-            return array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''));
+            return array(self::NEXT_CHAR_OK, new qtype_poasquestion\string(''));
         }
         return array(self::NEXT_CHAR_CANNOT_GENERATE, null);
     }
@@ -1317,7 +1316,7 @@ class qtype_preg_leaf_assert_esc_g extends qtype_preg_leaf_assert {
 
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
         if ($pos == $matcherstateobj->start_pos()) {
-            return array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''));
+            return array(self::NEXT_CHAR_OK, new qtype_poasquestion\string(''));
         }
         return array(self::NEXT_CHAR_CANNOT_GENERATE, null);
     }
@@ -1344,7 +1343,7 @@ class qtype_preg_leaf_assert_circumflex extends qtype_preg_leaf_assert_esc_a {
 
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
         if ($pos == 0 || $newstr[$pos - 1] == "\n") {
-            return array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''));
+            return array(self::NEXT_CHAR_OK, new qtype_poasquestion\string(''));
         }
         return array(self::NEXT_CHAR_CANNOT_GENERATE, null);
     }
@@ -1404,7 +1403,7 @@ class qtype_preg_leaf_assert_subexpr extends qtype_preg_leaf_assert {
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
         $subexpr = $this->name !== null ? $this->name : $this->number;
         $ok = ($matcherstateobj->is_subexpr_captured($subexpr) xor $this->negative);
-        return $ok ? array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''))
+        return $ok ? array(self::NEXT_CHAR_OK, new qtype_poasquestion\string(''))
                    : array(self::NEXT_CHAR_CANNOT_GENERATE, null);
     }
 
@@ -1441,7 +1440,7 @@ class qtype_preg_leaf_assert_recursion extends qtype_preg_leaf_assert {
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
         $subexpr = $this->name !== null ? $this->name : $this->number;
         $ok = ($matcherstateobj->is_recursion($subexpr) xor $this->negative);
-        return $ok ? array(self::NEXT_CHAR_OK, new qtype_poasquestion_string(''))
+        return $ok ? array(self::NEXT_CHAR_OK, new qtype_poasquestion\string(''))
                    : array(self::NEXT_CHAR_CANNOT_GENERATE, null);
     }
 

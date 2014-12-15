@@ -28,7 +28,6 @@
  */
 namespace qtype_poasquestion;
 defined('MOODLE_INTERNAL') || die();
-global $CFG;
 
 /**
  * Class for compatibility with Moodle teacher-defined text and other hints

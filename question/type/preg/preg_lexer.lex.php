@@ -24,7 +24,6 @@
  */
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
-require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/poasquestion/jlex.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_parser.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
@@ -208,7 +207,7 @@ class qtype_preg_lexer extends JLexBase  {
         $this->modify_top_options_stack_item($options->modifiers, 0);
     }
     protected static function ctype_octal($str) {
-        $str = new qtype_poasquestion_string($str);
+        $str = new qtype_poasquestion\string($str);
         for ($i = 0; $i < $str->length(); $i++) {
             $ch = $str[$i];
             if (!ctype_digit($ch) || (int)$ch > 7) {
@@ -596,7 +595,7 @@ class qtype_preg_lexer extends JLexBase  {
             $flag = new qtype_preg_charset_flag;
             $flag->negative = $negative;
             if ($type == qtype_preg_charset_flag::TYPE_SET) {
-                $data = new qtype_poasquestion_string($data);
+                $data = new qtype_poasquestion\string($data);
             }
             $flag->set_data($type, $data);
             $node->flags = array(array($flag));
@@ -6855,7 +6854,7 @@ array(
     $unsetflags = qtype_preg_handling_options::string_to_modifiers($unset);
     $errors = $this->modify_top_options_stack_item($setflags, $unsetflags);
     if ($this->options->preserveallnodes) {
-        $node = new qtype_preg_leaf_options(new qtype_poasquestion_string($set), new qtype_poasquestion_string($unset));
+        $node = new qtype_preg_leaf_options(new qtype_poasquestion\string($set), new qtype_poasquestion\string($unset));
         $node->errors = $errors;
         $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
         return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
@@ -7018,7 +7017,7 @@ array(
     if ($this->options->preserveallnodes) {
         $res = array();
         $res[] = $this->form_subexpr($text, qtype_preg_node_subexpr::SUBTYPE_GROUPING);
-        $node = new qtype_preg_leaf_options(new qtype_poasquestion_string($set), new qtype_poasquestion_string($unset));
+        $node = new qtype_preg_leaf_options(new qtype_poasquestion\string($set), new qtype_poasquestion\string($unset));
         $node->errors = $errors;
         $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
         $res[] = new JLexToken(qtype_preg_parser::PARSELEAF, $node);
@@ -7357,7 +7356,7 @@ array(
     $this->charset->set_user_info($position, $this->charset->userinscription);
     if ($this->charset_set !== '') {
         $flag = new qtype_preg_charset_flag;
-        $flag->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string($this->charset_set));
+        $flag->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion\string($this->charset_set));
         $this->charset->flags[] = array($flag);
     }
     $this->set_node_modifiers($this->charset);

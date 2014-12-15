@@ -25,8 +25,6 @@
   **************************************************************
 */
 
-require_once('poasquestion_string.php');
-
 class JLexToken {
     public $type;
     public $value;
@@ -60,7 +58,7 @@ class JLexBase {
 
     function __construct($stream) {
         $this->yy_reader = $stream;
-        $this->yy_buffer = new qtype_poasquestion_string();
+        $this->yy_buffer = new qtype_poasquestion\string();
 
         $meta = stream_get_meta_data($stream);
         if (!isset($meta['uri'])) {

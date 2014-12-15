@@ -3,7 +3,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/poasquestion/stringstream/stringstream.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
@@ -46,7 +45,7 @@ class qtype_preg_unicode_huge_test extends PHPUnit_Framework_TestCase {
         $lexer = $this->create_lexer('\pL\pLl');
         $node1 = $lexer->nextToken()->value;
         $node2 = $lexer->nextToken()->value;
-        $str = new qtype_poasquestion_string($ch);
+        $str = new qtype_poasquestion\string($ch);
         $length = 0;
         $start = time();
         $node = $node1->intersect($node2);

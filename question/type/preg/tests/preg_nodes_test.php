@@ -392,14 +392,14 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $backref->matcher = $matcher;
 
         // Matching at the end of the string.
-        $str = new qtype_poasquestion_string('abc');
+        $str = new qtype_poasquestion\string('abc');
         $res = $backref->match($str, 3, $length, $matcher->get_match_results());
         list($flag, $ch) = $backref->next_character($str, $str, 3, $length, $matcher->get_match_results());
         $this->assertFalse($res);
         $this->assertEquals($length, 0);
         $this->assertEquals($ch, 'abc');
         // The string doesn't match backref at all.
-        $str = new qtype_poasquestion_string('abcdef');
+        $str = new qtype_poasquestion\string('abcdef');
         $res = $backref->match($str, 3, $length, $matcher->get_match_results());
         list($flag, $ch) = $backref->next_character($str, $str, 3, $length, $matcher->get_match_results());
         $this->assertFalse($res);
@@ -417,14 +417,14 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $backref->matcher = $matcher;
 
         // Reaching the end of the string.
-        $str = new qtype_poasquestion_string('abcab');
+        $str = new qtype_poasquestion\string('abcab');
         $res = $backref->match($str, 3, $length, $matcher->get_match_results());
         list($flag, $ch) = $backref->next_character($str, $str, 3, $length, $matcher->get_match_results());
         $this->assertFalse($res);
         $this->assertEquals($length, 2);
         $this->assertEquals($ch, 'c');
         // The string matches backref partially.
-        $str = new qtype_poasquestion_string('abcacd');
+        $str = new qtype_poasquestion\string('abcacd');
         $res = $backref->match($str, 3, $length, $matcher->get_match_results());
         list($flag, $ch) = $backref->next_character($str, $str, 4, $length, $matcher->get_match_results());
         $this->assertFalse($res);
@@ -441,7 +441,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $backref = new qtype_preg_leaf_backref(1);
         $backref->matcher = $matcher;
 
-        $str = new qtype_poasquestion_string('abcabc');
+        $str = new qtype_poasquestion\string('abcabc');
         $res = $backref->match($str, 3, $length, $matcher->get_match_results());
         list($flag, $ch) = $backref->next_character($str, $str, 3, $length, $matcher->get_match_results());
         $this->assertTrue($res);
@@ -459,7 +459,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $backref = new qtype_preg_leaf_backref(1);
         $backref->matcher = $matcher;
 
-        $str = new qtype_poasquestion_string('');
+        $str = new qtype_poasquestion\string('');
         $res = $backref->match($str, 0, $length, $matcher->get_match_results());
         list($flag, $ch) = $backref->next_character($str, $str, 0, $length, $matcher->get_match_results());
         $this->assertTrue($res);
@@ -477,7 +477,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $backref->matcher = $matcher;
 
         // 2 characters matched
-        $str = new qtype_poasquestion_string('aba');
+        $str = new qtype_poasquestion\string('aba');
         $res = $backref->match($str, 2, $length, $matcher->get_match_results());
         list($flag, $ch) = $backref->next_character($str, $str, 3, $length, $matcher->get_match_results());
         $this->assertFalse($res);
@@ -485,7 +485,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals($ch, 'b');
         // Emptiness matched.
         $matcher->match('');
-        $str = new qtype_poasquestion_string('');
+        $str = new qtype_poasquestion\string('');
         $res = $backref->match($str, 0, $length, $matcher->get_match_results());
         $this->assertTrue($res);
         $this->assertEquals($length, 0);
@@ -494,149 +494,149 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
     function test_dot() {
         $charset = $this->leaf_by_regex(".");
         $length = 0;
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('a'), 0, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string(core_text::code2utf8(0x10FFFF)), 0, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('a'), 0, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string(core_text::code2utf8(0x10FFFF)), 0, $length));
     }
 
     function test_charflag_set_match() {
         $charset = $this->leaf_by_regex("[asdf0123]");
         $length = 0;
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('abc015'), 0, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('abc015'), 1, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('abc015'), 2, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('abc015'), 3, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('abc015'), 4, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('abc015'), 5, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('abc015'), 0, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('abc015'), 1, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('abc015'), 2, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('abc015'), 3, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('abc015'), 4, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('abc015'), 5, $length));
 
         $charset->negative = true;
         $charset->clear_cached_ranges();
 
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('abc015'), 0, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('abc015'), 1, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('abc015'), 2, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('abc015'), 3, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('abc015'), 4, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('abc015'), 5, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('abc015'), 0, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('abc015'), 1, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('abc015'), 2, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('abc015'), 3, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('abc015'), 4, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('abc015'), 5, $length));
     }
 
     function test_charflag_flag_d_match() {
         $charset = $this->leaf_by_regex("[[:digit:]]");
         $length = 0;
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('12Afg'), 0, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('12Afg'), 1, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('12Afg'), 2, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('12Afg'), 3, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('12Afg'), 4, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('12Afg'), 0, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('12Afg'), 1, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('12Afg'), 2, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('12Afg'), 3, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('12Afg'), 4, $length));
 
         $charset->negative = true;
         $charset->clear_cached_ranges();
 
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('12Afg'), 0, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('12Afg'), 1, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('12Afg'), 2, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('12Afg'), 3, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('12Afg'), 4, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('12Afg'), 0, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('12Afg'), 1, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('12Afg'), 2, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('12Afg'), 3, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('12Afg'), 4, $length));
     }
 
     function test_charflag_flag_xdigit_match() {
         $charset = $this->leaf_by_regex("[[:xdigit:]]");
         $length = 0;
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('12Afg'), 0, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('12Afg'), 1, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('12Afg'), 2, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('12Afg'), 3, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('12Afg'), 4, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('12Afg'), 0, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('12Afg'), 1, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('12Afg'), 2, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('12Afg'), 3, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('12Afg'), 4, $length));
 
         $charset->negative = true;
         $charset->clear_cached_ranges();
 
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('12Afg'), 0, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('12Afg'), 1, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('12Afg'), 2, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('12Afg'), 3, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('12Afg'), 4, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('12Afg'), 0, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('12Afg'), 1, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('12Afg'), 2, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('12Afg'), 3, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('12Afg'), 4, $length));
     }
 
     function test_charflag_flag_s_match() {
         $charset = $this->leaf_by_regex("[[:space:]]");
         $length = 0;
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('a bc '), 0, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('a bc  '), 1, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('a bc '), 2, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('a bc '), 3, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('a bc  '), 4, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('a bc '), 0, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('a bc  '), 1, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('a bc '), 2, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('a bc '), 3, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('a bc  '), 4, $length));
 
         $charset->negative = true;
         $charset->clear_cached_ranges();
 
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('a bc  '), 0, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('a bc '), 1, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('a bc  '), 2, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('a bc  '), 3, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('a bc '), 4, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('a bc  '), 0, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('a bc '), 1, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('a bc  '), 2, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('a bc  '), 3, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('a bc '), 4, $length));
     }
 
     function test_charflag_flag_w_match() {
         $charset = $this->leaf_by_regex("[[:word:]]");
         $length = 0;
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('1a_@5'), 0, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('1a_@5'), 1, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('1a_@5'), 2, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('1a_@5'), 3, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('1a_@5'), 4, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('1a_@5'), 0, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('1a_@5'), 1, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('1a_@5'), 2, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('1a_@5'), 3, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('1a_@5'), 4, $length));
 
         $charset->negative = true;
         $charset->clear_cached_ranges();
 
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('1a_@5'), 0, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('1a_@5'), 1, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('1a_@5'), 2, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('1a_@5'), 3, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('1a_@5'), 4, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('1a_@5'), 0, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('1a_@5'), 1, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('1a_@5'), 2, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('1a_@5'), 3, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('1a_@5'), 4, $length));
     }
 
     function test_charflag_flag_alnum_match() {
         $charset = $this->leaf_by_regex("[[:alnum:]]");
         $length = 0;
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('1a_@5'), 0, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('1a_@5'), 1, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('1a_@5'), 2, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('1a_@5'), 3, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('1a_@5'), 4, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('1a_@5'), 0, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('1a_@5'), 1, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('1a_@5'), 2, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('1a_@5'), 3, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('1a_@5'), 4, $length));
 
         $charset->negative = true;
         $charset->clear_cached_ranges();
 
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('1a_@5'), 0, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('1a_@5'), 1, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('1a_@5'), 2, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('1a_@5'), 3, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('1a_@5'), 4, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('1a_@5'), 0, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('1a_@5'), 1, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('1a_@5'), 2, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('1a_@5'), 3, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('1a_@5'), 4, $length));
     }
 
     function test_charflag_flag_alpha_match() {
         $charset = $this->leaf_by_regex("[[:alpha:]]");
         $length = 0;
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('1a_@5'), 0, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('1a_@5'), 1, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('1a_@5'), 2, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('1a_@5'), 3, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('1a_@5'), 4, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('1a_@5'), 0, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('1a_@5'), 1, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('1a_@5'), 2, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('1a_@5'), 3, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('1a_@5'), 4, $length));
 
         $charset->negative = true;
         $charset->clear_cached_ranges();
 
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('1a_@5'), 0, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('1a_@5'), 1, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('1a_@5'), 2, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('1a_@5'), 3, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('1a_@5'), 4, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('1a_@5'), 0, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('1a_@5'), 1, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('1a_@5'), 2, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('1a_@5'), 3, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('1a_@5'), 4, $length));
     }
 
     function test_charflag_flag_ascii_match() {
         $charset = $this->leaf_by_regex("[[:ascii:]]");
         $length = 0;
-        $str = new qtype_poasquestion_string(qtype_preg_unicode::code2utf8(17).qtype_preg_unicode::code2utf8(78).qtype_preg_unicode::code2utf8(130).qtype_preg_unicode::code2utf8(131).qtype_preg_unicode::code2utf8(200));
+        $str = new qtype_poasquestion\string(qtype_preg_unicode::code2utf8(17).qtype_preg_unicode::code2utf8(78).qtype_preg_unicode::code2utf8(130).qtype_preg_unicode::code2utf8(131).qtype_preg_unicode::code2utf8(200));
         $this->assertTrue($charset->match($str, 0, $length));
         $this->assertTrue($charset->match($str, 1, $length));
         $this->assertFalse($charset->match($str, 2, $length));
@@ -656,115 +656,115 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
     function test_charflag_flag_graph_match() {
         $charset = $this->leaf_by_regex("[[:graph:]]");
         $length = 0;
-        $this->assertTrue($charset->match(new qtype_poasquestion_string("ab 5\t"), 0, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string("ab 5\t"), 1, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string("ab 5\t"), 2, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string("ab 5\t"), 3, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string("ab 5\t"), 4, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string("ab 5\t"), 0, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string("ab 5\t"), 1, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string("ab 5\t"), 2, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string("ab 5\t"), 3, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string("ab 5\t"), 4, $length));
 
         $charset->negative = true;
         $charset->clear_cached_ranges();
 
-        $this->assertFalse($charset->match(new qtype_poasquestion_string("ab 5\t"), 0, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string("ab 5\t"), 1, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string("ab 5\t"), 2, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string("ab 5\t"), 3, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string("ab 5\t"), 4, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string("ab 5\t"), 0, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string("ab 5\t"), 1, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string("ab 5\t"), 2, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string("ab 5\t"), 3, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string("ab 5\t"), 4, $length));
     }
 
     function test_charflag_flag_lower_match() {
         $charset = $this->leaf_by_regex("[[:lower:]]");
         $length = 0;
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('aB!De'), 0, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('aB!De'), 1, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('aB!De'), 2, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('aB!De'), 3, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('aB!De'), 4, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('aB!De'), 0, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('aB!De'), 1, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('aB!De'), 2, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('aB!De'), 3, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('aB!De'), 4, $length));
 
         $charset->negative = true;
         $charset->clear_cached_ranges();
 
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('aB!De'), 0, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('aB!De'), 1, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('aB!De'), 2, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('aB!De'), 3, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('aB!De'), 4, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('aB!De'), 0, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('aB!De'), 1, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('aB!De'), 2, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('aB!De'), 3, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('aB!De'), 4, $length));
     }
 
     function test_charflag_flag_upper_match() {
         $charset = $this->leaf_by_regex("[[:upper:]]");
         $length = 0;
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('aB!De'), 0, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('aB!De'), 1, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('aB!De'), 2, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('aB!De'), 3, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('aB!De'), 4, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('aB!De'), 0, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('aB!De'), 1, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('aB!De'), 2, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('aB!De'), 3, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('aB!De'), 4, $length));
 
         $charset->negative = true;
         $charset->clear_cached_ranges();
 
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('aB!De'), 0, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('aB!De'), 1, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('aB!De'), 2, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('aB!De'), 3, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('aB!De'), 4, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('aB!De'), 0, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('aB!De'), 1, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('aB!De'), 2, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('aB!De'), 3, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('aB!De'), 4, $length));
     }
 
     function test_charflag_flag_print_match() {
         $charset = $this->leaf_by_regex("[[:print:]]");
         $length = 0;
-        $this->assertTrue($charset->match(new qtype_poasquestion_string("ab 5\0"), 0, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string("ab 5\0"), 1, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string("ab 5\0"), 2, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string("ab 5\0"), 3, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string("ab 5\0"), 4, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string("ab 5\0"), 0, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string("ab 5\0"), 1, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string("ab 5\0"), 2, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string("ab 5\0"), 3, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string("ab 5\0"), 4, $length));
 
         $charset->negative = true;
         $charset->clear_cached_ranges();
 
-        $this->assertFalse($charset->match(new qtype_poasquestion_string("ab 5\0"), 0, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string("ab 5\0"), 1, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string("ab 5\0"), 2, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string("ab 5\0"), 3, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string("ab 5\0"), 4, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string("ab 5\0"), 0, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string("ab 5\0"), 1, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string("ab 5\0"), 2, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string("ab 5\0"), 3, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string("ab 5\0"), 4, $length));
     }
 
     function test_charflag_flag_punct_match() {
         $charset = $this->leaf_by_regex("[[:punct:]]");
         $length = 0;
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('ab, c'), 0, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('ab, c'), 1, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('ab, c'), 2, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('ab, c'), 3, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('ab, c'), 4, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('ab, c'), 0, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('ab, c'), 1, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('ab, c'), 2, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('ab, c'), 3, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('ab, c'), 4, $length));
 
         $charset->negative = true;
         $charset->clear_cached_ranges();
 
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('ab, c'), 0, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('ab, c'), 1, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('ab, c'), 2, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('ab, c'), 3, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('ab, c'), 4, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('ab, c'), 0, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('ab, c'), 1, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('ab, c'), 2, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('ab, c'), 3, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('ab, c'), 4, $length));
     }
 
     function test_charflag_flag_cntrl_match() {
         $charset = $this->leaf_by_regex("[[:cntrl:]]");
         $length = 0;
-        $this->assertFalse($charset->match(new qtype_poasquestion_string("abc\26d"), 0, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string("abc\26d"), 1, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string("abc\26d"), 2, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string("abc\26d"), 3, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string("abc\26d"), 4, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string("abc\26d"), 0, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string("abc\26d"), 1, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string("abc\26d"), 2, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string("abc\26d"), 3, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string("abc\26d"), 4, $length));
 
         $charset->negative = true;
         $charset->clear_cached_ranges();
 
-        $this->assertTrue($charset->match(new qtype_poasquestion_string("abc\26d"), 0, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string("abc\26d"), 1, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string("abc\26d"), 2, $length));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string("abc\26d"), 3, $length));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string("abc\26d"), 4, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string("abc\26d"), 0, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string("abc\26d"), 1, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string("abc\26d"), 2, $length));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string("abc\26d"), 3, $length));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string("abc\26d"), 4, $length));
     }
 
     function test_charset_match() {
@@ -772,18 +772,18 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $a = new qtype_preg_charset_flag;
         $b = new qtype_preg_charset_flag;
         $c = new qtype_preg_charset_flag;
-        $a->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string('b@('));
+        $a->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion\string('b@('));
         $b->set_data(qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::POSIX_WORD);
-        $c->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string('s@'));
+        $c->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion\string('s@'));
         $c->negative = true;
 
         $charset = new qtype_preg_leaf_charset();
         $charset->flags[0][0] = $a;
         $charset->flags[1][0] = $b;
         $charset->flags[1][1] = $c;
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('bs@'), 0, $l));
-        $this->assertFalse($charset->match(new qtype_poasquestion_string('bs@'), 1, $l));
-        $this->assertTrue($charset->match(new qtype_poasquestion_string('bs@'), 2, $l));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('bs@'), 0, $l));
+        $this->assertFalse($charset->match(new qtype_poasquestion\string('bs@'), 1, $l));
+        $this->assertTrue($charset->match(new qtype_poasquestion\string('bs@'), 2, $l));
     }
 
     function test_charset_next() {
@@ -791,16 +791,16 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $a = new qtype_preg_charset_flag;
         $b = new qtype_preg_charset_flag;
         $c = new qtype_preg_charset_flag;
-        $a->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string('b@('));
+        $a->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion\string('b@('));
         $b->set_data(qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::POSIX_WORD);
-        $c->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string('s@'));
+        $c->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion\string('s@'));
         $c->negative = true;
 
         $charset = new qtype_preg_leaf_charset();
         $charset->flags[0][0] = $a;
         $charset->flags[1][0] = $b;
         $charset->flags[1][1] = $c;
-        $str = new qtype_poasquestion_string('');
+        $str = new qtype_poasquestion\string('');
         list($flag, $ch) = $charset->next_character($str, $str, 0);
         $this->assertTrue(strlen($ch)==1, 'Not one character got by next_character()!');
         $this->assertTrue($charset->match($ch, 0, $l), 'Next character is unmatched!');
@@ -814,15 +814,15 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $d = new qtype_preg_charset_flag;
         $e = new qtype_preg_charset_flag;
         $f = new qtype_preg_charset_flag;
-        $a->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string('b%('));
+        $a->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion\string('b%('));
         $b->set_data(qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::POSIX_WORD);
-        $c->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string('s@'));
+        $c->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion\string('s@'));
         $c->negative = true;
         $d->set_data(qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::POSIX_WORD);
         $d->negative = true;
-        $e->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string('a%'));
+        $e->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion\string('a%'));
         $e->negative = true;
-        $f->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string('b%)'));
+        $f->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion\string('b%)'));
         //form charsets
         $charset1 = new qtype_preg_leaf_charset;
         $charset1->flags[0][0] = $a;
@@ -848,10 +848,10 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($result->flags[0][0]->set=='(' || $result->flags[1][0]->set=='(' || $result->flags[2][0]->set=='(', '\'(\' not exist in intersection of [b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
         $this->assertTrue($result->flags[0][0]->set=='b%' || $result->flags[1][0]->set=='b%' || $result->flags[2][0]->set=='b%%', '\"b%\" not exist in intersection of [b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
         $this->assertTrue($result->flags[0][0]->set=='b' || $result->flags[1][0]->set=='b' || $result->flags[2][0]->set=='b', '\"b\" not exist in intersection of [b%%(]U\w[^s@] and \W[^a%%]U[b%%)]!');
-        $this->assertTrue($result->match(new qtype_poasquestion_string('(b@%)'), 0, $l, true), 'Incorrect matching');
-        $this->assertTrue($result->match(new qtype_poasquestion_string('(b@%)'), 1, $l, true), 'Incorrect matching');
-        $this->assertFalse($result->match(new qtype_poasquestion_string('(b@%)'), 2, $l, true), 'Incorrect matching');
-        $this->assertTrue($result->match(new qtype_poasquestion_string('(b@%)'), 3, $l, true), 'Incorrect matching');
-        $this->assertFalse($result->match(new qtype_poasquestion_string('(b@%)'), 4, $l, true), 'Incorrect matching');
+        $this->assertTrue($result->match(new qtype_poasquestion\string('(b@%)'), 0, $l, true), 'Incorrect matching');
+        $this->assertTrue($result->match(new qtype_poasquestion\string('(b@%)'), 1, $l, true), 'Incorrect matching');
+        $this->assertFalse($result->match(new qtype_poasquestion\string('(b@%)'), 2, $l, true), 'Incorrect matching');
+        $this->assertTrue($result->match(new qtype_poasquestion\string('(b@%)'), 3, $l, true), 'Incorrect matching');
+        $this->assertFalse($result->match(new qtype_poasquestion\string('(b@%)'), 4, $l, true), 'Incorrect matching');
     }*/
 }

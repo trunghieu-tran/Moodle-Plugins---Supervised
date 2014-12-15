@@ -54,7 +54,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
     }
 
     /*function test_match_string_ends() {
-        $str = new qtype_poasquestion_string("a\n");
+        $str = new qtype_poasquestion\string("a\n");
         $length = 0;
         $lexer = $this->create_lexer("[ab\n]");
         $leaf = $lexer->nextToken()->value;
@@ -67,7 +67,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_match_character_with_circumflex() {
-        $str = new qtype_poasquestion_string("ab\n");
+        $str = new qtype_poasquestion\string("ab\n");
         $length = 0;
         $lexer = $this->create_lexer("[ab]");
         $leaf = $lexer->nextToken()->value;
@@ -79,7 +79,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_match_string_ends_dollar_assert() {
-        $str = new qtype_poasquestion_string("ab\na\nas");
+        $str = new qtype_poasquestion\string("ab\na\nas");
         $length = 0;
         $lexer = $this->create_lexer("[ab\n]");
         $leaf = $lexer->nextToken()->value;
@@ -91,7 +91,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_match_character_with_dollar() {
-        $str = new qtype_poasquestion_string("ab\na\nas");
+        $str = new qtype_poasquestion\string("ab\na\nas");
         $length = 0;
         $lexer = $this->create_lexer("[ab]");
         $leaf = $lexer->nextToken()->value;
@@ -103,7 +103,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_match_one_string() {
-        $str = new qtype_poasquestion_string("ab");
+        $str = new qtype_poasquestion\string("ab");
         $length = 0;
         $lexer = $this->create_lexer("[a]");
         $leaf = $lexer->nextToken()->value;
@@ -113,7 +113,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_match_single_assert() {
-        $str = new qtype_poasquestion_string("ab\na\nas");
+        $str = new qtype_poasquestion\string("ab\na\nas");
         $length = 0;
         $leaf= new qtype_preg_leaf_assert_circumflex;
         $pos = 0;
@@ -122,7 +122,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_match_before_and_after_asserts_true() {
-        $str = new qtype_poasquestion_string("ab\na\nas");
+        $str = new qtype_poasquestion\string("ab\na\nas");
         $length = 0;
         $lexer = $this->create_lexer("[ab\n]");
         $leaf = $lexer->nextToken()->value;
@@ -136,7 +136,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_match_before_and_after_asserts_false() {
-        $str = new qtype_poasquestion_string("ab\na\nas");
+        $str = new qtype_poasquestion\string("ab\na\nas");
         $length = 0;
         $lexer = $this->create_lexer("[ab]");
         $leaf = $lexer->nextToken()->value;
@@ -150,7 +150,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_match_empty_string_true() {
-        $str = new qtype_poasquestion_string("ab\n\nas");
+        $str = new qtype_poasquestion\string("ab\n\nas");
         $length = 0;
         $lexer = $this->create_lexer("[a-z\n]");
         $leaf = $lexer->nextToken()->value;
@@ -164,7 +164,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_match_empty_string_false() {
-        $str = new qtype_poasquestion_string("ab\n\nas");
+        $str = new qtype_poasquestion\string("ab\n\nas");
         $length = 0;
         $lexer = $this->create_lexer("[a-z]");
         $leaf = $lexer->nextToken()->value;
@@ -178,7 +178,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_match_single_dollar_in_the_end() {
-        $str = new qtype_poasquestion_string("ab\n\nas");
+        $str = new qtype_poasquestion\string("ab\n\nas");
         $length = 0;
         $leaf = new qtype_preg_leaf_assert_dollar;
         $pos = 6;
@@ -187,7 +187,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_match_middle_of_the_string() {
-        $str = new qtype_poasquestion_string("bcd");
+        $str = new qtype_poasquestion\string("bcd");
         $length = 0;
         $lexer = $this->create_lexer("[a-c\n]");
         $leaf = $lexer->nextToken()->value;
@@ -201,7 +201,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
     ////////////////////////////////////////// next_character
 
     function test_generation_empty_string() {
-        $str = new qtype_poasquestion_string("ax");
+        $str = new qtype_poasquestion\string("ax");
         $pos = 1;
         $length = 0;
 
@@ -218,7 +218,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_generation_string_ends_false() {
-        $str = new qtype_poasquestion_string("b\n");
+        $str = new qtype_poasquestion\string("b\n");
         $pos = 1;
         $length = 0;
 
@@ -235,7 +235,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_generation_string_ends_dollar_assert() {
-        $str = new qtype_poasquestion_string("bx\na\nas");
+        $str = new qtype_poasquestion\string("bx\na\nas");
         $pos = 2;
         $length = 0;
 
@@ -252,7 +252,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_generation_character_with_dollar() {
-        $str = new qtype_poasquestion_string("b\na\nas");
+        $str = new qtype_poasquestion\string("b\na\nas");
         $pos = 1;
         $length = 0;
 
@@ -269,7 +269,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_generation_one_string() {
-        $str = new qtype_poasquestion_string("ab");
+        $str = new qtype_poasquestion\string("ab");
         $pos = 1;
         $length = 0;
 
@@ -286,7 +286,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_generation_single_assert() {
-        $str = new qtype_poasquestion_string("\n\nas");
+        $str = new qtype_poasquestion\string("\n\nas");
         $pos = 0;
         $length = 0;
 
@@ -303,7 +303,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_generation_before_and_after_asserts_false() {
-        $str = new qtype_poasquestion_string("a\na\nas");
+        $str = new qtype_poasquestion\string("a\na\nas");
         $pos = 1;
         $length = 0;
 
@@ -321,7 +321,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_generation_before_and_after_asserts_true() {
-        $str = new qtype_poasquestion_string("abcd\nas");
+        $str = new qtype_poasquestion\string("abcd\nas");
         $pos = 1;
         $length = 0;
 
@@ -338,7 +338,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_generation_single_dollar_in_the_end() {
-        $str = new qtype_poasquestion_string("as");
+        $str = new qtype_poasquestion\string("as");
         $pos = 2;
         $length = 0;
 
@@ -355,7 +355,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_generation_middle_of_the_string() {
-        $str = new qtype_poasquestion_string("bcd");
+        $str = new qtype_poasquestion\string("bcd");
         $pos = 1;
         $length = 0;
 
@@ -372,7 +372,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_generation_last_character() {
-        $str = new qtype_poasquestion_string("a\n");
+        $str = new qtype_poasquestion\string("a\n");
         $pos = 1;
         $length = 0;
 

@@ -3,7 +3,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
 class qtype_preg_unicode_test extends PHPUnit_Framework_TestCase {
@@ -241,29 +240,29 @@ class qtype_preg_unicode_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_get_ranges_from_charset() {
-        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion_string('a'));
+        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion\string('a'));
         $this->assertTrue(count($ranges) === 1);
         $this->assertTrue($ranges[0][0] === core_text::utf8ord('a'));
         $this->assertTrue($ranges[0][1] === core_text::utf8ord('a'));
 
-        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion_string('ab'));
+        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion\string('ab'));
         $this->assertTrue(count($ranges) === 1);
         $this->assertTrue($ranges[0][0] === core_text::utf8ord('a'));
         $this->assertTrue($ranges[0][1] === core_text::utf8ord('b'));
 
-        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion_string('abc'));
+        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion\string('abc'));
         $this->assertTrue(count($ranges) === 1);
         $this->assertTrue($ranges[0][0] === core_text::utf8ord('a'));
         $this->assertTrue($ranges[0][1] === core_text::utf8ord('c'));
 
-        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion_string('abde'));
+        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion\string('abde'));
         $this->assertTrue(count($ranges) === 2);
         $this->assertTrue($ranges[0][0] === core_text::utf8ord('a'));
         $this->assertTrue($ranges[0][1] === core_text::utf8ord('b'));
         $this->assertTrue($ranges[1][0] === core_text::utf8ord('d'));
         $this->assertTrue($ranges[1][1] === core_text::utf8ord('e'));
 
-        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion_string('acdfghj'));
+        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion\string('acdfghj'));
         $this->assertTrue(count($ranges) === 4);
         $this->assertTrue($ranges[0][0] === core_text::utf8ord('a'));
         $this->assertTrue($ranges[0][1] === core_text::utf8ord('a'));

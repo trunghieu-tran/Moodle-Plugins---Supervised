@@ -60,9 +60,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
-require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
-
 abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
 
     // Different sources of test data.
@@ -243,7 +240,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         $lexer = new qtype_preg_lexer($pseudofile);
         $token = $lexer->nextToken();
         $leaf = is_array($token) ? $token[0]->value : $token->value;
-        $res = $leaf->match(new qtype_poasquestion_string($char), 0, $length, false);
+        $res = $leaf->match(new qtype_poasquestion\string($char), 0, $length, false);
         fclose($pseudofile);
         return $res;
     }
@@ -354,7 +351,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
             if ($obtainednext === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER) {
                 $nextpassed = ($pattern === $obtainednext);
             } else {
-                $char = qtype_poasquestion_string::substr($obtainednext, 0, 1);
+                $char = core_text::substr($obtainednext, 0, 1);
                 $nextpassed = ($pattern === qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER && $pattern === $obtainednext) ||
                               ($pattern === '' && $pattern === $obtainednext) ||
                               ($pattern !== '' && $this->check_next_character($pattern, $char));
