@@ -44,14 +44,15 @@ class block_formal_langs_token_simple_english_word extends block_formal_langs_to
  */
 class block_formal_langs_token_simple_english_numeric extends block_formal_langs_token_simple_english_token
 {
- 
 } 
 
 /** Describes a punctuation mark
  */
 class block_formal_langs_token_simple_english_punctuation extends block_formal_langs_token_simple_english_token
 {
- 
+    public function use_editing_distance() {
+        return false;
+    }
 } 
 
 /** Describes a typographic marks
