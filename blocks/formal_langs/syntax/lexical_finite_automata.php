@@ -108,7 +108,7 @@ class block_formal_langs_lexical_automata_state {
         $result->startstringpos  = $this->startstringpos;
         $result->endstringpos = $this->endstringpos;
         $result->buffer = $this->buffer;
-        if (textlib::strlen($appendsym)) {
+        if (core_text::strlen($appendsym)) {
             $result->append($appendsym);
         }
         if ($zerowidth) {
@@ -131,7 +131,7 @@ class block_formal_langs_lexical_automata_state {
      * @param array $symbols symbols
      */
     public function append($symbols) {
-        for($i = 0; $i < textlib::strlen($symbols); $i++) {
+        for($i = 0; $i < core_text::strlen($symbols); $i++) {
             $this->buffer[] = $symbols[$i];
         }
     }
@@ -590,10 +590,10 @@ class block_formal_langs_lexer_interaction_wrapper_impl {
      * @return string|int
      */
     public function get($pos) {
-        if ($pos >= textlib::strlen($this->string)) {
+        if ($pos >= core_text::strlen($this->string)) {
             return block_formal_langs_lexical_matching_rule_type::$EOF_SYMBOL;
         }
-        return textlib::substr($this->string, $pos, 1);
+        return core_text::substr($this->string, $pos, 1);
     }
     /**
      * Sets assigned lexical automata
