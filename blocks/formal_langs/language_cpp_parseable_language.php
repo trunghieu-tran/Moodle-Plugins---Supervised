@@ -49,6 +49,9 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
 	/*! A stack, that determine, whether we should pop introduced namespace stack or not
 	 */
 	protected $shoulclosenamespacestack;
+	/*! Makes parser to not strip comments from data
+	 */
+	protected $stripcomments;
     /**
      * Construcs mapper
      */
@@ -59,7 +62,15 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
         $this->introducednamespacestack = array();
 		$this->constructabletypestree = array();
 		$this->shoulclosenamespacestack = array();
+		$this->stripcomments = true;
     }
+	/** 
+	 * Enables or disabled comment stripping
+	 * @param $flag a flag value
+	 */
+	public function set_strip_comments($flag) {
+		$this->stripcomments = $flag;
+	}
 	
 	/** Pushed introduced type
 	 *  @param[in] string $name a name of type
@@ -132,7 +143,7 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
     /** Sets namespace tree for a mapper
      *  @param array $tree a tree for namespaces
      */
-    public function setNamespaceTree($tree) {
+    public function set_namespace_tree($tree) {
         $this->namespacetree = $tree;
     }
     /**
@@ -373,7 +384,7 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
      * @param mixed $token a token
      */
     protected function parse_token($token, $parser) {
-        if ($token->type() != 'singleline_comment' && $token->type() != 'multiline_comment') {
+        if (($token->type() != 'singleline_comment' && $token->type() != 'multiline_comment') || $this->stripcomments == false) {
             parent::parse_token($token, $parser);
         }
     }

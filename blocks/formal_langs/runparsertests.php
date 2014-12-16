@@ -185,12 +185,17 @@ $failedethalons = false;
 if (count($inputs)) {
 	foreach($inputs as $file)
 	{
-		include($inputdir . DIRECTORY_SEPARATOR . $file);
-		
+		if (isset($donotstripcomments)) {
+			unset($donotstripcomments);
+		}
+		include($inputdir . DIRECTORY_SEPARATOR . $file);		
 		$name = preg_replace("/\.php$/", ".txt", $file);
 		
 		$lang = new block_formal_langs_language_cpp_parseable_language();
-		$lang->parser()->setNamespaceTree($namespacetree);
+		$lang->parser()->set_namespace_tree($namespacetree);
+		if (isset($donotstripcomments)) {
+			$lang->parser()->set_strip_comments(false);
+		}
 		$result = $lang->create_from_string($string);
 		$newstring = print_node($result->syntaxtree, 0);
 		if ($buildethalon)
