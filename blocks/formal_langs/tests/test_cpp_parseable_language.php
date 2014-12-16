@@ -67,7 +67,7 @@ class block_formal_langs_cpp_parseable_language_test extends PHPUnit_Framework_T
             /** @noinspection PhpUndefinedMethodInspection */
             $value = $node->value();
         }
-        if (textlib::strlen($value)) {
+        if (core_text::strlen($value)) {
             $result .= $padding . $value . PHP_EOL;
         }
         //echo $padding . $node->type() . $value . PHP_EOL;

@@ -24,7 +24,6 @@
 define('AJAX_SCRIPT', true);
 require_once('../../../config.php');
 require_once($CFG->libdir.'/accesslib.php');
-require_once($CFG->dirroot.'/lib/classes/text.php');
 require_once($CFG->dirroot .'/blocks/formal_langs/language_cpp_parseable_language.php');
 
 global $USER;
@@ -109,7 +108,7 @@ function node_to_array($node, $parent, &$maxkey)
 }
 
 
-if (textlib::strlen($text)) {
+if (core_text::strlen($text)) {
     $lang = new block_formal_langs_language_cpp_parseable_language();
     $lang->parser()->setNamespaceTree($namespacetree);
     $result = $lang->create_from_string($text);
