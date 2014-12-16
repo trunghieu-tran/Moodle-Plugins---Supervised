@@ -200,14 +200,14 @@ abstract class block_formal_langs_predefined_language extends block_formal_langs
         // Also it can implement find_errors for seeking of deferred errors
         $scanerclass = $this->lexername();
         $string = $processedstring->string;
-        if (is_a($string,'qtype_poasquestion_string') == true) {
+        if (is_a($string,'qtype_poasquestion\string') == true) {
             $string = $string->string();
         }
         $string = $this->preprocess_for_scan($string);
         $stream = new block_formal_langs_token_stream();
         $stream->tokens = array();
         $stream->errors = array();
-        if (textlib::strlen(trim($string)) != 0) {
+        if (core_text::strlen(trim($string)) != 0) {
             StringStreamController::createRef('str', $string);
             $pseudofile = fopen('string://str', 'r');
             $this->scaner = new $scanerclass($pseudofile);
