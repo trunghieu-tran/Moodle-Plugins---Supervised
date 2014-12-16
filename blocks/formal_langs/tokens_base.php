@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
 require_once($CFG->dirroot.'/question/type/poasquestion/classes/string.php');
+require_once($CFG->dirroot.'/question/type/poasquestion/stringstream/stringstream.php');
+require_once($CFG->dirroot.'/blocks/formal_langs/descriptions/descriptionrule.php');
 
 class block_formal_langs_ast {
 
@@ -44,8 +46,8 @@ class block_formal_langs_ast {
     public function __construct() {
         
     }
-
-    private function print_node($node, $args = NULL) {//TODO - normal printing, maybe using dot
+    
+    private function print_node($node, $args = null) {// TODO - normal printing, maybe using dot
         printf('Node number: %d\n', $node->number());
         printf('Node type: %s\n', $node->type());
         printf('Node position: [%d, %d, %d, %d]\n',
@@ -64,10 +66,10 @@ class block_formal_langs_ast {
         // entering node
         if ($node->is_leaf()) {
             // leaf action
-            $callback($node, $args);//TODO - what is args?
+            $callback($node, $args);// TODO - what is args?
         }
-
-        foreach($node->childs as $child) {//TODO - why no callback for non-leaf nodes?
+        foreach ($node->childs as $child) {
+            // TODO - why no callback for non-leaf nodes?
             $this->traverse($child, $callback);
         }
     }
@@ -101,7 +103,7 @@ class block_formal_langs_node_position {
      */	    
     protected $stringend;
 
-    public function linestart(){
+    public function linestart() {
         return $this->linestart;
     }
 
@@ -213,7 +215,11 @@ class block_formal_langs_ast_node_base {
      */
     protected $description;
 	
-	public $rule;
+    /**
+     * A rule for generating node description
+     * @var block_formal_langs_description_rule
+     */
+    public $rule;
 
     public function __construct($type, $position, $number, $needuserdescription) {
         $this->number = $number;
@@ -223,6 +229,7 @@ class block_formal_langs_ast_node_base {
 
         $this->childs = array();
         $this->description = '';
+        $this->rule = null;
     }
 
     /**
@@ -330,12 +337,13 @@ class block_formal_langs_ast_node_base {
      */
     public function tokens_list() {
         $childcount = count($this->childs());
+        $children = $this->childs();
         $result = array();
-        if (count($childcount) == 0) {
+        if (count($childcount) == 0 || $children === null || !is_array($children)) {
             $result[] = $this;
         } else {
             /** @var block_formal_langs_ast_node_base $child */
-            foreach($this->childs() as $child) {
+            foreach($children as $child) {
                 $tmp = $child->tokens_list();
                 if (count($result) == 0) {
                     $result = $tmp;
@@ -423,7 +431,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      */
     public function name() {
         $className = get_class($this);
-        $name = str_replace('block_formal_langs_','', $className);
+        $name = str_replace('block_formal_langs_', '', $className);
         return $name;
     }
 
@@ -447,23 +455,147 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * @param $options - comparing options
      */
     public function editing_distance($token, block_formal_langs_comparing_options $options) {
-        if ($this->is_same($token, $options->usecase)) {//If two tokens are identical, return 0.
+        if ($this->is_same($token, $options)) {// If two tokens are identical, return 0.
             return 0;
         }
-        if ($this->use_editing_distance()) {//Damerau-Levenshtein distance is default now.
+        if ($this->use_editing_distance()) {// Damerau-Levenshtein distance is default now.
             $distance = block_formal_langs_token_base::damerau_levenshtein($this->value(), $token->value(), $options);
-        } else {//Distance not applicable, so return a big number.
+        } else {// Distance not applicable, so return a big number.
             $distance = core_text::strlen($this->value()) + core_text::strlen($token->value());
         }
+        return $distance;
     }
 
-    /* Calculates Damerau-Levenshtein distance between two strings.  
+    /* Calculates Damerau-Levenshtein distance between two strings
      *
      * @return int Damerau-Levenshtein distance
      */
     static public function damerau_levenshtein($str1, $str2, block_formal_langs_comparing_options $options) {
+        if ($options->usecase == false) {
+            $str1 = textlib::strtolower($str1);
+            $str2 = textlib::strtolower($str2);
+        }
+        if ($str1 == $str2) {
+            return 0;// words identical
+        }
+        $lenstr1 = textlib::strlen($str1);
+        $lenstr2 = textlib::strlen($str2);
+        // zero length of words
+        if ($lenstr1 == 0) {
+            return $lenstr2;
+        } else {
+            if ($lenstr2 == 0) {
+                return $lenstr1;
+            }
+        }
+        // matrix [lenstr1+1][lenstr2+1]
+        for ($i = 0; $i < $lenstr1; $i++) {
+            for ($j = 0; $j < $lenstr2+1; $j++) {
+                    $matrix[$i][$j] = 0;
+            }
+        }
+        // fill in the first row and column
+        for ($i = 0; $i <= $lenstr1; $i++) {
+            $matrix[$i][0] = $i;
+        }
+        for ($j = 0; $j <= $lenstr2; $j++) {
+            $matrix[0][$j] = $j;
+        }
+        // calculation
+        for ($i = 1; $i <= $lenstr1; $i++) {
+            for ($j = 1; $j <= $lenstr2; $j++) {
+                $cellup = $matrix[$i-1][$j]+1;// deletion
+                $cellleft = $matrix[$i][$j-1]+1;// insertion
+                if ($str1[$i-1] == $str2[$j-1]) {
+                    $cost=0;
+                } else {
+                    $cost=1;
+                }
+                $celldiag = $matrix[$i-1][$j-1] + $cost;// replacement
+                $matrix[$i][$j] = min(min($cellup, $cellleft), $celldiag);
+                if ($i>1 && $j>1 && $str1[$i-1] == $str2[$j-2] && $str1[$i-2] == $str2[$j-1]) {
+                    $matrix[$i][$j] = min($matrix[$i][$j], $matrix[$i-2][$j-2] + $cost);// transposition
+                }
+            }
+        }
+        return $matrix[$lenstr1][$lenstr2];
     }
 
+    /* Calculates redaction between two strings.
+     *
+     * @return str redaction distance
+     */
+    static public function redaction($str1, $str2) {
+        // lenght of tokens
+        $lenstr1 = textlib::strlen($str1);
+        $lenstr2 = textlib::strlen($str2);
+        // matrix operation and cost
+        for ($i=0; $i < $lenstr1+1; $i++) {
+            for ($j=0; $j < $lenstr2+1; $j++) {
+                $d[$i][$j] = 0;
+                $m[$i][$j] = 'i';
+            }
+        }
+        for ($i = 0; $i <= $lenstr1; $i++) {
+            $d[$i][0] = $i;
+            $p[$i][0] = 'd';
+        }
+        for ($i = 0; $i <= $lenstr2; $i++) {
+            $d[0][$i] = $i;
+            $p[0][$i] = 'i';
+        }
+        //operation from strings
+        for ($i = 1; $i <= $lenstr1; $i++) {
+            for ($j = 1; $j <= $lenstr2; $j++) {
+                $cost = ($str1[$i - 1] != $str2[$j - 1]) ? 1 : 0;
+                if ($d[$i][$j - 1] < $d[$i - 1][$j] && $d[$i][$j - 1] < $d[$i - 1][$j - 1] + $cost) {
+                    // insertion
+                    $d[$i][$j] = $d[$i][$j - 1] + 1;
+                    $p[$i][$j] = 'i';
+                } else if ($d[$i - 1][$j] < $d[$i - 1][$j - 1] + $cost) {
+                    // deletion
+                    $d[$i][$j] = $d[$i - 1][$j] + 1;
+                    $p[$i][$j] = 'd';
+                } else {
+                    // replacement or not operation
+                    $d[$i][$j] = $d[$i - 1][$j - 1] + $cost;
+                    $p[$i][$j] = ($cost == 1) ? 'r' : 'm';
+                }
+            }
+        }
+        // recovery orders
+        $route = '';
+        $i = $lenstr1;
+        $j = $lenstr2;
+        do {
+            $c = $p[$i][$j];
+            $route = $route.($c);
+            if ($c == 'r' || $c == 'm') {
+                $i --;
+                $j --;
+            } else if ($c == 'd') {
+                $i --;
+            } else if ($c == 'i') {
+                $j --;
+            }
+        } while (($i != 0) || ($j != 0));
+        $redact = strrev($route);
+        return $redact;
+    }
+     /* Calculates possible pair
+     *
+     * @return distance if possible or -1 if no possible
+     */
+    public function possible_pair($token, $max, $options) {
+        $str1 = $this->value;
+        $str2 = $token->value;
+        $distance = $this->editing_distance($token, $options);// define the distance of damerau-levenshtein
+        if ($distance<=$max) {
+            return $distance;
+        } else {
+            return -1;
+        }
+    }
     /**
      * Base lexical mistakes handler. Looks for possible matches for this
      * token in other answer and return an array of them.
@@ -481,10 +613,63 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * @return array - array of block_formal_langs_matched_tokens_pair objects with blank
      * $answertokens or $responsetokens field inside (it is filling from outside)
      */
-    public function look_for_matches($other, $threshold, $iscorrect, block_formal_langs_comparing_options $options) {
-        // TODO: generic mistakes handling
+    public function look_for_matches($other, $threshold, $iscorrect, block_formal_langs_comparing_options $options, $bypass) {
+        if ($bypass == true) {
+            $possiblepairs = array();
+            if($options->usecase == true){
+                for ($k=0; $k < count($other); $k++) {
+                    if($other[$k] == $this->value) {
+                        $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), 0, false, '');
+                        $possiblepairs[] = $pair;
+                    }
+                }
+            }
+        } else {
+            // TODO: generic mistakes handling
+            $result = textlib::strlen($this->value) - textlib::strlen($this->value) * $threshold;
+            $str = '';
+            $possiblepairs = array();
+            for ($k=0; $k < count($other); $k++) {
+                // incorrect lexem
+                if ($iscorrect == true) {
+                    $max = round($result);
+                    // possible pair (typo)
+                    $dist = $this->possible_pair($other[$k], $max, $options);
+                    if ($dist != -1) {
+                        $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), $dist, false, '');
+                        $possiblepairs[] = $pair;
+                    }
+                    // possible pair (extra separator)
+                    if ($k+1 != count($other)) {
+                        $max = 1;
+                        $str = $str.($other[$k]->value).("\x0d").($other[$k+1]->value);
+                        $lexem = new block_formal_langs_token_base(null, 'type', $str, null, 0);
+                        $dist = $this->possible_pair($lexem, $max, $options);
+                        if ($dist != -1) {
+                            $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k, $k+1), $dist, false, '');
+                            $possiblepairs[] = $pair;
+                        }
+                        $str='';
+                    }
+                } else {
+                    // possible pair (missing separator)
+                    if ($k+1 != count($other)) {
+                        $max = 1;
+                        $str = $str.($other[$k]->value).("\x0d").($other[$k+1]->value);
+                        $lexem = new block_formal_langs_token_base(null, 'type', $str, null, 0);
+                        $dist = $this->possible_pair($lexem, $max, $options);
+                        if ($dist != -1) {
+                            $pair = new block_formal_langs_matched_tokens_pair(array($k, $k+1), array($this->tokenindex), $dist, false, '');
+                            $possiblepairs[] = $pair;
+                        }
+                        $str = '';
+                    }
+                }
+            }
+        }
+        return $possiblepairs;
     }
-
+    
     /**
      * Returns a string caseinsensitive semantic value of token
      * @return string
@@ -512,10 +697,10 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
         if ($this->type == $other->type) {
             if ($options->usecase) {
                 $result = $this->value == $other->value;
-            }  else {
-                $left = $this->string_caseinsensitive_value();
+            } else {
+                $cellleft = $this->string_caseinsensitive_value();
                 $right = $other->string_caseinsensitive_value();
-                $result = $left == $right;
+                $result = $cellleft == $right;
             }
         }
         return $result;
@@ -533,16 +718,15 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
  */
 class block_formal_langs_matched_tokens_pair {
 
-
-    //No mistake in this pair, all is correct.
+    // No mistake in this pair, all is correct.
     const TYPE_NO_MISTAKE = 0;
-    //Mistake is a typo, measured by Damerau-Levenshtein distance.
+    // Mistake is a typo, measured by Damerau-Levenshtein distance.
     const TYPE_TYPO = 1;
-    //Mistake is an extra separator.
+    // Mistake is an extra separator.
     const TYPE_EXTRA_SEPARATOR = 2;
-    //Mistake is a missing separator.
+    // Mistake is a missing separator.
     const TYPE_MISSING_SEPARATOR = 3;
-    //This is a token-type specific mistake.
+    // This is a token-type specific mistake.
     const TYPE_SPECIFIC_MISTAKE = 999999;
 
     /**
@@ -584,7 +768,7 @@ class block_formal_langs_matched_tokens_pair {
         $this->correcttokens = $correcttokens;
         $this->comparedtokens = $comparedtokens;
         $this->mistakeweight = $mistakeweight;
-        if ($specific) {//This mistake is a lexem-type specific mistake.
+        if ($specific) {// This mistake is a lexem-type specific mistake.
             if ($mistakeweight == 0) {
                 $this->type = self::TYPE_NO_MISTAKE;
                 $this->messageid = '';
@@ -592,7 +776,7 @@ class block_formal_langs_matched_tokens_pair {
                 $this->type = self::TYPE_SPECIFIC_MISTAKE;
                 $this->messageid = $messageid;
             }
-        } else {//This mistake is a general mistake.
+        } else {// This mistake is a general mistake.
             if ($mistakeweight == 0) {
                 $this->type = self::TYPE_NO_MISTAKE;
                 $this->messageid = '';
@@ -616,19 +800,24 @@ class block_formal_langs_matched_tokens_pair {
      * @return user language message string, describing a possible mistake this pair represents.
      */
     public function message($correctstring, $comparedstring) {
-        if ($this->type == self::TYPE_NO_MISTAKE) {//Full match, no mistake.
+        if ($this->type == self::TYPE_NO_MISTAKE) {// Full match, no mistake.
             return '';
         }
 
         $a = new stdClass();
         $a->mistakeweight = $this->mistakeweight;
-        $a->correct = array();
+        $i = 0;
         foreach ($this->correcttokens as $index) {
-            $a->correct[] = $correctstring->node_description($index);
+            $name = 'correct'.$i;
+            $a->$name = $correctstring->node_description($index);
+            $i++;
         }
         $a->compared = array();
+        $j = 0;
         foreach ($this->comparedtokens as $index) {
-            $a->compared[] = $comparedstring->node_description($index);
+            $name = 'compared'.$j;
+            $a->$name = $comparedstring->node_description($index);
+            $j++;
         }
 
         return get_string($this->messageid, 'block_formal_langs', $a);
@@ -640,6 +829,8 @@ class block_formal_langs_typo_pair extends block_formal_langs_matched_tokens_pai
     /**
      * A string with editing operators.
      * @var string
+     * derived from function redaction($str1, $str2)
+     * 'i' - insert, 'm' - no operation, 'd' - deletion, 'r' - replacement
      */
      public $editops='';
 }
@@ -683,30 +874,48 @@ class block_formal_langs_token_stream {
     }
 
     /**
-     * Set token indexes traversing array of tokens from left to right
+     * Set token indexes traversing array of tokens from cellleft to right
      *
      * Use to restore indexes after inserting or removing tokens (c.e. correct_mistakes)
      */
     public function set_token_indexes() {
-        //TODO Birukova
+        // TODO Birukova
     }
 
     /**
      * Compares compared stream of tokens with this (correct) stream looking for
      * matches with possible errors in tokens (but not in their placement)
      *
-     * @param comparedstream object of block_formal_langs_token_stream to compare with this, may contain errors
-     * @param threshold editing distance threshold (in percents to token length)
-     * @return array of block_formal_langs_matched_tokens_pair objects
+     * @param block_formal_langs_token_stream $comparedstream object of block_formal_langs_token_stream to compare with this, may contain errors
+     * @param float $threshold editing distance threshold (in percents to token length)
+     * @param block_formal_langs_comparing_options $options options data
+     * @param bool $bypass bypass for pairs
+     * @return array of block_formal_langs_matches_group objects
      */
-    public function look_for_token_pairs($comparedstream, $threshold, block_formal_langs_comparing_options $options) {
-        //TODO Birukova
-        //1. Find matched pairs (typos, typical errors etc) - Birukova
+    public function look_for_token_pairs($comparedstream, $threshold, block_formal_langs_comparing_options $options, $bypass) {
+        // TODO Birukova
+        // 1. Find matched pairs (typos, typical errors etc) - Birukova
         //  - look_for_matches function
-        //2. Find best groups of pairs - Birukova
+        // 2. Find best groups of pairs - Birukova
         //  - group_matches function, with criteria defined by compare_matches_groups function
+        if ($bypass == false) {
+            $allpossiblepairs = array();
+            $bestgroups = array();
+            $allpossiblepairs = $this->look_for_matches($comparedstream, $threshold, $options);
+            if (count($allpossiblepairs)>0) {
+                $bestgroups = $this->group_matches($allpossiblepairs);
+            } 
+        } else {
+            $allpossiblepairs = array();
+            $bestgroups = array();
+            $allpossiblepairs = $this->look_for_matches_for_bypass($comparedstream, $threshold, $options);
+            if (count($allpossiblepairs)>0) {
+                $bestgroups = $this->group_matches_for_bypass($allpossiblepairs);
+            } 
+        }
+        return $bestgroups;
     }
-
+    
     /**
      * Creates an array of all possible matched pairs using this stream as correct one.
      *
@@ -717,9 +926,43 @@ class block_formal_langs_token_stream {
      * @return array array of matched_tokens_pair objects representing all possible pairs within threshold
      */
     public function look_for_matches($comparedstream, $threshold, block_formal_langs_comparing_options $options) {
-        //TODO Birukova
+        $bypass=false;
+        // TODO Birukova
+        $tokens = $this->tokens;
+        $allpossiblepairs = array();
+        $pairs = array();
+        // search for correct tokens
+        for ($i=0; $i<count($tokens); $i++) {
+            $pairs = $tokens[$i]->look_for_matches($comparedstream->tokens, $threshold, true, $options, $bypass);
+            for ($j=0; $j<count($pairs); $j++) {
+                $allpossiblepairs[] = $pairs[$j];
+            }
+        }
+        // search for compared tokens
+        for ($i=0; $i<count($comparedstream->tokens); $i++) {
+            $pairs=$comparedstream->tokens[$i]->look_for_matches($this->tokens, $threshold, false, $options, $bypass);
+            for ($j=0; $j<count($pairs); $j++) {
+                $allpossiblepairs[] = $pairs[$j];
+            }
+        }
+        return $allpossiblepairs;
     }
 
+    public function look_for_matches_for_bypass($comparedstream, $threshold, block_formal_langs_comparing_options $options) {
+        $bypass=true;
+        $tokens = $this->tokens;
+        $allpossiblepairs = array();
+        $pairs = array();
+        // search for correct tokens
+        for ($i=0; $i<count($tokens); $i++) {
+            $pairs = $tokens[$i]->look_for_matches($comparedstream->tokens, $threshold, true, $options, $bypass);
+            for ($j=0; $j<count($pairs); $j++) {
+                $allpossiblepairs[] = $pairs[$j];
+            }
+        }
+        return $allpossiblepairs;
+    }
+    
     /**
      * Generates array of best groups of matches representing possible set of mistakes in tokens.
      *
@@ -728,12 +971,316 @@ class block_formal_langs_token_stream {
      * compared using compare_matches_groups function
      *
      * @param array $matches array of matched_tokens_pair objects representing all possible pairs within threshold
-     * @return array of  block_formal_langs_matches_group objects
+     * @return array of block_formal_langs_matches_group objects
      */
     public function group_matches($matches) {
-        //TODO Birukova
+        // TODO Birukova
+        $status = array();
+        for ($i=0; $i < count($matches); $i++) {
+            $status[] = 0;
+        }
+        $setspairs = array();
+        $arraybestgroupsmatches = array();
+        // recurcive_backtracking
+        $this->recurcive_backtracking($matches, $status, $setspairs);
+        if (count($setspairs)>0) {
+            // first is the best
+            $arraybestgroupsmatches[] = $setspairs[0];
+            // write the best
+            for ($i = 1; $i<count($setspairs); $i++) {
+                // equal
+                if ($this->compare_matches_groups($arraybestgroupsmatches[0], $setspairs[$i]) == 0) {
+                    $arraybestgroupsmatches[] = $setspairs[$i];
+                    // new group
+                } else {
+                    if ($this->compare_matches_groups($arraybestgroupsmatches[0], $setspairs[$i]) < 0) {
+                        // clear
+                        $arraybestgroupsmatches = array();
+                        $arraybestgroupsmatches[] = $setspairs[$i];
+                    }
+                }
+            }
+        }
+        // array of results
+        return $arraybestgroupsmatches;
     }
-
+    
+    public function group_matches_for_bypass($matches) {
+        $status = array();
+        for ($i=0; $i < count($matches); $i++) {
+            $status[] = 0;
+        }
+        $setspairs = array();
+        $arraybestgroupsmatches = array();
+        // recurcive_backtracking
+        $this->recurcive_backtracking_for_bypass($matches, $status, $setspairs);
+        if (count($setspairs)>0) {
+            // first is the best
+            $arraybestgroupsmatches[] = $setspairs[0];
+            // write the best
+            for ($i = 1; $i<count($setspairs); $i++) {
+                // equal
+                if ($this->compare_matches_groups_for_bypass($arraybestgroupsmatches[0], $setspairs[$i]) == 0) {
+                    $arraybestgroupsmatches[] = $setspairs[$i];
+                    // new group
+                } else {
+                    if ($this->compare_matches_groups_for_bypass($arraybestgroupsmatches[0], $setspairs[$i]) < 0) {
+                        // clear
+                        $arraybestgroupsmatches = array();
+                        $arraybestgroupsmatches[] = $setspairs[$i];
+                    }
+                }
+            }
+        }
+        // array of results
+        return $arraybestgroupsmatches;
+    }
+    
+    public function recurcive_backtracking(&$matches, &$status, &$setspairs) {
+        $place = -1;
+        // empty set
+        for ($i=0; $i<count($status); $i++) {
+            if ($status[$i] == 1) {
+                $place = $i;
+            }
+        }
+        $place = $place+1;
+        $countstatus = count($status);
+        for ($i = $place; $i < $countstatus; $i++) {
+            if ($status[$i] == 0) {
+                $status[$i] = 1;
+                // add new pair and bloking
+                $this->bloking($i, $matches, $status);
+                $flag = -1;
+                for ($j= $i; $j<count($status); $j++) {
+                    if ($status[$j]==0) {
+                        $flag=1;
+                    }
+                }
+                // recurcive
+                if ($flag!=-1) {
+                    $this->recurcive_backtracking($matches, $status, $setspairs);
+                } else {
+                    // set is finished
+                    $setpairs = new block_formal_langs_matches_group();
+                    $setpairs->matchedpairs = array();
+                    $setpairs->mistakeweight = 0;
+                    $setpairs->correctcoverage = array();
+                    $setpairs->comparedcoverage = array();
+                    // find used pairs
+                    for ($k=0; $k<count($status); $k++) {
+                        if ($status[$k] == 1) {
+                            array_push($setpairs->matchedpairs, $matches[$k]);
+                            $setpairs->mistakeweight += $matches[$k]->mistakeweight;
+                            for ($g=0; $g<count($matches[$k]->correcttokens); $g++) {
+                                $setpairs->correctcoverage[] = $matches[$k]->correcttokens[$g];
+                            }
+                            for ($g=0; $g<count($matches[$k]->comparedtokens); $g++) {
+                                $setpairs->comparedcoverage[] = $matches[$k]->comparedtokens[$g];
+                            }
+                        }
+                    }
+                    sort($setpairs->correctcoverage);
+                    sort($setpairs->comparedcoverage);
+                    $setspairs[]=$setpairs;
+                }
+                // unlock
+                $this->unlock($i, $matches, $status);
+                $status[$i] = 0;
+                // bloking
+                for ($j=0; $j<count($status); $j++) {
+                    if ($status[$j]==1) {
+                        $this->bloking($j, $matches, $status);
+                    }
+                }
+            }
+        }
+    }
+    
+    public function recurcive_backtracking_for_bypass(&$matches, &$status, &$setspairs) {
+        $place = -1;
+        // empty set
+        for ($i=0; $i<count($status); $i++) {
+            if ($status[$i] == 1) {
+                $place = $i;
+            }
+        }
+        $place = $place+1;
+        $countstatus = count($status);
+        for ($i = $place; $i < $countstatus; $i++) {
+            if ($status[$i] == 0) {
+                $status[$i] = 1;
+                // add new pair and bloking
+                $this->bloking_for_bypass($i, $matches, $status);
+                $flag = -1;
+                for ($j= $i; $j<count($status); $j++) {
+                    if ($status[$j]==0) {
+                        $flag=1;
+                    }
+                }
+                // recurcive
+                if ($flag!=-1) {
+                    $this->recurcive_backtracking_for_bypass($matches, $status, $setspairs);
+                } else {
+                    // set is finished
+                    $setpairs = new block_formal_langs_matches_group();
+                    $setpairs->matchedpairs = array();
+                    $setpairs->mistakeweight = 0;
+                    $setpairs->correctcoverage = array();
+                    $setpairs->comparedcoverage = array();
+                    // find used pairs
+                    for ($k=0; $k<count($status); $k++) {
+                        if ($status[$k] == 1) {
+                            array_push($setpairs->matchedpairs, $matches[$k]);
+                            for ($g=0; $g<count($matches[$k]->correcttokens); $g++) {
+                                $setpairs->correctcoverage[] = $matches[$k]->correcttokens[$g];
+                            }
+                            for ($g=0; $g<count($matches[$k]->comparedtokens); $g++) {
+                                $setpairs->comparedcoverage[] = $matches[$k]->comparedtokens[$g];
+                            }
+                        }
+                    }
+                    sort($setpairs->correctcoverage);
+                    sort($setpairs->comparedcoverage);
+                    $setspairs[]=$setpairs;
+                }
+                // unlock
+                $this->unlock_for_bypass($i, $matches, $status);
+                $status[$i] = 0;
+                // bloking
+                for ($j=0; $j<count($status); $j++) {
+                    if ($status[$j]==1) {
+                        $this->bloking_for_bypass($j, $matches, $status);
+                    }
+                }
+            }
+        }
+    }
+    
+    public function bloking(&$place, &$matches, &$status) {
+        $countpairs = count($matches);
+        // -1 if no possible
+        for ($i = $place+1; $i<$countpairs; $i++) {
+            if ($status[$i] != -1) {
+                // 1 indexs
+                if ($matches[$place]->correcttokens[0] == $matches[$i]->correcttokens[0] || $matches[$place]->comparedtokens[0] == $matches[$i]->comparedtokens[0]) {
+                    $status[$i] = -1;
+                }
+                // 2 indexs
+                if (count($matches[$place]->correcttokens) == 2) {
+                    // 1 indexs
+                    if ($matches[$place]->correcttokens[1] == $matches[$i]->correcttokens[0]) {
+                        $status[$i] = -1;
+                    }
+                    if (count($matches[$i]->correcttokens) == 2) {
+                        // 2 indexs
+                        if ($matches[$place]->correcttokens[1] == $matches[$i]->correcttokens[1]) {
+                            $status[$i] = -1;
+                        }
+                    }
+                }
+                if (count($matches[$i]->correcttokens) == 2) {
+                    if ($matches[$place]->correcttokens[0] == $matches[$i]->correcttokens[1]) {
+                        $status[$i]=-1;
+                    }
+                }
+                // incorrect lexems
+                // 2 indexs
+                if (count($matches[$place]->comparedtokens) == 2) {
+                    // 1 index
+                    if ($matches[$place]->comparedtokens[1] == $matches[$i]->comparedtokens[0]) {
+                        $status[$i] = -1;
+                    }
+                    if (count($matches[$i]->comparedtokens) == 2) {
+                        // 2 indexs
+                        if ($matches[$place]->comparedtokens[1] == $matches[$i]->comparedtokens[1]) {
+                            $status[$i]=-1;
+                        }
+                    }
+                }
+                if (count($matches[$i]->comparedtokens) == 2) {
+                    if ($matches[$place]->comparedtokens[0] == $matches[$i]->comparedtokens[1]) {
+                        $status[$i] = -1;
+                    }
+                }
+            }
+        }
+    }
+    
+    public function bloking_for_bypass(&$place, &$matches, &$status) {
+        $countpairs = count($matches);
+        // -1 if no possible
+        for ($i = $place+1; $i<$countpairs; $i++) {
+            if ($status[$i] != -1) {
+                // 1 indexs
+                if ($matches[$place]->correcttokens[0] == $matches[$i]->correcttokens[0] || $matches[$place]->comparedtokens[0] == $matches[$i]->comparedtokens[0]) {
+                    $status[$i] = -1;
+                }
+            }
+        }
+    }
+    
+    public function unlock(&$place, &$matches, &$status) {
+        $countstatus = count($status)-1;
+        for ($i = $countstatus; $i>$place; $i--) {
+            if ($status[$i] != 0) {
+                // 1 index
+                if ($matches[$place]->correcttokens[0] == $matches[$i]->correcttokens[0] || $matches[$place]->comparedtokens[0] == $matches[$i]->comparedtokens[0]) {
+                    $status[$i] = 0;
+                }
+                // 2 indexs
+                if (count($matches[$place]->correcttokens) == 2) {
+                    // 1 index
+                    if ($matches[$place]->correcttokens[1] == $matches[$i]->correcttokens[0]) {
+                        $status[$i] = 0;
+                    }
+                    if (count($matches[$i]->correcttokens) == 2) {
+                        // 2 indexs
+                        if ($matches[$place]->correcttokens[1] == $matches[$i]->correcttokens[1]) {
+                            $status[$i] = 0;
+                        }
+                    }
+                }
+                if (count($matches[$i]->correcttokens) == 2) {
+                    if ($matches[$place]->correcttokens[0] == $matches[$i]->correcttokens[1]) {
+                        $status[$i] = 0;
+                    }
+                }
+                // incorrect lexems
+                // 2 indexs
+                if (count($matches[$place]->comparedtokens) == 2) {
+                    // 1 index
+                    if ($matches[$place]->comparedtokens[1] == $matches[$i]->comparedtokens[0]) {
+                        $status[$i]=0;
+                    }
+                    if (count($matches[$i]->comparedtokens) == 2) {
+                        // 2 indexs
+                        if ($matches[$place]->comparedtokens[1] == $matches[$i]->comparedtokens[1]) {
+                            $status[$i] = 0;
+                        }
+                    }
+                }
+                if (count($matches[$i]->comparedtokens) == 2) {
+                    if ($matches[$place]->comparedtokens[0] == $matches[$i]->comparedtokens[1]) {
+                        $status[$i]=0;
+                    }
+                }
+            }
+        }
+    }
+    
+    public function unlock_for_bypass(&$place, &$matches, &$status) {
+        $countstatus = count($status)-1;
+        for ($i = $countstatus; $i>$place; $i--) {
+            if ($status[$i] != 0) {
+                // 1 index
+                if ($matches[$place]->correcttokens[0] == $matches[$i]->correcttokens[0] || $matches[$place]->comparedtokens[0] == $matches[$i]->comparedtokens[0]) {
+                    $status[$i] = 0;
+                }
+            }
+        }
+    }
+    
     /**
      * Compares two matches groups.
      *
@@ -743,31 +1290,75 @@ class block_formal_langs_token_stream {
      * @return number <0 if $group1 worse than $group2; 0 if $group1==$group2; >0 if $group1 better than $group2
      */
     public function compare_matches_groups($group1, $group2) {
-        //TODO Birukova
+        // TODO Birukova
+        // count tokens
+        if (count($group1->correctcoverage) + count($group1->comparedcoverage) == count($group2->correctcoverage) + count($group2->comparedcoverage)) {
+            // mistakeweight tokens
+            if ($group1->mistakeweight == $group2->mistakeweight) {
+                return 0;
+            } else {
+                if ($group1->mistakeweight < $group2->mistakeweight) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
+        } else {
+            if (count($group1->correctcoverage) + count($group1->comparedcoverage) > count($group2->correctcoverage) + count($group2->comparedcoverage)) {
+                return 1;
+            } else {
+                return -1;
+            }
+        }
     }
-
+    
+    public function compare_matches_groups_for_bypass($group1, $group2) {
+        if (count($group1->correctcoverage) + count($group1->comparedcoverage) > count($group2->correctcoverage) + count($group2->comparedcoverage)) {
+            return 1;
+        } 
+        if (count($group1->correctcoverage) + count($group1->comparedcoverage) == count($group2->correctcoverage) + count($group2->comparedcoverage)) {
+            return 0;
+        } else {
+            return -1;
+        }
+    }
+    /**
+     * Create a copy of this stream and correct mistakes in tokens using given array of matched pairs
+     *
+     * @param correctstream object of block_formal_langs_token_stream for correct stream
+     * @param matchedpairsgroup array of block_formal_langs_matched_tokens_pair
+     * @return a new token stream where comparedtokens changed to correcttokens if mistakeweight > 0 for the pair
+     */
+    public function correct_mistakes($correctstream, $matchedpairsgroup) {
+    }
 }
-
 /**
  * Represents possible set of correspondes between tokens of correct and compared streams
  */
 class  block_formal_langs_matches_group {
     /**
-     * Array of matched pairs
+     * Array of matched pairs - set of pairs
      * This is main data for the group, other three fields contains agregate information from it.
      * @var array of block_formal_langs_matched_tokens_pair and it's child classes objects
      */
     public $matchedpairs;
-
-    //Sum of mistake weights for the group
+    /**
+     * Sum of mistake weights
+     * @var int
+    */
     public $mistakeweight;
-
-    //Sorted array of all correct token indexes for tokens, covered by pairs from this group
+    /**
+     * Sorted array of all correct token indexes for tokens, covered by pairs from this group
+     * @var array - array of int indexs
+    */
     public $correctcoverage;
-
-    //Sorted array of all compared token indexes for tokens, covered by pairs from this group
+    
+    /*
+     * Sorted array of all compared token indexes for tokens, covered by pairs from this group
+     * @var array - array of int indexs
+    */
     public $comparedcoverage;
-
+    
     /**
      * Returns an array of token indexes from compared string, which matches tokens from correct string
      *
@@ -794,8 +1385,8 @@ class  block_formal_langs_lexical_error {
     public $errormessage;
 
     /**
-     *  Corrected token object if possible, null otherwise
-     *  @var block_formal_langs_token_base
+     * Corrected token object if possible, null otherwise
+     * @var block_formal_langs_token_base
      */
     public $correctedtoken;
     /**
@@ -819,7 +1410,7 @@ class block_formal_langs_scanning_error extends block_formal_langs_lexical_error
  *
  * Contains a string, a token stream (if the string is tokenized) and a syntax tree (or array of trees) if parsed
  * This class is needed to encapsulate a processed string and centralize a code for it's handling while having
- *   language, lexer and parser objects stateless.
+ * language, lexer and parser objects stateless.
  */
 class block_formal_langs_processed_string {
    
@@ -828,27 +1419,27 @@ class block_formal_langs_processed_string {
      */
     protected $tablename;
     /**
-     *@var integer an id to load/store user descriptions
+     * @var integer an id to load/store user descriptions
      */
     protected $tableid;
     
     /**
-     *@var string a string to process
+     * @var string a string to process
      */
     protected $string='';
 
     /**
-     *@var object a link to the language object
+     * @var object a link to the language object
      */
     protected $language;
 
     /**
-     *@var object a token stream if the string is tokenized
+     * @var object a token stream if the string is tokenized
      */
     protected $tokenstream=null;
 
     /**
-     *@var object a syntax tree if the string is parsed
+     * @var object a syntax tree if the string is parsed
      */
     protected $syntaxtree=null;
 
@@ -858,17 +1449,17 @@ class block_formal_langs_processed_string {
     protected $descriptions=null;
     
     /**
-     *  Sets a language for a string
-     *  @param block_formal_langs_abstract_language $lang  language
+     * Sets a language for a string
+     * @param block_formal_langs_abstract_language $lang  language
      */
     public function __construct($lang) {
         $this->language = $lang;
     }
     
     /**
-     *  Called, when user assigns field to a class
-     *  @param string $name   name of field
-     *  @param mixed  $value  value of string
+     * Called, when user assigns field to a class
+     * @param string $name   name of field
+     * @param mixed  $value  value of string
      */
     public function __set($name, $value) {
         $settertable = array('string' => 'set_string', 'stream' => 'set_stream', 'syntaxtree' => 'set_syntax_tree');
@@ -885,22 +1476,23 @@ class block_formal_langs_processed_string {
         
     }
     /**
-     *  Called when need to determine, whether field exists
-     *  @param string $name   name of field
-     *  @return bool whether field exists
+     * Called when need to determine, whether field exists
+     * @param string $name   name of field
+     * @return bool whether field exists
      */
     public function __isset($name) {
-        $getters = array('string', 'stream', 'syntaxtree', 'descriptions');
+        $getters = array('string', 'stream', 'syntaxtree', 'descriptions', 'language');
         return in_array($name, $getters);
     }
     /**
-     *  Called when need to get field
-     *  @param string $name   name of field
-     *  @return mixed field
+     * Called when need to get field
+     * @param string $name   name of field
+     * @return mixed field
      */
     public function __get($name) {
         $gettertable = array('string' => 'get_string', 'stream' => 'get_stream', 'syntaxtree' => 'get_syntax_tree');
         $gettertable['descriptions'] = 'node_descriptions_list';
+        $gettertable['language'] = 'get_lang';
         if (array_key_exists($name, $gettertable)) {
             $method = $gettertable[$name];
             return $this->$method();
@@ -913,9 +1505,9 @@ class block_formal_langs_processed_string {
     
     
     /** Removes a descriptions from a DB
-      * @param string $tablename  name of source table
-      * @param mixed $tableid    id or ids in table      
-      */
+     * @param string $tablename  name of source table
+     * @param mixed $tableid    id or ids in table      
+     */
     public static function delete_descriptions_by_id($tablename, $tableid ) {
         global $DB;
         $conditions = array();
@@ -930,10 +1522,10 @@ class block_formal_langs_processed_string {
     }
     
     /** Returns a descriptions from a DB
-      * @param string $tablename  name of source table
-      * @param mixed $tableid     ids in table
-      * @return array like ['id'] => array( number => description)      
-      */
+     * @param string $tablename  name of source table
+     * @param mixed $tableid     ids in table
+     * @return array like ['id'] => array( number => description)      
+     */
     public static function get_descriptions_as_array($tablename, $tableid ) {
         global $DB;
         $conditions = array();
@@ -946,17 +1538,17 @@ class block_formal_langs_processed_string {
         }
         $records = $DB->get_records_select('block_formal_langs_node_dscr', implode(' AND ', $conditions));
         $result = array();
-        foreach($records as $record) {
+        foreach ($records as $record) {
             $result[$record->tableid][$record->number] = $record->description;
         }
         return $result;
     }
     
     /**
-     *  Sets an inner string. Also flushes any other dependent fields (token stream, syntax tree, descriptions) 
-     *  @param string $string inner string
+     * Sets an inner string. Also flushes any other dependent fields (token stream, syntax tree, descriptions) 
+     * @param string $string inner string
      */
-    protected function set_string($string)  {
+    protected function set_string($string) {
         $this->string=$string;
         $this->tokenstream=null;
         $this->syntaxtree=null;
@@ -967,8 +1559,9 @@ class block_formal_langs_processed_string {
      * @param block_formal_langs_token_stream $stream stream of lexemes     
      */
     public function set_corrected_stream($stream) {
-        //TODO - define, how it should differs from set_stream
+        // TODO - change string to match $stream
         $this->tokenstream = $stream;
+        $this->syntaxtree=null;
     }
     /**
      * Sets a token stream. Must be used by lexer, to set a stream for scan
@@ -979,18 +1572,18 @@ class block_formal_langs_processed_string {
         $this->syntaxtree=null;
     }
     /**
-     *  Sets a syntax tree.
-     *  @param object $tree syntax tree 
+     * Sets a syntax tree.
+     * @param object $tree syntax tree 
      */
     public function set_syntax_tree($tree) {
          $this->syntaxtree = $tree;
     }
-    
+
     /**
-     *  Sets a descriptions for a string. 
-     *  @param array $descriptions descriptions array
+     * Sets a descriptions for a string. 
+     * @param array $descriptions descriptions array
      */
-    protected function set_descriptions($descriptions)  {
+    protected function set_descriptions($descriptions) {
         $this->descriptions = $descriptions;
     }
 
@@ -998,7 +1591,7 @@ class block_formal_langs_processed_string {
      * Returns true if string doesn't contains line breaks.
      */
     public function single_line_string() {
-        return strpos($this->string, "\n") === FALSE;
+        return strpos($this->string, "\n") === false;
     }
 
     /**
@@ -1033,17 +1626,17 @@ class block_formal_langs_processed_string {
     }
 
     /**
-     *  Sets a descriptions for a string. Also saves it to database (table parameters must be set).
-     *  @param array $descriptions descriptions array
+     * Sets a descriptions for a string. Also saves it to database (table parameters must be set).
+     * @param array $descriptions descriptions array
      */
-    public function save_descriptions($descriptions)  {
+    public function save_descriptions($descriptions) {
         global $DB;
         $this->set_descriptions($descriptions);
 
         $conditions = array(" tableid='{$this->tableid}' ", "tablename = '{$this->tablename}' ");
         $oldrecords = $DB->get_records_select('block_formal_langs_node_dscr', implode(' AND ', $conditions));
         $index = 0;
-        foreach($this->descriptions as $description) {
+        foreach ($this->descriptions as $description) {
             $record = null;
             $mustinsert  = ($oldrecords == null);
             if ($oldrecords != null) {
@@ -1051,7 +1644,7 @@ class block_formal_langs_processed_string {
             }
             
             if ($record == null) {
-                $record = new stdClass();        
+                $record = new stdClass();
             }
             $record->tablename = $this->tablename;
             $record->tableid = $this->tableid;
@@ -1059,29 +1652,29 @@ class block_formal_langs_processed_string {
             $record->description = $description;
             
             if ($mustinsert) {
-                $DB->insert_record('block_formal_langs_node_dscr',$record);
+                $DB->insert_record('block_formal_langs_node_dscr', $record);
             } else {
-                $DB->update_record('block_formal_langs_node_dscr',$record);
+                $DB->update_record('block_formal_langs_node_dscr', $record);
             }
             
             $index = $index + 1;
         }
-        
+        // If some old descriptions cellleft - delete it
         // If some old descriptions left - delete it.
         if ($oldrecords != null) {
             $oldrecordids = array();
-            foreach($oldrecords as $oldrecord) {
-                $oldrecordids[] = $oldrecord->id;    
+            foreach ($oldrecords as $oldrecord) {
+                $oldrecordids[] = $oldrecord->id;
             }
-            $oldrecordin = implode(',',$oldrecordids);
+            $oldrecordin = implode(',', $oldrecordids);
             $DB->delete_records_select('block_formal_langs_node_dscr', " id IN ({$oldrecordin}) AND tablename = '{$this->tablename}' ");
         }
     }
     
     /**
-     *  Set table parameters for string. Used by language.
-     *  @param string $tablename source table name
-     *  @param string $tableid   source id
+     * Set table parameters for string. Used by language.
+     * @param string $tablename source table name
+     * @param string $tableid   source id
      */
     public function set_table_params($tablename, $tableid) {
         $this->tablename=$tablename;
@@ -1093,7 +1686,7 @@ class block_formal_langs_processed_string {
      *
      * @return integer
      */
-    public function nodes_requiring_description_count() {//TODO - name
+    public function nodes_requiring_description_count() {// TODO - name
         if ($this->language->could_parse()) {
             return count($this->syntaxtree->nodes_requiring_description_list());
         } else {
@@ -1252,8 +1845,7 @@ class block_formal_langs_processed_string {
      */
     public function node_descriptions_list() {
         global $DB;
-        if ($this->descriptions === null)
-        {
+        if ($this->descriptions == null) {
             $istablefilledincorrect = !is_string($this->tablename) || core_text::strlen($this->tablename) == 0;
             if (!is_numeric($this->tableid)  || $istablefilledincorrect) {
                 throw new coding_exception('Trying to extract descriptions from unknown sources for string');
@@ -1282,41 +1874,45 @@ class block_formal_langs_processed_string {
         $this->descriptions = $descriptions;
     }
     /** Test, whether we have a lexeme descriptions for token with specified index
-     *  @param int $index index of token
+     * @param int $index index of token
      */
     public function has_description($index) {
-       $this->node_descriptions_list();
-       if (isset($this->descriptions[$index])) {
-           return strlen(trim($this->descriptions[$index])) != 0;
+        $this->node_descriptions_list();
+        if (isset($this->descriptions[$index])) {
+            return strlen(trim($this->descriptions[$index]))!=0;
         }
-       return false;
+        return false;
     }
     /**
-     *  Returns a stream of tokens.
-     *  @return stream of tokens
+     * Returns a stream of tokens.
+     * @return stream of tokens
      */
     private function get_stream() {
-        if ($this->tokenstream == null)
+        if ($this->tokenstream == null) {
             $this->language->scan($this);
+        }
         return $this->tokenstream;
     }
     /**
-     *  Returns a syntax tree
-     *  @return syntax tree
+     * Returns a syntax tree
+     * @return syntax tree
      */
     protected function get_syntax_tree() {
         if ($this->syntaxtree == null && $this->language->could_parse()) {
             // TODO: Fix this inconsistency
-            $this->language->parse($this, false);
+            $this->language->parse($this, true);
         }
         return $this->syntaxtree;
     }
     /**
-     *  Returns inner string
-     *  @return inner string
+     * Returns inner string
+     * @return inner string
      */
     protected function get_string() {
         return $this->string;
+    }
+    protected function get_lang() {
+        return $this->language;
     }
 }
 
@@ -1372,27 +1968,16 @@ class block_formal_langs_string_pair {
         }
     }
 
-    //TODO - anyone -  access functions
-    //TODO - functions for the lexical and sequence analyzers, and mistake classes.
-
+    // TODO - anyone -  access functions
+    // TODO - functions for the lexical and sequence analyzers, and mistake classes.
     /**
-     *  Returns a corrected string.
-     *  Used in analyzers, for mistake generation and other
-     *  @return   block_formal_langs_processed_string
+     * Returns a corrected string.
+     * Used in analyzers, for mistake generation and other
+     * @return   block_formal_langs_processed_string
      */
     public function correctedstring() {
         return $this->correctedstring;
     }
-
-    /**
-     *  Returns a correct string.
-     *  Used in analyzers, for mistake generation and other
-     *  @return   block_formal_langs_processed_string
-     */
-    public function correctstring() {
-        return $this->correctstring;
-    }
-
     /**
      *  Returns a compared string.
      *  Used in analyzers, for mistake generation and other
@@ -1403,9 +1988,46 @@ class block_formal_langs_string_pair {
     }
 
     /**
+     * Returns a correct string.
+     * Used in analyzers, for mistake generation and other
+     * @return   block_formal_langs_processed_string
+     */
+    public function correctstring() {
+        return $this->correctstring;
+    }
+
+    public function matches() {
+        return $this->matches;
+    }
+
+    public static function best_string_pairs_for_bypass($correctstring, $comparedstring, $threshold, block_formal_langs_comparing_options $options, $classname = 'block_formal_langs_string_pair') {
+        $bestgroups = array();
+        /** @var block_formal_langs_token_stream $correctstream */
+        $correctstream = $correctstring->stream;
+        $comparedstream = $comparedstring->stream;
+        $bestgroups = $correctstream->look_for_token_pairs($comparedstream, $threshold, $options, true);
+        $arraystringpairs = array();
+        for ($i = 0; $i < count($bestgroups); $i++) {
+            $stringpair = new $classname($correctstring, $comparedstring, $bestgroups[$i]->matchedpairs);
+            $arraystringpairs[] = $stringpair;
+        }
+        return $arraystringpairs;
+    }
+    
+    /**
      * Factory method. Returns an array of block_formal_langs_string_pair objects for each best matches group for that pair of strings
      */
-    public static function best_string_pairs($lang, $correctstr, $tablename, $tableid, $compared, block_formal_langs_comparing_options $options) {
+    public static function best_string_pairs($correctstring, $comparedstring, $threshold, block_formal_langs_comparing_options $options, $classname = 'block_formal_langs_string_pair') {
+        $bestgroups = array();
+        $correctstream = $correctstring->stream;
+        $comparedstream = $comparedstring->stream;
+        $bestgroups = $correctstream->look_for_token_pairs($comparedstream, $threshold, $options, false);
+        $arraystringpairs = array();
+        for ($i = 0; $i < count($bestgroups); $i++) {
+            $stringpair = new $classname($correctstring, $comparedstring, $bestgroups[$i]->matchedpairs);
+            $arraystringpairs[] = $stringpair;
+        }
+        return $arraystringpairs;
     }
 
     public function __construct($correct, $compared, $matches) {
@@ -1415,21 +2037,99 @@ class block_formal_langs_string_pair {
         $this->correctedstring = $this->correct_mistakes();
     }
 
+    public function pairs_between_corrected_compared() {
+        $arraysets = array();
+        // $i - compared
+        // $j - corrected
+        $j=0;
+        for($n = 0; $n < count($this->matches); $n++) {
+            $arraypairs = array();
+            for($i = 0; $i < count($this->comparedstring->stream->tokens); $i++) {
+                if(array_search($i, $this->matches[$n]->comparedtokens)==1) {
+                    for($k=0; $k<count($this->matches[$n]->matchedpairs); $k++) {
+                    if(count($this->matches[$n]->matchedpairs[$k]->comparedtokens)==2 && ($this->matches[$n]->matchedpairs[$k]->comparedtokens[0]==$i || $this->matches[$n]->matchedpairs[$k]->comparedtokens[1]==$i)) {
+                        $arraypairs[]=array($i, array($j,$j++));
+                        $j++;
+                    }
+                    if(count($this->matches[$n]->matchedpairs[$k]->comparedtokens)==1 && ($this->matches[$n]->matchedpairs[$k]->comparedtokens[0]==$i)) {
+                        $arraypairs[]=array($i, $j);
+                        $j++;
+                    }
+                    if(count($this->matches[$n]->matchedpairs[$k]->correcttokens)==2
+                        && ($this->matches[$n]->matchedpairs[$k]->correcttokens[0]==$i || $this->matches[$n]->matchedpairs[$k]->correcttokens[1]==$i))
+                        $arraypairs[]=array(array($i, $i++), $j);
+                        $j++;
+                    }
+                } else {
+                    $arraypairs[]=array($i, $j);
+                    $j++;
+                }
+            }
+            $arraysets[]=$arraypairs;
+        }
+        return $arraysets;
+    }
+    
     /**
      * Correct mistakes in compared string using array of matched pairs and correct string.
      *
      * @return a new token stream where comparedtokens changed to correcttokens if mistakeweight > 0 for the pair
      */
     protected function correct_mistakes() {
-        //TODO Birukova - create a new string from $comparedstring and matches
-        //This is somewhat more difficult, as we need to preserve existing separators (except extra ones).
-        //Also, user-visible parts of the compared string should be saved where possible (e.g. not in typos)
-
+        // TODO Birukova - create a new string from $comparedstring and matches
+        // This is somewhat more difficult, as we need to preserve existing separators (except extra ones).
+        // Also, user-visible parts of the compared string should be saved where possible (e.g. not in typos)
+        $newstream = $this->comparedstring->stream;   // incorrect lexems
+        $correctstream = $this->correctstring->stream;   // correct lexems
+        $streamcorrected = new block_formal_langs_token_stream();
+        $streamcorrected->tokens = array();     // corrected lexems
+        // TODO Birukova - change tokens using pairs
+        for ($i = 0; $i < count($newstream->tokens); $i++) {
+            $flag = 0;
+            for ($j = 0; $j < count($this->matches); $j++) {
+                // not second
+                if (count($this->matches[$j]->comparedtokens) == 2) {
+                    if ($this->matches[$j]->comparedtokens[1] == $i) {
+                        $flag = 1;
+                    }
+                }
+                // write correcttokens
+                if ($this->matches[$j]->comparedtokens[0]==$i) {
+                    for ($k = 0; $k<count($this->matches[$j]->correcttokens); $k++) {
+                        $streamcorrected->tokens[] = $correctstream->tokens[$this->matches[$j]->correcttokens[$k]];
+                    }
+                    $flag = 1;
+                }
+            }
+            // write comparedtoken
+            if ($flag == 0) {
+                $streamcorrected->tokens[] = $newstream->tokens[$i];
+            }
+        }
+        $lang = $this->correctstring->language;
+        $this->correctedstring = new block_formal_langs_processed_string ($lang);
+        $this->correctedstring->set_corrected_stream($streamcorrected);
+        return $this->correctedstring;
         // Mamontov - added a simple stub, to make possible for sequence analyzer to work with
         // corrected string
-        return $this->comparedstring;
+        // return $this->comparedstring;
     }
 
+
+    private function count_indexes_correct($nodenumber) {
+        $count = 0;
+        return $count;
+    }
+    
+    private function count_indexes_incorrect($nodenumber) {
+		$count = 0;
+        return $count;
+    }
+    
+    private function index_pair_from_lexeme($nodenumber) {
+		$index = 0;
+        return $index;
+    }
     /**
      * Returns description string for passed node. If there is no description, token value from compared string is used, 
      * if it is not available too, than token value from correct string is used.  TODO - check the rules.
@@ -1440,7 +2140,52 @@ class block_formal_langs_string_pair {
      * @return string - description of node if present, quoted node value otherwise.
      */
     public function node_description($nodenumber, $quotevalue = true, $at = false) {
-        //$this->node_descriptions_list(); //Not needed, since has_description will call node_descriptions_list anyway.
+        $correctindexs = $this->count_indexes_incorrect($nodenumber);
+        $comparedindexs = $this->count_indexs_incorrect($nodenumber);
+        // typo
+        if (count($correctindexs)==1 && count($comparedindexs)==1) {
+            $index = $this->index_pair_from_lexeme($nodenumber);
+            if($this->correctstring()->has_description($nodenumber)) {
+                return $this->correctstring()->node_description($nodenumber, false, true);
+            } else {
+                $value = $this->comparedstring()->stream->tokens[$index]->value();
+                return get_string('quote', 'block_formal_langs', $value);
+            }
+        }
+        // extra separator
+        if(count($correctindexs)==1 && count($comparedindexs)==2) {
+            $index = $this->index_pair_from_lexeme($nodenumber);
+            if($this->correctstring()->has_description($nodenumber)) {
+                return $this->correctstring()->node_description($nodenumber, false, true);
+            } else {
+                $value1 = $this->comparedstring()->stream->tokens[$index]->value();
+                $value2 = $this->comparedstring()->stream->tokens[$index+1]->value();
+                $value = $value1.' and '.$value2;
+                return get_string('quote', 'block_formal_langs', $value);
+            }
+        }
+        if(count($correctindexs)==2 && count($comparedindexs)==1) {
+            $index = $this->index_pair_from_lexeme($nodenumber);
+            if($this->correctstring()->has_description($nodenumber) && !$this->correctstring()->has_description($nodenumber+1)) {
+                $value=$this->comparedstring()->stream->tokens[$index+1]->value();
+                return $this->correctstring()->node_description($nodenumber, false, true).' and '.get_string('quote', 'block_formal_langs', $value);
+            } 
+            if(!$this->correctstring()->has_description($nodenumber) && $this->correctstring()->has_description($nodenumber+1)) {
+                $value=$this->comparedstring()->stream->tokens[$index]->value();
+                return get_string('quote', 'block_formal_langs', $value).' and '.$this->correctstring()->node_description($nodenumber+1, false, true);
+            } 
+            if($this->correctstring()->has_description($nodenumber) && $this->correctstring()->has_description($nodenumber+1)) {
+                return $this->correctstring()->node_description($nodenumber, false, true).' and '.$this->correctstring()->node_description($nodenumber+1, false, true);
+            } 
+            else {
+                $value=$this->comparedstring()->stream->tokens[$index]->value();
+                return get_string('quote', 'block_formal_langs', $value);
+            }
+        }
+    
+    
+    
+        // $this->node_descriptions_list(); //Not needed, since has_description will call node_descriptions_list anyway.
         /* TODO - implement, this code from processed_string may be useful
         $result = '';
         if ($this->has_description($nodenumber)) {
@@ -1452,7 +2197,7 @@ class block_formal_langs_string_pair {
             }
             if (!$quotevalue) {
                 return $value;
-            } else if ($at) {//Should return position information.
+            } else if ($at) {// Should return position information.
                 $a = new stdClass();
                 $a->value = $value;
                 $pos = $this->tokenstream->tokens[$nodenumber]->position();
@@ -1463,7 +2208,7 @@ class block_formal_langs_string_pair {
                     $a->line = $pos->linestart();
                     return get_string('quoteat', 'block_formal_langs', $a);
                 }
-            } else {//Just quote 
+            } else {// Just quote
                 return get_string('quote', 'block_formal_langs', $value);
             }
         }*/
