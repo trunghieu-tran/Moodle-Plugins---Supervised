@@ -23,7 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
 global $CFG;
-require_once($CFG->dirroot.'/lib/textlib.class.php');
+require_once($CFG->dirroot.'/lib/classes/text.php');
 /**
  *  Determines a type enumeration for matching rules of lexer
  */
@@ -538,7 +538,7 @@ class block_formal_langs_lexical_matching_rule  {
         }
         if ($this->type == block_formal_langs_lexical_matching_rule_type::$MATCHANYONENOTFROMSET) {
             /** @noinspection PhpUndefinedClassInspection */
-            $result = '[^' . textlib::substr($denormalizedcset, 1);
+            $result = '[^' . core_text::substr($denormalizedcset, 1);
         }        
         return $result;
     }
