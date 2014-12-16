@@ -23,7 +23,6 @@
  */
 require_once('../../../config.php');
 require_once($CFG->libdir.'/accesslib.php');
-require_once($CFG->dirroot.'/lib/classes/text.php');
 require_once($CFG->dirroot .'/blocks/formal_langs/language_cpp_parseable_language.php');
 
 global $USER;

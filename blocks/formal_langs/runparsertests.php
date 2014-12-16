@@ -7,7 +7,6 @@ $CFG = new stdClass();
 $CFG->dirroot = dirname(dirname(dirname(__FILE__)));
 $CFG->libdir = $CFG->dirroot . '/lib';
 
-require_once($CFG->dirroot.'/lib/classes/text.php');
 require_once($CFG->dirroot .'/blocks/formal_langs/language_cpp_parseable_language.php');
 
 
@@ -39,7 +38,7 @@ function print_node($node, $paddingcount)
     if (is_a($node, 'block_formal_langs_token_base')) {
         $value = $node->value();
     }
-    if (textlib::strlen($value)) {
+    if (core_text::strlen($value)) {
         $result .= $padding . $value . PHP_EOL;
     }
 	//echo $padding . $node->type() . $value . PHP_EOL;
