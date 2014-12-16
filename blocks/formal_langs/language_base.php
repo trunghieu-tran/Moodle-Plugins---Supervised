@@ -133,13 +133,14 @@ abstract class block_formal_langs_abstract_language {
      *  @return block_formal_langs_processed_string string
      */
      public function create_from_string($string, $classname = 'block_formal_langs_processed_string') {
-         // Consult with cache, when creating from string
-         $key = get_class($this);
-         if (array_key_exists($key, self::$cachedstringsbystring)) {
+        // Consult with cache, when creating from string
+        $key = get_class($this);
+        $keystring = (string)$string;
+        if (array_key_exists($key, self::$cachedstringsbystring)) {
             $map = self::$cachedstringsbystring[$key];
-            if (array_key_exists($string, $map)) {
-                if (is_a($map[$string], $classname)) {
-                    return $map[$string];
+            if (array_key_exists($keystring, $map)) {
+                if (is_a($map[$keystring], $classname)) {
+                    return $map[$keystring];
                 }
             }
         }
@@ -150,7 +151,7 @@ abstract class block_formal_langs_abstract_language {
         if (array_key_exists($key, self::$cachedstringsbystring) == false) {
             self::$cachedstringsbystring[$key] = array();
         }
-        self::$cachedstringsbystring[$key][$string] = $result;
+        self::$cachedstringsbystring[$key][$keystring] = $result;
         return $result;
      }
 
@@ -165,15 +166,16 @@ abstract class block_formal_langs_abstract_language {
     public function create_from_db($tablename, $tableid, $string = null, $classname = 'block_formal_langs_processed_string') {
         // Consult with cache, when creating from string
         $key = get_class($this);
+        $keystring = (string)$string;
         if (array_key_exists($key, self::$cachedstringsfromdb)) {
             $map = self::$cachedstringsfromdb[$key];
             if (array_key_exists($tablename, $map)) {
                 $map = $map[$tablename];
                 if (array_key_exists($tableid, $map)) {
                     $map = $map[$tableid];
-                    if (array_key_exists($string, $map)) {
-                        if (is_a($map[$string], $classname)) {
-                            return $map[$string];
+                    if (array_key_exists($keystring, $map)) {
+                        if (is_a($map[$keystring], $classname)) {
+                            return $map[$keystring];
                         }
                     }
                 }
@@ -193,7 +195,7 @@ abstract class block_formal_langs_abstract_language {
         if (array_key_exists($tableid, self::$cachedstringsfromdb[$key][$tablename]) == false) {
             self::$cachedstringsfromdb[$key][$tablename][$tableid] = array();
         }
-        self::$cachedstringsfromdb[$key][$tablename][$tableid][$string] = $result;
+        self::$cachedstringsfromdb[$key][$tablename][$tableid][$keystring] = $result;
         return $result;
     }
 
