@@ -235,8 +235,8 @@ class qtype_correctwriting_question extends question_graded_automatically
             $response = array('answer' => '');
         }
         // Check, for cache, and make it lowercase to prevent some odd executions
-        if (is_a($response['answer'],'qtype_poasquestion_string') == false) {
-            $response['answer'] = new qtype_poasquestion_string($response['answer']);
+        if (is_a($response['answer'],'qtype_poasquestion\string') == false) {
+            $response['answer'] = new qtype_poasquestion\string($response['answer']);
         }
 
         if (($this->gradecachevalid == true) && ($this->gradecachedanswer == $response['answer'])) {
@@ -244,8 +244,8 @@ class qtype_correctwriting_question extends question_graded_automatically
         }
 
         foreach($this->answers as $id => $answer) {
-            if (is_a($answer->answer,'qtype_poasquestion_string') == false) {
-                $answer->answer = new qtype_poasquestion_string($answer->answer);
+            if (is_a($answer->answer,'qtype_poasquestion\string') == false) {
+                $answer->answer = new qtype_poasquestion\string($answer->answer);
             }
         }
 
