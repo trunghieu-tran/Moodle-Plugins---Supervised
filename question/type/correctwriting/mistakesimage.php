@@ -243,7 +243,7 @@ class qtype_correctwriting_table_cell
     * @return bool result
     */
    public function is_response_length_bigger($length) {
-       return textlib::strlen($this->response->text()) > $length;
+       return core_text::strlen($this->response->text()) > $length;
    }
    /** Returns a total size of cell
        @return array of coordinates as array(width, height)
