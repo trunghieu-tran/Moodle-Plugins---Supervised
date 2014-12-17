@@ -24,6 +24,10 @@
     width: auto;
 }
 
+.block_supervised .content .mform .fitem .flink {
+    font-size: 13px;
+}
+
 /* Styles for view sessions page */
 #supervisedblock_selectcourseform {
     text-align: center;
