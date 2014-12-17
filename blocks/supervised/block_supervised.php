@@ -122,7 +122,7 @@ class block_supervised extends block_base {
      * @return bool true if the planned session exists
      */
     private function render_plannedsession_form(&$title, &$formbody) {
-        global $CFG, $COURSE, $DB;
+        global $CFG, $COURSE, $DB, $USER;
         $context = context_course::instance($COURSE->id);
         $plannedsession = $this->get_teacher_planned_session();
 
