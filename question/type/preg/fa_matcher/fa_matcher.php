@@ -183,6 +183,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
             $this->after_transition_passed($newstate, $tr, $curpos, $length);
 
+            $curpos += $length;
+
             /*$recursionlevel = $newstate->recursion_level();
             echo "level $recursionlevel: generated char '$newchr' by $tr. length changed {$newstate->length} : {$newstate->length}\n";
             echo "new string is {$newstate->str}\n\n";*/
