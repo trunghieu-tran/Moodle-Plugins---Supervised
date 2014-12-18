@@ -499,6 +499,7 @@ class qtype_preg_fa_transition {
             $assert = $this->intersect_asserts($other);
             $resulttran->mergedbefore = $assert->mergedbefore;
             $resulttran->mergedafter = $assert->mergedafter;
+            $resulttran->loopsback = $this->loopsback || $other->loopsback;
             return $resulttran;
         }
         if ($other->is_eps() && $this->consumeschars == false) {
@@ -507,6 +508,7 @@ class qtype_preg_fa_transition {
             $assert = $this->intersect_asserts($other);
             $resulttran->mergedbefore = $assert->mergedbefore;
             $resulttran->mergedafter = $assert->mergedafter;
+            $resulttran->loopsback = $this->loopsback || $other->loopsback;
             return $resulttran;
         }
         if ($this->is_unmerged_assert() && $this->consumeschars == false && (!$other->is_eps() && !$other->is_unmerged_assert())
@@ -528,6 +530,7 @@ class qtype_preg_fa_transition {
             $assert = $this->intersect_asserts($other);
             $resulttran->mergedbefore = $assert->mergedbefore;
             $resulttran->mergedafter = $assert->mergedafter;
+            $resulttran->loopsback = $this->loopsback || $other->loopsback;
         }
         return $resulttran;
     }

@@ -214,6 +214,7 @@ abstract class qtype_preg_fa_node {
                 } else {
                     $tran = clone($transition);
                     $delclone = clone $del;
+                    $tran->loopsback = $transition->loopsback || $del->loopsback;
                     $tran->greediness = qtype_preg_fa_transition::min_greediness($tran->greediness, $del->greediness);
                     $merged = array_merge($delclone->mergedbefore, array($delclone), $delclone->mergedafter);
                     // Work with tags.
