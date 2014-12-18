@@ -107,7 +107,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $stackitem->subexpr = $subexpr;
         $stackitem->recursionstartpos = $startpos;
         $stackitem->state = $state;
-        $stackitem->flags = 0x00;
+        $stackitem->next_char_flags = 0x00;
         $stackitem->matches = array();
         $stackitem->subexpr_to_subpatt = array(0 => $this->astroot);   // Remember this explicitly
         $stackitem->last_transition = null;
@@ -144,36 +144,24 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
      */
     protected function generate_char_by_transition($curstate, $transition, $str, $curpos) {
         $newstate = clone $curstate;
-        $transitions = array_merge($transition->mergedbefore, array($transition), $transition->mergedafter);
+        $transitions = array_merge(/*$transition->mergedbefore,*/ array($transition)/*, $transition->mergedafter*/);
         foreach ($transitions as $tr) {
             list($flag, $newchr) = $tr->next_character($str, $newstate->str, $curpos, 0, $newstate);
             if ($flag === qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE) {
                 return null;
             }
+            //echo "lookin at $transition: $flag '$newchr'\n";
 
             $length = 0;
 
             // TODO: ^ and \A
 
-            // $ matches before any \n and at the end of the string.
-            // Reset the dollar flag after every \n.
-            if (is_object($newchr) && $newchr->string() === "\n") {
-                $newstate->unset_flag(qtype_preg_fa_exec_state::FLAG_VISITED_DOLLAR);
-            }
 
             if (is_object($newchr) && $newchr->length() > 0) {
-                // \z matches only at the end of the string
-                if ($newstate->is_flag_set(qtype_preg_fa_exec_state::FLAG_VISITED_SLASH_Z_SMALL)) {
+                // If we had to end the generation, but generated something, cut out this path
+                if ($newstate->is_flag_set(qtype_preg_leaf::NEXT_CHAR_END_HERE)) {
                     return null;
                 }
-                // \Z matches at the end of the string or before the very last \n (meaning that \n is the last char)
-                if ($newstate->is_flag_set(qtype_preg_fa_exec_state::FLAG_VISITED_SLASH_Z_CAPITAL) && $newchr->string() !== "\n") {
-                    return null;
-                }
-                if ($newstate->is_flag_set(qtype_preg_fa_exec_state::FLAG_VISITED_DOLLAR)) {
-                    return null;
-                }
-                //var_dump($newstate->is_flag_set(qtype_preg_fa_exec_state::FLAG_VISITED_SLASH_Z_CAPITAL));
                 $newstate->str->concatenate($newchr);
                 $length = $newchr->length();
                 //var_dump($newstate->str->string());
@@ -182,6 +170,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             }
 
             $this->after_transition_passed($newstate, $tr, $curpos, $length);
+            $newstate->set_flag($flag);
 
             $curpos += $length;
 
@@ -261,30 +250,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
         $newstate->set_state($transition->to);
         $newstate->set_full(in_array($newstate->state(), $endstates));
-
-        switch ($transition->pregleaf->subtype) {
-        case qtype_preg_leaf_assert::SUBTYPE_ESC_A:
-            $newstate->set_flag(qtype_preg_fa_exec_state::FLAG_VISITED_SLASH_A);
-            break;
-        case qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z:
-            $newstate->set_flag(qtype_preg_fa_exec_state::FLAG_VISITED_SLASH_Z_SMALL);
-            break;
-        case qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z:
-            $newstate->set_flag(qtype_preg_fa_exec_state::FLAG_VISITED_SLASH_Z_CAPITAL);
-            break;
-        case qtype_preg_leaf_assert::SUBTYPE_ESC_G:
-            $newstate->set_flag(qtype_preg_fa_exec_state::FLAG_VISITED_SLASH_G);
-            break;
-        case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
-            $newstate->set_flag(qtype_preg_fa_exec_state::FLAG_VISITED_CIRCUMFLEX);
-            break;
-        case qtype_preg_leaf_assert::SUBTYPE_DOLLAR:
-            $newstate->set_flag(qtype_preg_fa_exec_state::FLAG_VISITED_DOLLAR);
-            break;
-        default:
-            break;
-        }
-
         $newstate->left = $newstate->is_full() ? 0 : qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
         $newstate->length += $length;
         $newstate->write_tag_values($transition, $curpos, $length);

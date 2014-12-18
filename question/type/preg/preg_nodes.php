@@ -439,9 +439,9 @@ abstract class qtype_preg_node {
 abstract class qtype_preg_leaf extends qtype_preg_node {
 
     /** Constants that can be returned from next_character for special cases. */
-    const NEXT_CHAR_OK              = 0x01;
-    const NEXT_CHAR_CANNOT_GENERATE = 0x02;
-    const NEXT_CHAR_END_HERE        = 0x04;
+    const NEXT_CHAR_OK              = 0x00;
+    const NEXT_CHAR_CANNOT_GENERATE = 0x01;
+    const NEXT_CHAR_END_HERE        = 0x02;
 
     /** Is matching case insensitive? */
     public $caseless = false;
