@@ -246,7 +246,7 @@ class qtype_preg_cross_tests_from_preg_merging {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
                         'left'=>array(1),
-                        'next'=>'NEXT_CHAR_END_HERE');
+                        'next'=>'');
 
         return array('regex'=>'(?m)a\nb\Z\n',
                      'tests'=>array($test1, $test2, $test3, $test4),
@@ -287,7 +287,7 @@ class qtype_preg_cross_tests_from_preg_merging {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
                         'left'=>array(0),
-                        'next'=>'NEXT_CHAR_END_HERE');
+                        'next'=>'');
 
         $test2 = array( 'str'=>"kl\nkl",
                         'is_match'=>false,
