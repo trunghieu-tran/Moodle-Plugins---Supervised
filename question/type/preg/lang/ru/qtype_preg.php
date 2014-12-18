@@ -197,6 +197,7 @@ $string['leaf_charset_error'] = 'ошибка в символьном класс
 /******* Error messages *******/
 $string['error_PCREincorrectregex']              = 'Некорректное регулярное выражение - ошибка синтаксиса! Ознакомьтесь с <a href="http://pcre.org/pcre.txt">документацией PCRE</a> для получения информации.';
 $string['error_duringauthoringtool']             = 'Ошибки при попытке построения {$a}:';
+$string['error_infiniterecursion']               = 'Регулярное выражение содержит бесконечную рекурсию';
 
 /******* FA limitations *******/
 $string['fa_settings_heading'] = 'Настройки движка конечных автоматов';
