@@ -212,7 +212,7 @@ abstract class qtype_preg_fa_node {
                 if ($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
                     $backref = true;
                 } else {
-                    $tran = clone($transition);
+                    $tran = clone $transition;
                     $delclone = clone $del;
                     $tran->loopsback = $transition->loopsback || $del->loopsback;
                     $tran->greediness = qtype_preg_fa_transition::min_greediness($tran->greediness, $del->greediness);
@@ -352,8 +352,6 @@ abstract class qtype_preg_fa_node {
             $wordbreak->mergedbefore[] = $epstran;
         }
 
-
-
         // Intersect transitions.
         for ($i = 0; $i < count($wordbreakinto); $i++) {
             foreach ($intotransitions as $intotran) {
@@ -376,8 +374,7 @@ abstract class qtype_preg_fa_node {
                  var_dump("\n");*/
 
                         if ($resultout !== null) {
-                            /*printf($resultout->get_label_for_dot($resultout->from, $resultout->to));
-                 var_dump("\n");*/
+
                             // Add state and transition
                  //printf($resultinto->get_label_for_dot($resultinto->from, $resultinto->to));
                  //var_dump("\n");
@@ -388,8 +385,8 @@ abstract class qtype_preg_fa_node {
                             $resultout->to = $outtran->to;
                             $clone->redirect_merged_transitions();
                             $resultout->redirect_merged_transitions();
-                            $automaton->add_transition($clone);
-                            $automaton->add_transition($resultout);
+                            $automaton->add_transition(clone $clone);
+                            $automaton->add_transition(clone $resultout);
                             /*if ($fromdel) {
                                 // Copy transitions from deleting states.
                                 $copiedout = $automaton->get_adjacent_transitions($tran->from, true);
@@ -427,7 +424,7 @@ abstract class qtype_preg_fa_node {
         }
         //Remove repeated uncapturing transitions.
         $automaton->remove_transition($tran);
-        //printf($automaton->fa_to_dot());*/
+        //printf($automaton->fa_to_dot());
     }
 }
 
