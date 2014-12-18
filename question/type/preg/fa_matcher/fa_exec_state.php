@@ -39,8 +39,11 @@ class qtype_preg_fa_stack_item {
     // The corresponding fa state.
     public $state;
 
-    // Bitwise union of the qtype_preg_fa_exec_state flags.
-    public $flags;
+    // Is the match full.
+    public $full;
+
+    // Bitwise union of qtype_preg_leaf NEXT_CHAR_XXX flags.
+    public $next_char_flags;
 
     // 2-dimensional array of matches; 1st is subpattern number; 2nd is repetitions of the subpattern.
     // Each subpattern is initialized with (-1,-1) at start.
@@ -249,15 +252,6 @@ class qtype_preg_fa_stack_item {
  */
 class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
 
-    // Indicates that this state is a full match state.
-    const FLAG_FULL                    = 0x01;
-    const FLAG_VISITED_SLASH_A         = 0x02;
-    const FLAG_VISITED_SLASH_Z_SMALL   = 0x04;
-    const FLAG_VISITED_SLASH_Z_CAPITAL = 0x08;
-    const FLAG_VISITED_SLASH_G         = 0x10;
-    const FLAG_VISITED_CIRCUMFLEX      = 0x20;
-    const FLAG_VISITED_DOLLAR          = 0x40;
-
     // FA being executed.
     public $matcher;
 
@@ -344,30 +338,28 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
 
     public function set_flag($flag) {
         $end = end($this->stack);
-        $end->flags = ($end->flags | $flag);
+        $end->next_char_flags = ($end->next_char_flags | $flag);
     }
 
     public function unset_flag($flag) {
         $flag = ~$flag;
         $end = end($this->stack);
-        $end->flags = ($end->flags & $flag);
+        $end->next_char_flags = ($end->next_char_flags & $flag);
     }
 
     public function is_flag_set($flag) {
         $end = end($this->stack);
-        return ($end->flags & $flag) !== 0;
+        return ($end->next_char_flags & $flag) !== 0;
     }
 
     public function set_full($value) {
-        if ($value) {
-            $this->set_flag(self::FLAG_FULL);
-        } else {
-            $this->unset_flag(self::FLAG_FULL);
-        }
+        $end = end($this->stack);
+        $end->full = $value;
     }
 
     public function is_full() {
-        return $this->is_flag_set(self::FLAG_FULL);
+        $end = end($this->stack);
+        return $end->full;
     }
 
 ///
