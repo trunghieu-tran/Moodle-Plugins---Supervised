@@ -1012,6 +1012,33 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         return $result;
     }
 
+    protected function check_for_infinite_recursion() {
+        $end = $this->automaton->end_states();
+        $front = $this->automaton->start_states();
+        $endstatereached = false;
+        while (!$endstatereached && !empty($front)) {
+            $curstate = array_pop($front);
+            if (in_array($curstate, $end)) {
+                $endstatereached = true;
+                break;
+            }
+            $transitions = $this->automaton->get_adjacent_transitions($curstate, true);
+            foreach ($transitions as $transition) {
+                if ($transition->loopsback) {
+                    continue;
+                }
+                // Skip recursive transitions
+                if ($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL && $transition->pregleaf->isrecursive) {
+                    continue;
+                }
+                $front[] = $transition->to;
+            }
+        }
+        if (!$endstatereached) {
+            $this->errors[] = new qtype_preg_error(get_string('error_infiniterecursion', 'qtype_preg'), $this->regex->string(), $this->astroot->position);
+        }
+    }
+
     public function __construct($regex = null, $options = null) {
         if ($options === null) {
             $options = new qtype_preg_matching_options();
@@ -1027,6 +1054,11 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $this->automaton = self::build_fa($this->options->mergeassertions);
         if ($this->automaton === null) {
             $this->errors[] = new qtype_preg_too_complex_error($regex, $this);
+            return;
+        }
+
+        $this->check_for_infinite_recursion();
+        if (!empty($this->errors)) {
             return;
         }
 

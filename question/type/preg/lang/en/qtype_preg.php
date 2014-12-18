@@ -197,6 +197,7 @@ $string['leaf_charset_error'] = 'incorrect character set';
 /******* Error messages *******/
 $string['error_PCREincorrectregex']              = 'Incorrect regular expression - syntax error! Consult <a href="http://pcre.org/pcre.txt">PCRE documentation</a> for more information.';
 $string['error_duringauthoringtool']             = 'There were errors while trying to build {$a}:';
+$string['error_infiniterecursion']               = 'Regex contains infinite recursion';
 
 /******* FA limitations *******/
 $string['fa_settings_heading'] = 'Finite state automata engine settings';
