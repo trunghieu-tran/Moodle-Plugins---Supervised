@@ -145,6 +145,10 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
     protected function generate_char_by_transition($curstate, $transition, $str, $curpos) {
         $newstate = clone $curstate;
         $transitions = array_merge(/*$transition->mergedbefore,*/ array($transition)/*, $transition->mergedafter*/);
+
+        foreach ($transition->mergedbefore as $tr) {
+            $this->after_transition_passed($newstate, $tr, $curpos, 0);
+        }
         foreach ($transitions as $tr) {
             list($flag, $newchr) = $tr->next_character($str, $newstate->str, $curpos, 0, $newstate);
             if ($flag === qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE) {
@@ -177,6 +181,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             /*$recursionlevel = $newstate->recursion_level();
             echo "level $recursionlevel: generated char '$newchr' by $tr. length changed {$newstate->length} : {$newstate->length}\n";
             echo "new string is {$newstate->str}\n\n";*/
+        }
+        foreach ($transition->mergedafter as $tr) {
+            $this->after_transition_passed($newstate, $tr, $curpos, 0);
         }
         $this->set_last_transition($newstate, $transition, $newstate->length - $curstate->length);
         return $newstate;
