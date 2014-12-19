@@ -70,7 +70,7 @@ class ajax_question_category_list extends moodle_list {
     public function to_html($indent=0, $extraargs=array()) {
         $attributes = array(
             'id' => 'ajaxlistitem',
-            'data-id' => $category->id,
+            //'data-id' => $category->id,
         );
         if (count($this->items)) {
             $tabs = str_repeat("\t", $indent);
@@ -78,7 +78,7 @@ class ajax_question_category_list extends moodle_list {
             $itemiter = 1;
             $lastitem = '';
             $html = '';
-            $html .= html_writer::start_div('ajaxcategorylist',  array('id' => 'ajaxcategorylist'));
+            //$html .= html_writer::start_div('ajaxcategorylist',  array('id' => 'ajaxcategorylist'));
             foreach ($this->items as $item) {
                 $html .= html_writer::start_tag('li', $attributes);
                 $html .= html_writer::start_div('ajaxitem');
@@ -95,7 +95,7 @@ class ajax_question_category_list extends moodle_list {
                 $lastitem = $item;
                 $itemiter++;
             }
-            $html .= html_writer::end_div();
+            //$html .= html_writer::end_div();
         } else {
             $html = '';
         }
@@ -241,7 +241,7 @@ class ajax_question_category_object {
     public function initialize($page, $contexts, $currentcat, $defaultcategory, $todelete, $addcontexts) {
         $lastlist = null;
         foreach ($contexts as $context){
-            $this->editlists[$context->id] = new ajax_question_category_list('ul', array('id' => 'ajaxcategorylist'), true, $this->pageurl, $page, 'cpage', QUESTION_PAGE_LENGTH, $context);
+            $this->editlists[$context->id] = new ajax_question_category_list('ul', 'id="ajaxcategorylist"', true, $this->pageurl, $page, 'cpage', QUESTION_PAGE_LENGTH, $context);
             $this->editlists[$context->id]->lastlist =& $lastlist;
             if ($lastlist!== null){
                 $lastlist->nextlist =& $this->editlists[$context->id];
