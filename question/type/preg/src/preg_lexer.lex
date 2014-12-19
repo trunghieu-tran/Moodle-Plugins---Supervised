@@ -1194,8 +1194,8 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
 
 
 <YYINITIAL> "(?#" {                                        /* (?#....) Comment beginning */
-    $this->comment = $this->yytext();
-    $this->comment_length = $this->yylength();
+    $this->comment = '';
+    $this->comment_length = 0;
     $this->state_begin_position = $this->current_position_for_node();
     $this->yybegin(self::YYCOMMENT);
 }
@@ -1212,13 +1212,41 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     $this->comment_length += $this->yylength();
 }
 <YYCOMMENT> ")" {                                          /* Comment ending */
-    //$this->comment .= $this->yytext();
-    //$this->comment_length += $this->yylength();
-    // TODO: make use of it?
+    $result = null;
+    if ($this->options->parsetemplates && $this->comment_length > 0) {
+        $position = new qtype_preg_position($this->state_begin_position->indfirst, $this->yychar + $this->yylength() - 1,
+                                            $this->state_begin_position->linefirst, $this->yyline,
+                                            $this->state_begin_position->colfirst, $this->yycol + $this->yylength() - 1);
+        if ($this->comment === '##,') {
+            // Template params separator
+            $sep = new qtype_preg_lexem();
+            $sep->set_user_info($position, array(new qtype_preg_userinscription('(?##,)')));
+            $result = new JLexToken(qtype_preg_parser::TEMPLATESEP, $sep);
+
+        } else if ($this->comment === '##>') {
+            // Template close bracket
+            $closebr = new qtype_preg_lexem();
+            $closebr->set_user_info($position, array(new qtype_preg_userinscription('(?##>)')));
+            $result = new JLexToken(qtype_preg_parser::TEMPLATECLOSEBRACK, $closebr);
+        } else if (core_text::substr($this->comment, 0, 2) === '##' && core_text::substr($this->comment, -1) === '<') {
+            // Template open bracket
+            $node = new qtype_preg_node_template();
+            $node->set_user_info($position, array(new qtype_preg_userinscription('(?#' . $this->comment . ')')));
+            $result = new JLexToken(qtype_preg_parser::TEMPLATEOPENBRACK, $node);
+        } else if (core_text::substr($this->comment, 0, 2) === '##') {
+            // Template leaf
+            $node = new qtype_preg_leaf_template();
+            $node->set_user_info($position, array(new qtype_preg_userinscription('(?#' . $this->comment . ')')));
+            $result = new JLexToken(qtype_preg_parser::PARSELEAF, $node);
+        }
+    }
     $this->comment = '';
     $this->comment_length = 0;
     $this->state_begin_position = null;
     $this->yybegin(self::YYINITIAL);
+    if ($result !== null) {
+        return $result;
+    }
 }
 
 

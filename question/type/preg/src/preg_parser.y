@@ -296,13 +296,14 @@
 %nonassoc ERROR_PREC_SHORTEST.
 %nonassoc ERROR_PREC_SHORT.
 %nonassoc ERROR_PREC.
-%nonassoc CLOSEBRACK.
+%nonassoc TEMPLATESEP.
+%nonassoc CLOSEBRACK TEMPLATECLOSEBRACK.
 %left ALT_SHORTEST.
 %left ALT_SHORT.
 %left ALT.
 %left CONC PARSELEAF.
 %nonassoc QUANT.
-%nonassoc OPENBRACK CONDSUBEXPR.
+%nonassoc OPENBRACK TEMPLATEOPENBRACK CONDSUBEXPR.
 
 start ::= expr(B). {
     // Set the root node.
