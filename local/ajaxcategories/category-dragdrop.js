@@ -11,14 +11,47 @@ function dump(obj) {
 }
 
 YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
+    var before;
+    var addedNode;
+    var child;
+    var after;
   //Listen for all drop:over events
     Y.DD.DDM.on('drop:over', function(e) {
         //Get a reference to our drag and drop nodes
         var drag = e.drag.get('node'),
             drop = e.drop.get('node');
-
+        var parent = drop.ancestor();
+        var first = parent.one('li');
+        if (before !== undefined ) {
+            before.remove();
+        }
+        if (addedNode !== undefined ) {
+            addedNode.remove();
+        }
+        if (after !== undefined ) {
+            after.remove();
+        }
+        // Check if node is first in list
+        if (first.compareTo(drop)) {
+            before = Y.Node.create( '<li class="placeholder"></li>');
+            before.setAttribute("id", Y.guid() );
+            e.drop.get('node').get('parentNode').insertBefore(before, drop);
+        }
+        // Check if node doesn't have children
+        if (drop.one( "ul" ) == undefined) {
+            child = Y.Node.create( '<li class="placeholder"></li>');
+            child.setAttribute("id", Y.guid() );
+            addedNode = Y.Node.create( "<ul></ul>" );
+            addedNode.setAttribute("id", Y.guid() );
+            addedNode.append(child);
+            drop.append(addedNode);
+        }
+        after = Y.Node.create( '<li class="placeholder"></li>');
+        after.setAttribute("id", Y.guid() );
+        e.drop.get('node').get('parentNode').insert(before, drop);
+        drop.insert(after, "after");
         //Are we dropping on a li node?
-        if (drop.get('tagName').toLowerCase() === 'li') {
+        /*if (drop.get('tagName').toLowerCase() === 'li') {
             //Are we not going up?
             if (!goingUp) {
                 drop = drop.get('nextSibling');
@@ -27,7 +60,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
             e.drop.get('node').get('parentNode').insertBefore(drag, drop);
             //Resize this nodes shim, so we can drop on it later.
             e.drop.sizeShim();
-        }
+        }*/
     });
 
     //Listen for all drag:drag events
@@ -67,18 +100,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
             opacity: '1'
         });
     });
-    //Listen for all drag:drophit events
-    Y.DD.DDM.on('drag:drophit', function(e) {
-        var drop = e.drop.get('node'),
-            drag = e.drag.get('node');
 
-        //if we are not on an li, we must have been dropped on a ul
-        if (drop.get('tagName').toLowerCase() !== 'li') {
-            if (!drop.contains(drag)) {
-                drop.appendChild(drag);
-            }
-        }
-    });
 
     //Static Vars
     var goingUp = false, lastY = 0;
@@ -105,7 +127,7 @@ items.each(function(v, k) {
 
 });
 
-var uls = Y.Node.all('#ajaxcategorylist ul');
+var uls = Y.Node.all('#placeholder');
     uls.each(function(v, k) {
         var tar = new Y.DD.Drop({
             node: v
