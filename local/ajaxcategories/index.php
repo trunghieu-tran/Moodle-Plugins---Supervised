@@ -116,3 +116,4 @@ if (!empty($param->edit)) {
     $qcobject->display_user_interface();
 }
 echo $OUTPUT->footer();
+echo '<script src="./category-dragdrop.js"></script>';
