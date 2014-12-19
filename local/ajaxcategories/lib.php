@@ -6,7 +6,8 @@ defined('MOODLE_INTERNAL') || die;
 function local_ajaxcategories_extends_settings_navigation(settings_navigation $nav, context $context) {
     $coursenode = $nav->get('courseadmin');
     if ($coursenode) {
-	   $questionbank = $coursenode->find(12);
+        //var_dump($coursenode);
+	   $questionbank = $coursenode->find(12, navigation_node::TYPE_CONTAINER);
         if ($questionbank) {
     	   $params = array();
     	   if ($context->contextlevel == CONTEXT_COURSE) {
