@@ -10,7 +10,7 @@ function dump(obj) {
     alert(out);
 }
 
-YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', function(Y) {
+YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
   //Listen for all drop:over events
     Y.DD.DDM.on('drop:over', function(e) {
         //Get a reference to our drag and drop nodes
@@ -84,6 +84,8 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', function(Y) {
     var goingUp = false, lastY = 0;
 var items = Y.Node.all('#ajaxlistitem');
 items.each(function(v, k) {
+
+
     var dd = new Y.DD.Drag({
         node: v,
         //Make it Drop target and pass this config to the Drop constructor
@@ -97,6 +99,10 @@ items.each(function(v, k) {
         //Keep it inside the #play node
         constrain2node: '#ajaxcategorylist'
     });
+   dd.addHandle('.drag-handle');
+
+
+
 });
 
 var uls = Y.Node.all('#ajaxcategorylist ul');
