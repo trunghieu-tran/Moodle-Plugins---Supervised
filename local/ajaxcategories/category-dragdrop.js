@@ -1,39 +1,97 @@
-YUI().use('sortable', function(Y){
-    var list1 = new Y.Sortable({
-            container: '#list1',
-        nodes: 'li:not(.empty)',
-            opacity: '.1'
+function dump(obj) {
+    var out = "";
+    if(obj && typeof(obj) == "object"){
+        for (var i in obj) {
+            out += i + ": " + obj[i] + "\n";
+        }
+    } else {
+        out = obj;
+    }
+    alert(out);
+}
+YUI().use( 'dd' , 'sortable', 'gallery-treeviewlite', function(Y) {
+
+ var list1 = new Y.Sortable({
+        container: '#ajaxcategorylist',
+        nodes: 'li',
+        opacity: '.5',
+
     });
 
-    var list2 = new Y.Sortable({
-            container: '#list2',
-            nodes: 'li',
-            opacity: '.1'
+    Y.one( "#ajaxcategorylist" ).plug( Y.Plugin.TreeviewLite );
+    // nodes we're moving around
+    var addedNode, newNode;
+
+var recNode;
+
+    // make a new node that can be inserted as a new tree sometimes
+    Y.DD.DDM.on("drag:start", function(ev){
+
+            newNode = Y.Node.create( "<ul></ul>" );
+            newNode.setAttribute("id", Y.guid() );
+            recNode = Y.Node.create( '<li class="placeholder"></li>');
+            recNode.setAttribute("id", Y.guid() );
     });
 
-    list1.join(list2);
 
-    list1.drop.on('drop:enter', function(){
-        Y.log('drop:enter');
-        Y.one('#list1 .empty').setStyle('display', 'none');
-    });
+    // insert the nodes where needed
+    Y.DD.DDM.on("drag:over", function(ev){
 
-    list1.drop.after('drop:exit', function () {
-        Y.log('drop:exit');
+                  // remove it from where it was
+                  if( addedNode !== undefined ) {
+                      addedNode.remove();
+                  }
 
-        Y.log('number of items in #list1: ' + Y.all('#list1 li:not(.empty)').size());
-        Y.log(Y.all('#list1 li:not(.empty)'));
-        if(Y.all('#list1 li:not(.empty)').size() <= 0){
-            Y.one('#list1 .empty').setStyle('display',null);
+
+        var t = ev.drop.get("node"),
+            // tOl is looking for a child ol below the li
+            tOl = t.one( "ul" );
+
+
+
+        // if we've over an li, add the new ol child block
+        switch( t.get("nodeName").toLowerCase() ) {
+
+           case "li":
+
+                // try and append it to existing ol on the target
+                if( tOl ) {
+                  try {
+                    //addedNode = placeholder;
+                    tOl.append( ev.drag.get("node") );
+                  } catch(e){ }
+                }
+
+                // else add a new ol to the target
+                else {
+
+                  // try adding newNode
+                  try{
+                    t.append( newNode );
+                    newNode.append( ev.drag.get( "node" ) );
+
+                    addedNode = newNode;
+
+
+                  } catch(e){ }
+                }
+                break;
+
+
+        // if we're over an ul, just add this as a new li child
+         /* case "ul":
+              try{
+                t.prepend( ev.drag.get("node" ) );
+                dump(t);
+              }
+              catch(e){}
+              break;*/
+
+          default:
+              break;
+
         }
 
-    });
 
-    list1.delegate.dd.on('drag:start', function () {
-        Y.log('drag:start');
-        Y.log('number of items in #list1: ' + Y.all('#list1 li:not(.empty)').size());
-        if(Y.all('#list1 li:not(.empty)').size() <= 0){
-            Y.one('#list1 .empty').setStyle('display',null);
-        }
     });
 });
