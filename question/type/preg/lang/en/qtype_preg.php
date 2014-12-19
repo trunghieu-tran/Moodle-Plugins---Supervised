@@ -98,6 +98,7 @@ $string['leaf_meta']                   = 'meta-character or escape-sequence';
 $string['leaf_assert']                 = 'simple assertion';
 $string['leaf_backref']                = 'backreference';
 $string['leaf_subexpr_call']           = 'subexpression call';
+$string['leaf_template']               = 'template without params';
 $string['leaf_control']                = 'control sequence';
 $string['leaf_options']                = 'modifier';   // TODO: remove?
 $string['node_finite_quant']           = 'finite quantifier';
@@ -107,6 +108,7 @@ $string['node_alt']                    = 'alternation';
 $string['node_assert']                 = 'lookaround assertion';
 $string['node_subexpr']                = 'subpattern';
 $string['node_cond_subexpr']           = 'conditional subpattern';
+$string['node_template']               = 'template with params';
 $string['node_error']                  = 'syntax error';
 
 // Subtypes.
@@ -245,8 +247,8 @@ $string['description_circumflex_leaf_assert'] = 'start of the string';
 $string['description_dollar_leaf_assert'] = 'end of the string';
 $string['description_esc_b_leaf_assert_neg'] = 'not a word boundary';
 // TYPE_LEAF_BACKREF
-$string['description_leaf_backref'] = 'text that matched by subpattern #{$a}';
-$string['description_leaf_backref_name'] = 'text that matched by subpattern "{$a}"';
+$string['description_leaf_backref'] = 'text matched by subpattern #{$a}';
+$string['description_leaf_backref_name'] = 'text matched by subpattern "{$a}"';
 // TYPE_LEAF_SUBEXPR_CALL
 $string['description_leaf_subexpr_call'] = 'call of the subpattern #{$a}';
 $string['description_leaf_subexpr_call_all'] = 'call of the whole regular expression';
@@ -254,6 +256,8 @@ $string['description_leaf_subexpr_call_name'] = 'call of the subpattern "{$a}"';
 $string['description_leaf_subexpr_call_recursive'] = 'recursive call of the subpattern #{$a}';
 $string['description_leaf_subexpr_call_all_recursive'] = 'recursive call of the whole regular expression';
 $string['description_leaf_subexpr_call_name_recursive'] = 'recursive call of the subpattern "{$a}"';
+// TYPE_LEAF_TEMPLATE
+$string['description_leaf_template'] = 'template without params';
 // TYPE_LEAF_CONTROL
 $string['description_accept_leaf_control'] = 'force successful subpattern match';
 $string['description_fail_leaf_control'] = 'force fail';
@@ -338,6 +342,8 @@ $string['description_subexpr_node_cond_subexpr_wrapper'] = 'if {$a->cond} then c
 $string['description_define_node_cond_subexpr'] = 'definition of {$a->firstoperand}';
 $string['description_node_cond_subexpr'] = 'if {$a->cond} then check: [{$a->firstoperand}]{$a->else}';
 $string['description_node_cond_subexpr_else'] = ' else check: [{$a->secondoperand}]';
+// TYPE_NODE_TEMPLATE
+$string['description_node_template'] = 'template with params';
 // TYPE_LEAF_CHARSET
 $string['description_charset'] = 'one of the following characters: {$a->characters};';
 $string['description_charset_neg'] = 'any character except the following: {$a->characters};';
@@ -711,4 +717,3 @@ $string['explain_begin'] = 'begin';
 $string['explain_end'] = 'end';
 $string['explain_true'] = 'true';
 $string['explain_false'] = 'false';
-

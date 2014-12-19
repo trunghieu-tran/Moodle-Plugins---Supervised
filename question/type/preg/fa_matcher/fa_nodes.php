@@ -167,7 +167,7 @@ abstract class qtype_preg_fa_node {
             // Get transitions for merging forward.
             $transitions = $automaton->get_adjacent_transitions($del->to, true);
             // Case of changeing assrts' places while merging.//TO THINK AND TODO!!!
-            /*if ($del->is_unmerged_assert() && $del->is_both_anchor()) {
+            /*if ($del->is_unmerged_assert() && $del->is_conditional_assert()) {
                 $oppositetransitions = $automaton->get_adjacent_transitions($del->from, false);
                 if (empty($oppositetransitions)) {
                     return false;

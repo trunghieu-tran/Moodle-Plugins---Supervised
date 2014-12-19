@@ -269,6 +269,8 @@ abstract class qtype_preg_node {
     const TYPE_LEAF_BACKREF = 'leaf_backref';
     /** Recursive match. */
     const TYPE_LEAF_SUBEXPR_CALL = 'leaf_subexpr_call';
+    /** Template leaf (without params). */
+    const TYPE_LEAF_TEMPLATE = 'leaf_template';
     /** Backtracking control, newline conventions etc sequences. */
     const TYPE_LEAF_CONTROL = 'leaf_control';
     /** Option set. */
@@ -287,6 +289,8 @@ abstract class qtype_preg_node {
     const TYPE_NODE_SUBEXPR = 'node_subexpr';
     /** Conditional subexpression. */
     const TYPE_NODE_COND_SUBEXPR = 'node_cond_subexpr';
+    /** Template node (with params). */
+    const TYPE_NODE_TEMPLATE = 'node_template';
     /** Error node. */
     const TYPE_NODE_ERROR = 'node_error';
 
@@ -316,8 +320,8 @@ abstract class qtype_preg_node {
     }
 
     /**
-     * Is this node a subpattern? According to Fowler, a subpattern
-     * is a leaf, or a subexpression, or a quantifier.
+     * Is this node a subpattern? According to Glenn Fowler's "An Interpretation of the POSIX regex Standard",
+     * a subpattern is a leaf, or a subexpression, or a quantifier.
      */
     abstract public function is_subpattern();
 
@@ -1179,7 +1183,7 @@ abstract class qtype_preg_leaf_assert extends qtype_preg_leaf {
                 $this->subtype == self::SUBTYPE_SMALL_ESC_Z);
     }
 
-    public function is_both_anchor() {
+    public function is_conditional_assert() {
         return ($this->subtype == self::SUBTYPE_SUBEXPR || $this->subtype == self::SUBTYPE_RECURSION);
     }
 
@@ -1596,6 +1600,21 @@ class qtype_preg_leaf_subexpr_call extends qtype_preg_leaf {
     }
 }
 
+class qtype_preg_leaf_template extends qtype_preg_leaf {
+    // TODO
+    public function __construct() {
+        $this->type = qtype_preg_node::TYPE_LEAF_TEMPLATE;
+    }
+
+    public function match($str, $pos, &$length, $matcherstateobj = null) {
+        return false;
+    }
+
+    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
+        return array(self::NEXT_CHAR_CANNOT_GENERATE, null);
+    }
+}
+
 /**
  * Reperesents backtracking control, newline convention etc sequences like (*...).
  */
@@ -1966,6 +1985,16 @@ class qtype_preg_node_cond_subexpr extends qtype_preg_operator {
     }
 
     // TODO - ui_nodename().
+}
+
+class qtype_preg_node_template extends qtype_preg_operator {
+    // TODO
+    public function __construct() {
+        $this->type = qtype_preg_node::TYPE_NODE_TEMPLATE;
+    }
+    public function is_subpattern() {
+        return false;   // TODO: child's value?
+    }
 }
 
 /**
