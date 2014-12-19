@@ -1546,6 +1546,22 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $token = $lexer->nextToken();    // )
         $this->assertTrue($token->type === qtype_preg_parser::CLOSEBRACK);
     }
+    function test_templates() {
+        $lexer = $this->create_lexer('(?#)(?##)(?###)(?###leaf)(?###brack<)(?###,)(?###>)');
+        $token = $lexer->nextToken();   // First 2 tokens are skipped
+        $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
+        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_TEMPLATE);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
+        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_TEMPLATE);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === qtype_preg_parser::TEMPLATEOPENBRACK);
+        $this->assertTrue($token->value->type === qtype_preg_node::TYPE_NODE_TEMPLATE);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === qtype_preg_parser::TEMPLATESEP);
+        $token = $lexer->nextToken();
+        $this->assertTrue($token->type === qtype_preg_parser::TEMPLATECLOSEBRACK);
+    }
     function test_lookaround_assertions() {
         $lexer = $this->create_lexer('(?=(?!(?<=(?<!');
         $token = $lexer->nextToken();
