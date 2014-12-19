@@ -3,3 +3,6 @@
     min-height: 100px;
     background: red;
 }
+.drag-handle{
+    display:inline-block;
+}
