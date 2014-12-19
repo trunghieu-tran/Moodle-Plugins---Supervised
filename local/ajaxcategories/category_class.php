@@ -82,8 +82,6 @@ class ajax_question_category_list extends moodle_list {
             foreach ($this->items as $item) {
                 $html .= html_writer::start_tag('li', $attributes);
                 $html .= html_writer::start_div('ajaxitem');
-                $html .= html_writer::start_div('placeholder');
-                $html .= html_writer::end_div();
                 $last = (count($this->items) == $itemiter);
                 if ($this->editable) {
                     $item->set_icon_html($first, $last, $lastitem);
