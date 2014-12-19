@@ -231,15 +231,15 @@ class qtype_preg_fa_transition {
     }
 
     public function is_start_anchor() {
-        return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $this->pregleaf->is_start_anchor() &&  empty($this->mergedbefore));
+        return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $this->pregleaf->is_start_anchor() && empty($this->mergedbefore));
     }
 
     public function is_end_anchor() {
-        return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $this->pregleaf->is_end_anchor() &&  empty($this->mergedafter));
+        return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $this->pregleaf->is_end_anchor() && empty($this->mergedafter));
     }
 
-    public function is_both_anchor() {
-        return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT &&  ($this->pregleaf->is_both_anchor() && (!empty($this->mergedafter) || !empty($this->mergedbefore))));
+    public function is_conditional_assert() {
+        return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT &&  ($this->pregleaf->is_conditional_assert() && (!empty($this->mergedafter) || !empty($this->mergedbefore))));
     }
 
     /**

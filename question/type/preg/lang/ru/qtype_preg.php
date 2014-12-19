@@ -98,6 +98,7 @@ $string['leaf_meta']                   = 'мета-символ или escape-п
 $string['leaf_assert']                 = 'простое утверждение';
 $string['leaf_backref']                = 'обратная ссылка';
 $string['leaf_subexpr_call']           = 'вызов подмаски';
+$string['leaf_template']               = 'шаблон без параметров';
 $string['leaf_control']                = 'управляющая последовательность';
 $string['leaf_options']                = 'модификатор';   // TODO: remove?
 $string['node_finite_quant']           = 'конечный квантификатор';
@@ -107,6 +108,7 @@ $string['node_alt']                    = 'альтернатива';
 $string['node_assert']                 = 'назад смотрящее утверждение';
 $string['node_subexpr']                = 'подвыражение';
 $string['node_cond_subexpr']           = 'условное подвыражение';
+$string['node_template']               = 'шаблон с параметрами';
 $string['node_error']                  = 'синтаксическая ошибка';
 
 // Subtypes.
@@ -254,6 +256,8 @@ $string['description_leaf_subexpr_call_name'] = 'вызов подмаски "{$
 $string['description_leaf_subexpr_call_recursive'] = 'рекурсивный вызов подмаски #{$a}';
 $string['description_leaf_subexpr_call_all_recursive'] = 'рекурсивный вызов проверки совпадения со всем регулярным выражением';
 $string['description_leaf_subexpr_call_name_recursive'] = 'рекурсивный вызов подмаски "{$a}"';
+// TYPE_LEAF_TEMPLATE
+$string['description_leaf_template'] = 'шаблон без параметров';
 // TYPE_LEAF_CONTROL
 $string['description_accept_leaf_control'] = 'спровоцировать удачное совпадение';
 $string['description_fail_leaf_control'] = 'спровоцировать неудачу';
@@ -338,6 +342,8 @@ $string['description_subexpr_node_cond_subexpr_wrapper'] = 'если {$a->cond},
 $string['description_define_node_cond_subexpr'] = 'описание {$a->firstoperand}';
 $string['description_node_cond_subexpr'] = 'если {$a->cond}, тогда проверить: [{$a->firstoperand}]{$a->else}';
 $string['description_node_cond_subexpr_else'] = ' иначе проверить: [{$a->secondoperand}]';
+// TYPE_NODE_TEMPLATE
+$string['description_node_template'] = 'шаблон с параметрами';
 // TYPE_LEAF_CHARSET
 $string['description_charset'] = 'один из следующих символов: {$a->characters};';
 $string['description_charset_neg'] = 'любой из символов кроме следующих: {$a->characters};';
