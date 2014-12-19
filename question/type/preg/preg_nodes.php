@@ -1171,12 +1171,14 @@ abstract class qtype_preg_leaf_assert extends qtype_preg_leaf {
 
     public function is_start_anchor() {
         return ($this->subtype == self::SUBTYPE_CIRCUMFLEX || $this->subtype == self::SUBTYPE_ESC_A ||
-                $this->subtype == self::SUBTYPE_ESC_G);
+                $this->subtype == self::SUBTYPE_ESC_G || $this->subtype == self::SUBTYPE_SUBEXPR ||
+                $this->subtype == self::SUBTYPE_RECURSION);
     }
 
     public function is_end_anchor() {
         return ($this->subtype == self::SUBTYPE_DOLLAR || $this->subtype == self::SUBTYPE_CAPITAL_ESC_Z ||
-                $this->subtype == self::SUBTYPE_SMALL_ESC_Z);
+                $this->subtype == self::SUBTYPE_SMALL_ESC_Z || $this->subtype == self::SUBTYPE_SUBEXPR ||
+                $this->subtype == self::SUBTYPE_RECURSION);
     }
 
     public function consumes($matcherstateobj = null) {
