@@ -868,4 +868,32 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[4]->number === 2);
         $this->assertFalse($root->operands[4]->isrecursive);
     }
+    function test_templates() {
+        $handler = $this->run_handler("(?###word)");
+        $root = $handler->get_ast_root();
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_LEAF_TEMPLATE);
+        $handler = $this->run_handler("(?###smth<)a(?###>)");
+        $root = $handler->get_ast_root();
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_TEMPLATE);
+        $handler = $this->run_handler("(?###smth<)ab?|c(?###>)");
+        $root = $handler->get_ast_root();
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_TEMPLATE);
+        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_NODE_ALT);
+        $handler = $this->run_handler("(?###smth<)a(?###,)b?(?###,)c|(d)(?###>)");
+        $root = $handler->get_ast_root();
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_TEMPLATE);
+        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[1]->type === qtype_preg_node::TYPE_NODE_FINITE_QUANT);
+        $this->assertTrue($root->operands[2]->type === qtype_preg_node::TYPE_NODE_ALT);
+        // Okay, these guys can be nested
+        $handler = $this->run_handler("(?###outer<)a(?###,)(?###inner<)a(?###,)b?(?###,)(c)(?###>)(?###,)c|(d)(?###>)");
+        $root = $handler->get_ast_root();
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_TEMPLATE);
+        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[1]->type === qtype_preg_node::TYPE_NODE_TEMPLATE);
+        $this->assertTrue($root->operands[1]->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[1]->operands[1]->type === qtype_preg_node::TYPE_NODE_FINITE_QUANT);
+        $this->assertTrue($root->operands[1]->operands[2]->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        $this->assertTrue($root->operands[2]->type === qtype_preg_node::TYPE_NODE_ALT);
+    }
 }

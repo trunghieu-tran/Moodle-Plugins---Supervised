@@ -470,6 +470,23 @@ expr(A) ::= CONDSUBEXPR(B) CLOSEBRACK(C) CLOSEBRACK(D). {
 }
 
 /**************************************************
+ *    Below are the rules for templates parsing.  *
+ **************************************************/
+
+templateparams(A) ::= expr(B). {
+    A = array(B);
+}
+
+templateparams(A) ::= templateparams(B) TEMPLATESEP(C) expr(D). {
+    A = array_merge(B, array(D));
+}
+
+expr(A) ::= TEMPLATEOPENBRACK(B) templateparams(C) TEMPLATECLOSEBRACK(D). {
+    A = B;
+    A->operands = C;
+}
+
+/**************************************************
  *    Below are the rules for error reporting.    *
  **************************************************/
 
