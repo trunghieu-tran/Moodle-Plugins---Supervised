@@ -15,13 +15,29 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
     var addedNode;
     var child;
     var after;
+    var block;
+    var change = false;
   //Listen for all drop:over events
-    Y.DD.DDM.on('drop:over', function(e) {
+    Y.DD.DDM.on('drag:over', function(e) {
         //Get a reference to our drag and drop nodes
         var drag = e.drag.get('node'),
             drop = e.drop.get('node');
         var parent = drop.ancestor();
         var first = parent.one('li');
+        if (block !== undefined ) {
+            if (!block.compareTo(drop) && !block.compareTo(drop.ancestor('li'))) {
+                change = true;
+            } else {
+                change = false;
+                /*if (drop.get('tagName').toLowerCase() === 'li' && !block.compareTo(drop)) {
+                    change = true;
+                }*/
+            }
+        } else {
+            change = true;
+        }
+
+        if (change) {
         if (before !== undefined ) {
             before.remove();
         }
@@ -33,9 +49,9 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
         }
         // Check if node is first in list
         if (first.compareTo(drop)) {
-            before = Y.Node.create( '<li class="placeholder"></li>');
+            before = Y.Node.create( '<div class="placeholder"></div>');
             before.setAttribute("id", Y.guid() );
-            e.drop.get('node').get('parentNode').insertBefore(before, drop);
+            e.drop.get('node').prepend(before);
         }
         // Check if node doesn't have children
         if (drop.one( "ul" ) == undefined) {
@@ -46,10 +62,17 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
             addedNode.append(child);
             drop.append(addedNode);
         }
-        after = Y.Node.create( '<li class="placeholder"></li>');
+        after = Y.Node.create( '<div class="placeholder"></div>');
         after.setAttribute("id", Y.guid() );
-        e.drop.get('node').get('parentNode').insert(before, drop);
-        drop.insert(after, "after");
+        //e.drop.get('node').get('parentNode').insert(before, drop);
+        drop.append(after);
+        block = drop;
+        //dump(block.getHTML())
+    } else {
+        //e.drop.get('node').insertBefore(drag, drop);
+        //drop.remove();
+
+    }
         //Are we dropping on a li node?
         /*if (drop.get('tagName').toLowerCase() === 'li') {
             //Are we not going up?
@@ -66,7 +89,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
     //Listen for all drag:drag events
     Y.DD.DDM.on('drag:drag', function(e) {
         //Get the last y point
-        var y = e.target.lastXY[1];
+        /*var y = e.target.lastXY[1];
         //is it greater than the lastY var?
         if (y < lastY) {
             //We are going up
@@ -76,7 +99,8 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
             goingUp = false;
         }
         //Cache for next check
-        lastY = y;
+        lastY = y;*/
+        //if ()
     });
     //Listen for all drag:start events
     Y.DD.DDM.on('drag:start', function(e) {
@@ -84,6 +108,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
         var drag = e.target;
         //Set some styles here
         drag.get('node').setStyle('opacity', '.25');
+        drag.get('node').remove();
         drag.get('dragNode').set('innerHTML', drag.get('node').get('innerHTML'));
         drag.get('dragNode').setStyles({
             opacity: '.5',
@@ -104,7 +129,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
 
     //Static Vars
     var goingUp = false, lastY = 0;
-var items = Y.Node.all('#ajaxlistitem');
+var items = Y.Node.all('#ajaxcategorylist li');
 items.each(function(v, k) {
 
 
@@ -119,7 +144,7 @@ items.each(function(v, k) {
         moveOnEnd: false
     }).plug(Y.Plugin.DDConstrained, {
         //Keep it inside the #play node
-        constrain2node: '#ajaxcategorylist'
+        constrain2node: '#main'
     });
    dd.addHandle('.drag-handle');
 
@@ -127,7 +152,7 @@ items.each(function(v, k) {
 
 });
 
-var uls = Y.Node.all('#placeholder');
+var uls = Y.Node.all('#ajaxcategorylist li');
     uls.each(function(v, k) {
         var tar = new Y.DD.Drop({
             node: v
