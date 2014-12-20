@@ -266,7 +266,7 @@ class qtype_preg_fa_transition {
         $resultbefore = array_merge($this->mergedbefore, $other->mergedbefore);
         $resultafter = array_merge($this->mergedafter, $other->mergedafter);
         // Removing same asserts.
-        for ($i = 0; $i < count($resultbefore); $i++) {
+        /*for ($i = 0; $i < count($resultbefore); $i++) {
             for ($j = ($i+1); $j < count($resultbefore); $j++) {
                 if ($resultbefore[$i]->pregleaf->subtype == $resultbefore[$j]->pregleaf->subtype) {
                     unset($resultbefore[$j]);
@@ -284,7 +284,7 @@ class qtype_preg_fa_transition {
                     $j--;
                 }
             }
-        }
+        }*/
 
         $resultbefore = array_values($resultbefore);
         $resultafter = array_values($resultafter);
