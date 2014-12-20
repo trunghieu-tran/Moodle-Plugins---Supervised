@@ -1,6 +1,7 @@
 .placeholder {
-    min-width: 200px;
-    min-height: 100px;
+    min-width: 100px;
+    min-height: 14px;
+    margin-bottom: 5px;
     background: red;
 }
 .drag-handle{
