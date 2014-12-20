@@ -266,9 +266,9 @@ class qtype_preg_fa_transition {
         $resultbefore = array_merge($this->mergedbefore, $other->mergedbefore);
         $resultafter = array_merge($this->mergedafter, $other->mergedafter);
         // Removing same asserts.
-        /*for ($i = 0; $i < count($resultbefore); $i++) {
+        for ($i = 0; $i < count($resultbefore); $i++) {
             for ($j = ($i+1); $j < count($resultbefore); $j++) {
-                if ($resultbefore[$i]->pregleaf->subtype == $resultbefore[$j]->pregleaf->subtype) {
+                if ($resultbefore[$i] == $resultbefore[$j]) {
                     unset($resultbefore[$j]);
                     $resultbefore = array_values($resultbefore);
                     $j--;
@@ -278,13 +278,13 @@ class qtype_preg_fa_transition {
 
         for ($i = 0; $i < count($resultafter); $i++) {
             for ($j = ($i+1); $j < count($resultafter); $j++) {
-                if ($resultafter[$i]->pregleaf->subtype == $resultafter[$j]->pregleaf->subtype) {
+                if ($resultafter[$i] == $resultafter[$j]) {
                     unset($resultafter[$j]);
                     $resultafter = array_values($resultafter);
                     $j--;
                 }
             }
-        }*/
+        }
 
         $resultbefore = array_values($resultbefore);
         $resultafter = array_values($resultafter);
