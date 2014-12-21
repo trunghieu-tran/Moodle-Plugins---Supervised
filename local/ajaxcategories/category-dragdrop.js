@@ -16,7 +16,8 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
     var child;
     var after;
     var block;
-    var change = false;
+    var change = true;
+    var blockX;
   //Listen for all drop:over events
     Y.DD.DDM.on('drag:over', function(e) {
         //Get a reference to our drag and drop nodes
@@ -24,20 +25,20 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
             drop = e.drop.get('node');
         var parent = drop.ancestor();
         var first = parent.one('li');
-        if (block !== undefined ) {
-            if (!block.compareTo(drop) && !block.compareTo(drop.ancestor('li'))) {
+        /*if (block !== undefined ) {
+            if (!block.compareTo(drop) && !block.compareTo(drop.ancestor())) {
                 change = true;
             } else {
                 change = false;
                 /*if (drop.get('tagName').toLowerCase() === 'li' && !block.compareTo(drop)) {
                     change = true;
                 }*/
-            }
+            /*}
         } else {
             change = true;
-        }
+        }*/
 
-        if (change) {
+        if (change /*&& (block == undefined || !block.compareTo(drop))*/) {
         if (before !== undefined ) {
             before.remove();
         }
@@ -67,7 +68,9 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
         //e.drop.get('node').get('parentNode').insert(before, drop);
         drop.append(after);
         block = drop;
-        //dump(block.getHTML())
+        //change = false;
+        blockX = e.target.lastXY[0];
+       // dump(blockX);
     } else {
         //e.drop.get('node').insertBefore(drag, drop);
         //drop.remove();
@@ -89,18 +92,22 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
     //Listen for all drag:drag events
     Y.DD.DDM.on('drag:drag', function(e) {
         //Get the last y point
-        /*var y = e.target.lastXY[1];
+        //var y = e.target.lastXY[0];
         //is it greater than the lastY var?
-        if (y < lastY) {
+        /*if (y < lastY) {
             //We are going up
             goingUp = true;
         } else {
             //We are going down.
             goingUp = false;
-        }
+        }*/
         //Cache for next check
-        lastY = y;*/
-        //if ()
+        //lastY = y;
+
+        if ((blockX - e.pageX) > 10 || (blockX - e.pageX) < -10) {
+            //alert('sdssdsd');
+            change = true;
+        }
     });
     //Listen for all drag:start events
     Y.DD.DDM.on('drag:start', function(e) {
@@ -152,7 +159,7 @@ items.each(function(v, k) {
 
 });
 
-var uls = Y.Node.all('#ajaxcategorylist li');
+var uls = Y.Node.all('#placeholder');
     uls.each(function(v, k) {
         var tar = new Y.DD.Drop({
             node: v
