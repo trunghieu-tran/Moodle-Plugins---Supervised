@@ -63,6 +63,61 @@ class ajax_question_category_list extends moodle_list {
     }
 
     /**
+     * Replace category item in choosen place.
+     *
+     * @var $movingid - id of question_category_item replacing category.
+     * @var $environment - array with keys: 'before' - before item id
+     *                                      'after' - after item id
+     *                                      'level' - 'normal' or 'inner'
+     *                                      'dest' - destination list
+     */
+    function change_category_list($movingid, $environment) {
+        global $DB;
+        // Change context.
+        if ($environment['dest']->context != $this->context) {
+            // Moving to a new context. Must move files belonging to questions.
+            question_move_category_to_context($movingid, $this->context, $environment['dest']->context);
+        }
+        $item = $this->find_item($movingid);
+        //  Define the place of replacing
+        if ($environment['after'] != -1 && $environment['level'] != "inner") {
+            // Replacing at the same level after some item.
+            $afteritem = $environment['dest']->find_item($environment['after']);
+            if ($environment['level'] != "inner") {
+                // At the same level.
+                if (isset($afteritem->parentlist->parentitem)) {
+                    $newparent = $afteritem->parentlist->parentitem->id;
+                } else {
+                    $newparent = 0;
+                }
+                $DB->set_field($this->table, "parent", $newparent, array("id"=>$item->id));
+                $newpeers = $this->get_items_peers($afteritem->id);
+                $oldkey = array_search($afteritem->id, $newpeers);
+                $neworder = array_merge(array_slice($newpeers, 0, $oldkey+1), array($item->id), array_slice($newpeers, $oldkey+1));
+                $this->reorder_peers($neworder);
+            } else {
+                $newlist = new ajax_question_category_list($this->type, $this->attributes, $this->editable, $this->pageurl, $this->page, $this->pageparamname,  $this->itemsperpage, $this->context);
+                $newlist->parentitem = $afteritem;
+                $newparent = $afteritem->id;
+                $DB->set_field($this->table, "parent", $newparent, array("id"=>$item->id));
+            }
+        } else {
+            $beforeitem = $environment['dest']->find_item($environment['before']);
+            if (isset($beforeitem->parentlist->parentitem)) {
+                $newparent = $beforeitem->parentlist->parentitem->id;
+            } else {
+                $newparent = 0;
+            }
+            $DB->set_field($this->table, "parent", $newparent, array("id"=>$item->id));
+            $newpeers = $this->get_items_peers($beforeitem->id);
+            $oldkey = array_search($beforeitem->id, $newpeers);
+            $neworder = array_merge(array_slice($newpeers, 0, $oldkey), array($item->id), array_slice($newpeers, $oldkey));
+            $this->reorder_peers($neworder);
+        }
+    }
+
+
+    /**
      * Returns html string.
      *
      * @param integer $indent depth of indentation.
