@@ -22,9 +22,9 @@ class qtype_preg_cross_tests_from_preg_merging {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
-                        'length'=>array(0=>4),
-                        'left'=>array(1),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);    // Can't generate a character.
+                        'length'=>array(0=>3),
+                        'left'=>array(2),
+                        'next'=>'!');    // Can't generate a character.
 
         return array('regex'=>'^abc[a-z.?!]\b[a-zA-Z]',
                      'tests'=>array($test1, $test2),
@@ -800,10 +800,10 @@ class qtype_preg_cross_tests_from_preg_merging {
 
     function data_for_test_assertions_wordboundary_3() {
         $test1 = array( 'str'=>'ac',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>1),
+                        'index_first'=>array(),
+                        'length'=>array(),
                         'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
@@ -894,10 +894,10 @@ class qtype_preg_cross_tests_from_preg_merging {
 
     function data_for_test_assertions_wordboundary_8() {
         $test1 = array( 'str'=>"\t",
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>1),
+                        'index_first'=>array(),
+                        'length'=>array(),
                         'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
@@ -916,10 +916,10 @@ class qtype_preg_cross_tests_from_preg_merging {
 
     function data_for_test_assertions_wordboundary_9() {
         $test1 = array( 'str'=>'c',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>1),
+                        'index_first'=>array(),
+                        'length'=>array(),
                         'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
@@ -1221,7 +1221,7 @@ class qtype_preg_cross_tests_from_preg_merging {
     }
 
     function data_for_test_assertions_wordboundary_22() {
-        $test1 = array( 'str'=>'a?c&',
+        $test1 = array( 'str'=>'a?c+',
                         'is_match'=>false,
                         'full'=>false,
                         'index_first'=>array(),
