@@ -25,57 +25,29 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
             drop = e.drop.get('node');
         var parent = drop.ancestor();
         var first = parent.one('li');
-        /*if (block !== undefined ) {
-            if (!block.compareTo(drop) && !block.compareTo(drop.ancestor())) {
-                change = true;
+        if (child !== undefined) {
+            child.remove();
+        }
+        child = Y.Node.create( '<div id = "placeholder"></div>' );
+        if (drop.get('tagName').toLowerCase() === 'li') {
+            if (drop.one("ul") == undefined) {
+                addedNode = Y.Node.create( "<ul></ul>" );
+                addedNode.setAttribute("id", Y.guid() );
+                addedNode.append(child);
+                addedNode.append(drag);
+                addedNode.append(child);
+                drop.append(addedNode);
             } else {
-                change = false;
-                /*if (drop.get('tagName').toLowerCase() === 'li' && !block.compareTo(drop)) {
-                    change = true;
-                }*/
-            /*}
+                addedNode = drop.one("ul");
+                addedNode.append(drag);
+                addedNode.append(child);
+            }
         } else {
-            change = true;
-        }*/
 
-        if (change /*&& (block == undefined || !block.compareTo(drop))*/) {
-        if (before !== undefined ) {
-            before.remove();
+            drop.insert(child, 'after');
+            drop.insert(drag, 'after');
         }
-        if (addedNode !== undefined ) {
-            addedNode.remove();
-        }
-        if (after !== undefined ) {
-            after.remove();
-        }
-        // Check if node is first in list
-        if (first.compareTo(drop)) {
-            before = Y.Node.create( '<div class="placeholder"></div>');
-            before.setAttribute("id", Y.guid() );
-            e.drop.get('node').prepend(before);
-        }
-        // Check if node doesn't have children
-        if (drop.one( "ul" ) == undefined) {
-            child = Y.Node.create( '<li class="placeholder"></li>');
-            child.setAttribute("id", Y.guid() );
-            addedNode = Y.Node.create( "<ul></ul>" );
-            addedNode.setAttribute("id", Y.guid() );
-            addedNode.append(child);
-            drop.append(addedNode);
-        }
-        after = Y.Node.create( '<div class="placeholder"></div>');
-        after.setAttribute("id", Y.guid() );
-        //e.drop.get('node').get('parentNode').insert(before, drop);
-        drop.append(after);
-        block = drop;
-        //change = false;
-        blockX = e.target.lastXY[0];
-       // dump(blockX);
-    } else {
-        //e.drop.get('node').insertBefore(drag, drop);
-        //drop.remove();
 
-    }
         //Are we dropping on a li node?
         /*if (drop.get('tagName').toLowerCase() === 'li') {
             //Are we not going up?
@@ -115,7 +87,9 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
         var drag = e.target;
         //Set some styles here
         drag.get('node').setStyle('opacity', '.25');
-        drag.get('node').remove();
+        //drag.get('node').remove();
+        var next = drag.get('node').get('nextSibling');
+        next.remove();
         drag.get('dragNode').set('innerHTML', drag.get('node').get('innerHTML'));
         drag.get('dragNode').setStyles({
             opacity: '.5',
