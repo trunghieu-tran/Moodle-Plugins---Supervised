@@ -72,6 +72,9 @@ class ajax_question_category_list extends moodle_list {
             'id' => 'ajaxlistitem',
             //'data-id' => $category->id,
         );
+        $placeholder = array(
+            'id' => 'placeholder',
+        );
         if (count($this->items)) {
             $tabs = str_repeat("\t", $indent);
             $first = true;
@@ -80,7 +83,12 @@ class ajax_question_category_list extends moodle_list {
             $html = '';
             //$html .= html_writer::start_div('ajaxcategorylist',  array('id' => 'ajaxcategorylist'));
             foreach ($this->items as $item) {
+                if ($first) {
+                    $html .= html_writer::start_tag('div' ,$placeholder);
+                    $html .= html_writer::end_tag('div');
+                }
                 $html .= html_writer::start_tag('li', $attributes);
+
                 $html .= html_writer::start_div('ajaxitem');
                 $last = (count($this->items) == $itemiter);
                 if ($this->editable) {
@@ -90,7 +98,10 @@ class ajax_question_category_list extends moodle_list {
                     $html .= $itemhtml;
                 }
                 $html .= html_writer::end_div();
+
                 $html .= html_writer::end_tag('li');
+                $html .= html_writer::start_tag('div' ,$placeholder);
+                $html .= html_writer::end_tag('div');
                 $first = false;
                 $lastitem = $item;
                 $itemiter++;
