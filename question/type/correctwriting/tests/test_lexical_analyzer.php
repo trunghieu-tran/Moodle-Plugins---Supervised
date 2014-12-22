@@ -26,55 +26,192 @@
  * @package questions
  */
 global $CFG;
+
 require_once($CFG->dirroot.'/question/type/correctwriting/questiontype.php');
 require_once($CFG->dirroot.'/question/type/correctwriting/question.php');
+require_once($CFG->dirroot.'/question/type/correctwriting/string_pair.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/language_simple_english.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/language_c_language.php');
 
 class qtype_correctwriting_lexical_analyzer_test extends PHPUnit_Framework_TestCase {
-	public function test_lexical_analyzer1() {
-    $language1 = new block_formal_langs_language_simple_english();
+    //net oshibok
+    public function test_lexical_analyzer1() {
+		$language1 = new block_formal_langs_language_simple_english();
+		$question = new qtype_correctwriting_question();
+		$question->usecase = true;
+		$question->lexicalerrorthreshold = 0.5;
+		$question->lexicalerrorweight = 0.1;
+		$question->usedlanguage = $language1;
+		$question->movedmistakeweight = 0.1;
+		$question->absentmistakeweight = 0.11;
+		$question->addedmistakeweight = 0.12;
+		$question->hintgradeborder = 0.75;
+		$question->maxmistakepercentage = 0.95;
+		$question->qtype = new qtype_correctwriting();
 
-    $question = new qtype_correctwriting_question();
-    $question->usecase = true;
-    $question->lexicalerrorthreshold = 0.5;
-    $question->lexicalerrorweight = 0.1;
-    $question->usedlanguage = $language1;
-    $question->movedmistakeweight = 0.1;
-    $question->absentmistakeweight = 0.11;
-    $question->addedmistakeweight = 0.12;
-    $question->hintgradeborder = 0.75;
-    $question->maxmistakepercentage = 0.95;
-    $question->qtype = new qtype_correctwriting();
-
-	$bestmatchpair1 = new qtype_correctwriting_string_pair();
-	$bestmatchpair1->correctstring = $language1->create_from_string('abc cde');
-	$bestmatchpair1->comparedstring = $language1->create_from_string('abc cde');
-
-	$analyzer1 = new qtype_correctwriting_lexical_analyzer($question, $bestmatchpair1, $language1);
-	$this->assertTrue(count($analyzer1->bestmatchstring->matches)==2);
+		$bestmatchpair1 = new qtype_correctwriting_string_pair($language1->create_from_string('abc cde'),$language1->create_from_string('abc cde'),null);
+		$analyzer1 = new qtype_correctwriting_lexical_analyzer($question, $bestmatchpair1, $language1, false);
+		$result = $analyzer1->result_pairs(); // array of resultstringpairs
+		$this->assertTrue(count($result[0]->matches()->matchedpairs)==2);
+		$this->assertTrue($result[0]->matches()->mistakeweight==0);
 	}
-	
+
+	//opechatka
+	public function test_lexical_analyzer8() {
+		$language2 = new block_formal_langs_language_c_language();
+		$question = new qtype_correctwriting_question();
+		$question->usecase = true;
+		$question->lexicalerrorthreshold = 0.5;
+		$question->lexicalerrorweight = 0.1;
+		$question->usedlanguage = $language2;
+		$question->movedmistakeweight = 0.1;
+		$question->absentmistakeweight = 0.11;
+		$question->addedmistakeweight = 0.12;
+		$question->hintgradeborder = 0.75;
+		$question->maxmistakepercentage = 0.95;
+		$question->qtype = new qtype_correctwriting();
+		$bestmatchpair1 = new qtype_correctwriting_string_pair($language2->create_from_string('abcdpoc'),$language2->create_from_string('abcdpc'), null);
+		$analyzer2 = new qtype_correctwriting_lexical_analyzer($question, $bestmatchpair1, $language2, false);
+		$result=$analyzer2->result_pairs(); // array of resultstringpairs
+		$this->assertTrue(count($result[0]->matches()->matchedpairs)==1);
+		$this->assertTrue($result[0]->matches()->mistakeweight==1);
+	}
+
+	//1 para
 	public function test_lexical_analyzer2() {
-	$language2 = new block_formal_langs_language_c_language();
+		$language2 = new block_formal_langs_language_c_language();
+		$question = new qtype_correctwriting_question();
+		$question->usecase = true;
+		$question->lexicalerrorthreshold = 0.5;
+		$question->lexicalerrorweight = 0.1;
+		$question->usedlanguage = $language2;
+		$question->movedmistakeweight = 0.1;
+		$question->absentmistakeweight = 0.11;
+		$question->addedmistakeweight = 0.12;
+		$question->hintgradeborder = 0.75;
+		$question->maxmistakepercentage = 0.95;
+		$question->qtype = new qtype_correctwriting();
+		$bestmatchpair1 = new qtype_correctwriting_string_pair($language2->create_from_string('abc dpoc'),$language2->create_from_string('abc naklc'),null);
+		$analyzer2 = new qtype_correctwriting_lexical_analyzer($question, $bestmatchpair1, $language2, false);
+		$result=$analyzer2->result_pairs(); // array of resultstringpairs
+		$this->assertTrue(count($result[0]->matches()->matchedpairs)==1);
+		$this->assertTrue($result[0]->matches()->mistakeweight==0);
+	}
+/*
+	//нет пар
+	public function test_lexical_analyzer3() {
+		$language2 = new block_formal_langs_language_c_language();
 	
-    $question = new qtype_correctwriting_question();
-    $question->usecase = true;
-    $question->lexicalerrorthreshold = 0.5;
-    $question->lexicalerrorweight = 0.1;
-    $question->usedlanguage = $language2;
-    $question->movedmistakeweight = 0.1;
-    $question->absentmistakeweight = 0.11;
-    $question->addedmistakeweight = 0.12;
-    $question->hintgradeborder = 0.75;
-    $question->maxmistakepercentage = 0.95;
-    $question->qtype = new qtype_correctwriting();
+		$question = new qtype_correctwriting_question();
+		$question->usecase = true;
+		$question->lexicalerrorthreshold = 0.5;
+		$question->lexicalerrorweight = 0.1;
+		$question->usedlanguage = $language2;
+		$question->movedmistakeweight = 0.1;
+		$question->absentmistakeweight = 0.11;
+		$question->addedmistakeweight = 0.12;
+		$question->hintgradeborder = 0.75;
+		$question->maxmistakepercentage = 0.95;
+		$question->qtype = new qtype_correctwriting();
 
-	$bestmatchpair1 = new qtype_correctwriting_string_pair();
-	$bestmatchpair1->correctstring = $language2->create_from_string('abc dpoc');
-	$bestmatchpair1->comparedstring = $language2->create_from_string('abc naklc');
+		$bestmatchpair1 = new qtype_correctwriting_string_pair($language2->create_from_string('abkplllc dpoc'),$language2->create_from_string('abc naklc'),null);
 
-	$analyzer2 = new qtype_correctwriting_lexical_analyzer($question, $bestmatchpair1, $language2);
-	$this->assertTrue(count($analyzer2->bestmatchstring->matches)==1);
+		$analyzer2 = new qtype_correctwriting_lexical_analyzer($question, $bestmatchpair1, $language2, false);
+		$result=$analyzer2->result_pairs(); // array of resultstringpairs
+		$this->assertTrue(count($result[0]->matches()->matchedpairs)==0);
+		$this->assertTrue($result[0]->matches()->mistakeweight==0);
 	}
+*/
+
+	//prop.razd
+	public function test_lexical_analyzer7() {
+		$language2 = new block_formal_langs_language_c_language();
+	
+		$question = new qtype_correctwriting_question();
+		$question->usecase = true;
+		$question->lexicalerrorthreshold = 0.5;
+		$question->lexicalerrorweight = 0.1;
+		$question->usedlanguage = $language2;
+		$question->movedmistakeweight = 0.1;
+		$question->absentmistakeweight = 0.11;
+		$question->addedmistakeweight = 0.12;
+		$question->hintgradeborder = 0.75;
+		$question->maxmistakepercentage = 0.95;
+		$question->qtype = new qtype_correctwriting();
+
+		$bestmatchpair1 = new qtype_correctwriting_string_pair($language2->create_from_string('abkd poc'),$language2->create_from_string('abkdpoc'),null);
+
+		$analyzer2 = new qtype_correctwriting_lexical_analyzer($question, $bestmatchpair1, $language2, false);
+		$result=$analyzer2->result_pairs(); // array of resultstringpairs
+		$this->assertTrue(count($result[0]->matches()->matchedpairs)==1);
+		$this->assertTrue($result[0]->matches()->mistakeweight==1);
 	}
+	//lish.razd
+	public function test_lexical_analyzer4() {
+		$language2 = new block_formal_langs_language_c_language();
+	
+		$question = new qtype_correctwriting_question();
+		$question->usecase = true;
+		$question->lexicalerrorthreshold = 0.5;
+		$question->lexicalerrorweight = 0.1;
+		$question->usedlanguage = $language2;
+		$question->movedmistakeweight = 0.1;
+		$question->absentmistakeweight = 0.11;
+		$question->addedmistakeweight = 0.12;
+		$question->hintgradeborder = 0.75;
+		$question->maxmistakepercentage = 0.95;
+		$question->qtype = new qtype_correctwriting();
+
+		$bestmatchpair1 = new qtype_correctwriting_string_pair($language2->create_from_string('abkdroc'),$language2->create_from_string('abk droc'),null);
+
+		$analyzer2 = new qtype_correctwriting_lexical_analyzer($question, $bestmatchpair1, $language2, false);
+		$result=$analyzer2->result_pairs(); // array of resultstringpairs
+		$this->assertTrue(count($result[0]->matches()->matchedpairs)==1);
+		$this->assertTrue($result[0]->matches()->mistakeweight==1);
+	}
+	//2 nabora
+	public function test_lexical_analyzer5() {
+		$language2 = new block_formal_langs_language_c_language();
+	
+		$question = new qtype_correctwriting_question();
+		$question->usecase = true;
+		$question->lexicalerrorthreshold = 0.5;
+		$question->lexicalerrorweight = 0.1;
+		$question->usedlanguage = $language2;
+		$question->movedmistakeweight = 0.1;
+		$question->absentmistakeweight = 0.11;
+		$question->addedmistakeweight = 0.12;
+		$question->hintgradeborder = 0.75;
+		$question->maxmistakepercentage = 0.95;
+		$question->qtype = new qtype_correctwriting();
+
+		$bestmatchpair1 = new qtype_correctwriting_string_pair($language2->create_from_string('abc abc dpoc'),$language2->create_from_string('abc naklc'), null);
+
+		$analyzer2 = new qtype_correctwriting_lexical_analyzer($question, $bestmatchpair1, $language2, false);
+		$result=$analyzer2->result_pairs(); // array of resultstringpairs
+		$this->assertTrue(count($result)==2);
+	}
+
+	//bypass
+	public function test_lexical_analyzer6() {
+		$language2 = new block_formal_langs_language_c_language();
+	
+		$question = new qtype_correctwriting_question();
+		$question->usecase = true;
+		$question->lexicalerrorthreshold = 0.5;
+		$question->lexicalerrorweight = 0.1;
+		$question->usedlanguage = $language2;
+		$question->movedmistakeweight = 0.1;
+		$question->absentmistakeweight = 0.11;
+		$question->addedmistakeweight = 0.12;
+		$question->hintgradeborder = 0.75;
+		$question->maxmistakepercentage = 0.95;
+		$question->qtype = new qtype_correctwriting();
+
+		$bestmatchpair1 = new qtype_correctwriting_string_pair($language2->create_from_string('abc dpoc'),$language2->create_from_string('abc naklc'),null);
+
+		$analyzer2 = new qtype_correctwriting_lexical_analyzer($question, $bestmatchpair1, $language2, true);
+		$result=$analyzer2->result_pairs(); // array of resultstringpairs
+		$this->assertTrue(count($result)==1);
+	}
+}
