@@ -124,7 +124,7 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
         );
 
         /** @var qtype_correctwriting_string_pair $string */
-        //$string->set_mistakes($this->convert_lexer_errors_to_mistakes());
+        $this->resultstringpairs[0]->set_mistakes($this->convert_lexer_errors_to_mistakes());
 
     }
 
