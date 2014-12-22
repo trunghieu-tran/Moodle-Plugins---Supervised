@@ -68,7 +68,7 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
      */
     protected function analyze() {
         if ($this->question->are_lexeme_sequences_equal($this->basestringpair)) {
-            parent::bypass();
+            $this->bypass();
             $this->resultstringpairs[0]->assert_that_strings_are_equal();
             return;
         }
@@ -86,18 +86,19 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
             'qtype_correctwriting_string_pair'
         );
 
+
         /** @var qtype_correctwriting_string_pair $pair */
         /** @var qtype_correctwriting_string_pair $pair */
         foreach($this->resultstringpairs as $pair) {
-            $pair->tokenmappings[get_class($this)] = $pair->pairs_between_corrected_compared();
+            //$pair->tokenmappings[get_class($this)] = $pair->pairs_between_corrected_compared();
             $pair->analyzersequence[] = get_class($this);
 
-            $setmatches = $pair->matches();
+            $setmatches = $pair->matches()->matchedpairs;
             $lexmistakes=array();
             foreach ($setmatches as $onematch) {
                 if ($onematch->mistakeweight > 0) {
                     $lexmistake = new qtype_correctwriting_lexical_mistake($onematch);
-                    $lexmistake->mistakemsg = $onematch->message($this->basestringpair->correctstring(), $this->basestringpair->comparedstring());
+                    //$lexmistake->mistakemsg = $onematch->message($this->basestringpair->correctstring(), $this->basestringpair->comparedstring());
                     $lexmistake->weight = $onematch->mistakeweight;
                     $lexmistake->answermistaken = $onematch->correcttokens;
                     $lexmistake->responsemistaken = $onematch->comparedtokens;
@@ -106,18 +107,14 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
             }
             $pair->append_mistakes($lexmistakes);
         }
-
     }
 
 
     protected function bypass() {
-        parent::bypass();
         // You must create mistakes of skipped lexemes and additional lexemes
         // Also, you need to create matched 1:1 by simply comparing lexemes of two sequences
         // with ::is_same
-        $pairs = $this->result_pairs();
-        $string = $pairs[0];
-    /*
+
         $this->resultstringpairs = block_formal_langs_string_pair::best_string_pairs_for_bypass(
             $this->basestringpair->correctstring(),
             $this->basestringpair->comparedstring(),
@@ -125,9 +122,10 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
             $this->question->token_comparing_options(),
             'qtype_correctwriting_string_pair'
         );
-*/
+
         /** @var qtype_correctwriting_string_pair $string */
-        $string->set_mistakes($this->convert_lexer_errors_to_mistakes());
+        //$string->set_mistakes($this->convert_lexer_errors_to_mistakes());
+
     }
 
     /**
