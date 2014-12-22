@@ -309,7 +309,8 @@ class block_formal_langs_ast_node_base {
         }
         return false;
     }
-    /**
+	
+	/**
      * Returns value for node
      * @return string value for text of node
      */
@@ -329,8 +330,8 @@ class block_formal_langs_ast_node_base {
 
         return implode(' ', $values);
     }
-
-    /**
+	
+	/**
      * Returns list of tokens, covered by AST node. Tokens determined as not having any children
      * @return array list of tokens
      */
@@ -389,13 +390,13 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      */
     protected $tokenindex;
 
-    public function number() {
+	public function number() {
         if ($this->number === null) {
             $this->number = $this->tokenindex;
         }
         return $this->number;
     }
-
+	
     public function value() {
         return $this->value;
     }
@@ -612,7 +613,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * $answertokens or $responsetokens field inside (it is filling from outside)
      */
     public function look_for_matches($other, $threshold, $iscorrect, block_formal_langs_comparing_options $options, $bypass) {      
-        if ($bypass == true) {
+	if ($bypass == true) {
             $possiblepairs = array();
             if($options->usecase == true){
                 for ($k=0; $k < count($other); $k++) {
@@ -622,16 +623,16 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
                     }
                 }
             } else {
-                //if usecase false
-                for ($k=0; $k < count($other); $k++) {
-                    $str1 = strtolower($other[$k]->value);
-                    $str2 = strtolower($this->value);
+		//если usecase false
+		for ($k=0; $k < count($other); $k++) {
+		$str1 = strtolower($other[$k]->value);
+		$str2 = strtolower($this->value);
                     if($str1 == $str2) {
                         $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), 0, false, '');
                         $possiblepairs[] = $pair;
                     }
                 }
-            }
+	     }
         } else {
             // TODO: generic mistakes handling
             $result = textlib::strlen($this->value) - textlib::strlen($this->value) * $threshold;
@@ -2016,7 +2017,7 @@ class block_formal_langs_string_pair {
         $bestgroups = $correctstream->look_for_token_pairs($comparedstream, $threshold, $options, true);
         $arraystringpairs = array();
         for ($i = 0; $i < count($bestgroups); $i++) {
-            $stringpair = new $classname($correctstring, $comparedstring, $bestgroups[$i]->matchedpairs);
+            $stringpair = new $classname($correctstring, $comparedstring, $bestgroups[$i]);
             $arraystringpairs[] = $stringpair;
         }
         return $arraystringpairs;
@@ -2032,7 +2033,7 @@ class block_formal_langs_string_pair {
         $bestgroups = $correctstream->look_for_token_pairs($comparedstream, $threshold, $options, false);
         $arraystringpairs = array();
         for ($i = 0; $i < count($bestgroups); $i++) {
-            $stringpair = new $classname($correctstring, $comparedstring, $bestgroups[$i]->matchedpairs);
+            $stringpair = new $classname($correctstring, $comparedstring, $bestgroups[$i]);
             $arraystringpairs[] = $stringpair;
         }
         return $arraystringpairs;
@@ -2098,15 +2099,15 @@ class block_formal_langs_string_pair {
             $flag = 0;
             for ($j = 0; $j < count($this->matches); $j++) {
                 // not second
-                if (count($this->matches[$j]->comparedtokens) == 2) {
-                    if ($this->matches[$j]->comparedtokens[1] == $i) {
+                if (count($this->matches()->matchedpairs[$j]->comparedtokens) == 2) {
+                    if ($this->matches()->matchedpairs[$j]->comparedtokens[1] == $i) {
                         $flag = 1;
                     }
                 }
                 // write correcttokens
-                if ($this->matches[$j]->comparedtokens[0]==$i) {
-                    for ($k = 0; $k<count($this->matches[$j]->correcttokens); $k++) {
-                        $streamcorrected->tokens[] = $correctstream->tokens[$this->matches[$j]->correcttokens[$k]];
+                if ($this->matches()->matchedpairs[$j]->comparedtokens[0]==$i) {
+                    for ($k = 0; $k<count($this->matches()->matchedpairs[$j]->correcttokens); $k++) {
+                        $streamcorrected->tokens[] = $correctstream->tokens[$this->matches()->matchedpairs[$j]->correcttokens[$k]];
                     }
                     $flag = 1;
                 }
