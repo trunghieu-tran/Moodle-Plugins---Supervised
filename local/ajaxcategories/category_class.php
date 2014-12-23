@@ -123,13 +123,23 @@ class ajax_question_category_list extends moodle_list {
      * @param integer $indent depth of indentation.
      */
     public function to_html($indent=0, $extraargs=array()) {
-        $attributes = array(
+        if ($this->context != null) {
+            $attributes = array(
             'id' => 'ajaxlistitem',
-            //'data-id' => $category->id,
+            'data-id' => $this->context->id,
         );
+        } else {
+            $attributes = array(
+                'id' => 'ajaxlistitem',
+            );
+        }
+
+
         $placeholder = array(
             'id' => 'placeholder',
         );
+
+
         if (count($this->items)) {
             $tabs = str_repeat("\t", $indent);
             $first = true;
@@ -138,13 +148,17 @@ class ajax_question_category_list extends moodle_list {
             $html = '';
             //$html .= html_writer::start_div('ajaxcategorylist',  array('id' => 'ajaxcategorylist'));
             foreach ($this->items as $item) {
+                $itemattributes = array(
+                    'id' => 'ajaxitem',
+                    'data-id' => $item->id,
+                );
                 if ($first) {
                     $html .= html_writer::start_tag('div' ,$placeholder);
                     $html .= html_writer::end_tag('div');
                 }
                 $html .= html_writer::start_tag('li', $attributes);
 
-                $html .= html_writer::start_div('ajaxitem');
+                $html .= html_writer::start_div('ajaxitem', $itemattributes);
                 $last = (count($this->items) == $itemiter);
                 if ($this->editable) {
                     $item->set_icon_html($first, $last, $lastitem);
@@ -205,7 +219,6 @@ class ajax_question_category_list_item extends list_item {
         global $CFG, $OUTPUT;
         $str = $extraargs['str'];
         $category = $this->item;
-
         $editqestions = get_string('editquestions', 'question');
 
         // Each section adds html to be displayed as part of this list item.

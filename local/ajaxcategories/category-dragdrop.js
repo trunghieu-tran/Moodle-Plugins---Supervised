@@ -18,6 +18,11 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
     var block;
     var change = true;
     var blockX;
+    var contextid;
+    var beforeitemid;
+    var afteritemid;
+    var level;
+    var movingid;
   //Listen for all drop:over events
     Y.DD.DDM.on('drag:over', function(e) {
         //Get a reference to our drag and drop nodes
@@ -28,6 +33,15 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
         if (child !== undefined) {
             child.remove();
         }
+        contextid = drop.getAttribute('data-id');
+        if (contextid  === null ||  contextid == '') {
+            //alert('aaaaa');
+            parent = drop.ancestor('li[data-id]');
+            contextid = parent.getAttribute('data-id');
+        } else {
+            contextid = drop.getAttribute('data-id');
+        }
+        //alert(contextid);
         child = Y.Node.create( '<div id = "placeholder"></div>' );
         if (drop.get('tagName').toLowerCase() === 'li') {
             if (drop.one("ul") == undefined) {
@@ -37,16 +51,48 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
                 addedNode.append(drag);
                 addedNode.append(child);
                 drop.append(addedNode);
+                var item = drop.one('.ajaxitem[data-id]');
+                beforeitemid = -1;
+                afteritemid = item.getAttribute('data-id');
+                level = 'inner';
             } else {
                 addedNode = drop.one("ul");
                 addedNode.append(drag);
+                if ((addedNode.get('children').size()-3) >= 0)
+                {
+                    var item = addedNode.get('children').item(addedNode.get('children').size()-3);
+                    beforeitemid = -1;
+                    afteritemid = item.one('.ajaxitem[data-id]').getAttribute('data-id');
+                    level = 'normal';
+                }
+
                 addedNode.append(child);
             }
         } else {
-
-            drop.insert(child, 'after');
-            drop.insert(drag, 'after');
+            if (drop.one('#placeholder') !== undefined) {
+                beforeitemid = -1;
+                afteritemid = -1;
+                var item = drop.get('nextSibling');
+                if (item !== undefined) {
+                    item = item.one('.ajaxitem[data-id]');
+                    if (item !== undefined && item !== null) {
+                        beforeitemid = item.getAttribute('data-id');
+                    }
+                }
+                item = drop.get('previousSibling');
+                if (item !== undefined) {
+                    item = item.one('.ajaxitem[data-id]');
+                    if (item !== undefined && item !== null) {
+                        afteritemid = item.getAttribute('data-id');
+                    }
+                }
+                drop.insert(child, 'after');
+                drop.insert(drag, 'after');
+                level = 'normal';
+            }
         }
+
+        //alert(drop.getAttribute('data-id'));
 
         //Are we dropping on a li node?
         /*if (drop.get('tagName').toLowerCase() === 'li') {
@@ -96,6 +142,8 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
             borderColor: drag.get('node').getStyle('borderColor'),
             backgroundColor: drag.get('node').getStyle('backgroundColor')
         });
+        var item = drag.get('node').one('.ajaxitem[data-id]');
+        movingid = item.getAttribute('data-id');
     });
     //Listen for a drag:end events
     Y.DD.DDM.on('drag:end', function(e) {
@@ -105,6 +153,8 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
             visibility: '',
             opacity: '1'
         });
+        alert(afteritemid);
+        alert(contextid);
     });
 
 
