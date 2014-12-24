@@ -1,0 +1,114 @@
+[
+ (program) {
+  (stmt_list) {
+   (stmt_list) {
+    (stmt_or_defined_macro) {
+     (class_or_union_or_struct) {
+      (identified_type_meta_specifier_with_template_def) {
+       (type_meta_specifier_with_template_def) {
+        (template_def) {
+         template
+         <
+         (template_spec) {
+          class
+          T
+         }
+         >
+        }
+        class
+       }
+       myarray
+      }
+      (structure_body) {
+       {
+       }
+      }
+      ;
+     }
+    }
+   }
+   (stmt_or_defined_macro) {
+    (class_or_union_or_struct) {
+     (identified_type_meta_specifier_with_template_def) {
+      (type_meta_specifier_with_template_def) {
+       (template_def) {
+        template
+        <
+        (template_spec_list) {
+         (template_spec_list) {
+          (template_spec) {
+           class
+           K
+          }
+          ,
+          (template_spec) {
+           class
+           V
+          }
+         }
+         ,
+         (template_spec) {
+          (template_def) {
+           template
+           <
+           (template_spec) {
+            typename
+           }
+           >
+          }
+          class
+          C
+          =
+          myarray
+         }
+        }
+        >
+       }
+       class
+      }
+      Map
+     }
+     (structure_body) {
+      {
+      (stmt_or_visibility_spec_list) {
+       (stmt_or_defined_macro) {
+        (stmt) {
+         (variable_declaration) {
+          (instantiated_template_type) {
+           C
+           (template_instantiation_arguments) {
+            <
+            K
+            >
+           }
+          }
+          key
+         }
+         ;
+        }
+       }
+       (stmt_or_defined_macro) {
+        (stmt) {
+         (variable_declaration) {
+          (instantiated_template_type) {
+           C
+           (template_instantiation_arguments) {
+            <
+            V
+            >
+           }
+          }
+          value
+         }
+         ;
+        }
+       }
+      }
+      }
+     }
+     ;
+    }
+   }
+  }
+ }
+]

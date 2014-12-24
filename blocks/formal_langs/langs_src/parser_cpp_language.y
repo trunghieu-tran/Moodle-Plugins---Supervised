@@ -247,6 +247,11 @@ template_spec_list(R) ::= template_spec(A) . {
 	R = A;
 }
 
+template_spec(R) ::= template_typename(A). {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s"));
+	R = $this->create_node('template_spec', array(A));
+}
+
 template_spec(R) ::= template_typename(A)  identifier(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s"));
 	$this->mapper->introduce_type(B->value());
@@ -263,6 +268,24 @@ template_spec(R) ::= template_typename(A)  identifier(B) assign(C) expr_prec_7(D
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%s", "%ur(именительный)"));
 	$this->mapper->introduce_type(B->value());
 	R = $this->create_node('template_spec', array(A, B, C, D));
+}
+
+template_spec(R) ::= template_def(Z) template_typename(A)  identifier(B) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%ur(именительный)", "%s"));
+	$this->mapper->introduce_type(B->value());
+	R = $this->create_node('template_spec', array(Z, A, B));
+}
+
+template_spec(R) ::= template_def(Z) template_typename(A)  identifier(B) assign(C) type_or_type_ref_or_with_ptr(D) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%ur(именительный)", "%s", "%s", "%ur(именительный)"));
+	$this->mapper->introduce_type(B->value());
+	R = $this->create_node('template_spec', array(Z, A, B, C, D));
+}
+
+template_spec(R) ::= template_def(Z) template_typename(A)  identifier(B) assign(C) expr_prec_7(D) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%ur(именительный)", "%s", "%s", "%ur(именительный)"));
+	$this->mapper->introduce_type(B->value());
+	R = $this->create_node('template_spec', array(Z, A, B, C, D));
 }
 
 
