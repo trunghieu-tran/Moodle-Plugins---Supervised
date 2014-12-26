@@ -595,6 +595,11 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
             return -1;
         }
     }
+
+    public function check_specific_error ($token) {
+        return 0;
+    }
+
     /**
      * Base lexical mistakes handler. Looks for possible matches for this
      * token in other answer and return an array of them.
@@ -644,9 +649,21 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
                     $max = round($result);
                     // possible pair (typo)
                     $dist = $this->possible_pair($other[$k], $max, $options);
-                    if ($dist != -1) {
-                        $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), $dist, false, '');
+                    if ($dist != -1) {     
+			if ($this->check_specific_error($other[$k])) {
+                            $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), $dist, true, '');
+                        } else {
+                            $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), $dist, false, '');
+                        }
                         $possiblepairs[] = $pair;
+/*
+			$result = $this->additional_generation($other[$k]);
+			if (count ($result)>0) {
+                            for ($i=0; $i<count($result); $i++) {
+                                $possiblepairs[]=$result[$i];
+                            }
+                        }
+*/
                     }
                     // possible pair (extra separator)
                     if ($k+1 != count($other)) {
@@ -2009,6 +2026,10 @@ class block_formal_langs_string_pair {
         return $this->matches;
     }
 
+    public function setcorrectedstring($string) {
+        $this->correctedstring=$string;
+    }
+
     public static function best_string_pairs_for_bypass($correctstring, $comparedstring, $threshold, block_formal_langs_comparing_options $options, $classname = 'block_formal_langs_string_pair') {
         $bestgroups = array();
         /** @var block_formal_langs_token_stream $correctstream */
@@ -2031,6 +2052,12 @@ class block_formal_langs_string_pair {
         $correctstream = $correctstring->stream;
         $comparedstream = $comparedstring->stream;
         $bestgroups = $correctstream->look_for_token_pairs($comparedstream, $threshold, $options, false);
+	if(count($bestgroups)==0) {
+		$stringpair = new $classname($correctstring, $comparedstring, array());
+		$arraystringpairs = array();
+		$arraystringpairs[] = $stringpair;
+		return $arraystringpairs;
+	}
         $arraystringpairs = array();
         for ($i = 0; $i < count($bestgroups); $i++) {
             $stringpair = new $classname($correctstring, $comparedstring, $bestgroups[$i]);
