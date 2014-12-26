@@ -111,6 +111,26 @@ class blocks_formal_langs_token_base_best_string_pairs extends UnitTestCase {
         }*/
     }
 
+    function test_best_string_pairs_21_all_functions() {
+        $options=new block_formal_langs_comparing_options();
+        $options->usecase=true;
+
+        $lang = new block_formal_langs_language_c_language();
+
+        $comparedstring = $lang->create_from_string('cos sin tan atoi atof #if #else fputc fgets fabs setbuf rand strtok ctime fgetws wctok');
+        $correctstring = $lang->create_from_string('cosh sinh tanh atol if else fputs gets abs  time setvbuf srand strtok fgetwc wctol');
+
+        $correctstringstream = $correctstring->stream;
+        $comparedstringstream  = $comparedstring->stream;
+
+        $stringpair = new block_formal_langs_string_pair($correctstring, $comparedstring, array());
+
+        $result = $stringpair->best_string_pairs($correctstring, $comparedstring, 0.7, $options);
+      /*  for($i=0; $i<count($result[0]->matches()->matchedpairs); $i++) {
+	    $this->assertTrue($result[0]->matches()->matchedpairs[$i]->type==999999);
+        }*/
+    }
+
     // =-==
     function test_best_string_pairs_3() {
         $options=new block_formal_langs_comparing_options();
