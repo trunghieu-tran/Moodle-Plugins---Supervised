@@ -26,6 +26,7 @@
 global $CFG;
 require_once($CFG->dirroot.'/blocks/formal_langs/tokens_base.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/language_simple_english.php');
+require_once($CFG->dirroot.'/blocks/formal_langs/language_c_language.php');
 
 class blocks_formal_langs_token_base_best_string_pairs extends UnitTestCase {
 
@@ -43,8 +44,151 @@ class blocks_formal_langs_token_base_best_string_pairs extends UnitTestCase {
 
         $stringpair = new block_formal_langs_string_pair($correctstring, $comparedstring, array());
 
-        $result = $stringpair->best_string_pairs($correctstring, $comparedstring, 1.0, $options);
+        $result = $stringpair->best_string_pairs($correctstring, $comparedstring, 0.6, $options);
 
-        $this->assertTrue(count($result) > 1);
+        $this->assertTrue(count($result) == 1);
     }
+
+    //specific errors
+    //acos-cos
+    function test_best_string_pairs_2() {
+        $options=new block_formal_langs_comparing_options();
+        $options->usecase=true;
+
+        $lang = new block_formal_langs_language_c_language();
+
+        $comparedstring = $lang->create_from_string('cos');
+        $correctstring = $lang->create_from_string('acos');
+
+        $correctstringstream = $correctstring->stream;
+        $comparedstringstream  = $comparedstring->stream;
+
+        $stringpair = new block_formal_langs_string_pair($correctstring, $comparedstring, array());
+
+        $result = $stringpair->best_string_pairs($correctstring, $comparedstring, 0.6, $options);
+        $this->assertTrue(count($result[0]->matches()->matchedpairs)==1);
+	$this->assertTrue($result[0]->matches()->matchedpairs[0]->type==999999);
+    }
+
+    //acos-cos
+    function test_best_string_pairs_21() {
+        $options=new block_formal_langs_comparing_options();
+        $options->usecase=true;
+
+        $lang = new block_formal_langs_language_c_language();
+
+        $comparedstring = $lang->create_from_string('acos');
+        $correctstring = $lang->create_from_string('cos');
+
+        $correctstringstream = $correctstring->stream;
+        $comparedstringstream  = $comparedstring->stream;
+
+        $stringpair = new block_formal_langs_string_pair($correctstring, $comparedstring, array());
+
+        $result = $stringpair->best_string_pairs($correctstring, $comparedstring, 0.6, $options);
+
+        $this->assertTrue(count($result[0]->matches()->matchedpairs)==1);
+	$this->assertTrue($result[0]->matches()->matchedpairs[0]->type==999999);
+    }
+
+    function test_best_string_pairs_2_all_functions() {
+        $options=new block_formal_langs_comparing_options();
+        $options->usecase=true;
+
+        $lang = new block_formal_langs_language_c_language();
+
+        $comparedstring = $lang->create_from_string('acos asin atan itoa strcmp strspn strcpy strchr calloc printf fputc abs fopen scanf');
+        $correctstring = $lang->create_from_string('cos sin tan ltoa strncmp strnspn strncpy strnchr malloc fprintf putc fabs open fscanf');
+
+        $correctstringstream = $correctstring->stream;
+        $comparedstringstream  = $comparedstring->stream;
+
+        $stringpair = new block_formal_langs_string_pair($correctstring, $comparedstring, array());
+
+        $result = $stringpair->best_string_pairs($correctstring, $comparedstring, 0.6, $options);
+      /*  for($i=0; $i<count($result[0]->matches()->matchedpairs); $i++) {
+	    $this->assertTrue($result[0]->matches()->matchedpairs[$i]->type==999999);
+        }*/
+    }
+
+    // =-==
+    function test_best_string_pairs_3() {
+        $options=new block_formal_langs_comparing_options();
+        $options->usecase=true;
+
+        $lang = new block_formal_langs_language_c_language();
+
+        $comparedstring = $lang->create_from_string('lang =');
+        $correctstring = $lang->create_from_string('value ==');
+
+        $correctstringstream = $correctstring->stream;
+        $comparedstringstream  = $comparedstring->stream;
+
+        $stringpair = new block_formal_langs_string_pair($correctstring, $comparedstring, array());
+
+        $result = $stringpair->best_string_pairs($correctstring, $comparedstring, 0.5, $options);
+        $this->assertTrue(count($result[0]->matches()->matchedpairs) ==1);
+	$this->assertTrue($result[0]->matches()->matchedpairs[0]->type==999999);
+    }
+
+    // =-==
+    function test_best_string_pairs_31() {
+        $options=new block_formal_langs_comparing_options();
+        $options->usecase=true;
+
+        $lang = new block_formal_langs_language_c_language();
+
+        $comparedstring = $lang->create_from_string('lang ==');
+        $correctstring = $lang->create_from_string('value =');
+
+        $correctstringstream = $correctstring->stream;
+        $comparedstringstream  = $comparedstring->stream;
+
+        $stringpair = new block_formal_langs_string_pair($correctstring, $comparedstring, array());
+
+        $result = $stringpair->best_string_pairs($correctstring, $comparedstring, 0.5, $options);
+        $this->assertTrue(count($result[0]->matches()->matchedpairs) ==1);
+	$this->assertTrue($result[0]->matches()->matchedpairs[0]->type==1);
+    }
+/*
+    // char-signed char
+    function test_best_string_pairs_4() {
+        $options=new block_formal_langs_comparing_options();
+        $options->usecase=true;
+
+        $lang = new block_formal_langs_language_c_language();
+
+        $comparedstring = $lang->create_from_string('signed char value');
+        $correctstring = $lang->create_from_string('char value');
+
+        $correctstringstream = $correctstring->stream;
+        $comparedstringstream  = $comparedstring->stream;
+
+        $stringpair = new block_formal_langs_string_pair($correctstring, $comparedstring, array());
+
+        $result = $stringpair->best_string_pairs($correctstring, $comparedstring, 0.5, $options);
+
+        $this->assertTrue(count($result[0]->matches()->mathedpairs) == 3);
+    }
+
+    // char-signed char
+    function test_best_string_pairs_41() {
+        $options=new block_formal_langs_comparing_options();
+        $options->usecase=true;
+
+        $lang = new block_formal_langs_language_c_language();
+
+        $comparedstring = $lang->create_from_string('signed char value');
+        $correctstring = $lang->create_from_string('signed signed char value');
+
+        $correctstringstream = $correctstring->stream;
+        $comparedstringstream  = $comparedstring->stream;
+
+        $stringpair = new block_formal_langs_string_pair($correctstring, $comparedstring, array());
+
+        $result = $stringpair->best_string_pairs($correctstring, $comparedstring, 0.5, $options);
+
+        $this->assertTrue(count($result[0]->matches()->mathedpairs) == 6);
+    }
+*/
 }
