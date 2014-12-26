@@ -34,8 +34,8 @@ require_once($CFG->dirroot.'/blocks/formal_langs/language_simple_english.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/language_c_language.php');
 
 class qtype_correctwriting_lexical_analyzer_test extends PHPUnit_Framework_TestCase {
-    //net oshibok
-    public function test_lexical_analyzer1() {
+	//нет ошибок
+	public function test_lexical_analyzer1() {
 		$language1 = new block_formal_langs_language_simple_english();
 		$question = new qtype_correctwriting_question();
 		$question->usecase = true;
@@ -56,7 +56,7 @@ class qtype_correctwriting_lexical_analyzer_test extends PHPUnit_Framework_TestC
 		$this->assertTrue($result[0]->matches()->mistakeweight==0);
 	}
 
-	//opechatka
+	//опечатка
 	public function test_lexical_analyzer8() {
 		$language2 = new block_formal_langs_language_c_language();
 		$question = new qtype_correctwriting_question();
@@ -77,7 +77,7 @@ class qtype_correctwriting_lexical_analyzer_test extends PHPUnit_Framework_TestC
 		$this->assertTrue($result[0]->matches()->mistakeweight==1);
 	}
 
-	//1 para
+	//1 пара
 	public function test_lexical_analyzer2() {
 		$language2 = new block_formal_langs_language_c_language();
 		$question = new qtype_correctwriting_question();
@@ -97,7 +97,7 @@ class qtype_correctwriting_lexical_analyzer_test extends PHPUnit_Framework_TestC
 		$this->assertTrue(count($result[0]->matches()->matchedpairs)==1);
 		$this->assertTrue($result[0]->matches()->mistakeweight==0);
 	}
-/*
+
 	//нет пар
 	public function test_lexical_analyzer3() {
 		$language2 = new block_formal_langs_language_c_language();
@@ -118,12 +118,11 @@ class qtype_correctwriting_lexical_analyzer_test extends PHPUnit_Framework_TestC
 
 		$analyzer2 = new qtype_correctwriting_lexical_analyzer($question, $bestmatchpair1, $language2, false);
 		$result=$analyzer2->result_pairs(); // array of resultstringpairs
-		$this->assertTrue(count($result[0]->matches()->matchedpairs)==0);
-		$this->assertTrue($result[0]->matches()->mistakeweight==0);
-	}
-*/
+		$this->assertTrue($result[0]->matches()==null);
 
-	//prop.razd
+	}
+
+	//пропущенный разделитель
 	public function test_lexical_analyzer7() {
 		$language2 = new block_formal_langs_language_c_language();
 	
@@ -146,7 +145,7 @@ class qtype_correctwriting_lexical_analyzer_test extends PHPUnit_Framework_TestC
 		$this->assertTrue(count($result[0]->matches()->matchedpairs)==1);
 		$this->assertTrue($result[0]->matches()->mistakeweight==1);
 	}
-	//lish.razd
+	//лишний разделитель
 	public function test_lexical_analyzer4() {
 		$language2 = new block_formal_langs_language_c_language();
 	
@@ -169,7 +168,7 @@ class qtype_correctwriting_lexical_analyzer_test extends PHPUnit_Framework_TestC
 		$this->assertTrue(count($result[0]->matches()->matchedpairs)==1);
 		$this->assertTrue($result[0]->matches()->mistakeweight==1);
 	}
-	//2 nabora
+	//2 набора
 	public function test_lexical_analyzer5() {
 		$language2 = new block_formal_langs_language_c_language();
 	
@@ -192,7 +191,7 @@ class qtype_correctwriting_lexical_analyzer_test extends PHPUnit_Framework_TestC
 		$this->assertTrue(count($result)==2);
 	}
 
-	//bypass
+	//байпасс включен
 	public function test_lexical_analyzer6() {
 		$language2 = new block_formal_langs_language_c_language();
 	
@@ -214,4 +213,5 @@ class qtype_correctwriting_lexical_analyzer_test extends PHPUnit_Framework_TestC
 		$result=$analyzer2->result_pairs(); // array of resultstringpairs
 		$this->assertTrue(count($result)==1);
 	}
+
 }
