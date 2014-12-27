@@ -1,0 +1,58 @@
+[
+ (program) {
+  (stmt_list) {
+   (stmt_or_defined_macro) {
+    (stmt) {
+     (variable_declaration) {
+      (builtintype) {
+       int
+      }
+      (assign) {
+       (lvalue) {
+        (
+        (namespace_resolve) {
+         a
+         ::
+        }
+        (lvalue) {
+         *
+         f
+        }
+        )
+        (formal_args_list_with_or_without_const) {
+         (formal_args_list) {
+          (
+          (arg_list) {
+           (arg_list) {
+            (builtintype) {
+             double
+            }
+           }
+           ,
+           (builtintype) {
+            double
+           }
+          }
+          )
+         }
+        }
+       }
+       =
+       (expr_take_adress) {
+        &
+        (scoped_identifier) {
+         (namespace_resolve) {
+          a
+          ::
+         }
+         m
+        }
+       }
+      }
+     }
+     ;
+    }
+   }
+  }
+ }
+]

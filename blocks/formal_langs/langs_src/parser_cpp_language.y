@@ -70,6 +70,7 @@ require_once($CFG->dirroot.'/blocks/formal_langs/descriptions/descriptionrule.ph
 	*/
 }
 
+%left   RIGHTROUNDBRACKET.
 %nonassoc THENKWD .
 %left    ELSEKWD.
 %left    NOTEQUAL EQUAL.
@@ -498,7 +499,7 @@ stmt_or_defined_macro(R) ::= type_or_type_with_qualifier(A) function_definition_
 	R = $this->create_node('stmt_or_defined_macro', array(A, B));
 }
 
-stmt_or_defined_macro(R) ::= template_def(A) type(B) function_definition_without_type(C) . {
+stmt_or_defined_macro(R) ::= template_def(A) type_or_type_with_qualifier(B) function_definition_without_type(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)", "%ur(именительный)"));
 	R = $this->create_node('stmt_or_defined_macro', array(A, B, C));
 }
@@ -543,13 +544,13 @@ operator_overload_declaration_without_type(R) ::= operatoroverloaddeclaration(A)
 /* CONSTRUCTORS */
 
 /* Template constructor within class */
-stmt_or_defined_macro(R) ::= template_def(A) typename(B) formal_args_list(B) function_body(C) . {
+stmt_or_defined_macro(R) ::= template_def(A) type_or_type_with_qualifier(B) formal_args_list(B) function_body(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%ur(именительный)", "%ur(именительный)"));
 	R = $this->create_node('constructor', array(A, B, C));
 }
 
 /* Constructor of non-template class within class */
-stmt_or_defined_macro(R) ::= typename(A) formal_args_list(B) function_body(C) . {
+stmt_or_defined_macro(R) ::= type_or_type_with_qualifier(A) formal_args_list(B) function_body(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%ur(именительный)", "%ur(именительный)"));
 	R = $this->create_node('constructor', array(A, B, C));
 }
@@ -975,16 +976,16 @@ stmt(R) ::= leftfigurebracket(A) stmt_list(B) rightfigurebracket(C) . {
 	R = $this->create_node('stmt', array( A, B, C ));
 }
 
-stmt(R) ::=  typedef(A) type(B) identifier(C) SEMICOLON(D) . { 
+stmt(R) ::=  typedef(A) type(B) lvalue(C) SEMICOLON(D) . { 
 	$this->currentrule = new block_formal_langs_description_rule("объявление синонима типа", array("ключевое слово объявления синонима типа", "%s", "%s", "точка с запятой"));
 	R = $this->create_node('typedef_declaration', array(A, B, C, D));
-	$this->mapper->introduce_type(C->value());
+	$this->mapper->perform_typedef_action(C);
 }
 
-stmt(R) ::=  typedef(A) type(B) identifier(C) SEMICOLON(D) comment_list(E) . { 
+stmt(R) ::=  typedef(A) type(B) lvalue(C) SEMICOLON(D) comment_list(E) . { 
 	$this->currentrule = new block_formal_langs_description_rule("объявление синонима типа", array("ключевое слово объявления синонима типа", "%s", "%s", "точка с запятой"));
 	R = $this->create_node('typedef_declaration', array(A, B, C, D, E));
-	$this->mapper->introduce_type(C->value());
+	$this->mapper->perform_typedef_action(C);
 }
 
 
@@ -1492,6 +1493,7 @@ lvalue(R) ::= possibly_identifier_preceded_ref(A) . {
 	R = A;
 }
 
+/* THIS IS ARRAY RULE DON'T REMOVE IT!!!! */
 lvalue(R) ::= lvalue(A) leftsquarebracket(B) expr_prec_9(C) rightsquarebracket(D) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%ur(именительный)", "%s"));
 	R =  $this->create_node('lvalue', array( A, B, C, D));
@@ -1510,12 +1512,30 @@ possibly_idenitifer_preceded_ptrs(R) ::= identifier(A) . {
 	R = A;
 }
 
+
+possibly_idenitifer_preceded_ptrs(R) ::= leftroundbracket(A) arg_list(B) rightroundbracket(C)  formal_args_list_with_or_without_const(D) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)", "%ur(именительный)", "%ur(именительный)"));
+	R =  $this->create_node('lvalue', array( A, B, C, D));
+}
+
+possibly_idenitifer_preceded_ptrs(R) ::= leftroundbracket(A) namespace_resolve(B) possibly_identifier_preceded_ref(C) rightroundbracket(D)  formal_args_list_with_or_without_const(E) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%ur(именительный)", "%ur(именительный)", "%ur(именительный)"));
+	$this->mapper->clear_lookup_namespace();
+	R =  $this->create_node('lvalue', array( A, B, C, D, E));
+}
+
+
 possibly_idenitifer_preceded_ptrs(R) ::= multiply(A) possibly_idenitifer_preceded_ptrs(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s"));
 	R =  $this->create_node('lvalue', array( A, B));
 }
 
 possibly_idenitifer_preceded_ptrs(R) ::= constkwd(A) multiply(B) possibly_idenitifer_preceded_ptrs(C) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s", "%s"));
+	R =  $this->create_node('lvalue', array( A, B, C));
+}
+
+possibly_idenitifer_preceded_ptrs(R) ::= volatilekwd(A) multiply(B) possibly_idenitifer_preceded_ptrs(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%s", "%s"));
 	R =  $this->create_node('lvalue', array( A, B, C));
 }
