@@ -28,6 +28,16 @@ require_once($CFG->dirroot.'/question/type/poasquestion/stringstream/stringstrea
 abstract class block_formal_langs_abstract_language {
 
     /**
+     * A cache for strings, indexed by string, used in create_from_string
+     * @var array
+     */
+    private static $cachedstringsbystring = array();
+    /**
+     * A cache for strings, used in create_from_db
+     * @var array
+     */
+    private static $cachedstringsfromdb = array();
+    /**
      * Id in language table.
      * @var integer
      */
@@ -119,11 +129,29 @@ abstract class block_formal_langs_abstract_language {
     /**
      *  Creates a processed string from string
      *  @param string $string string
+     *  @param string $classname  a name of class, which type must be used for creating string
      *  @return block_formal_langs_processed_string string
      */
      public function create_from_string($string, $classname = 'block_formal_langs_processed_string') {
+        // Consult with cache, when creating from string
+        $key = get_class($this);
+        $keystring = (string)$string;
+        if (array_key_exists($key, self::$cachedstringsbystring)) {
+            $map = self::$cachedstringsbystring[$key];
+            if (array_key_exists($keystring, $map)) {
+                if (is_a($map[$keystring], $classname)) {
+                    return $map[$keystring];
+                }
+            }
+        }
         $result = new $classname($this);
         $result->string = $string;
+
+         // Update cache with new string
+        if (array_key_exists($key, self::$cachedstringsbystring) == false) {
+            self::$cachedstringsbystring[$key] = array();
+        }
+        self::$cachedstringsbystring[$key][$keystring] = $result;
         return $result;
      }
 
@@ -132,12 +160,42 @@ abstract class block_formal_langs_abstract_language {
       *  @param string $tablename table name
       *  @param string $tableid    id of source table
       *  @param string|null $string string data
+      *  @param string $classname a class, which should be used when creating data
       *  @return block_formal_langs_processed_string processed string
       */
     public function create_from_db($tablename, $tableid, $string = null, $classname = 'block_formal_langs_processed_string') {
+        // Consult with cache, when creating from string
+        $key = get_class($this);
+        $keystring = (string)$string;
+        if (array_key_exists($key, self::$cachedstringsfromdb)) {
+            $map = self::$cachedstringsfromdb[$key];
+            if (array_key_exists($tablename, $map)) {
+                $map = $map[$tablename];
+                if (array_key_exists($tableid, $map)) {
+                    $map = $map[$tableid];
+                    if (array_key_exists($keystring, $map)) {
+                        if (is_a($map[$keystring], $classname)) {
+                            return $map[$keystring];
+                        }
+                    }
+                }
+            }
+        }
         $result = new $classname($this);
         $result->set_table_params($tablename,$tableid);
         $result->string  = $string;
+
+        // Insert entry into cache
+        if (array_key_exists($key, self::$cachedstringsfromdb) == false) {
+            self::$cachedstringsfromdb[$key] = array();
+        }
+        if (array_key_exists($tablename, self::$cachedstringsfromdb[$key]) == false) {
+            self::$cachedstringsfromdb[$key][$tablename] = array();
+        }
+        if (array_key_exists($tableid, self::$cachedstringsfromdb[$key][$tablename]) == false) {
+            self::$cachedstringsfromdb[$key][$tablename][$tableid] = array();
+        }
+        self::$cachedstringsfromdb[$key][$tablename][$tableid][$keystring] = $result;
         return $result;
     }
 
@@ -151,6 +209,7 @@ abstract class block_formal_langs_abstract_language {
  * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
 abstract class block_formal_langs_predefined_language extends block_formal_langs_abstract_language {
+
     /**
      * Создает новый язык
      * @param int $id ID записи из БД
@@ -189,6 +248,52 @@ abstract class block_formal_langs_predefined_language extends block_formal_langs
         return 'block_formal_langs_predefined_' . $this->name() . '_lexer_raw';
     }
     /**
+     * A function for safe fetching of next token
+     */
+    protected function next_token($stream) {
+        try {
+            return $this->scaner->next_token();
+        }  catch (Exception $e) {
+            // Avoid visibility problems via solution from http://php.net/manual/ru/function.get-object-vars.php#47075
+            $obj2array = function(&$Instance) {
+                $clone = (array) $Instance;
+                $rtn = array ();
+                $rtn['___SOURCE_KEYS_'] = $clone;
+
+                while ( list ($key, $value) = each ($clone) ) {
+                    $aux = explode ("\0", $key);
+                    $newkey = $aux[count($aux)-1];
+                    $rtn[$newkey] = &$rtn['___SOURCE_KEYS_'][$key];
+                }
+
+                return $rtn;
+            };
+            $pos = $obj2array($this->scaner);
+            
+            $res = new block_formal_langs_scanning_error();
+            $res->tokenindex = $pos['counter'];
+            $a = new stdClass();
+            $a->line = $pos['yyline'];
+            $a->position = $pos['yycol'];
+            $a->str = $pos['yychar'];
+            $yytext = function() use($pos) {
+                return $pos['yy_buffer']->substring($pos['yy_buffer_start'], $pos['yy_buffer_end'] - $pos['yy_buffer_start']
+                )->string();
+            };
+            $a->symbol = $yytext();
+            if (is_object($a->symbol)) {
+                $a->symbol = $symbol->string();
+            }
+            $errormessage = 'clanguageunknownsymbol';
+			if (function_exists('get_string')) {
+				$res->errormessage = get_string($errormessage,'block_formal_langs',$a);
+			}
+            $stream->errors[] = $res;  
+            return $this->next_token($stream);
+        }
+        return null;
+    }
+    /**
      * Fills token stream field of the processed string objects
      *
      * Add lexical errors if any exists.
@@ -213,16 +318,22 @@ abstract class block_formal_langs_predefined_language extends block_formal_langs
             $this->scaner = new $scanerclass($pseudofile);
             //Now, we are splitting text into lexemes
             $tokens = array();
-            while ($token = $this->scaner->next_token()) {
+            while ($token = $this->next_token($stream)) {
                 $tokens[] = $token;
             }
-
-            $stream->tokens = $tokens;
-            $stream->errors = $this->scaner->get_errors();
+            
+            $stream->tokens = $tokens;            
+            $scanererrors = $this->scaner->get_errors();
+            if (count($stream->errors)) {
+                if (count($scanererrors)) {
+                    $stream->errors = array_merge($stream->errors, $scanererrors);
+                }
+            } else {
+                $stream->errors = $scanererrors;
+            }
         }
 
         $processedstring->stream = $stream;
-
     }
 
     /**
@@ -242,7 +353,8 @@ abstract class block_formal_langs_predefined_language extends block_formal_langs
     public function parse($processedstring, $iscorrect) {
         if ($processedstring->stream == null) {
             $this->scan($processedstring);
-        }        
+        }
+        $parsername = $this->parsername();
         $parser =  $this->parser();
         $parser->parse($processedstring, $iscorrect);
     }

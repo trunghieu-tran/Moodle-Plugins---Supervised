@@ -62,7 +62,7 @@ class block_formal_langs_token_printf_text extends block_formal_langs_token_base
             $string = chr(intval($code));
         } else {
             //  mb_convert_encoding left intentionally, because
-            // textlib uses iconv to convert, and iconv fails
+            // core_text uses iconv to convert, and iconv fails
             // to conver from entities
             $string = mb_convert_encoding('&#' . intval($code) . ';', 'UTF-8', 'HTML-ENTITIES');
         }
@@ -71,7 +71,7 @@ class block_formal_langs_token_printf_text extends block_formal_langs_token_base
 
     function to_text($text) {
         $state = 0;
-        $length = textlib::strlen($text);
+        $length = core_text::strlen($text);
         $result = "";
         $statetext = '';
         $esc = array('\'' => '\'', '"' => '"' , 'a' => "\a", 'b' => "\b", 'f' => "\f",
@@ -138,7 +138,7 @@ class block_formal_langs_token_printf_text extends block_formal_langs_token_base
         if (in_array($c, $numbers)) {
             $statetext .= $c;
         } else {
-            if (textlib::strlen($statetext) != 0) {
+            if (core_text::strlen($statetext) != 0) {
                 $funname = 'block_formal_langs_' . $fun;
                 $result .= $funname($statetext);
             } else {
@@ -168,7 +168,7 @@ class block_formal_langs_token_printf_text extends block_formal_langs_token_base
     }
 
     protected function string_caseinsensitive_value() {
-        return textlib::strtolower($this->unescapedtext);
+        return core_text::strtolower($this->unescapedtext);
     }
     /**
      * Tests, whether other lexeme is the same as this lexeme
