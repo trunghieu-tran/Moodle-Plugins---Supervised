@@ -170,6 +170,17 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
             $root[(string)$typename] = array(); 
         }
     }
+    /**
+     * Introduces an array of types
+     * @param array $typenames an array of typenames
+     */
+    public function introduce_types($typenames) {
+        if (count($typenames)) {
+            foreach($typenames as $typename) {
+                $this->introduce_type($typename);
+            }
+        }
+    }
 	/**
 	 * Adds new constructable type to a tree
 	 * @param string $typename name of type
@@ -233,6 +244,41 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
         }
         return $result;
     }
+    /** Finds all identifiers except the one in formal args
+     *  @param $node node data
+     *  @return array
+     */
+    public function find_identifiers_except_in_formal_args($node) { 
+        $result = array();
+        $type = (string)($node->type());
+        if ($type == 'identifier') {
+            $result = array( $node->value() );
+        }
+        if (count($node->childs())) {
+            $children = $node->childs();
+            for($i = 0; $i < count($children); $i++) {
+                $child = $children[$i];
+                $type = (string)($child->type());
+                if ($type != 'formal_args_list_with_or_without_const') {
+                    $k = $this->find_identifiers_except_in_formal_args($child);
+                    if (count($result)) {
+                        if (count($k)) {
+                            $result = array_merge($result, $k);
+                        }
+                    } else {
+                        $result = $k;
+                    }
+                }
+            }
+        }
+        return $result;
+    }
+    /** Performs action for typedef
+     *  @param $node node data
+     */
+    public function perform_typedef_action($node) {
+        $this->introduce_types($this->find_identifiers_except_in_formal_args($node));
+    }
     /** Extracts template parameters from node as argument 
      *  @param block_formal_langs_ast_base $node a node
      *  @param array
@@ -254,7 +300,7 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
                 $type = (string)$type;
                 $istype = array_key_exists($type, $types);
             }
-            if ($istype)
+            if ($istype && count($children) > 1)
             {
                 $value = $children[1]->value();
                 $value = (string)$value;
@@ -546,9 +592,9 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
      * @return string mapped constants name
      */
     public function map($token) {
-        if ($token->type() == 'keyword') {
+		if ($token->type() == 'keyword') {
             if ($this->is_operator_overload_declaration($token->value())) {
-                return 'OPERATOROVERLOADDECLARATION';
+				return 'OPERATOROVERLOADDECLARATION';
             }
         }
         if ($token->type() == 'identifier') {
@@ -556,7 +602,7 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
 				return 'OUTER_CONSTRUCTOR_NAME';
 			}
             if ($this->is_type($token->value())) {
-                //echo $token->value() . " is type \n";
+				//echo $token->value() . " is type \n";
 				return 'TYPENAME';
             }			
         }
