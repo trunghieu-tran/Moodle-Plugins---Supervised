@@ -67,7 +67,7 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
      * Passed responsestring could be null, than object used just to find errors in the answers, token count etc...
      */
     protected function analyze() {
-        if ($this->question->are_lexeme_sequences_equal($this->basestringpair)) {
+        if ($this->question->are_lexeme_sequences_equal($this->basestringpair)) {		
             $this->bypass();
             $this->resultstringpairs[0]->assert_that_strings_are_equal();
             return;
@@ -92,7 +92,10 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
         foreach($this->resultstringpairs as $pair) {
             //$pair->tokenmappings[get_class($this)] = $pair->pairs_between_corrected_compared();
             $pair->analyzersequence[] = get_class($this);
-
+            if($pair->matches()==null){
+                $pair->setcorrectedstring($pair->comparedstring());
+                return;
+            }
             $setmatches = $pair->matches()->matchedpairs;
             $lexmistakes=array();
             foreach ($setmatches as $onematch) {
@@ -114,7 +117,6 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
         // You must create mistakes of skipped lexemes and additional lexemes
         // Also, you need to create matched 1:1 by simply comparing lexemes of two sequences
         // with ::is_same
-
         $this->resultstringpairs = block_formal_langs_string_pair::best_string_pairs_for_bypass(
             $this->basestringpair->correctstring(),
             $this->basestringpair->comparedstring(),
