@@ -49,6 +49,25 @@ class blocks_formal_langs_token_base_best_string_pairs extends UnitTestCase {
         $this->assertTrue(count($result) == 1);
     }
 
+    function test_best_string_pairs_1_1() {
+        $options=new block_formal_langs_comparing_options();
+        $options->usecase=true;
+
+        $lang = new block_formal_langs_language_simple_english();
+
+        $comparedstring = $lang->create_from_string('winter mappp');
+        $correctstring = $lang->create_from_string('winteri mippp');
+
+        $correctstringstream = $correctstring->stream;
+        $comparedstringstream  = $comparedstring->stream;
+
+        $stringpair = new block_formal_langs_string_pair($correctstring, $comparedstring, array());
+
+        $result = $stringpair->best_string_pairs($correctstring, $comparedstring, 0.6, $options);
+
+        $this->assertTrue(count($result) == 1);
+    }
+
     //specific errors
     //acos-cos
     function test_best_string_pairs_2() {
