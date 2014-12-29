@@ -147,16 +147,16 @@ function supervisedblock_print_logs($sessionid, $timefrom, $timeto, $userid=0, $
         // Getting the type of event (read, update, create or delete).
         switch ($log->crud ) {
             case ('r'):
-                $row[] = 'Read';
+                $row[] = get_string('read','report_eventlist');
             break;
             case ('u'):
-                $row[] = 'Update';
+                $row[] = get_string('update','report_eventlist');
             break;
             case ('d'):
-                $row[] = 'Delete';
+                $row[] = get_string('delete','report_eventlist');
             break;
             case ('c'):
-                $row[] = 'Create';
+                $row[] = get_string('create','report_eventlist');
             break;
         }
         // Getting the event description.
