@@ -38,9 +38,12 @@ function supervisedblock_build_logs_array($sessionid, $timefrom, $timeto, $useri
 
     $session = $DB->get_record('block_supervised_session', array('id' => $sessionid));
 
+    $params['timeto'] = $timeto;
+    $params['timefrom'] = $timefrom;
+    $params['courseid'] = $session->courseid;
     $logs = $DB->get_records_sql('SELECT * FROM {logstore_standard_log} WHERE
-                                timecreated < ? AND timecreated > ? AND courseid = ?',
-                                array($timeto, $timefrom, $session->courseid));
+                                timecreated BETWEEN :timefrom AND :timeto AND courseid = :courseid',
+                                $params);
     // Filter logs by classroom's ip subnet, student's group and user's id.
     $logsfiltered = array();
     foreach ($logs as $id => $log) {
