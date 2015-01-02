@@ -252,13 +252,13 @@ class qtype_preg_fa_transition {
 
         // Adding assert to array.
         if ($this->is_start_anchor()) {
-            $this->mergedafter[] = clone $this;
+            array_unshift($this->mergedafter, clone $this);
         } else if ($this->is_end_anchor()) {
             $this->mergedbefore[] = clone $this;    // TODO: maybe prepend?
         }
 
         if ($other->is_start_anchor()) {
-            $other->mergedafter[] = clone $other;
+            array_unshift($other->mergedafter,clone $other);
         } else if ($other->is_end_anchor()){
             $other->mergedbefore[] = clone $other;  // TODO: same
         }
@@ -332,8 +332,8 @@ class qtype_preg_fa_transition {
             $assert = clone $other;
         } else {
             if (count($resultbefore) != 0) {
-                $assert = clone $resultbefore[0];
-                unset($resultbefore[0]);
+                $assert = clone $resultbefore[count($resultbefore) - 1];
+                unset($resultbefore[count($resultbefore) - 1]);
             } else if (count($resultafter) != 0) {
                 $assert = $resultafter[0];
                 unset($resultafter[0]);
@@ -348,14 +348,14 @@ class qtype_preg_fa_transition {
             if ($this->is_start_anchor()) {
                 unset($this->mergedafter[0]);
             } else {
-                unset($this->mergedbefore[0]);
+                unset($this->mergedbefore[count($this->mergedbefore) - 1]);
             }
         }
         if ($other->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
             if ($other->is_start_anchor()) {
                 unset($other->mergedafter[0]);
             } else {
-                unset($other->mergedbefore[0]);
+                unset($other->mergedbefore[count($other->mergedbefore) - 1]);
             }
         }
         return $assert;
@@ -494,20 +494,21 @@ class qtype_preg_fa_transition {
         // Consider that eps and transition which doesn't consume characters always intersect
         if ($this->is_eps() && $other->consumeschars == false) {
             $resulttran = new qtype_preg_fa_transition(0, $other->pregleaf, 1, self::ORIGIN_TRANSITION_INTER, $other->consumeschars);
-            $this->unite_tags($other, $resulttran);
             $assert = $this->intersect_asserts($other);
             $resulttran->mergedbefore = $assert->mergedbefore;
             $resulttran->mergedafter = $assert->mergedafter;
             $resulttran->loopsback = $this->loopsback || $other->loopsback;
+            $this->unite_tags($other, $resulttran);
             return $resulttran;
         }
         if ($other->is_eps() && $this->consumeschars == false) {
             $resulttran = new qtype_preg_fa_transition(0, $this->pregleaf, 1, self::ORIGIN_TRANSITION_INTER, $this->consumeschars);
-            $this->unite_tags($other, $resulttran);
+
             $assert = $this->intersect_asserts($other);
             $resulttran->mergedbefore = $assert->mergedbefore;
             $resulttran->mergedafter = $assert->mergedafter;
             $resulttran->loopsback = $this->loopsback || $other->loopsback;
+            $this->unite_tags($other, $resulttran);
             return $resulttran;
         }
         if ($this->is_unmerged_assert() && $this->consumeschars == false && (!$other->is_eps() && !$other->is_unmerged_assert())
