@@ -1,8 +1,9 @@
 #placeholder {
     min-width: 100px;
     min-height: 5px;
-    background: white;
+    background: none;
 }
+
 .drag-handle{
     display:inline-block;
 }
