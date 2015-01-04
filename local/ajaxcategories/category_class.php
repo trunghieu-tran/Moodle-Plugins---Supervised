@@ -74,7 +74,7 @@ class ajax_question_category_list extends moodle_list {
     function change_category_list($movingid, $environment) {
         global $DB;
         // Change context.
-        if ($environment['dest']->context != $this->context) {
+        if ($environment['dest']->context != $this->context->id) {
             // Moving to a new context. Must move files belonging to questions.
             question_move_category_to_context($movingid, $this->context, $environment['dest']->context);
         }
@@ -126,7 +126,6 @@ class ajax_question_category_list extends moodle_list {
         if ($this->context != null) {
             $attributes = array(
             'id' => 'ajaxlistitem',
-            'data-id' => $this->context->id,
         );
         } else {
             $attributes = array(
@@ -320,7 +319,7 @@ class ajax_question_category_object {
     public function initialize($page, $contexts, $currentcat, $defaultcategory, $todelete, $addcontexts) {
         $lastlist = null;
         foreach ($contexts as $context){
-            $this->editlists[$context->id] = new ajax_question_category_list('ul', 'id="ajaxcategorylist"', true, $this->pageurl, $page, 'cpage', QUESTION_PAGE_LENGTH, $context);
+            $this->editlists[$context->id] = new ajax_question_category_list('ul', 'id="ajaxcategorylist" data-id = "' . $context->id . '"', true, $this->pageurl, $page, 'cpage', QUESTION_PAGE_LENGTH, $context);
             $this->editlists[$context->id]->lastlist =& $lastlist;
             if ($lastlist!== null){
                 $lastlist->nextlist =& $this->editlists[$context->id];
