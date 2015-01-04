@@ -29,9 +29,10 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
         var drag = e.drag.get('node'),
             drop = e.drop.get('node');
         var parent = drop.ancestor();
-        if (child !== undefined && child !== null) {
+        if (child !== undefined && child !== null && !change) {
             child.remove();
         }
+        change = false;
         contextid = drop.getAttribute('data-id');
         if (contextid  === null ||  contextid == '') {
             //alert('aaaaa');
@@ -46,6 +47,9 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
         }
         //alert(contextid);
         child = Y.Node.create( '<div id = "placeholder"></div>' );
+        var tar = new Y.DD.Drop({
+            node: child
+        });
         if (drop.get('tagName').toLowerCase() === 'li') {
             if (drop.one("ul") == undefined) {
                 addedNode = Y.Node.create( "<ul></ul>" );
@@ -65,9 +69,12 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
                 if ((addedNode.get('children').size()-4) >= 0)
                 {
                     var item = addedNode.get('children').item(addedNode.get('children').size()-4);
-                    beforeitemid = -1;
-                    afteritemid = item.one('.ajaxitem[data-id]').getAttribute('data-id');
-                    level = 'normal';
+                    item = item.one('.ajaxitem[data-id]');
+                    if (item) {
+                        beforeitemid = -1;
+                        afteritemid = item.getAttribute('data-id');
+                        level = 'normal';
+                    }
                 }
 
                 addedNode.append(child);
@@ -78,11 +85,14 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
                 afteritemid = -1;
                 var item = drop.get('nextSibling');
                 if (item !== undefined && item !== null) {
+                    item = item.get('nextSibling');
+                    if (item !== null) {
                     item = item.one('.ajaxitem[data-id]');
                     if (item !== undefined && item !== null) {
                         beforeitemid = item.getAttribute('data-id');
-                        contextid = item.ancestor().getAttribute('data-id');
+                        contextid = item.ancestor('li').getAttribute('data-id');
                     }
+                }
                 }
                 item = drop.get('previousSibling');
                 if (item !== undefined && item !== null) {
@@ -112,33 +122,13 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
         }*/
     });
 
-    //Listen for all drag:drag events
-    Y.DD.DDM.on('drag:drag', function(e) {
-        //Get the last y point
-        //var y = e.target.lastXY[0];
-        //is it greater than the lastY var?
-        /*if (y < lastY) {
-            //We are going up
-            goingUp = true;
-        } else {
-            //We are going down.
-            goingUp = false;
-        }*/
-        //Cache for next check
-        //lastY = y;
-
-        if ((blockX - e.pageX) > 10 || (blockX - e.pageX) < -10) {
-            //alert('sdssdsd');
-            change = true;
-        }
-    });
     //Listen for all drag:start events
     Y.DD.DDM.on('drag:start', function(e) {
         //Get our drag object
         var drag = e.target;
+        var dragnode = drag.get('node');
         //Set some styles here
         drag.get('node').setStyle('opacity', '.25');
-        //drag.get('node').remove();
         var next = drag.get('node').get('nextSibling');
         if (next !== null) {
             next.remove();
@@ -151,7 +141,11 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
         });
         var item = drag.get('node').one('.ajaxitem[data-id]');
         movingid = item.getAttribute('data-id');
+        drag.get('node').remove();
+
+
     });
+
     //Listen for a drag:end events
     Y.DD.DDM.on('drag:end', function(e) {
         var drag = e.target;
@@ -160,6 +154,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
             visibility: '',
             opacity: '1'
         });
+        change = true;
         //alert(movingid);
         //alert(beforeitemid);
         alert(afteritemid);
