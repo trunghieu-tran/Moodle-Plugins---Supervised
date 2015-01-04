@@ -2004,7 +2004,9 @@ class qtype_preg_node_error extends qtype_preg_operator {
 
     const SUBTYPE_UNKNOWN_ERROR                = 'unknown_error_node_error';                  // Unknown parse error.
     const SUBTYPE_MISSING_OPEN_PAREN           = 'missing_open_paren_node_error';             // Closing paren without opening  xxx).
+    const SUBTYPE_MISSING_TEMPLATE_OPEN_PAREN  = 'missing_template_open_paren_node_error';    // Closing template 'paren' without opening  xxx(?###>).
     const SUBTYPE_MISSING_CLOSE_PAREN          = 'missing_close_paren_node_error';            // Opening paren without closing  (xxx.
+    const SUBTYPE_MISSING_TEMPLATE_CLOSE_PAREN = 'missing_template_close_paren_node_error';   // Opening template 'paren' without closing  (?###smth<)xxx.
     const SUBTYPE_MISSING_COMMENT_ENDING       = 'missing_comment_ending_node_error';         // Missing ) after comment.
     const SUBTYPE_MISSING_CONDSUBEXPR_ENDING   = 'missing_condsubexpr_ending_node_error';     // Missing conditional subexpression name ending.
     const SUBTYPE_MISSING_CALLOUT_ENDING       = 'missing_callout_ending_node_error';         // Missing ) after (?C.

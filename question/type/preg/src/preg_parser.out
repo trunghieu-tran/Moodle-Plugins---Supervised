@@ -13,64 +13,38 @@ State 0:
           expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
           expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
           expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
-          expr ::= * TEMPLATEOPENBRACK templateparams TEMPLATECLOSEBRACK
+          expr ::= * expr TEMPLATESEP expr
+          expr ::= * expr TEMPLATESEP
+          expr ::= * TEMPLATESEP expr
+          expr ::= * TEMPLATESEP
+          expr ::= * TEMPLATEOPENBRACK TEMPLATECLOSEBRACK
+          expr ::= * TEMPLATEOPENBRACK expr TEMPLATECLOSEBRACK
           expr ::= * expr CLOSEBRACK
+          expr ::= * expr TEMPLATECLOSEBRACK
           expr ::= * CLOSEBRACK
+          expr ::= * TEMPLATECLOSEBRACK
           expr ::= * OPENBRACK expr
+          expr ::= * TEMPLATEOPENBRACK expr
           expr ::= * OPENBRACK
+          expr ::= * TEMPLATEOPENBRACK
           expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
           expr ::= * CONDSUBEXPR expr
           expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
-                    CLOSEBRACK shift  30
+                    CLOSEBRACK shift  28
+            TEMPLATECLOSEBRACK shift  35
+                   TEMPLATESEP shift  13
                            ALT shift  15
-                     PARSELEAF shift  20
-                         QUANT shift  25
-                     OPENBRACK shift  13
-             TEMPLATEOPENBRACK shift  1
-                   CONDSUBEXPR shift  11
+                     PARSELEAF shift  27
+                         QUANT shift  26
+                     OPENBRACK shift  10
+             TEMPLATEOPENBRACK shift  4
+                   CONDSUBEXPR shift  8
                          start accept
-                          expr shift  4
+                          expr shift  5
 
 State 1:
-          expr ::= * PARSELEAF
-          expr ::= * expr expr
-          expr ::= * expr ALT expr
-          expr ::= * expr ALT
-          expr ::= * ALT expr
-          expr ::= * ALT
-          expr ::= * expr QUANT
-          expr ::= * OPENBRACK CLOSEBRACK
-          expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
-          expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
-          templateparams ::= * expr
-          templateparams ::= * templateparams TEMPLATESEP expr
-          expr ::= * TEMPLATEOPENBRACK templateparams TEMPLATECLOSEBRACK
-          expr ::= TEMPLATEOPENBRACK * templateparams TEMPLATECLOSEBRACK
-          expr ::= * expr CLOSEBRACK
-          expr ::= * CLOSEBRACK
-          expr ::= * OPENBRACK expr
-          expr ::= * OPENBRACK
-          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
-          expr ::= * CONDSUBEXPR expr
-          expr ::= * CONDSUBEXPR
-          expr ::= * QUANT
-
-                    CLOSEBRACK shift  30
-                           ALT shift  15
-                     PARSELEAF shift  20
-                         QUANT shift  25
-                     OPENBRACK shift  13
-             TEMPLATEOPENBRACK shift  1
-                   CONDSUBEXPR shift  11
-                          expr shift  10
-                templateparams shift  19
-
-State 2:
           expr ::= * PARSELEAF
           expr ::= * expr expr
           expr ::= expr * expr
@@ -89,29 +63,43 @@ State 2:
           expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
           expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
           expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
-          expr ::= * TEMPLATEOPENBRACK templateparams TEMPLATECLOSEBRACK
+          expr ::= * expr TEMPLATESEP expr
+          expr ::= expr * TEMPLATESEP expr
+          expr ::= * expr TEMPLATESEP
+          expr ::= expr * TEMPLATESEP
+          expr ::= * TEMPLATESEP expr
+          expr ::= * TEMPLATESEP
+          expr ::= * TEMPLATEOPENBRACK TEMPLATECLOSEBRACK
+          expr ::= * TEMPLATEOPENBRACK expr TEMPLATECLOSEBRACK
           expr ::= * expr CLOSEBRACK
           expr ::= expr * CLOSEBRACK
+          expr ::= * expr TEMPLATECLOSEBRACK
+          expr ::= expr * TEMPLATECLOSEBRACK
           expr ::= * CLOSEBRACK
+          expr ::= * TEMPLATECLOSEBRACK
           expr ::= * OPENBRACK expr
+          expr ::= * TEMPLATEOPENBRACK expr
           expr ::= * OPENBRACK
+          expr ::= * TEMPLATEOPENBRACK
           expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
-     (21) expr ::= CONDSUBEXPR expr CLOSEBRACK expr *
+     (28) expr ::= CONDSUBEXPR expr CLOSEBRACK expr *
           expr ::= * CONDSUBEXPR expr
           expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
-                    CLOSEBRACK shift  26
+                    CLOSEBRACK shift  34
+            TEMPLATECLOSEBRACK shift  32
+                   TEMPLATESEP shift  12
                            ALT shift  16
-                     PARSELEAF shift  20
-                         QUANT shift  28
-                     OPENBRACK shift  13
-             TEMPLATEOPENBRACK shift  1
-                   CONDSUBEXPR shift  11
-                          expr shift  18
-                     {default} reduce 21
+                     PARSELEAF shift  27
+                         QUANT shift  33
+                     OPENBRACK shift  10
+             TEMPLATEOPENBRACK shift  4
+                   CONDSUBEXPR shift  8
+                          expr shift  20
+                     {default} reduce 28
 
-State 3:
+State 2:
           expr ::= * PARSELEAF
           expr ::= * expr expr
           expr ::= * expr ALT expr
@@ -127,30 +115,147 @@ State 3:
           expr ::= CONDSUBEXPR expr CLOSEBRACK * CLOSEBRACK
           expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
           expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
-          expr ::= * TEMPLATEOPENBRACK templateparams TEMPLATECLOSEBRACK
+          expr ::= * expr TEMPLATESEP expr
+          expr ::= * expr TEMPLATESEP
+          expr ::= * TEMPLATESEP expr
+          expr ::= * TEMPLATESEP
+          expr ::= * TEMPLATEOPENBRACK TEMPLATECLOSEBRACK
+          expr ::= * TEMPLATEOPENBRACK expr TEMPLATECLOSEBRACK
           expr ::= * expr CLOSEBRACK
-     (17) expr ::= expr CLOSEBRACK *
+     (20) expr ::= expr CLOSEBRACK *
+          expr ::= * expr TEMPLATECLOSEBRACK
           expr ::= * CLOSEBRACK
-     (18) expr ::= CLOSEBRACK *
+     (22) expr ::= CLOSEBRACK *
+          expr ::= * TEMPLATECLOSEBRACK
           expr ::= * OPENBRACK expr
+          expr ::= * TEMPLATEOPENBRACK expr
           expr ::= * OPENBRACK
+          expr ::= * TEMPLATEOPENBRACK
           expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
           expr ::= CONDSUBEXPR expr CLOSEBRACK * expr
           expr ::= * CONDSUBEXPR expr
           expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
-                    CLOSEBRACK shift  24
+                    CLOSEBRACK shift  21
+            TEMPLATECLOSEBRACK shift  35
+                   TEMPLATESEP shift  13
                            ALT shift  15
-                     PARSELEAF shift  20
-                         QUANT shift  25
-                     OPENBRACK shift  13
-             TEMPLATEOPENBRACK shift  1
-                   CONDSUBEXPR shift  11
-                          expr shift  2
-                     {default} reduce 17
+                     PARSELEAF shift  27
+                         QUANT shift  26
+                     OPENBRACK shift  10
+             TEMPLATEOPENBRACK shift  4
+                   CONDSUBEXPR shift  8
+                          expr shift  1
+                     {default} reduce 20
+
+State 3:
+          expr ::= * PARSELEAF
+          expr ::= * expr expr
+          expr ::= expr * expr
+          expr ::= * expr ALT expr
+          expr ::= expr * ALT expr
+          expr ::= * expr ALT
+          expr ::= expr * ALT
+          expr ::= * ALT expr
+          expr ::= * ALT
+          expr ::= * expr QUANT
+          expr ::= expr * QUANT
+          expr ::= * OPENBRACK CLOSEBRACK
+          expr ::= * OPENBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK
+          expr ::= CONDSUBEXPR expr * CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
+          expr ::= CONDSUBEXPR expr * CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
+          expr ::= * expr TEMPLATESEP expr
+          expr ::= expr * TEMPLATESEP expr
+          expr ::= * expr TEMPLATESEP
+          expr ::= expr * TEMPLATESEP
+          expr ::= * TEMPLATESEP expr
+          expr ::= * TEMPLATESEP
+          expr ::= * TEMPLATEOPENBRACK TEMPLATECLOSEBRACK
+          expr ::= * TEMPLATEOPENBRACK expr TEMPLATECLOSEBRACK
+          expr ::= * expr CLOSEBRACK
+          expr ::= expr * CLOSEBRACK
+          expr ::= * expr TEMPLATECLOSEBRACK
+          expr ::= expr * TEMPLATECLOSEBRACK
+          expr ::= * CLOSEBRACK
+          expr ::= * TEMPLATECLOSEBRACK
+          expr ::= * OPENBRACK expr
+          expr ::= * TEMPLATEOPENBRACK expr
+          expr ::= * OPENBRACK
+          expr ::= * TEMPLATEOPENBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
+          expr ::= CONDSUBEXPR expr * CLOSEBRACK expr
+          expr ::= * CONDSUBEXPR expr
+     (29) expr ::= CONDSUBEXPR expr *
+          expr ::= * CONDSUBEXPR
+          expr ::= * QUANT
+
+                    CLOSEBRACK shift  2
+            TEMPLATECLOSEBRACK shift  32
+                   TEMPLATESEP shift  12
+                           ALT shift  16
+                     PARSELEAF shift  27
+                         QUANT shift  33
+                     OPENBRACK shift  10
+             TEMPLATEOPENBRACK shift  4
+                   CONDSUBEXPR shift  8
+                          expr shift  20
+                     {default} reduce 29
 
 State 4:
+          expr ::= * PARSELEAF
+          expr ::= * expr expr
+          expr ::= * expr ALT expr
+          expr ::= * expr ALT
+          expr ::= * ALT expr
+          expr ::= * ALT
+          expr ::= * expr QUANT
+          expr ::= * OPENBRACK CLOSEBRACK
+          expr ::= * OPENBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
+          expr ::= * expr TEMPLATESEP expr
+          expr ::= * expr TEMPLATESEP
+          expr ::= * TEMPLATESEP expr
+          expr ::= * TEMPLATESEP
+          expr ::= * TEMPLATEOPENBRACK TEMPLATECLOSEBRACK
+          expr ::= TEMPLATEOPENBRACK * TEMPLATECLOSEBRACK
+          expr ::= * TEMPLATEOPENBRACK expr TEMPLATECLOSEBRACK
+          expr ::= TEMPLATEOPENBRACK * expr TEMPLATECLOSEBRACK
+          expr ::= * expr CLOSEBRACK
+          expr ::= * expr TEMPLATECLOSEBRACK
+          expr ::= * CLOSEBRACK
+          expr ::= * TEMPLATECLOSEBRACK
+          expr ::= * OPENBRACK expr
+          expr ::= * TEMPLATEOPENBRACK expr
+          expr ::= TEMPLATEOPENBRACK * expr
+          expr ::= * OPENBRACK
+          expr ::= * TEMPLATEOPENBRACK
+     (27) expr ::= TEMPLATEOPENBRACK *
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
+          expr ::= * CONDSUBEXPR expr
+          expr ::= * CONDSUBEXPR
+          expr ::= * QUANT
+
+                    CLOSEBRACK shift  28
+            TEMPLATECLOSEBRACK shift  22
+                   TEMPLATESEP shift  13
+                           ALT shift  15
+                     PARSELEAF shift  27
+                         QUANT shift  26
+                     OPENBRACK shift  10
+             TEMPLATEOPENBRACK shift  4
+                   CONDSUBEXPR shift  8
+                          expr shift  9
+                     {default} reduce 27
+
+State 5:
       (0) start ::= expr *
           expr ::= * PARSELEAF
           expr ::= * expr expr
@@ -169,60 +274,40 @@ State 4:
           expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
           expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
           expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
-          expr ::= * TEMPLATEOPENBRACK templateparams TEMPLATECLOSEBRACK
+          expr ::= * expr TEMPLATESEP expr
+          expr ::= expr * TEMPLATESEP expr
+          expr ::= * expr TEMPLATESEP
+          expr ::= expr * TEMPLATESEP
+          expr ::= * TEMPLATESEP expr
+          expr ::= * TEMPLATESEP
+          expr ::= * TEMPLATEOPENBRACK TEMPLATECLOSEBRACK
+          expr ::= * TEMPLATEOPENBRACK expr TEMPLATECLOSEBRACK
           expr ::= * expr CLOSEBRACK
           expr ::= expr * CLOSEBRACK
+          expr ::= * expr TEMPLATECLOSEBRACK
+          expr ::= expr * TEMPLATECLOSEBRACK
           expr ::= * CLOSEBRACK
+          expr ::= * TEMPLATECLOSEBRACK
           expr ::= * OPENBRACK expr
+          expr ::= * TEMPLATEOPENBRACK expr
           expr ::= * OPENBRACK
+          expr ::= * TEMPLATEOPENBRACK
           expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
           expr ::= * CONDSUBEXPR expr
           expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
                     CLOSEBRACK shift  29
+            TEMPLATECLOSEBRACK shift  32
+                   TEMPLATESEP shift  12
                            ALT shift  16
-                     PARSELEAF shift  20
-                         QUANT shift  28
-                     OPENBRACK shift  13
-             TEMPLATEOPENBRACK shift  1
-                   CONDSUBEXPR shift  11
-                          expr shift  18
+                     PARSELEAF shift  27
+                         QUANT shift  33
+                     OPENBRACK shift  10
+             TEMPLATEOPENBRACK shift  4
+                   CONDSUBEXPR shift  8
+                          expr shift  20
                      {default} reduce 0
-
-State 5:
-          expr ::= * PARSELEAF
-          expr ::= * expr expr
-          expr ::= * expr ALT expr
-          expr ::= * expr ALT
-          expr ::= * ALT expr
-          expr ::= * ALT
-          expr ::= * expr QUANT
-          expr ::= * OPENBRACK CLOSEBRACK
-          expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
-          expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
-          templateparams ::= templateparams TEMPLATESEP * expr
-          expr ::= * TEMPLATEOPENBRACK templateparams TEMPLATECLOSEBRACK
-          expr ::= * expr CLOSEBRACK
-          expr ::= * CLOSEBRACK
-          expr ::= * OPENBRACK expr
-          expr ::= * OPENBRACK
-          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
-          expr ::= * CONDSUBEXPR expr
-          expr ::= * CONDSUBEXPR
-          expr ::= * QUANT
-
-                    CLOSEBRACK shift  30
-                           ALT shift  15
-                     PARSELEAF shift  20
-                         QUANT shift  25
-                     OPENBRACK shift  13
-             TEMPLATEOPENBRACK shift  1
-                   CONDSUBEXPR shift  11
-                          expr shift  8
 
 State 6:
           expr ::= * PARSELEAF
@@ -243,25 +328,39 @@ State 6:
           expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
           expr ::= CONDSUBEXPR CLOSEBRACK expr * CLOSEBRACK
           expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
-          expr ::= * TEMPLATEOPENBRACK templateparams TEMPLATECLOSEBRACK
+          expr ::= * expr TEMPLATESEP expr
+          expr ::= expr * TEMPLATESEP expr
+          expr ::= * expr TEMPLATESEP
+          expr ::= expr * TEMPLATESEP
+          expr ::= * TEMPLATESEP expr
+          expr ::= * TEMPLATESEP
+          expr ::= * TEMPLATEOPENBRACK TEMPLATECLOSEBRACK
+          expr ::= * TEMPLATEOPENBRACK expr TEMPLATECLOSEBRACK
           expr ::= * expr CLOSEBRACK
           expr ::= expr * CLOSEBRACK
+          expr ::= * expr TEMPLATECLOSEBRACK
+          expr ::= expr * TEMPLATECLOSEBRACK
           expr ::= * CLOSEBRACK
+          expr ::= * TEMPLATECLOSEBRACK
           expr ::= * OPENBRACK expr
+          expr ::= * TEMPLATEOPENBRACK expr
           expr ::= * OPENBRACK
+          expr ::= * TEMPLATEOPENBRACK
           expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
           expr ::= * CONDSUBEXPR expr
           expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
                     CLOSEBRACK shift  23
+            TEMPLATECLOSEBRACK shift  32
+                   TEMPLATESEP shift  12
                            ALT shift  16
-                     PARSELEAF shift  20
-                         QUANT shift  28
-                     OPENBRACK shift  13
-             TEMPLATEOPENBRACK shift  1
-                   CONDSUBEXPR shift  11
-                          expr shift  18
+                     PARSELEAF shift  27
+                         QUANT shift  33
+                     OPENBRACK shift  10
+             TEMPLATEOPENBRACK shift  4
+                   CONDSUBEXPR shift  8
+                          expr shift  20
 
 State 7:
           expr ::= * PARSELEAF
@@ -279,151 +378,39 @@ State 7:
           expr ::= CONDSUBEXPR CLOSEBRACK * expr CLOSEBRACK
           expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
           expr ::= CONDSUBEXPR CLOSEBRACK * CLOSEBRACK
-          expr ::= * TEMPLATEOPENBRACK templateparams TEMPLATECLOSEBRACK
+          expr ::= * expr TEMPLATESEP expr
+          expr ::= * expr TEMPLATESEP
+          expr ::= * TEMPLATESEP expr
+          expr ::= * TEMPLATESEP
+          expr ::= * TEMPLATEOPENBRACK TEMPLATECLOSEBRACK
+          expr ::= * TEMPLATEOPENBRACK expr TEMPLATECLOSEBRACK
           expr ::= * expr CLOSEBRACK
+          expr ::= * expr TEMPLATECLOSEBRACK
           expr ::= * CLOSEBRACK
-     (18) expr ::= CLOSEBRACK *
+     (22) expr ::= CLOSEBRACK *
+          expr ::= * TEMPLATECLOSEBRACK
           expr ::= * OPENBRACK expr
+          expr ::= * TEMPLATEOPENBRACK expr
           expr ::= * OPENBRACK
+          expr ::= * TEMPLATEOPENBRACK
           expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
           expr ::= * CONDSUBEXPR expr
           expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
-                    CLOSEBRACK shift  22
+                    CLOSEBRACK shift  25
+            TEMPLATECLOSEBRACK shift  35
+                   TEMPLATESEP shift  13
                            ALT shift  15
-                     PARSELEAF shift  20
-                         QUANT shift  25
-                     OPENBRACK shift  13
-             TEMPLATEOPENBRACK shift  1
-                   CONDSUBEXPR shift  11
+                     PARSELEAF shift  27
+                         QUANT shift  26
+                     OPENBRACK shift  10
+             TEMPLATEOPENBRACK shift  4
+                   CONDSUBEXPR shift  8
                           expr shift  6
-                     {default} reduce 18
-
-State 8:
-          expr ::= * PARSELEAF
-          expr ::= * expr expr
-          expr ::= expr * expr
-          expr ::= * expr ALT expr
-          expr ::= expr * ALT expr
-          expr ::= * expr ALT
-          expr ::= expr * ALT
-          expr ::= * ALT expr
-          expr ::= * ALT
-          expr ::= * expr QUANT
-          expr ::= expr * QUANT
-          expr ::= * OPENBRACK CLOSEBRACK
-          expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
-          expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
-     (15) templateparams ::= templateparams TEMPLATESEP expr *
-          expr ::= * TEMPLATEOPENBRACK templateparams TEMPLATECLOSEBRACK
-          expr ::= * expr CLOSEBRACK
-          expr ::= expr * CLOSEBRACK
-          expr ::= * CLOSEBRACK
-          expr ::= * OPENBRACK expr
-          expr ::= * OPENBRACK
-          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
-          expr ::= * CONDSUBEXPR expr
-          expr ::= * CONDSUBEXPR
-          expr ::= * QUANT
-
-                    CLOSEBRACK shift  29
-                           ALT shift  16
-                     PARSELEAF shift  20
-                         QUANT shift  28
-                     OPENBRACK shift  13
-             TEMPLATEOPENBRACK shift  1
-                   CONDSUBEXPR shift  11
-                          expr shift  18
-                     {default} reduce 15
-
-State 9:
-          expr ::= * PARSELEAF
-          expr ::= * expr expr
-          expr ::= expr * expr
-          expr ::= * expr ALT expr
-          expr ::= expr * ALT expr
-          expr ::= * expr ALT
-          expr ::= expr * ALT
-          expr ::= * ALT expr
-          expr ::= * ALT
-          expr ::= * expr QUANT
-          expr ::= expr * QUANT
-          expr ::= * OPENBRACK CLOSEBRACK
-          expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK
-          expr ::= CONDSUBEXPR expr * CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
-          expr ::= CONDSUBEXPR expr * CLOSEBRACK CLOSEBRACK
-          expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
-          expr ::= * TEMPLATEOPENBRACK templateparams TEMPLATECLOSEBRACK
-          expr ::= * expr CLOSEBRACK
-          expr ::= expr * CLOSEBRACK
-          expr ::= * CLOSEBRACK
-          expr ::= * OPENBRACK expr
-          expr ::= * OPENBRACK
-          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
-          expr ::= CONDSUBEXPR expr * CLOSEBRACK expr
-          expr ::= * CONDSUBEXPR expr
-     (22) expr ::= CONDSUBEXPR expr *
-          expr ::= * CONDSUBEXPR
-          expr ::= * QUANT
-
-                    CLOSEBRACK shift  3
-                           ALT shift  16
-                     PARSELEAF shift  20
-                         QUANT shift  28
-                     OPENBRACK shift  13
-             TEMPLATEOPENBRACK shift  1
-                   CONDSUBEXPR shift  11
-                          expr shift  18
                      {default} reduce 22
 
-State 10:
-          expr ::= * PARSELEAF
-          expr ::= * expr expr
-          expr ::= expr * expr
-          expr ::= * expr ALT expr
-          expr ::= expr * ALT expr
-          expr ::= * expr ALT
-          expr ::= expr * ALT
-          expr ::= * ALT expr
-          expr ::= * ALT
-          expr ::= * expr QUANT
-          expr ::= expr * QUANT
-          expr ::= * OPENBRACK CLOSEBRACK
-          expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
-          expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
-          expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
-     (14) templateparams ::= expr *
-          expr ::= * TEMPLATEOPENBRACK templateparams TEMPLATECLOSEBRACK
-          expr ::= * expr CLOSEBRACK
-          expr ::= expr * CLOSEBRACK
-          expr ::= * CLOSEBRACK
-          expr ::= * OPENBRACK expr
-          expr ::= * OPENBRACK
-          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
-          expr ::= * CONDSUBEXPR expr
-          expr ::= * CONDSUBEXPR
-          expr ::= * QUANT
-
-                    CLOSEBRACK shift  29
-                           ALT shift  16
-                     PARSELEAF shift  20
-                         QUANT shift  28
-                     OPENBRACK shift  13
-             TEMPLATEOPENBRACK shift  1
-                   CONDSUBEXPR shift  11
-                          expr shift  18
-                     {default} reduce 14
-
-State 11:
+State 8:
           expr ::= * PARSELEAF
           expr ::= * expr expr
           expr ::= * expr ALT expr
@@ -441,30 +428,145 @@ State 11:
           expr ::= CONDSUBEXPR * CLOSEBRACK expr CLOSEBRACK
           expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
           expr ::= CONDSUBEXPR * CLOSEBRACK CLOSEBRACK
-          expr ::= * TEMPLATEOPENBRACK templateparams TEMPLATECLOSEBRACK
+          expr ::= * expr TEMPLATESEP expr
+          expr ::= * expr TEMPLATESEP
+          expr ::= * TEMPLATESEP expr
+          expr ::= * TEMPLATESEP
+          expr ::= * TEMPLATEOPENBRACK TEMPLATECLOSEBRACK
+          expr ::= * TEMPLATEOPENBRACK expr TEMPLATECLOSEBRACK
           expr ::= * expr CLOSEBRACK
+          expr ::= * expr TEMPLATECLOSEBRACK
           expr ::= * CLOSEBRACK
+          expr ::= * TEMPLATECLOSEBRACK
           expr ::= * OPENBRACK expr
+          expr ::= * TEMPLATEOPENBRACK expr
           expr ::= * OPENBRACK
+          expr ::= * TEMPLATEOPENBRACK
           expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
           expr ::= CONDSUBEXPR * expr CLOSEBRACK expr
           expr ::= * CONDSUBEXPR expr
           expr ::= CONDSUBEXPR * expr
           expr ::= * CONDSUBEXPR
-     (23) expr ::= CONDSUBEXPR *
+     (30) expr ::= CONDSUBEXPR *
           expr ::= * QUANT
 
                     CLOSEBRACK shift  7
+            TEMPLATECLOSEBRACK shift  35
+                   TEMPLATESEP shift  13
                            ALT shift  15
-                     PARSELEAF shift  20
-                         QUANT shift  25
-                     OPENBRACK shift  13
-             TEMPLATEOPENBRACK shift  1
-                   CONDSUBEXPR shift  11
-                          expr shift  9
-                     {default} reduce 23
+                     PARSELEAF shift  27
+                         QUANT shift  26
+                     OPENBRACK shift  10
+             TEMPLATEOPENBRACK shift  4
+                   CONDSUBEXPR shift  8
+                          expr shift  3
+                     {default} reduce 30
 
-State 12:
+State 9:
+          expr ::= * PARSELEAF
+          expr ::= * expr expr
+          expr ::= expr * expr
+          expr ::= * expr ALT expr
+          expr ::= expr * ALT expr
+          expr ::= * expr ALT
+          expr ::= expr * ALT
+          expr ::= * ALT expr
+          expr ::= * ALT
+          expr ::= * expr QUANT
+          expr ::= expr * QUANT
+          expr ::= * OPENBRACK CLOSEBRACK
+          expr ::= * OPENBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
+          expr ::= * expr TEMPLATESEP expr
+          expr ::= expr * TEMPLATESEP expr
+          expr ::= * expr TEMPLATESEP
+          expr ::= expr * TEMPLATESEP
+          expr ::= * TEMPLATESEP expr
+          expr ::= * TEMPLATESEP
+          expr ::= * TEMPLATEOPENBRACK TEMPLATECLOSEBRACK
+          expr ::= * TEMPLATEOPENBRACK expr TEMPLATECLOSEBRACK
+          expr ::= TEMPLATEOPENBRACK expr * TEMPLATECLOSEBRACK
+          expr ::= * expr CLOSEBRACK
+          expr ::= expr * CLOSEBRACK
+          expr ::= * expr TEMPLATECLOSEBRACK
+          expr ::= expr * TEMPLATECLOSEBRACK
+          expr ::= * CLOSEBRACK
+          expr ::= * TEMPLATECLOSEBRACK
+          expr ::= * OPENBRACK expr
+          expr ::= * TEMPLATEOPENBRACK expr
+     (25) expr ::= TEMPLATEOPENBRACK expr *
+          expr ::= * OPENBRACK
+          expr ::= * TEMPLATEOPENBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
+          expr ::= * CONDSUBEXPR expr
+          expr ::= * CONDSUBEXPR
+          expr ::= * QUANT
+
+                    CLOSEBRACK shift  29
+            TEMPLATECLOSEBRACK shift  30
+                   TEMPLATESEP shift  12
+                           ALT shift  16
+                     PARSELEAF shift  27
+                         QUANT shift  33
+                     OPENBRACK shift  10
+             TEMPLATEOPENBRACK shift  4
+                   CONDSUBEXPR shift  8
+                          expr shift  20
+                     {default} reduce 25
+
+State 10:
+          expr ::= * PARSELEAF
+          expr ::= * expr expr
+          expr ::= * expr ALT expr
+          expr ::= * expr ALT
+          expr ::= * ALT expr
+          expr ::= * ALT
+          expr ::= * expr QUANT
+          expr ::= * OPENBRACK CLOSEBRACK
+          expr ::= OPENBRACK * CLOSEBRACK
+          expr ::= * OPENBRACK expr CLOSEBRACK
+          expr ::= OPENBRACK * expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
+          expr ::= * expr TEMPLATESEP expr
+          expr ::= * expr TEMPLATESEP
+          expr ::= * TEMPLATESEP expr
+          expr ::= * TEMPLATESEP
+          expr ::= * TEMPLATEOPENBRACK TEMPLATECLOSEBRACK
+          expr ::= * TEMPLATEOPENBRACK expr TEMPLATECLOSEBRACK
+          expr ::= * expr CLOSEBRACK
+          expr ::= * expr TEMPLATECLOSEBRACK
+          expr ::= * CLOSEBRACK
+          expr ::= * TEMPLATECLOSEBRACK
+          expr ::= * OPENBRACK expr
+          expr ::= OPENBRACK * expr
+          expr ::= * TEMPLATEOPENBRACK expr
+          expr ::= * OPENBRACK
+     (26) expr ::= OPENBRACK *
+          expr ::= * TEMPLATEOPENBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
+          expr ::= * CONDSUBEXPR expr
+          expr ::= * CONDSUBEXPR
+          expr ::= * QUANT
+
+                    CLOSEBRACK shift  24
+            TEMPLATECLOSEBRACK shift  35
+                   TEMPLATESEP shift  13
+                           ALT shift  15
+                     PARSELEAF shift  27
+                         QUANT shift  26
+                     OPENBRACK shift  10
+             TEMPLATEOPENBRACK shift  4
+                   CONDSUBEXPR shift  8
+                          expr shift  11
+                     {default} reduce 26
+
+State 11:
           expr ::= * PARSELEAF
           expr ::= * expr expr
           expr ::= expr * expr
@@ -483,27 +585,88 @@ State 12:
           expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
           expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
           expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
-          expr ::= * TEMPLATEOPENBRACK templateparams TEMPLATECLOSEBRACK
+          expr ::= * expr TEMPLATESEP expr
+          expr ::= expr * TEMPLATESEP expr
+          expr ::= * expr TEMPLATESEP
+          expr ::= expr * TEMPLATESEP
+          expr ::= * TEMPLATESEP expr
+          expr ::= * TEMPLATESEP
+          expr ::= * TEMPLATEOPENBRACK TEMPLATECLOSEBRACK
+          expr ::= * TEMPLATEOPENBRACK expr TEMPLATECLOSEBRACK
           expr ::= * expr CLOSEBRACK
           expr ::= expr * CLOSEBRACK
+          expr ::= * expr TEMPLATECLOSEBRACK
+          expr ::= expr * TEMPLATECLOSEBRACK
           expr ::= * CLOSEBRACK
+          expr ::= * TEMPLATECLOSEBRACK
           expr ::= * OPENBRACK expr
-     (19) expr ::= OPENBRACK expr *
+     (24) expr ::= OPENBRACK expr *
+          expr ::= * TEMPLATEOPENBRACK expr
           expr ::= * OPENBRACK
+          expr ::= * TEMPLATEOPENBRACK
           expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
           expr ::= * CONDSUBEXPR expr
           expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
-                    CLOSEBRACK shift  27
+                    CLOSEBRACK shift  31
+            TEMPLATECLOSEBRACK shift  32
+                   TEMPLATESEP shift  12
                            ALT shift  16
-                     PARSELEAF shift  20
-                         QUANT shift  28
-                     OPENBRACK shift  13
-             TEMPLATEOPENBRACK shift  1
-                   CONDSUBEXPR shift  11
+                     PARSELEAF shift  27
+                         QUANT shift  33
+                     OPENBRACK shift  10
+             TEMPLATEOPENBRACK shift  4
+                   CONDSUBEXPR shift  8
+                          expr shift  20
+                     {default} reduce 24
+
+State 12:
+          expr ::= * PARSELEAF
+          expr ::= * expr expr
+          expr ::= * expr ALT expr
+          expr ::= * expr ALT
+          expr ::= * ALT expr
+          expr ::= * ALT
+          expr ::= * expr QUANT
+          expr ::= * OPENBRACK CLOSEBRACK
+          expr ::= * OPENBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
+          expr ::= * expr TEMPLATESEP expr
+          expr ::= expr TEMPLATESEP * expr
+          expr ::= * expr TEMPLATESEP
+     (15) expr ::= expr TEMPLATESEP *
+          expr ::= * TEMPLATESEP expr
+          expr ::= TEMPLATESEP * expr
+          expr ::= * TEMPLATESEP
+     (17) expr ::= TEMPLATESEP *
+          expr ::= * TEMPLATEOPENBRACK TEMPLATECLOSEBRACK
+          expr ::= * TEMPLATEOPENBRACK expr TEMPLATECLOSEBRACK
+          expr ::= * expr CLOSEBRACK
+          expr ::= * expr TEMPLATECLOSEBRACK
+          expr ::= * CLOSEBRACK
+          expr ::= * TEMPLATECLOSEBRACK
+          expr ::= * OPENBRACK expr
+          expr ::= * TEMPLATEOPENBRACK expr
+          expr ::= * OPENBRACK
+          expr ::= * TEMPLATEOPENBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
+          expr ::= * CONDSUBEXPR expr
+          expr ::= * CONDSUBEXPR
+          expr ::= * QUANT
+
+                   TEMPLATESEP shift  13
+                           ALT shift  15
+                     PARSELEAF shift  27
+                         QUANT shift  26
+                     OPENBRACK shift  10
+             TEMPLATEOPENBRACK shift  4
+                   CONDSUBEXPR shift  8
                           expr shift  18
-                     {default} reduce 19
+                     {default} reduce 15
 
 State 13:
           expr ::= * PARSELEAF
@@ -514,34 +677,41 @@ State 13:
           expr ::= * ALT
           expr ::= * expr QUANT
           expr ::= * OPENBRACK CLOSEBRACK
-          expr ::= OPENBRACK * CLOSEBRACK
           expr ::= * OPENBRACK expr CLOSEBRACK
-          expr ::= OPENBRACK * expr CLOSEBRACK
           expr ::= * CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK
           expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
           expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
           expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
-          expr ::= * TEMPLATEOPENBRACK templateparams TEMPLATECLOSEBRACK
+          expr ::= * expr TEMPLATESEP expr
+          expr ::= * expr TEMPLATESEP
+          expr ::= * TEMPLATESEP expr
+          expr ::= TEMPLATESEP * expr
+          expr ::= * TEMPLATESEP
+     (17) expr ::= TEMPLATESEP *
+          expr ::= * TEMPLATEOPENBRACK TEMPLATECLOSEBRACK
+          expr ::= * TEMPLATEOPENBRACK expr TEMPLATECLOSEBRACK
           expr ::= * expr CLOSEBRACK
+          expr ::= * expr TEMPLATECLOSEBRACK
           expr ::= * CLOSEBRACK
+          expr ::= * TEMPLATECLOSEBRACK
           expr ::= * OPENBRACK expr
-          expr ::= OPENBRACK * expr
+          expr ::= * TEMPLATEOPENBRACK expr
           expr ::= * OPENBRACK
-     (20) expr ::= OPENBRACK *
+          expr ::= * TEMPLATEOPENBRACK
           expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
           expr ::= * CONDSUBEXPR expr
           expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
-                    CLOSEBRACK shift  21
+                   TEMPLATESEP shift  13
                            ALT shift  15
-                     PARSELEAF shift  20
-                         QUANT shift  25
-                     OPENBRACK shift  13
-             TEMPLATEOPENBRACK shift  1
-                   CONDSUBEXPR shift  11
-                          expr shift  12
-                     {default} reduce 20
+                     PARSELEAF shift  27
+                         QUANT shift  26
+                     OPENBRACK shift  10
+             TEMPLATEOPENBRACK shift  4
+                   CONDSUBEXPR shift  8
+                          expr shift  14
+                     {default} reduce 17
 
 State 14:
           expr ::= * PARSELEAF
@@ -552,7 +722,6 @@ State 14:
           expr ::= * expr ALT
           expr ::= expr * ALT
           expr ::= * ALT expr
-      (5) expr ::= ALT expr *
           expr ::= * ALT
           expr ::= * expr QUANT
           expr ::= expr * QUANT
@@ -562,25 +731,39 @@ State 14:
           expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
           expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
           expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
-          expr ::= * TEMPLATEOPENBRACK templateparams TEMPLATECLOSEBRACK
+          expr ::= * expr TEMPLATESEP expr
+          expr ::= expr * TEMPLATESEP expr
+          expr ::= * expr TEMPLATESEP
+          expr ::= expr * TEMPLATESEP
+          expr ::= * TEMPLATESEP expr
+     (16) expr ::= TEMPLATESEP expr *
+          expr ::= * TEMPLATESEP
+          expr ::= * TEMPLATEOPENBRACK TEMPLATECLOSEBRACK
+          expr ::= * TEMPLATEOPENBRACK expr TEMPLATECLOSEBRACK
           expr ::= * expr CLOSEBRACK
           expr ::= expr * CLOSEBRACK
+          expr ::= * expr TEMPLATECLOSEBRACK
+          expr ::= expr * TEMPLATECLOSEBRACK
           expr ::= * CLOSEBRACK
+          expr ::= * TEMPLATECLOSEBRACK
           expr ::= * OPENBRACK expr
+          expr ::= * TEMPLATEOPENBRACK expr
           expr ::= * OPENBRACK
+          expr ::= * TEMPLATEOPENBRACK
           expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
           expr ::= * CONDSUBEXPR expr
           expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
+                   TEMPLATESEP shift  12
                            ALT shift  16
-                     PARSELEAF shift  20
-                         QUANT shift  28
-                     OPENBRACK shift  13
-             TEMPLATEOPENBRACK shift  1
-                   CONDSUBEXPR shift  11
-                          expr shift  18
-                     {default} reduce 5
+                     PARSELEAF shift  27
+                         QUANT shift  33
+                     OPENBRACK shift  10
+             TEMPLATEOPENBRACK shift  4
+                   CONDSUBEXPR shift  8
+                          expr shift  20
+                     {default} reduce 16
 
 State 15:
           expr ::= * PARSELEAF
@@ -598,23 +781,32 @@ State 15:
           expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
           expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
           expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
-          expr ::= * TEMPLATEOPENBRACK templateparams TEMPLATECLOSEBRACK
+          expr ::= * expr TEMPLATESEP expr
+          expr ::= * expr TEMPLATESEP
+          expr ::= * TEMPLATESEP expr
+          expr ::= * TEMPLATESEP
+          expr ::= * TEMPLATEOPENBRACK TEMPLATECLOSEBRACK
+          expr ::= * TEMPLATEOPENBRACK expr TEMPLATECLOSEBRACK
           expr ::= * expr CLOSEBRACK
+          expr ::= * expr TEMPLATECLOSEBRACK
           expr ::= * CLOSEBRACK
+          expr ::= * TEMPLATECLOSEBRACK
           expr ::= * OPENBRACK expr
+          expr ::= * TEMPLATEOPENBRACK expr
           expr ::= * OPENBRACK
+          expr ::= * TEMPLATEOPENBRACK
           expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
           expr ::= * CONDSUBEXPR expr
           expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
                            ALT shift  15
-                     PARSELEAF shift  20
-                         QUANT shift  25
-                     OPENBRACK shift  13
-             TEMPLATEOPENBRACK shift  1
-                   CONDSUBEXPR shift  11
-                          expr shift  14
+                     PARSELEAF shift  27
+                         QUANT shift  26
+                     OPENBRACK shift  10
+             TEMPLATEOPENBRACK shift  4
+                   CONDSUBEXPR shift  8
+                          expr shift  17
                      {default} reduce 6
 
 State 16:
@@ -635,26 +827,138 @@ State 16:
           expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
           expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
           expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
-          expr ::= * TEMPLATEOPENBRACK templateparams TEMPLATECLOSEBRACK
+          expr ::= * expr TEMPLATESEP expr
+          expr ::= * expr TEMPLATESEP
+          expr ::= * TEMPLATESEP expr
+          expr ::= * TEMPLATESEP
+          expr ::= * TEMPLATEOPENBRACK TEMPLATECLOSEBRACK
+          expr ::= * TEMPLATEOPENBRACK expr TEMPLATECLOSEBRACK
           expr ::= * expr CLOSEBRACK
+          expr ::= * expr TEMPLATECLOSEBRACK
           expr ::= * CLOSEBRACK
+          expr ::= * TEMPLATECLOSEBRACK
           expr ::= * OPENBRACK expr
+          expr ::= * TEMPLATEOPENBRACK expr
           expr ::= * OPENBRACK
+          expr ::= * TEMPLATEOPENBRACK
           expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
           expr ::= * CONDSUBEXPR expr
           expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
                            ALT shift  15
-                     PARSELEAF shift  20
-                         QUANT shift  25
-                     OPENBRACK shift  13
-             TEMPLATEOPENBRACK shift  1
-                   CONDSUBEXPR shift  11
-                          expr shift  17
+                     PARSELEAF shift  27
+                         QUANT shift  26
+                     OPENBRACK shift  10
+             TEMPLATEOPENBRACK shift  4
+                   CONDSUBEXPR shift  8
+                          expr shift  19
                      {default} reduce 4
 
 State 17:
+          expr ::= * PARSELEAF
+          expr ::= * expr expr
+          expr ::= expr * expr
+          expr ::= * expr ALT expr
+          expr ::= expr * ALT expr
+          expr ::= * expr ALT
+          expr ::= expr * ALT
+          expr ::= * ALT expr
+      (5) expr ::= ALT expr *
+          expr ::= * ALT
+          expr ::= * expr QUANT
+          expr ::= expr * QUANT
+          expr ::= * OPENBRACK CLOSEBRACK
+          expr ::= * OPENBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
+          expr ::= * expr TEMPLATESEP expr
+          expr ::= expr * TEMPLATESEP expr
+          expr ::= * expr TEMPLATESEP
+          expr ::= expr * TEMPLATESEP
+          expr ::= * TEMPLATESEP expr
+          expr ::= * TEMPLATESEP
+          expr ::= * TEMPLATEOPENBRACK TEMPLATECLOSEBRACK
+          expr ::= * TEMPLATEOPENBRACK expr TEMPLATECLOSEBRACK
+          expr ::= * expr CLOSEBRACK
+          expr ::= expr * CLOSEBRACK
+          expr ::= * expr TEMPLATECLOSEBRACK
+          expr ::= expr * TEMPLATECLOSEBRACK
+          expr ::= * CLOSEBRACK
+          expr ::= * TEMPLATECLOSEBRACK
+          expr ::= * OPENBRACK expr
+          expr ::= * TEMPLATEOPENBRACK expr
+          expr ::= * OPENBRACK
+          expr ::= * TEMPLATEOPENBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
+          expr ::= * CONDSUBEXPR expr
+          expr ::= * CONDSUBEXPR
+          expr ::= * QUANT
+
+                           ALT shift  16
+                     PARSELEAF shift  27
+                         QUANT shift  33
+                     OPENBRACK shift  10
+             TEMPLATEOPENBRACK shift  4
+                   CONDSUBEXPR shift  8
+                          expr shift  20
+                     {default} reduce 5
+
+State 18:
+          expr ::= * PARSELEAF
+          expr ::= * expr expr
+          expr ::= expr * expr
+          expr ::= * expr ALT expr
+          expr ::= expr * ALT expr
+          expr ::= * expr ALT
+          expr ::= expr * ALT
+          expr ::= * ALT expr
+          expr ::= * ALT
+          expr ::= * expr QUANT
+          expr ::= expr * QUANT
+          expr ::= * OPENBRACK CLOSEBRACK
+          expr ::= * OPENBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
+          expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
+          expr ::= * expr TEMPLATESEP expr
+          expr ::= expr * TEMPLATESEP expr
+     (14) expr ::= expr TEMPLATESEP expr *
+          expr ::= * expr TEMPLATESEP
+          expr ::= expr * TEMPLATESEP
+          expr ::= * TEMPLATESEP expr
+     (16) expr ::= TEMPLATESEP expr *
+          expr ::= * TEMPLATESEP
+          expr ::= * TEMPLATEOPENBRACK TEMPLATECLOSEBRACK
+          expr ::= * TEMPLATEOPENBRACK expr TEMPLATECLOSEBRACK
+          expr ::= * expr CLOSEBRACK
+          expr ::= expr * CLOSEBRACK
+          expr ::= * expr TEMPLATECLOSEBRACK
+          expr ::= expr * TEMPLATECLOSEBRACK
+          expr ::= * CLOSEBRACK
+          expr ::= * TEMPLATECLOSEBRACK
+          expr ::= * OPENBRACK expr
+          expr ::= * TEMPLATEOPENBRACK expr
+          expr ::= * OPENBRACK
+          expr ::= * TEMPLATEOPENBRACK
+          expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
+          expr ::= * CONDSUBEXPR expr
+          expr ::= * CONDSUBEXPR
+          expr ::= * QUANT
+
+                           ALT shift  16
+                     PARSELEAF shift  27
+                         QUANT shift  33
+                     OPENBRACK shift  10
+             TEMPLATEOPENBRACK shift  4
+                   CONDSUBEXPR shift  8
+                          expr shift  20
+                     {default} reduce 14
+
+State 19:
           expr ::= * PARSELEAF
           expr ::= * expr expr
           expr ::= expr * expr
@@ -674,26 +978,38 @@ State 17:
           expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
           expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
           expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
-          expr ::= * TEMPLATEOPENBRACK templateparams TEMPLATECLOSEBRACK
+          expr ::= * expr TEMPLATESEP expr
+          expr ::= expr * TEMPLATESEP expr
+          expr ::= * expr TEMPLATESEP
+          expr ::= expr * TEMPLATESEP
+          expr ::= * TEMPLATESEP expr
+          expr ::= * TEMPLATESEP
+          expr ::= * TEMPLATEOPENBRACK TEMPLATECLOSEBRACK
+          expr ::= * TEMPLATEOPENBRACK expr TEMPLATECLOSEBRACK
           expr ::= * expr CLOSEBRACK
           expr ::= expr * CLOSEBRACK
+          expr ::= * expr TEMPLATECLOSEBRACK
+          expr ::= expr * TEMPLATECLOSEBRACK
           expr ::= * CLOSEBRACK
+          expr ::= * TEMPLATECLOSEBRACK
           expr ::= * OPENBRACK expr
+          expr ::= * TEMPLATEOPENBRACK expr
           expr ::= * OPENBRACK
+          expr ::= * TEMPLATEOPENBRACK
           expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
           expr ::= * CONDSUBEXPR expr
           expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
-                     PARSELEAF shift  20
-                         QUANT shift  28
-                     OPENBRACK shift  13
-             TEMPLATEOPENBRACK shift  1
-                   CONDSUBEXPR shift  11
-                          expr shift  18
+                     PARSELEAF shift  27
+                         QUANT shift  33
+                     OPENBRACK shift  10
+             TEMPLATEOPENBRACK shift  4
+                   CONDSUBEXPR shift  8
+                          expr shift  20
                      {default} reduce 3
 
-State 18:
+State 20:
           expr ::= * PARSELEAF
           expr ::= * expr expr
           expr ::= expr * expr
@@ -712,99 +1028,123 @@ State 18:
           expr ::= * CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK
           expr ::= * CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK
           expr ::= * CONDSUBEXPR CLOSEBRACK CLOSEBRACK
-          expr ::= * TEMPLATEOPENBRACK templateparams TEMPLATECLOSEBRACK
+          expr ::= * expr TEMPLATESEP expr
+          expr ::= expr * TEMPLATESEP expr
+          expr ::= * expr TEMPLATESEP
+          expr ::= expr * TEMPLATESEP
+          expr ::= * TEMPLATESEP expr
+          expr ::= * TEMPLATESEP
+          expr ::= * TEMPLATEOPENBRACK TEMPLATECLOSEBRACK
+          expr ::= * TEMPLATEOPENBRACK expr TEMPLATECLOSEBRACK
           expr ::= * expr CLOSEBRACK
           expr ::= expr * CLOSEBRACK
+          expr ::= * expr TEMPLATECLOSEBRACK
+          expr ::= expr * TEMPLATECLOSEBRACK
           expr ::= * CLOSEBRACK
+          expr ::= * TEMPLATECLOSEBRACK
           expr ::= * OPENBRACK expr
+          expr ::= * TEMPLATEOPENBRACK expr
           expr ::= * OPENBRACK
+          expr ::= * TEMPLATEOPENBRACK
           expr ::= * CONDSUBEXPR expr CLOSEBRACK expr
           expr ::= * CONDSUBEXPR expr
           expr ::= * CONDSUBEXPR
           expr ::= * QUANT
 
-                         QUANT shift  28
-                     OPENBRACK shift  13
-             TEMPLATEOPENBRACK shift  1
-                   CONDSUBEXPR shift  11
-                          expr shift  18
+                         QUANT shift  33
+                     OPENBRACK shift  10
+             TEMPLATEOPENBRACK shift  4
+                   CONDSUBEXPR shift  8
+                          expr shift  20
                      {default} reduce 2
 
-State 19:
-          templateparams ::= templateparams * TEMPLATESEP expr
-          expr ::= TEMPLATEOPENBRACK templateparams * TEMPLATECLOSEBRACK
-
-                   TEMPLATESEP shift  5
-            TEMPLATECLOSEBRACK shift  31
-
-State 20:
-      (1) expr ::= PARSELEAF *
-
-                     {default} reduce 1
-
 State 21:
-      (8) expr ::= OPENBRACK CLOSEBRACK *
-     (18) expr ::= CLOSEBRACK *
+     (11) expr ::= CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK *
+     (22) expr ::= CLOSEBRACK *
 
-                     {default} reduce 8
+                     {default} reduce 11
 
 State 22:
-     (13) expr ::= CONDSUBEXPR CLOSEBRACK CLOSEBRACK *
-     (18) expr ::= CLOSEBRACK *
+     (18) expr ::= TEMPLATEOPENBRACK TEMPLATECLOSEBRACK *
+     (23) expr ::= TEMPLATECLOSEBRACK *
 
-                     {default} reduce 13
+                     {default} reduce 18
 
 State 23:
      (12) expr ::= CONDSUBEXPR CLOSEBRACK expr CLOSEBRACK *
-     (17) expr ::= expr CLOSEBRACK *
-     (18) expr ::= CLOSEBRACK *
+     (20) expr ::= expr CLOSEBRACK *
+     (22) expr ::= CLOSEBRACK *
 
                      {default} reduce 12
 
 State 24:
-     (11) expr ::= CONDSUBEXPR expr CLOSEBRACK CLOSEBRACK *
-     (18) expr ::= CLOSEBRACK *
+      (8) expr ::= OPENBRACK CLOSEBRACK *
+     (22) expr ::= CLOSEBRACK *
 
-                     {default} reduce 11
+                     {default} reduce 8
 
 State 25:
-     (24) expr ::= QUANT *
+     (13) expr ::= CONDSUBEXPR CLOSEBRACK CLOSEBRACK *
+     (22) expr ::= CLOSEBRACK *
 
-                     {default} reduce 24
+                     {default} reduce 13
 
 State 26:
-     (10) expr ::= CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK *
-     (17) expr ::= expr CLOSEBRACK *
-     (18) expr ::= CLOSEBRACK *
+     (31) expr ::= QUANT *
 
-                     {default} reduce 10
+                     {default} reduce 31
 
 State 27:
+      (1) expr ::= PARSELEAF *
+
+                     {default} reduce 1
+
+State 28:
+     (22) expr ::= CLOSEBRACK *
+
+                     {default} reduce 22
+
+State 29:
+     (20) expr ::= expr CLOSEBRACK *
+     (22) expr ::= CLOSEBRACK *
+
+                     {default} reduce 20
+
+State 30:
+     (19) expr ::= TEMPLATEOPENBRACK expr TEMPLATECLOSEBRACK *
+     (21) expr ::= expr TEMPLATECLOSEBRACK *
+     (23) expr ::= TEMPLATECLOSEBRACK *
+
+                     {default} reduce 19
+
+State 31:
       (9) expr ::= OPENBRACK expr CLOSEBRACK *
-     (17) expr ::= expr CLOSEBRACK *
-     (18) expr ::= CLOSEBRACK *
+     (20) expr ::= expr CLOSEBRACK *
+     (22) expr ::= CLOSEBRACK *
 
                      {default} reduce 9
 
-State 28:
+State 32:
+     (21) expr ::= expr TEMPLATECLOSEBRACK *
+     (23) expr ::= TEMPLATECLOSEBRACK *
+
+                     {default} reduce 21
+
+State 33:
       (7) expr ::= expr QUANT *
-     (24) expr ::= QUANT *
+     (31) expr ::= QUANT *
 
                      {default} reduce 7
 
-State 29:
-     (17) expr ::= expr CLOSEBRACK *
-     (18) expr ::= CLOSEBRACK *
+State 34:
+     (10) expr ::= CONDSUBEXPR expr CLOSEBRACK expr CLOSEBRACK *
+     (20) expr ::= expr CLOSEBRACK *
+     (22) expr ::= CLOSEBRACK *
 
-                     {default} reduce 17
+                     {default} reduce 10
 
-State 30:
-     (18) expr ::= CLOSEBRACK *
+State 35:
+     (23) expr ::= TEMPLATECLOSEBRACK *
 
-                     {default} reduce 18
-
-State 31:
-     (16) expr ::= TEMPLATEOPENBRACK templateparams TEMPLATECLOSEBRACK *
-
-                     {default} reduce 16
+                     {default} reduce 23
 
