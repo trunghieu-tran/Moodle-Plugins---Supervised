@@ -1601,9 +1601,10 @@ class qtype_preg_leaf_subexpr_call extends qtype_preg_leaf {
 }
 
 class qtype_preg_leaf_template extends qtype_preg_leaf {
-    // TODO
-    public function __construct() {
+    public $name;
+    public function __construct($name = '') {
         $this->type = qtype_preg_node::TYPE_LEAF_TEMPLATE;
+        $this->name = $name;
     }
 
     public function match($str, $pos, &$length, $matcherstateobj = null) {
@@ -1988,9 +1989,10 @@ class qtype_preg_node_cond_subexpr extends qtype_preg_operator {
 }
 
 class qtype_preg_node_template extends qtype_preg_operator {
-    // TODO
-    public function __construct() {
+    public $name;
+    public function __construct($name = '') {
         $this->type = qtype_preg_node::TYPE_NODE_TEMPLATE;
+        $this->name = $name;
     }
     public function is_subpattern() {
         return false;   // TODO: child's value?
