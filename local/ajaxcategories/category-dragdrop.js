@@ -37,7 +37,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
         contextid = drop.getAttribute('data-id');
         if (contextid  === null ||  contextid == '') {
             //alert('aaaaa');
-            parent = drop.ancestor('li[data-id]');
+            parent = drop.ancestor('ul[data-id]');
             if (parent !== null) {
                 contextid = parent.getAttribute('data-id');
             } else {
@@ -93,7 +93,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
                     item = item.one('.ajaxitem[data-id]');
                     if (item !== undefined && item !== null) {
                         beforeitemid = item.getAttribute('data-id');
-                        contextid = item.ancestor('li').getAttribute('data-id');
+                        contextid = item.ancestor('ul').getAttribute('data-id');
                     }
                 }
                 }
@@ -152,6 +152,11 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
     //Listen for a drag:end events
     Y.DD.DDM.on('drag:end', function(e) {
         var drag = e.target;
+        var item = drag.get('node').one("ul");
+        while (item !== undefined && item !== null) {
+            item.setAttribute('data-id', contextid);
+            item = item.one("ul[data-id]");
+        }
         //Put our styles back
         drag.get('node').setStyles({
             visibility: '',
@@ -161,7 +166,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
         //alert(movingid);
         //alert(beforeitemid);
         //alert(afteritemid);
-        //alert(contextid);
+        alert(contextid);
     });
 
 
