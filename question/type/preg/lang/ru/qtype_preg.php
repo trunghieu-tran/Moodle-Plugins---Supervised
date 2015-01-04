@@ -156,7 +156,9 @@ $string['nlb_node_cond_subexpr']       = 'положительное назад 
 
 $string['unknown_error_node_error']                = 'неизвестная ошибка';
 $string['missing_open_paren_node_error']           = 'Синтаксическая ошибка: ожидалась открывающая круглая скобка \'(\' для закрывающей круглой скобки в позиции {$a->colfirst}.';
+$string['missing_template_open_paren_node_error']  = 'Синтаксическая ошибка: ожидалось начало шаблона \'(?###имя<)\' для конца шаблона в позиции {$a->colfirst}.';
 $string['missing_close_paren_node_error']          = 'Синтаксическая ошибка: ожидалась закрывающая круглая скобка \')\' для открывающей круглой скобки в позиции {$a->colfirst}.';
+$string['missing_template_close_paren_node_error'] = 'Синтаксическая ошибка: ожидался конец шаблона \'(?###>)\' для начала шаблона в позиции {$a->colfirst}.';
 $string['missing_comment_ending_node_error']       = 'Синтаксическая ошибка: ожидалась закрывающая круглая скобка для комментария в позиции с {$a->colfirst} по {$a->collast}.';
 $string['missing_condsubexpr_ending_node_error']   = 'Не завершённое имя условного подвыражения.';
 $string['missing_callout_ending_node_error']       = 'Не закрытая скобка в callout.';

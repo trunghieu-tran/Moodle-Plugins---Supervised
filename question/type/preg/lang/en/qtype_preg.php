@@ -156,7 +156,9 @@ $string['nlb_node_cond_subexpr']       = 'negative lookbehind conditional subpat
 
 $string['unknown_error_node_error']                = 'unknown error';
 $string['missing_open_paren_node_error']           = 'Syntax error: missing opening parenthesis \'(\' for the closing parenthesis in position {$a->colfirst}.';
-$string['missing_close_paren_node_error']          = 'Syntax error: missing a closing parenthesis \')\' for the opening parenthesis in position {$a->colfirst}.';
+$string['missing_template_open_paren_node_error']  = 'Syntax error: missing template opening \'(?###name<)\' for the template closing in position {$a->colfirst}.';
+$string['missing_close_paren_node_error']          = 'Syntax error: missing closing parenthesis \')\' for the opening parenthesis in position {$a->colfirst}.';
+$string['missing_template_close_paren_node_error'] = 'Syntax error: missing template closing \'(?###>)\' for the template opening in position {$a->colfirst}.';
 $string['missing_comment_ending_node_error']       = 'Syntax error: missing closing parenthesis for the comment in position from {$a->colfirst} to {$a->collast}.';
 $string['missing_condsubexpr_ending_node_error']   = 'Unclosed conditional subpattern name.';
 $string['missing_callout_ending_node_error']       = 'Unclosed callout.';
