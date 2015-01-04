@@ -7301,12 +7301,12 @@ array(
             $result = new JLexToken(qtype_preg_parser::TEMPLATECLOSEBRACK, $closebr);
         } else if (core_text::substr($this->comment, 0, 2) === '##' && core_text::substr($this->comment, -1) === '<') {
             // Template open bracket
-            $node = new qtype_preg_node_template();
+            $node = new qtype_preg_node_template(core_text::substr($this->comment, 2, $this->comment_length - 3));
             $node->set_user_info($position, array(new qtype_preg_userinscription('(?#' . $this->comment . ')')));
             $result = new JLexToken(qtype_preg_parser::TEMPLATEOPENBRACK, $node);
         } else if (core_text::substr($this->comment, 0, 2) === '##') {
             // Template leaf
-            $node = new qtype_preg_leaf_template();
+            $node = new qtype_preg_leaf_template(core_text::substr($this->comment, 2));
             $node->set_user_info($position, array(new qtype_preg_userinscription('(?#' . $this->comment . ')')));
             $result = new JLexToken(qtype_preg_parser::PARSELEAF, $node);
         }
