@@ -25,9 +25,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
-require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
-
 /**
  * Represents a named template. For example, a template named 'word' can correspond to '\w+'.
  */
@@ -46,5 +43,20 @@ class qtype_preg_template {
         $this->name = $name;
         $this->regex = $regex;
         $this->placeholderscount = $placeholderscount;
+    }
+
+    /**
+     * Returns all templates that should be recognized by parser.
+     */
+    public static function available_templates() {
+        static $result;
+        if ($result === null) {
+            $result = array(
+                new qtype_preg_template('word', '(?:\w+)'),
+                new qtype_preg_template('integer', '(?:[+-]?\d+)'),
+                new qtype_preg_template('parens_req', '(?:(\((?:$$1|(?-1))\)))', 1)
+            );
+        }
+        return $result;
     }
 }
