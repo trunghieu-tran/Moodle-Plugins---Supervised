@@ -23,6 +23,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
     var afteritemid;
     var level;
     var movingid;
+
   //Listen for all drop:over events
     Y.DD.DDM.on('drag:over', function(e) {
         //Get a reference to our drag and drop nodes
@@ -52,8 +53,12 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
         });
         if (drop.get('tagName').toLowerCase() === 'li') {
             if (drop.one("ul") == undefined) {
-                addedNode = Y.Node.create( "<ul></ul>" );
+                addedNode = Y.Node.create( '<ul><div id = "placeholder"></div></ul>' );
                 addedNode.setAttribute("id", Y.guid() );
+                var tar1 = new Y.DD.Drop({
+            node: addedNode.one('#placeholder')
+        });
+
                 addedNode.append(child);
                 addedNode.append(drag);
                 addedNode.append(child);
@@ -64,11 +69,10 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
                 level = 'inner';
             } else {
                 addedNode = drop.one("ul");
-                addedNode.append(child);
                 addedNode.append(drag);
-                if ((addedNode.get('children').size()-4) >= 0)
+                if ((addedNode.get('children').size()-3) >= 0)
                 {
-                    var item = addedNode.get('children').item(addedNode.get('children').size()-4);
+                    var item = addedNode.get('children').item(addedNode.get('children').size()-3);
                     item = item.one('.ajaxitem[data-id]');
                     if (item) {
                         beforeitemid = -1;
@@ -76,7 +80,6 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
                         level = 'normal';
                     }
                 }
-
                 addedNode.append(child);
             }
         } else {
@@ -157,8 +160,8 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
         change = true;
         //alert(movingid);
         //alert(beforeitemid);
-        alert(afteritemid);
-        alert(contextid);
+        //alert(afteritemid);
+        //alert(contextid);
     });
 
 
