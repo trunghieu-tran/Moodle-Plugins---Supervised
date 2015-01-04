@@ -29,15 +29,18 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
         var drag = e.drag.get('node'),
             drop = e.drop.get('node');
         var parent = drop.ancestor();
-        var first = parent.one('li');
-        if (child !== undefined) {
+        if (child !== undefined && child !== null) {
             child.remove();
         }
         contextid = drop.getAttribute('data-id');
         if (contextid  === null ||  contextid == '') {
             //alert('aaaaa');
             parent = drop.ancestor('li[data-id]');
-            contextid = parent.getAttribute('data-id');
+            if (parent !== null) {
+                contextid = parent.getAttribute('data-id');
+            } else {
+                contextid = 999999;
+            }
         } else {
             contextid = drop.getAttribute('data-id');
         }
@@ -57,10 +60,11 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
                 level = 'inner';
             } else {
                 addedNode = drop.one("ul");
+                addedNode.append(child);
                 addedNode.append(drag);
-                if ((addedNode.get('children').size()-3) >= 0)
+                if ((addedNode.get('children').size()-4) >= 0)
                 {
-                    var item = addedNode.get('children').item(addedNode.get('children').size()-3);
+                    var item = addedNode.get('children').item(addedNode.get('children').size()-4);
                     beforeitemid = -1;
                     afteritemid = item.one('.ajaxitem[data-id]').getAttribute('data-id');
                     level = 'normal';
@@ -73,14 +77,15 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
                 beforeitemid = -1;
                 afteritemid = -1;
                 var item = drop.get('nextSibling');
-                if (item !== undefined) {
+                if (item !== undefined && item !== null) {
                     item = item.one('.ajaxitem[data-id]');
                     if (item !== undefined && item !== null) {
                         beforeitemid = item.getAttribute('data-id');
+                        contextid = item.ancestor().getAttribute('data-id');
                     }
                 }
                 item = drop.get('previousSibling');
-                if (item !== undefined) {
+                if (item !== undefined && item !== null) {
                     item = item.one('.ajaxitem[data-id]');
                     if (item !== undefined && item !== null) {
                         afteritemid = item.getAttribute('data-id');
@@ -135,7 +140,9 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
         drag.get('node').setStyle('opacity', '.25');
         //drag.get('node').remove();
         var next = drag.get('node').get('nextSibling');
-        next.remove();
+        if (next !== null) {
+            next.remove();
+        }
         drag.get('dragNode').set('innerHTML', drag.get('node').get('innerHTML'));
         drag.get('dragNode').setStyles({
             opacity: '.5',
@@ -153,6 +160,8 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
             visibility: '',
             opacity: '1'
         });
+        //alert(movingid);
+        //alert(beforeitemid);
         alert(afteritemid);
         alert(contextid);
     });
