@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Represents a named template. For example, a template named 'word' can correspond to '\w+'.
+ * Don't bother yourself wrapping regex in (?:grouping), it will be done automatically during parsing.
  */
 class template {
 
@@ -53,9 +54,9 @@ class template {
         static $result;
         if ($result === null) {
             $result = array(
-                new qtype_preg_template('word', '(?:\w+)'),
-                new qtype_preg_template('integer', '(?:[+-]?\d+)'),
-                new qtype_preg_template('parens_req', '(?:(\((?:$$1|(?-1))\)))', 1)
+                new qtype_preg_template('word', '\w+'),
+                new qtype_preg_template('integer', '[+-]?\d+'),
+                new qtype_preg_template('parens_req', '(\((?:$$1|(?-1))\))', 1)
             );
         }
         return $result;
