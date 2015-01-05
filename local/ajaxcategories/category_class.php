@@ -73,6 +73,7 @@ class ajax_question_category_list extends moodle_list {
      */
     function change_category_list($movingid, $environment) {
         global $DB;
+        var_dump("aaaaaaaaaa");
         // Change context.
         if ($environment['dest']->context != $this->context->id) {
             // Moving to a new context. Must move files belonging to questions.
@@ -341,7 +342,7 @@ class ajax_question_category_object {
      */
     public function find_list($categoryid) {
         foreach ($this->editlists as $key => $list) {
-            if ($list->find_item($categoryid) !== null) {
+            if ($list->find_item($categoryid, true) !== null) {
                 return $list;
             }
         }
