@@ -143,6 +143,10 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     // Array of lexical errors found.
     protected $errors = array();
 
+    // Subexpression number corresponding to the whole regex.
+    // By default is 0, but greater when lexing templates.
+    protected $initialsubexpr = 0;
+
     // Number of the last lexed subexpression, used to deal with (?| ... ) constructions.
     protected $lastsubexpr = 0;
 
@@ -286,6 +290,16 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
         }
 
         return null;
+    }
+
+    public function set_initial_subexpr($subexpr = 0) {
+        $this->initialsubexpr = $subexpr;
+        $this->set_last_subexpr($subexpr);
+    }
+
+    public function set_last_subexpr($subexpr = 0) {
+        $this->lastsubexpr = $subexpr;
+        $this->maxsubexpr = max($this->maxsubexpr, $this->lastsubexpr);
     }
 
     public function get_skipped_positions() {
