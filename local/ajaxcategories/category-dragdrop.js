@@ -24,6 +24,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
     var level;
     var movingid;
 
+
   //Listen for all drop:over events
     Y.DD.DDM.on('drag:over', function(e) {
         //Get a reference to our drag and drop nodes
@@ -163,6 +164,32 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
             opacity: '1'
         });
         change = true;
+        var topitems = Y.Node.all('ul[data-id]');
+        topitems.each(function(value, key) {
+            var parentnode = value.get('parentNode');
+            if (!parentnode.hasClass('ajaxitem')) {
+                var childrennodes = parentnode.one('ul').get("children");
+                var childrencount = 0;
+                childrennodes.each(function(child, key) {
+                    if (child.get('tagName').toLowerCase() === 'li') {
+                        childrencount++;
+                    }
+                });
+                if (childrencount > 1) {
+                    childrennodes.each(function(child, key) {
+                        if (child.get('tagName').toLowerCase() === 'li' && child.one('#ajaxitem') !== null && !child.one('#ajaxitem').get("children").item(0).hasClass('drag-handle')) {
+                            child.one('#ajaxitem').prepend(draghandle.cloneNode(true));
+                        }
+                    });
+                } else {
+                    childrennodes.each(function(child, key) {
+                        if (child.get('tagName').toLowerCase() === 'li' && child.one('#ajaxitem') !== null && child.one('#ajaxitem').get("children").item(0).hasClass('drag-handle')) {
+                            child.one('#ajaxitem').get("children").item(0).remove();
+                        }
+                    });
+                }
+            }
+        });
         //alert(movingid);
         //alert(beforeitemid);
         //alert(afteritemid);
@@ -202,6 +229,8 @@ var uls = Y.Node.all('#placeholder');
         });
     });
 });
+
+var draghandle = Y.Node.one('.drag-handle').cloneNode(true);
 /*YUI().use( 'dd' , 'sortable', 'gallery-treeviewlite', function(Y) {
 
  var list1 = new Y.Sortable({

@@ -225,7 +225,9 @@ class ajax_question_category_list_item extends list_item {
         $questionbankurl->param('cat', $category->id . ',' . $category->contextid);
         $catediturl = new moodle_url($this->parentlist->pageurl, array('edit' => $this->id));
         $item = '';
-        $item .= html_writer::div($OUTPUT->pix_icon('i/move_2d', 'You can drag and drop this category'), 'drag-handle');
+        if ($this->parentlist !== null && ($this->parentlist->parentitem !== null || count($this->parentlist->items) > 1)) {
+            $item .= html_writer::div($OUTPUT->pix_icon('i/move_2d', 'You can drag and drop this category'), 'drag-handle');
+        }
         $item .= html_writer::tag('b', html_writer::link($catediturl,
                 format_string(' ' . $category->name, true, array('context' => $this->parentlist->context)),
                 array('title' => $str->edit))) . ' ';
