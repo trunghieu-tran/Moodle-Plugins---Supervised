@@ -22,13 +22,14 @@
  * @author     Valeriy Streltsov <vostreltsov@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace qtype_preg;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Represents a named template. For example, a template named 'word' can correspond to '\w+'.
  */
-class qtype_preg_template {
+class template {
 
     /** Name of this template. */
     public $name;
