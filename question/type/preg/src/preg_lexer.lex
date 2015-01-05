@@ -69,6 +69,7 @@ class qtype_preg_opt_stack_item {
 QUANTTYPE  = ("?"|"+")?                                 // Greedy, lazy or possessive quantifiers.
 MODIFIER   = [imsxuADSUXJ]                              // Recognizable modifiers letters.
 ALNUM      = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpression\backreference names.
+DIGIT      = [0123456789]                               // Simply decimal digit.
 ANY        = (.|[\r\n])                                 // Any character.
 SIGN       = ("+"|"-")                                  // Sign of an integer.
 WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
@@ -292,14 +293,16 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
         return null;
     }
 
-    public function set_initial_subexpr($subexpr = 0) {
-        $this->initialsubexpr = $subexpr;
-        $this->set_last_subexpr($subexpr);
+    public function set_initial_subexpr($value = 0) {
+        $this->initialsubexpr = $value;
     }
 
-    public function set_last_subexpr($subexpr = 0) {
-        $this->lastsubexpr = $subexpr;
-        $this->maxsubexpr = max($this->maxsubexpr, $this->lastsubexpr);
+    public function set_last_subexpr($value = 0) {
+        $this->lastsubexpr = $value;
+    }
+
+    public function set_max_subexpr($value = 0) {
+        $this->maxsubexpr = max($this->maxsubexpr, $value);
     }
 
     public function get_skipped_positions() {
@@ -308,6 +311,10 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
 
     public function get_error_nodes() {
         return $this->errors;
+    }
+
+    public function get_last_subexpr() {
+        return $this->lastsubexpr;
     }
 
     public function get_max_subexpr() {
@@ -974,6 +981,31 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
         }
         return null;
     }
+
+    protected function assertion_for_circumflex() {
+        $topitem = end($this->opt_stack);
+        if ($this->options->preserveallnodes || $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_MULTILINE)) {
+            // The ^ assertion is used "as is" only in multiline mode. Or if preserveallnodes is true.
+            return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_circumflex');
+        } else {
+            // Default case: the same as \A.
+            return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_esc_a');
+        }
+    }
+
+    protected function assertion_for_dollar() {
+        $topitem = end($this->opt_stack);
+        if ($this->options->preserveallnodes || $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_MULTILINE)) {
+            // The $ assertion is used "as is" only in multiline mode. Or if preserveallnodes is true.
+            return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_dollar');
+        } else if ($topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOLLAR_ENDONLY)) {
+            // Not multiline, but dollar endonly; the same as \z.
+            return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_small_esc_z');
+        } else {
+            // Default case: the same as \Z.
+            return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_capital_esc_z');
+        }
+    }
 %}
 
 %%
@@ -1251,7 +1283,7 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
             // Template leaf
             $node = new qtype_preg_leaf_template(core_text::substr($this->comment, 2));
             $node->set_user_info($position, array(new qtype_preg_userinscription('(?#' . $this->comment . ')')));
-            $result = new JLexToken(qtype_preg_parser::PARSELEAF, $node);
+            $result = new JLexToken(qtype_preg_parser::TEMPLATEPARSELEAF, $node);
         }
     }
     $this->comment = '';
@@ -1727,27 +1759,25 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_esc_g');
 }
 <YYINITIAL> "^" {
-    $topitem = end($this->opt_stack);
-    if ($this->options->preserveallnodes || $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_MULTILINE)) {
-        // The ^ assertion is used "as is" only in multiline mode. Or if preserveallnodes is true.
-        return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_circumflex');
-    } else {
-        // Default case: the same as \A.
-        return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_esc_a');
+    return $this->assertion_for_circumflex();
+}
+<YYINITIAL> "$$"{DIGIT}+ {
+    $text = $this->yytext();
+    if ($this->options->parsetemplates) {
+        $number = (int)substr($text, 2);
+        $node = new qtype_preg_leaf_template_param($number);
+        $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
+        return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
     }
+    $result = array(
+        $this->assertion_for_dollar(),
+        $this->assertion_for_dollar()
+    );
+    return array_merge($result, $this->string_to_tokens(substr($text)));
+
 }
 <YYINITIAL> "$" {
-    $topitem = end($this->opt_stack);
-    if ($this->options->preserveallnodes || $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_MULTILINE)) {
-        // The $ assertion is used "as is" only in multiline mode. Or if preserveallnodes is true.
-        return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_dollar');
-    } else if ($topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOLLAR_ENDONLY)) {
-        // Not multiline, but dollar endonly; the same as \z.
-        return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_small_esc_z');
-    } else {
-        // Default case: the same as \Z.
-        return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_capital_esc_z');
-    }
+    return $this->assertion_for_dollar();
 }
 <YYINITIAL> "\c" {
     $error = $this->form_error(qtype_preg_node_error::SUBTYPE_C_AT_END_OF_PATTERN, '\c');

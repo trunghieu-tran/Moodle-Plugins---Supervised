@@ -1549,11 +1549,11 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
     function test_templates() {
         $lexer = $this->create_lexer('(?#)(?##)(?###)(?###leaf)(?###brack<)(?###,)(?###>)');
         $token = $lexer->nextToken();   // First 2 tokens are skipped
-        $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
+        $this->assertTrue($token->type === qtype_preg_parser::TEMPLATEPARSELEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_TEMPLATE);
         $this->assertTrue($token->value->name === '');
         $token = $lexer->nextToken();
-        $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
+        $this->assertTrue($token->type === qtype_preg_parser::TEMPLATEPARSELEAF);
         $this->assertTrue($token->value->type === qtype_preg_node::TYPE_LEAF_TEMPLATE);
         $this->assertTrue($token->value->name === 'leaf');
         $token = $lexer->nextToken();
@@ -1580,6 +1580,7 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($lexer->get_max_subexpr() === 11);
         $lexer = $this->create_lexer('(\g-1(\g-1');
         $lexer->set_initial_subexpr(10);
+        $lexer->set_last_subexpr(10);
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_parser::OPENBRACK);
         $this->assertTrue($token->value->number === 11);
@@ -1593,7 +1594,6 @@ class qtype_preg_lexer_test extends PHPUnit_Framework_TestCase {
         $token = $lexer->nextToken();
         $this->assertTrue($token->type === qtype_preg_parser::PARSELEAF);
         $this->assertTrue($token->value->number === 21);
-
     }
     function test_lookaround_assertions() {
         $lexer = $this->create_lexer('(?=(?!(?<=(?<!');

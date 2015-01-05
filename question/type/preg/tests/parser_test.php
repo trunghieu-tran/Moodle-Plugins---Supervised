@@ -723,7 +723,6 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(count($errors) === 1);
         $this->assertTrue($errors[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
         $this->assertTrue($errors[0]->subtype === qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_OPEN_PAREN);
-
         // Several unopened and unclosed parenthesis.
         $handler = $this->run_handler(')a)b)e(((g(');
         $errors = $handler->get_error_nodes();
@@ -944,24 +943,26 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertFalse($root->operands[4]->isrecursive);
     }
     function test_templates() {
-        $handler = $this->run_handler("(?###word)");
+        $options = new qtype_preg_handling_options();
+        $options->preserveallnodes = true;
+        $handler = $this->run_handler("(?###word)", $options);
         $root = $handler->get_ast_root();
         $this->assertTrue($root->type === qtype_preg_node::TYPE_LEAF_TEMPLATE);
-        $handler = $this->run_handler("(?###smth<)a(?###>)");
+        $handler = $this->run_handler("(?###smth<)a(?###>)", $options);
         $root = $handler->get_ast_root();
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_TEMPLATE);
-        $handler = $this->run_handler("(?###smth<)ab?|c(?###>)");
+        $handler = $this->run_handler("(?###smth<)ab?|c(?###>)", $options);
         $root = $handler->get_ast_root();
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_TEMPLATE);
         $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_NODE_ALT);
-        $handler = $this->run_handler("(?###smth<)a(?###,)b?(?###,)c|(d)(?###>)");
+        $handler = $this->run_handler("(?###smth<)a(?###,)b?(?###,)c|(d)(?###>)", $options);
         $root = $handler->get_ast_root();
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_TEMPLATE);
         $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[1]->type === qtype_preg_node::TYPE_NODE_FINITE_QUANT);
         $this->assertTrue($root->operands[2]->type === qtype_preg_node::TYPE_NODE_ALT);
         // Okay, these guys can be nested
-        $handler = $this->run_handler("(?###outer<)a(?###,)(?###inner<)a(?###,)b?(?###,)(c)(?###>)(?###,)c|(d)(?###>)");
+        $handler = $this->run_handler("(?###outer<)a(?###,)(?###inner<)a(?###,)b?(?###,)(c)(?###>)(?###,)c|(d)(?###>)", $options);
         $root = $handler->get_ast_root();
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_TEMPLATE);
         $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
@@ -971,28 +972,33 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[1]->operands[2]->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
         $this->assertTrue($root->operands[2]->type === qtype_preg_node::TYPE_NODE_ALT);
         // Weird cases with emptiness
-        $handler = $this->run_handler("(?###smth<)(?###>)");
+        $handler = $this->run_handler("(?###smth<)(?###>)", $options);
         $root = $handler->get_ast_root();
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_TEMPLATE);
         $this->assertTrue(count($root->operands) === 1);
         $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
-        $handler = $this->run_handler("(?###smth<)(?###,)(?###>)");
+        $handler = $this->run_handler("(?###smth<)(?###,)(?###>)", $options);
         $root = $handler->get_ast_root();
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_TEMPLATE);
         $this->assertTrue(count($root->operands) === 1);
         $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
-        $handler = $this->run_handler("(?###smth<)(?###,)(?###,)(?###,)(?###>)");
+        $handler = $this->run_handler("(?###smth<)(?###,)(?###,)(?###,)(?###>)", $options);
         $root = $handler->get_ast_root();
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_TEMPLATE);
         $this->assertTrue(count($root->operands) === 1);
         $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_META);
-        $handler = $this->run_handler("(?###smth<)abcde(?###,)(?###>)");
+        $handler = $this->run_handler("(?###smth<)abcde(?###,)(?###>)", $options);
         $root = $handler->get_ast_root();
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_TEMPLATE);
         $this->assertTrue(count($root->operands) === 1);
-        $handler = $this->run_handler("(?###smth<)(?###,)abcde(?###>)");
+        $handler = $this->run_handler("(?###smth<)(?###,)abcde(?###>)", $options);
         $root = $handler->get_ast_root();
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_TEMPLATE);
         $this->assertTrue(count($root->operands) === 1);
+    }
+    function test_template_expanding() {
+        $handler = $this->run_handler("(?###word)");
+        $root = $handler->get_ast_root();
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_INFINITE_QUANT);
     }
 }

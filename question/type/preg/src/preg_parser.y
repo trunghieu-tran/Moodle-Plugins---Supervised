@@ -9,11 +9,14 @@
     // Root of the Abstract Syntax Tree (AST).
     private $root;
 
-    // Objects of qtype_preg_node_error for errors found during the parsing.
+    // Lexer object.
+    private $lexer;
+
+    // Objects of qtype_preg_node_error for errors found during both lexing and parsing.
     private $errornodes;
 
     // Handling options.
-    private $handlingoptions;
+    private $options;
 
     // Counter of nodes id. After parsing, equals the number of nodes in the tree.
     private $id_counter;
@@ -27,17 +30,41 @@
     // Map subexpression number => nodes (possibly duplicates).
     private $subexpr_number_to_nodes_map;
 
-    public function __construct($handlingoptions = null) {
+    public function __construct($lexer, $options = null) {
         $this->root = null;
+        $this->lexer = $lexer;
         $this->errornodes = array();
-        if ($handlingoptions == null) {
-            $handlingoptions = new qtype_preg_handling_options();
+        if ($options == null) {
+            $options = new qtype_preg_handling_options();
         }
-        $this->handlingoptions = $handlingoptions;
+        $this->options = $options;
         $this->id_counter = 0;
         $this->subpatt_counter = 0;
         $this->subpatt_number_to_node_map = array();
         $this->subexpr_number_to_nodes_map = array();
+
+        // Do parsing.
+
+        while (($token = $this->lexer->nextToken()) !== null) {
+            if (!is_array($token)) {
+                $this->doParse($token->type, $token->value);
+            } else {
+                foreach ($token as $curtoken) {
+                    $this->doParse($curtoken->type, $curtoken->value);
+                }
+            }
+        }
+
+        // Lexer returns errors for an unclosed character set or wrong modifiers.
+        $lexerrors = $this->lexer->get_error_nodes();
+        foreach ($lexerrors as $node) {
+            if ($node->subtype == qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET || $node->subtype == qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING) {
+                $this->doParse(qtype_preg_parser::PARSELEAF, $node);
+            }
+        }
+        $this->errornodes = array_merge($lexerrors, $this->errornodes);
+
+        $this->doParse(0, 0);
     }
 
     public function get_root() {
@@ -162,6 +189,38 @@
 
         $node->set_user_info($position, array(new qtype_preg_userinscription($node->userinscription[0] . '...|...)')));
         return $node;
+    }
+
+    protected function create_template_node($originalnode) {
+        $tleaf = $originalnode->type === qtype_preg_node::TYPE_LEAF_TEMPLATE;
+        $tnode = $originalnode->type === qtype_preg_node::TYPE_NODE_TEMPLATE;
+        if (!$tleaf && !$tnode) {
+            return $originalnode;
+        }
+
+        if ($tnode) {
+            foreach ($originalnode->operands as $key => $operand) {
+                $originalnode->operands[$key] = $this->create_template_node($operand);
+            }
+        }
+
+        $templates = qtype_preg\template::available_templates();
+        $template = $templates[$originalnode->name];
+
+        // TODO: check errors
+
+        StringStreamController::createRef('regex', $template->regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new qtype_preg_lexer($pseudofile);
+        $lexer->set_options($this->options);
+        $lexer->set_initial_subexpr($this->lexer->get_last_subexpr());
+        $lexer->set_last_subexpr($this->lexer->get_last_subexpr());
+        $lexer->set_max_subexpr($this->lexer->get_max_subexpr());
+        $parser = new qtype_preg_parser($lexer, $this->options);
+        $this->lexer->set_last_subexpr($lexer->get_last_subexpr());
+        $this->lexer->set_max_subexpr($lexer->get_max_subexpr());
+        fclose($pseudofile);
+        return $parser->get_root();
     }
 
     protected function build_subexpr_number_to_nodes_map($node) {
@@ -303,7 +362,7 @@
 %left ALT_SHORTEST.
 %left ALT_SHORT.
 %left ALT.
-%left CONC PARSELEAF.
+%left CONC PARSELEAF TEMPLATEPARSELEAF.
 %nonassoc QUANT.
 %nonassoc OPENBRACK TEMPLATEOPENBRACK CONDSUBEXPR.
 
@@ -318,12 +377,12 @@ start ::= expr(B). {
     $this->detect_recursive_subexpr_calls($this->root);
 
     // Replace non-recursive subexpression calls if needed.
-    if ($this->handlingoptions->replacesubexprcalls) {
+    if ($this->options->replacesubexprcalls) {
         $this->root = $this->replace_non_recursive_subexpr_calls($this->root);
     }
 
     // Expand quantifiers if needed.
-    if ($this->handlingoptions->expandquantifiers) {
+    if ($this->options->expandquantifiers) {
         $this->root = $this->expand_quantifiers($this->root);
     }
 
@@ -336,6 +395,12 @@ start ::= expr(B). {
 
 expr(A) ::= PARSELEAF(B). {
     A = B;
+}
+
+expr(A) ::= TEMPLATEPARSELEAF(B). {
+    A = $this->options->parsetemplates && !$this->options->preserveallnodes
+      ? $this->create_template_node(B)
+      : B;
 }
 
 expr(A) ::= expr(B) expr(C). [CONC] {
@@ -378,7 +443,7 @@ expr(A) ::= expr(B) ALT(C). [ALT_SHORT] {
     if (B->type == qtype_preg_node::TYPE_LEAF_META && B->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
         A = B;
     } else if (B->type == qtype_preg_node::TYPE_NODE_ALT) {
-        if ($this->handlingoptions->preserveallnodes || !self::is_alt_nullable(B)) {
+        if ($this->options->preserveallnodes || !self::is_alt_nullable(B)) {
             $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             $epsleaf->set_user_info(C->position->add_chars_left(1));
             B->operands[] = $epsleaf;
@@ -398,7 +463,7 @@ expr(A) ::= ALT(B) expr(C). [ALT_SHORT] {
     if (C->type == qtype_preg_node::TYPE_LEAF_META && C->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
         A = C;
     } else if (C->type == qtype_preg_node::TYPE_NODE_ALT) {
-        if ($this->handlingoptions->preserveallnodes || !self::is_alt_nullable(C)) {
+        if ($this->options->preserveallnodes || !self::is_alt_nullable(C)) {
             $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             $epsleaf->set_user_info(B->position->add_chars_right(-1));
             C->operands = array_merge(array($epsleaf), C->operands);
