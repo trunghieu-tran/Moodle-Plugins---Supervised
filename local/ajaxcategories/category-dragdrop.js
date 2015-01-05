@@ -59,7 +59,18 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
     var level;
     var movingid;
 
+function ajaxRequest(uri) {
 
+    // Make the request. It has to be on your domain, not cross domain.
+    Y.io(uri, {
+        on: {
+            success: function (x, o) {
+                console.log("!!!!!!!!!!!!!!!!!");
+
+            }
+        }
+    });
+}
   //Listen for all drop:over events
     Y.DD.DDM.on('drag:over', function(e) {
         //Get a reference to our drag and drop nodes
@@ -233,12 +244,14 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         options['level'] = level;
         options['dest'] = contextid;
         get_params(options);
-        var uri = "./changer.php?";
+        var uri = "changer.php" + location.search + '&';
         uri += get_params(options);
-        alert(uri);
-        var request = Y.io(uri);
+        uri = M.cfg.wwwroot + '/local/ajaxcategories/' + uri;
+        console.log(uri);
+        ajaxRequest(uri);
+        //var request = new Y.io(uri);
         //request.send();
-        alert(request);
+        //alert(request);
         //alert(movingid);
         //alert(beforeitemid);
         //alert(afteritemid);
