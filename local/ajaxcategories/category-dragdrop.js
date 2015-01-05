@@ -10,7 +10,42 @@ function dump(obj) {
     alert(out);
 }
 
-YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
+var options = {};
+
+function get_params(options) {
+    var string = '';
+    for (var key in options) {
+        string += key + '=' + options[key] + '&';
+    }
+    string = string.slice(0, -1);
+
+    //alert(string);
+    return string;
+}
+
+/*YUI().use("io-base", function(Y) {
+    var uri = "./changer.php?";
+    uri += get_params(options);
+    // Define a function to handle the response data.
+    function complete(id, o, args) {
+        var id = id; // Transaction ID.
+        var data = o.responseText; // Response data.
+        var args = args[1]; // 'ipsum'.
+    };
+
+    // Subscribe to event "io:complete", and pass an array
+    // as an argument to the event handler "complete", since
+    // "complete" is global.   At this point in the transaction
+    // lifecycle, success or failure is not yet known.
+    Y.on('io:complete', complete, Y, ['lorem', 'ipsum']);
+
+    // Make an HTTP request to 'get.php'.
+    // NOTE: This transaction does not use a configuration object.
+    var request = Y.io(uri);
+    alert(request);
+});*/
+
+YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function(Y) {
     var before;
     var addedNode;
     var child;
@@ -78,7 +113,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
                     if (item) {
                         beforeitemid = -1;
                         afteritemid = item.getAttribute('data-id');
-                        level = 'normal';
+                        level = 'inner';
                     }
                 }
                 addedNode.append(child);
@@ -95,6 +130,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
                     if (item !== undefined && item !== null) {
                         beforeitemid = item.getAttribute('data-id');
                         contextid = item.ancestor('ul').getAttribute('data-id');
+
                     }
                 }
                 }
@@ -190,10 +226,23 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin', function(Y) {
                 }
             }
         });
+
+        options['movingid'] = movingid;
+        options['before'] = beforeitemid.toString();
+        options['after'] = afteritemid.toString();
+        options['level'] = level;
+        options['dest'] = contextid;
+        get_params(options);
+        var uri = "./changer.php?";
+        uri += get_params(options);
+        alert(uri);
+        var request = Y.io(uri);
+        //request.send();
+        alert(request);
         //alert(movingid);
         //alert(beforeitemid);
         //alert(afteritemid);
-        alert(contextid);
+        //alert(contextid);
     });
 
 
@@ -231,6 +280,8 @@ var uls = Y.Node.all('#placeholder');
 });
 
 var draghandle = Y.Node.one('.drag-handle').cloneNode(true);
+
+
 /*YUI().use( 'dd' , 'sortable', 'gallery-treeviewlite', function(Y) {
 
  var list1 = new Y.Sortable({
