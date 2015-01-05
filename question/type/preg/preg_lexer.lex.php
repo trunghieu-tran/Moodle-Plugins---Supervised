@@ -66,6 +66,9 @@ class qtype_preg_lexer extends JLexBase  {
     protected $skipped_positions = array();
     // Array of lexical errors found.
     protected $errors = array();
+    // Subexpression number corresponding to the whole regex.
+    // By default is 0, but greater when lexing templates.
+    protected $initialsubexpr = 0;
     // Number of the last lexed subexpression, used to deal with (?| ... ) constructions.
     protected $lastsubexpr = 0;
     // Max subexpression number.
@@ -183,6 +186,14 @@ class qtype_preg_lexer extends JLexBase  {
             return hexdec(core_text::substr($seq, $start, $end - $start + 1));
         }
         return null;
+    }
+    public function set_initial_subexpr($subexpr = 0) {
+        $this->initialsubexpr = $subexpr;
+        $this->set_last_subexpr($subexpr);
+    }
+    public function set_last_subexpr($subexpr = 0) {
+        $this->lastsubexpr = $subexpr;
+        $this->maxsubexpr = max($this->maxsubexpr, $this->lastsubexpr);
     }
     public function get_skipped_positions() {
         return $this->skipped_positions;
