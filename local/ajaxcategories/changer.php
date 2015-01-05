@@ -1,12 +1,18 @@
 <?php
 
-defined('MOODLE_INTERNAL') || die;
+
+define('AJAX_SCRIPT', true);
 
 require_once("../../config.php");
 require_once($CFG->dirroot."/question/editlib.php");
 require_once($CFG->dirroot."/local/ajaxcategories/category_class.php");
 
-function change_category_list($movingid, $environment) {
+$movingid = $_REQUEST['movingid'];
+$before = $_REQUEST['before'];
+$after = $_REQUEST['after'];
+$level = $_REQUEST['level'];
+$dest = $_REQUEST['dest'];
+
     list($thispageurl, $contexts, $cmid, $cm, $module, $pagevars) =
         question_edit_setup('categories', '/local/ajaxcategories/index.php');
 
@@ -31,6 +37,11 @@ function change_category_list($movingid, $environment) {
         $pagevars['cat'], $param->delete, $contexts->having_cap('moodle/question:add'));
 
     $fromlist = $qcobject->find_list($movingid);
+    $environment = array();
+    $environment['before'] = $before;
+    $environment['after'] = $after;
+    $environment['level'] = $level;
+    $environment['dest'] = $dest;
     if ($environment['after'] !== -1) {
         $tolist = $qcobject->find_list($environment['after']);
     } else {
@@ -38,4 +49,3 @@ function change_category_list($movingid, $environment) {
     }
     $environment['dest'] = $tolist;
     $fromlist->change_category_list($movingid, $environment);
-}
