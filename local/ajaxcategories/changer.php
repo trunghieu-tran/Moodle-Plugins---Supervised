@@ -28,6 +28,7 @@ $dest = optional_param('dest', 0, PARAM_INT);
 
 
     $fromlist = $qcobject->find_list($movingid);
+    //var_dump($fromlist);
     $environment = array();
     $environment['before'] = $before;
     $environment['after'] = $after;
