@@ -41,10 +41,14 @@ class template {
     /** Number of such placeholders in this template. */
     public $placeholderscount;
 
+    /** AST root for this template, null by default. Can be used for cache. */
+    public $astroot;
+
     public function __construct($name = '', $regex = '', $placeholderscount = 0) {
         $this->name = $name;
         $this->regex = $regex;
         $this->placeholderscount = $placeholderscount;
+        $this->astroot = null;
     }
 
     /**
@@ -54,9 +58,9 @@ class template {
         static $result;
         if ($result === null) {
             $result = array(
-                new qtype_preg_template('word', '\w+'),
-                new qtype_preg_template('integer', '[+-]?\d+'),
-                new qtype_preg_template('parens_req', '(\((?:$$1|(?-1))\))', 1)
+                'word' => new template('word', '\w+'),
+                'integer' => new template('integer', '[+-]?\d+'),
+                'parens_req' => new template('parens_req', '(\((?:$$1|(?-1))\))', 1)
             );
         }
         return $result;
