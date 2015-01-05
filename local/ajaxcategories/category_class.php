@@ -123,16 +123,10 @@ class ajax_question_category_list extends moodle_list {
      * @param integer $indent depth of indentation.
      */
     public function to_html($indent=0, $extraargs=array()) {
-        if ($this->context != null) {
-            $attributes = array(
+
+        $attributes = array(
             'id' => 'ajaxlistitem',
         );
-        } else {
-            $attributes = array(
-                'id' => 'ajaxlistitem',
-            );
-        }
-
 
         $placeholder = array(
             'id' => 'placeholder',
@@ -338,6 +332,20 @@ class ajax_question_category_object {
         if (!$currentcat){
             $this->catform->set_data(array('parent'=>$defaultcategory));
         }
+    }
+
+    /**
+     * Returns list with category.
+     *
+     * @param integer $categoryid id of category which should be in searched list.
+     */
+    public function find_list($categoryid) {
+        foreach ($this->editlists as $key => $list) {
+            if ($list->find_item($categoryid) !== null) {
+                return $list;
+            }
+        }
+        return null;
     }
 
     /**
