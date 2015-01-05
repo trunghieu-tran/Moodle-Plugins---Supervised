@@ -648,34 +648,13 @@ class qtype_preg_regex_handler {
         $pseudofile = fopen('string://regex', 'r');
         $this->lexer = new qtype_preg_lexer($pseudofile);
         $this->lexer->set_options($this->options);
+        $this->parser = new qtype_preg_parser($this->lexer, $this->options);
+        fclose($pseudofile);
 
-        $this->parser = new qtype_preg_parser($this->options);
-
-        while (($token = $this->lexer->nextToken()) !== null) {
-            if (!is_array($token)) {
-                $this->parser->doParse($token->type, $token->value);
-            } else {
-                foreach ($token as $curtoken) {
-                    $this->parser->doParse($curtoken->type, $curtoken->value);
-                }
-            }
-        }
-
-        // Lexer returns errors for an unclosed character set or wrong modifiers.
-        $lexerrors = $this->lexer->get_error_nodes();
-        foreach ($lexerrors as $node) {
-            if ($node->subtype == qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET || $node->subtype == qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING) {
-                $this->parser->doParse(qtype_preg_parser::PARSELEAF, $node);
-            }
-            $this->errornodes[] = $node;
-            $this->errors[] = new qtype_preg_parsing_error($regex, $node);
-        }
-
-        $this->parser->doParse(0, 0);
-
-        // Parser contains other errors inside AST nodes.
-        $parseerrors = $this->parser->get_error_nodes();
-        foreach ($parseerrors as $node) {
+        // Lexer finds errors for unclosed character sets or wrong modifiers.
+        // Parser finds other errors and stores them inside AST nodes.
+        // Parser accumulates both kinds of error nodes (lexing and parsing).
+        foreach ($this->parser->get_error_nodes() as $node) {
             $this->errornodes[] = $node;
             // There can be a specific accepting error.
             if ($node->subtype == qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED) {
@@ -706,8 +685,6 @@ class qtype_preg_regex_handler {
         if ($this->astroot != null) {
             $this->dstroot = $this->from_preg_node(clone $this->astroot);
         }
-
-        fclose($pseudofile);
     }
 
     /**
