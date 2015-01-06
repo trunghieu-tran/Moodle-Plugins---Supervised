@@ -93,13 +93,20 @@ class ajax_question_category_list extends moodle_list {
 
                 $DB->set_field($this->table, "parent", $newparent, array("id"=>$item->id));
                 $newpeers = $this->get_items_peers($afteritem->id);
+                var_dump($newpeers);
                 $oldkey = array_search($afteritem->id, $newpeers);
                 $key = array_search($item->id, $newpeers);
-                if ($oldkey < $key) {
-                    $neworder = array_merge(array_slice($newpeers, 0, $oldkey+1), array($item->id), array_slice($newpeers, $oldkey+1, $key-1), array_slice($newpeers, $key+1));
+                var_dump($key);
+                if ($key) {
+                    if ($oldkey < $key) {
+                        $neworder = array_merge(array_slice($newpeers, 0, $oldkey+1), array($item->id), array_slice($newpeers, $oldkey+1, $key-1), array_slice($newpeers, $key+1));
+                    } else {
+                        $neworder = array_merge(array_slice($newpeers, 0, $key), array_slice($newpeers, $key+1, $oldkey), array($item->id),  array_slice($newpeers, $oldkey +1));
+                    }
                 } else {
-                    $neworder = array_merge(array_slice($newpeers, 0, $key), array_slice($newpeers, $key+1, $oldkey), array($item->id),  array_slice($newpeers, $oldkey +1));
+                    $neworder = array_merge(array_slice($newpeers, 0, $oldkey+1), array($item->id), array_slice($newpeers, $oldkey+1));
                 }
+                var_dump($neworder);
                 $this->reorder_peers($neworder);
             } else {
                 $newlist = new ajax_question_category_list($this->type, $this->attributes, $this->editable, $this->pageurl, $this->page, $this->pageparamname,  $this->itemsperpage, $this->context);
@@ -110,7 +117,6 @@ class ajax_question_category_list extends moodle_list {
         } else {
             $beforeitem = $environment['dest']->find_item($environment['before']);
             if (isset($beforeitem->parentlist->parentitem)) {
-
                 $newparent = $beforeitem->parentlist->parentitem->id;
             } else {
                 $newparent = 0;
