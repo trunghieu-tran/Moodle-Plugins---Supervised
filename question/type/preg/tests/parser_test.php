@@ -996,9 +996,4 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_TEMPLATE);
         $this->assertTrue(count($root->operands) === 1);
     }
-    function test_template_expanding() {
-        $handler = $this->run_handler("(?###word)");
-        $root = $handler->get_ast_root();
-        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_INFINITE_QUANT);
-    }
 }
