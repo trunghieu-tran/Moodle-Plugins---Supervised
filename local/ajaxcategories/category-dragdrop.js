@@ -157,6 +157,7 @@ function ajaxRequest(uri) {
                 if (item !== undefined && item !== null) {
                     item = item.one('.ajaxitem[data-id]');
                     if (item !== undefined && item !== null) {
+                        beforeitemid = -1;
                         afteritemid = item.getAttribute('data-id');
                         level = 'normal';
                     }
