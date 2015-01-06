@@ -58,6 +58,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
     var afteritemid;
     var level;
     var movingid;
+    var addedNodewasadd = false;
 
 function ajaxRequest(uri) {
 
@@ -79,6 +80,9 @@ function ajaxRequest(uri) {
         var parent = drop.ancestor();
         if (child !== undefined && child !== null && !change) {
             child.remove();
+        }
+        if (addedNodewasadd) {
+            addedNode.remove();
         }
         change = false;
         contextid = drop.getAttribute('data-id');
@@ -114,7 +118,9 @@ function ajaxRequest(uri) {
                 beforeitemid = -1;
                 afteritemid = item.getAttribute('data-id');
                 level = 'inner';
+                addedNodewasadd = true;
             } else {
+                addedNodewasadd = false;
                 addedNode = drop.one("ul");
                 addedNode.append(drag);
                 if ((addedNode.get('children').size()-3) >= 0)
@@ -130,12 +136,13 @@ function ajaxRequest(uri) {
                 addedNode.append(child);
             }
         } else {
+            console.log('sssssss');
             if (drop.one('#placeholder') !== undefined) {
                 beforeitemid = -1;
                 afteritemid = -1;
                 var item = drop.get('nextSibling');
                 if (item !== undefined && item !== null) {
-                    item = item.get('nextSibling');
+                    //item = item.get('nextSibling');
                     if (item !== null) {
                     item = item.one('.ajaxitem[data-id]');
                     if (item !== undefined && item !== null) {
