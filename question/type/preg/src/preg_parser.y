@@ -45,11 +45,15 @@
 
         // Do parsing.
 
+//        echo "\nstart parsing\n";
+
         while (($token = $this->lexer->nextToken()) !== null) {
             if (!is_array($token)) {
+//                echo "token: {$token->value->userinscription[0]}\n";
                 $this->doParse($token->type, $token->value);
             } else {
                 foreach ($token as $curtoken) {
+//                    echo "token: {$curtoken->value->userinscription[0]}\n";
                     $this->doParse($curtoken->type, $curtoken->value);
                 }
             }
@@ -191,6 +195,18 @@
         return $node;
     }
 
+    protected function substitute_template_placeholders($node, $actualoperands) {
+        if (is_a($node, 'qtype_preg_operator')) {
+            foreach ($node->operands as $key => $operand) {
+                $node->operands[$key] = $this->substitute_template_placeholders($operand, $actualoperands);
+            }
+        }
+        if ($node->type !== qtype_preg_node::TYPE_LEAF_TEMPLATE_PARAM) {
+            return $node;
+        }
+        return $actualoperands[$node->number - 1];
+    }
+
     protected function create_template_node($originalnode) {
         $tleaf = $originalnode->type === qtype_preg_node::TYPE_LEAF_TEMPLATE;
         $tnode = $originalnode->type === qtype_preg_node::TYPE_NODE_TEMPLATE;
@@ -209,7 +225,8 @@
 
         // TODO: check errors
 
-        StringStreamController::createRef('regex', $template->regex);
+        $theregex = '(?:' . $template->regex . ')';
+        StringStreamController::createRef('regex', $theregex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
         $lexer->set_options($this->options);
@@ -220,7 +237,13 @@
         $this->lexer->set_last_subexpr($lexer->get_last_subexpr());
         $this->lexer->set_max_subexpr($lexer->get_max_subexpr());
         fclose($pseudofile);
-        return $parser->get_root();
+
+        $result = $parser->get_root()->operands[0]; // Can skip explicit top-level grouping now
+        if ($tnode) {
+            $result = $this->substitute_template_placeholders($result, $originalnode->operands);
+        }
+
+        return $result;
     }
 
     protected function build_subexpr_number_to_nodes_map($node) {
@@ -569,6 +592,9 @@ expr(A) ::= TEMPLATEOPENBRACK(B) TEMPLATECLOSEBRACK(C). {
 expr(A) ::= TEMPLATEOPENBRACK(B) expr(C) TEMPLATECLOSEBRACK(D). {
     A = B;
     A->operands = is_array(C) ? C : array(C);
+    if ($this->options->parsetemplates && !$this->options->preserveallnodes) {
+        A = $this->create_template_node(A);
+    }
 }
 
 /**************************************************
