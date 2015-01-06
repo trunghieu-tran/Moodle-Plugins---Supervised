@@ -126,7 +126,11 @@ class ajax_question_category_list extends moodle_list {
 
             $oldkey = array_search($beforeitem->id, $newpeers);
             $key = array_search($item->id, $newpeers);
-            $neworder = array_merge(array_slice($newpeers, 0, $oldkey), array($item->id), array_slice($newpeers, $oldkey, $key), array_slice($newpeers, $key+1));
+            if ($key) {
+                $neworder = array_merge(array_slice($newpeers, 0, $oldkey), array($item->id), array_slice($newpeers, $oldkey, $key), array_slice($newpeers, $key+1));
+            } else {
+                $neworder = array_merge(array_slice($newpeers, 0, $oldkey), array($item->id), array_slice($newpeers, $oldkey));
+            }
             $this->reorder_peers($neworder);
         }
     }

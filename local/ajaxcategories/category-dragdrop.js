@@ -142,7 +142,16 @@ function ajaxRequest(uri) {
                 afteritemid = -1;
                 var item = drop.get('nextSibling');
                 if (item !== undefined && item !== null) {
-                    //item = item.get('nextSibling');
+                    //if (item.one('.ajaxitem[data-id]') === undefined || item.one('.ajaxitem[data-id]') === null) {
+                        console.log(item);
+                        if (item.get('nextSibling')) {
+                            if (item.get('nextSibling').get('tagName').toLowerCase() === 'li') {
+                                item = item.get('nextSibling');
+                            }
+                        }
+
+                        console.log(item);
+                    //}
                     if (item !== null) {
                     item = item.one('.ajaxitem[data-id]');
                     if (item !== undefined && item !== null) {
