@@ -1,7 +1,5 @@
 <?php
 
-
-
 require_once("../../config.php");
 require_once($CFG->dirroot."/question/editlib.php");
 require_once($CFG->dirroot."/local/ajaxcategories/category_class.php");
@@ -26,7 +24,7 @@ $param->moveto = optional_param('moveto', 0, PARAM_INT);
 $param->edit = optional_param('edit', 0, PARAM_INT);
 
 $url = new moodle_url($thispageurl);
-foreach ((array)$param as $key=>$value) {
+foreach ((array)$param as $key => $value) {
     if (($key !== 'cancel' && $value !== 0) || ($key === 'cancel' && $value !== '')) {
         $url->param($key, $value);
     }
@@ -65,11 +63,11 @@ if ($param->delete && ($questionstomove = $DB->count_records("question", array("
     }
     $categorycontext = context::instance_by_id($category->contextid);
     $qcobject->moveform = new question_move_form($thispageurl,
-                array('contexts'=>array($categorycontext), 'currentcat'=>$param->delete));
-    if ($qcobject->moveform->is_cancelled()){
+                array('contexts' => array($categorycontext), 'currentcat' => $param->delete));
+    if ($qcobject->moveform->is_cancelled()) {
         redirect($thispageurl);
-    }  elseif ($formdata = $qcobject->moveform->get_data()) {
-        /// 'confirm' is the category to move existing questions to
+    } else if ($formdata = $qcobject->moveform->get_data()) {
+        // 'confirm' is the category to move existing questions to
         list($tocategoryid, $tocontextid) = explode(',', $formdata->category);
         $qcobject->move_questions_and_delete_category($formdata->delete, $tocategoryid);
         $thispageurl->remove_params('cat', 'category');
@@ -84,7 +82,7 @@ if ($qcobject->catform->is_cancelled()) {
 } else if ($catformdata = $qcobject->catform->get_data()) {
     $catformdata->infoformat = $catformdata->info['format'];
     $catformdata->info       = $catformdata->info['text'];
-    if (!$catformdata->id) {//new category
+    if (!$catformdata->id) {// new category
         $qcobject->add_category($catformdata->parent, $catformdata->name,
                 $catformdata->info, false, $catformdata->infoformat);
     } else {
@@ -93,7 +91,7 @@ if ($qcobject->catform->is_cancelled()) {
     }
     redirect($thispageurl);
 } else if ((!empty($param->delete) and (!$questionstomove) and confirm_sesskey())) {
-    $qcobject->delete_category($param->delete);//delete the category now no questions to move
+    $qcobject->delete_category($param->delete);// delete the category now no questions to move
     $thispageurl->remove_params('cat', 'category');
     redirect($thispageurl);
 }
@@ -109,7 +107,7 @@ echo $OUTPUT->header();
 // Display the UI.
 if (!empty($param->edit)) {
     $qcobject->edit_single_category($param->edit);
-} else if ($questionstomove){
+} else if ($questionstomove) {
     $qcobject->display_move_form($questionstomove, $category);
 } else {
     // Display the user interface.
