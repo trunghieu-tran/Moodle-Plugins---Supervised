@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -73,7 +73,6 @@ class ajax_question_category_list extends moodle_list {
      */
     function change_category_list($movingid, $environment) {
         global $DB;
-        var_dump("aaaaaaaaaa");
         // Change context.
         if ($environment['dest']->context != $this->context->id) {
             // Moving to a new context. Must move files belonging to questions.
@@ -104,15 +103,22 @@ class ajax_question_category_list extends moodle_list {
             }
         } else {
             $beforeitem = $environment['dest']->find_item($environment['before']);
+            //var_dump($beforeitem);
             if (isset($beforeitem->parentlist->parentitem)) {
+
                 $newparent = $beforeitem->parentlist->parentitem->id;
             } else {
                 $newparent = 0;
             }
             $DB->set_field($this->table, "parent", $newparent, array("id"=>$item->id));
             $newpeers = $this->get_items_peers($beforeitem->id);
+            var_dump($newpeers);
             $oldkey = array_search($beforeitem->id, $newpeers);
-            $neworder = array_merge(array_slice($newpeers, 0, $oldkey), array($item->id), array_slice($newpeers, $oldkey));
+            $key = array_search($item->id, $newpeers);
+            $neworder = array_merge(array_slice($newpeers, 0, $oldkey), array($item->id), array_slice($newpeers, $oldkey, $key), array_slice($newpeers, $key+1));
+
+            var_dump($neworder);
+            var_dump($key);
             $this->reorder_peers($neworder);
         }
     }
