@@ -148,6 +148,7 @@ function ajaxRequest(uri) {
                     if (item !== undefined && item !== null) {
                         beforeitemid = item.getAttribute('data-id');
                         contextid = item.ancestor('ul').getAttribute('data-id');
+                        level = 'normal';
 
                     }
                 }
@@ -157,6 +158,7 @@ function ajaxRequest(uri) {
                     item = item.one('.ajaxitem[data-id]');
                     if (item !== undefined && item !== null) {
                         afteritemid = item.getAttribute('data-id');
+                        level = 'normal';
                     }
                 }
                 drop.insert(child, 'after');
