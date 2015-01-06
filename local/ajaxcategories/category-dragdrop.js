@@ -59,6 +59,8 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
     var level;
     var movingid;
     var addedNodewasadd = false;
+    var ancestor;
+    var cloneancestor;
 
 function ajaxRequest(uri) {
 
@@ -197,6 +199,9 @@ function ajaxRequest(uri) {
         //Get our drag object
         var drag = e.target;
         var dragnode = drag.get('node');
+        cloneancestor = dragnode.get('parentNode').cloneNode(true);
+        console.log(cloneancestor);
+        ancestor = dragnode.get('parentNode');
         //Set some styles here
         drag.get('node').setStyle('opacity', '.25');
         var next = drag.get('node').get('nextSibling');
@@ -215,6 +220,7 @@ function ajaxRequest(uri) {
 
 
     });
+
 
     //Listen for a drag:end events
     Y.DD.DDM.on('drag:end', function(e) {
@@ -256,7 +262,11 @@ function ajaxRequest(uri) {
                 }
             }
         });
+if (beforeitemid == -1 && afteritemid == -1 || beforeitemid === undefined || afteritemid == undefined) {
+    console.log(cloneancestor);
+ancestor.replace(cloneancestor);
 
+} else {
         options['movingid'] = movingid;
         options['before'] = beforeitemid.toString();
         options['after'] = afteritemid.toString();
@@ -268,6 +278,7 @@ function ajaxRequest(uri) {
         uri = M.cfg.wwwroot + '/local/ajaxcategories/' + uri;
         console.log(uri);
         ajaxRequest(uri);
+    }
         //var request = new Y.io(uri);
         //request.send();
         //alert(request);
