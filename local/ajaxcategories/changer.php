@@ -39,5 +39,6 @@ $dest = optional_param('dest', 0, PARAM_INT);
     } else {
         $tolist = $qcobject->find_list($environment['before']);
     }
+    //var_dump($tolist->context->id);
     $environment['dest'] = $tolist;
     $fromlist->change_category_list($movingid, $environment);
