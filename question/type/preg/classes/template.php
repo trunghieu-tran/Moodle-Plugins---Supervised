@@ -44,6 +44,9 @@ class template {
     /** Number of such placeholders in this template. */
     public $placeholderscount;
 
+    /** All available templates. Can be changed from outside for testing purposes. */
+    private static $templates;
+
     public function __construct($name = '', $regex = '', $options = '', $placeholderscount = 0) {
         $this->name = $name;
         $this->regex = $regex;
@@ -55,38 +58,21 @@ class template {
      * Returns all templates that should be recognized by parser.
      */
     public static function available_templates() {
-
-        if (defined('qtype_preg_templates_test')) {
-            return self::available_testing_templates();
-        }
-
-        static $result;
-        if ($result === null) {
-            $result = array(
+        if (template::$templates === null) {
+            template::$templates = array(
                 'word' => new template('word', '\w+'),
                 'integer' => new template('integer', '[+-]?\d+'),
-                'parens_req' => new template('parens_req', '(\((?:$$1|(?-1))\))', '', 1),
+                'parens_req' => new template('parens_req', '(   \(    (?:$$1|(?-1))   \)  )', 'x', 1),
+                'parens_opt' => new template('parens_opt', '$$1|(?###parens_req<)$$1(?###>)', '', 1),
             );
         }
-        return $result;
+        return template::$templates;
     }
 
     /**
      * You are not supposed to call this one unless you are testing the parser.
      */
-    private static function available_testing_templates() {
-        static $result;
-        if ($result === null) {
-            $result = array(
-                'word' => new template('word', '\w+'),
-                'integer' => new template('integer', '[+-]?\d+'),
-                'word_and_integer' => new template('word_and_integer', '(?###word)(?###integer)'),
-                'parens_req' => new template('parens_req', '(\((?:$$1|(?-1))\))', '', 1),
-                'brackets_req' => new template('brackets_req', '(\[(?:$$1|(?-1))\])', '', 1),
-                'word_in_parens' => new template('word_in_parens', '(?###parens_req<)(?###word)(?###>)'),
-                'word_in_parens_in_brackets' => new template('word_in_parens_in_brackets', '(?###brackets_req<)(?###parens_req<)(?###word)(?###>)(?###>)'),
-            );
-        }
-        return $result;
+    public static function set_available_templates($value) {
+        template::$templates = $value;
     }
 }
