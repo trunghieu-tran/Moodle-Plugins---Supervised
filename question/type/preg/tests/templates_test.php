@@ -136,6 +136,30 @@ class qtype_preg_templates_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($res->length[0] === 3);
     }
 
+    public function test_template_node_emptiness() {
+        $matcher = new qtype_preg_fa_matcher('(?###parens_opt<)(?###>)');
+
+        $res = $matcher->match('');
+        $this->assertTrue($res->full);
+        $this->assertTrue($res->indexfirst[0] === 0);
+        $this->assertTrue($res->length[0] === 0);
+
+        $res = $matcher->match('()');
+        $this->assertTrue($res->full);
+        $this->assertTrue($res->indexfirst[0] === 0);
+        $this->assertTrue($res->length[0] === 2);
+
+        $res = $matcher->match('(())');
+        $this->assertTrue($res->full);
+        $this->assertTrue($res->indexfirst[0] === 0);
+        $this->assertTrue($res->length[0] === 4);
+
+        $res = $matcher->match('(a)');
+        $this->assertTrue($res->full);
+        $this->assertTrue($res->indexfirst[0] === 0);
+        $this->assertTrue($res->length[0] === 0);
+    }
+
     public function test_template_leaf_in_template_node() {
         $matcher = new qtype_preg_fa_matcher('(?###parens_req<)(?###word)(?###>)');
 
@@ -196,5 +220,27 @@ class qtype_preg_templates_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($res->full);
         $this->assertTrue($res->indexfirst[0] === 1);
         $this->assertTrue($res->length[0] === 9);
+    }
+
+    public function test_template_errors() {
+        $matcher = new qtype_preg_fa_matcher('(?###somethingweird)');
+        $errors = $matcher->get_error_nodes();
+        $root = $matcher->get_ast_root();
+        $this->assertTrue(count($errors) === 1);
+        $this->assertTrue($errors[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errors[0]->subtype === qtype_preg_node_error::SUBTYPE_UNKNOWN_TEMPLATE);
+        $this->assertTrue($errors[0]->position->colfirst === 0);
+        $this->assertTrue($errors[0]->position->collast === 19);
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_ERROR);
+
+        $matcher = new qtype_preg_fa_matcher('(?###parens_req<)a(?###,)b(?###>)');
+        $errors = $matcher->get_error_nodes();
+        $root = $matcher->get_ast_root();
+        $this->assertTrue(count($errors) === 1);
+        $this->assertTrue($errors[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errors[0]->subtype === qtype_preg_node_error::SUBTYPE_WRONG_TEMPLATE_PARAMS_COUNT);
+        $this->assertTrue($errors[0]->position->colfirst === 0);
+        $this->assertTrue($errors[0]->position->collast === 32);
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_ERROR);
     }
 }

@@ -193,6 +193,8 @@ $string['char_code_too_big_node_error']            = 'The character code {$a->ad
 $string['char_code_disallowed_node_error']         = 'Unicode code points 0xd800 ... 0xdfff are now allowed.';
 $string['callout_big_number_node_error']           = 'The number {$a->addinfo} in the callout is too big, should not be greater than 255.';
 $string['lnu_unsupported_node_error']              = 'Sequences \L, \l, \N{name}, \U, and \u are not supported.';
+$string['unknown_template_node_error']             = 'Unknown template: {$a->addinfo}.';
+$string['wrong_template_params_count_node_error']  = 'Wrong template parameters count: {$a->addinfo->expected} expected, {$a->addinfo->given} given.';
 
 // Types and subtypes needed for authoring tools
 $string['leaf_charset_neg'] = 'negative character set';

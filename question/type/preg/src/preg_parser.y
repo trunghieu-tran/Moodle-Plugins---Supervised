@@ -207,7 +207,7 @@
         return clone $actualoperands[$node->number - 1];
     }
 
-    protected function create_template_node($originalnode) {
+    protected function create_template_node($originalnode, $closebrack = null) {
         $tleaf = $originalnode->type === qtype_preg_node::TYPE_LEAF_TEMPLATE;
         $tnode = $originalnode->type === qtype_preg_node::TYPE_NODE_TEMPLATE;
         if (!$tleaf && !$tnode) {
@@ -216,14 +216,30 @@
 
         if ($tnode) {
             foreach ($originalnode->operands as $key => $operand) {
-                $originalnode->operands[$key] = $this->create_template_node($operand);
+                $originalnode->operands[$key] = $this->create_template_node($operand, $closebrack);
             }
         }
 
         $templates = qtype_preg\template::available_templates();
+
+        if (!array_key_exists($originalnode->name, $templates)) {
+            $operands = $tleaf
+                      ? array()
+                      : $originalnode->operands;
+            return $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_TEMPLATE, $originalnode->name, $originalnode->position, $originalnode->userinscription, $operands);
+        }
+
         $template = $templates[$originalnode->name];
 
-        // TODO: check errors
+        if ($tnode && $template->placeholderscount !== count($originalnode->operands)) {
+            $position = new qtype_preg_position($originalnode->position->indfirst, $closebrack->position->indlast,
+                                                $originalnode->position->linefirst, $closebrack->position->linelast,
+                                                $originalnode->position->colfirst, $closebrack->position->collast);
+            $operands = $tleaf
+                      ? array()
+                      : $originalnode->operands;
+            return $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_TEMPLATE_PARAMS_COUNT, $originalnode->name, $position, $originalnode->userinscription, $operands);
+        }
 
         $options = new qtype_preg_handling_options();
         $options->modifiers = qtype_preg_handling_options::string_to_modifiers($template->options);
@@ -590,13 +606,16 @@ expr(A) ::= TEMPLATEOPENBRACK(B) TEMPLATECLOSEBRACK(C). {
     $emptynode->set_user_info(C->position->add_chars_right(-1), array_merge(B->userinscription, C->userinscription));
     A = B;
     A->operands = array($emptynode);
+    if ($this->options->parsetemplates && !$this->options->preserveallnodes) {
+        A = $this->create_template_node(A, C);
+    }
 }
 
 expr(A) ::= TEMPLATEOPENBRACK(B) expr(C) TEMPLATECLOSEBRACK(D). {
     A = B;
     A->operands = is_array(C) ? C : array(C);
     if ($this->options->parsetemplates && !$this->options->preserveallnodes) {
-        A = $this->create_template_node(A);
+        A = $this->create_template_node(A, D);
     }
 }
 
@@ -606,87 +625,51 @@ expr(A) ::= TEMPLATEOPENBRACK(B) expr(C) TEMPLATECLOSEBRACK(D). {
 
 
 expr(A) ::= expr(B) CLOSEBRACK(C). [ERROR_PREC] {
-    $position = new qtype_preg_position(C->position->indfirst, C->position->indlast,
-                                        C->position->linefirst, C->position->linelast,
-                                        C->position->colfirst, C->position->collast);
-    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_OPEN_PAREN, C->userinscription[0]->data, $position, C->userinscription, array(B));
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_OPEN_PAREN, C->userinscription[0]->data, C->position, C->userinscription, array(B));
 }
 
 expr(A) ::= expr(B) TEMPLATECLOSEBRACK(C). [ERROR_PREC] {
-    $position = new qtype_preg_position(C->position->indfirst, C->position->indlast,
-                                        C->position->linefirst, C->position->linelast,
-                                        C->position->colfirst, C->position->collast);
     $b = is_array(B) ? B : array(B);
-    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_OPEN_PAREN, C->userinscription[0]->data, $position, C->userinscription, $b);
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_OPEN_PAREN, C->userinscription[0]->data, C->position, C->userinscription, $b);
 }
 
 expr(A) ::= CLOSEBRACK(B). [ERROR_PREC_SHORT] {
-    $position = new qtype_preg_position(B->position->indfirst, B->position->indlast,
-                                        B->position->linefirst, B->position->linelast,
-                                        B->position->colfirst, B->position->collast);
-    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_OPEN_PAREN, B->userinscription[0]->data, $position, B->userinscription);
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_OPEN_PAREN, B->userinscription[0]->data, B->position, B->userinscription);
 }
 
 expr(A) ::= TEMPLATECLOSEBRACK(B). [ERROR_PREC_SHORT] {
-    $position = new qtype_preg_position(B->position->indfirst, B->position->indlast,
-                                        B->position->linefirst, B->position->linelast,
-                                        B->position->colfirst, B->position->collast);
-    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_OPEN_PAREN, B->userinscription[0]->data, $position, B->userinscription);
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_OPEN_PAREN, B->userinscription[0]->data, B->position, B->userinscription);
 }
 
 expr(A) ::= OPENBRACK(B) expr(C). [ERROR_PREC] {
-    $position = new qtype_preg_position(B->position->indfirst, B->position->indlast,
-                                        B->position->linefirst, B->position->linelast,
-                                        B->position->colfirst, B->position->collast);
-    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, B->userinscription[0]->data, $position, B->userinscription, array(C));
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, B->userinscription[0]->data, B->position, B->userinscription, array(C));
 }
 
 expr(A) ::= TEMPLATEOPENBRACK(B) expr(C). [ERROR_PREC] {
-    $position = new qtype_preg_position(B->position->indfirst, B->position->indlast,
-                                        B->position->linefirst, B->position->linelast,
-                                        B->position->colfirst, B->position->collast);
     $c = is_array(C) ? C : array(C);
-    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_CLOSE_PAREN, B->userinscription[0]->data, $position, B->userinscription, $c);
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_CLOSE_PAREN, B->userinscription[0]->data, B->position, B->userinscription, $c);
 }
 
 expr(A) ::= OPENBRACK(B). [ERROR_PREC_SHORT] {
-    $position = new qtype_preg_position(B->position->indfirst, B->position->indlast,
-                                        B->position->linefirst, B->position->linelast,
-                                        B->position->colfirst, B->position->collast);
-    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, B->userinscription[0]->data, $position, B->userinscription);
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, B->userinscription[0]->data, B->position, B->userinscription);
 }
 
 expr(A) ::= TEMPLATEOPENBRACK(B). [ERROR_PREC_SHORT] {
-    $position = new qtype_preg_position(B->position->indfirst, B->position->indlast,
-                                        B->position->linefirst, B->position->linelast,
-                                        B->position->colfirst, B->position->collast);
-    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_CLOSE_PAREN, B->userinscription[0]->data, $position, B->userinscription);
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_CLOSE_PAREN, B->userinscription[0]->data, B->position, B->userinscription);
 }
 
 expr(A) ::= CONDSUBEXPR(B) expr(C) CLOSEBRACK(D) expr(E). [ERROR_PREC] {
-    $position = new qtype_preg_position(B->position->indfirst, B->position->indlast,
-                                        B->position->linefirst, B->position->linelast,
-                                        B->position->colfirst, B->position->collast);
-    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, B->userinscription[0]->data, $position, B->userinscription, array(E, C));
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, B->userinscription[0]->data, B->position, B->userinscription, array(E, C));
 }
 
 expr(A) ::= CONDSUBEXPR(B) expr(C). [ERROR_PREC_SHORT] {
-    $position = new qtype_preg_position(B->position->indfirst, B->position->indlast,
-                                        B->position->linefirst, B->position->linelast,
-                                        B->position->colfirst, B->position->collast);
-    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, B->userinscription[0]->data, $position, B->userinscription, array(C));
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, B->userinscription[0]->data, B->position, B->userinscription, array(C));
 }
 
 expr(A) ::= CONDSUBEXPR(B). [ERROR_PREC_SHORTEST] {
-    $position = new qtype_preg_position(B->position->indfirst, B->position->indlast,
-                                        B->position->linefirst, B->position->linelast,
-                                        B->position->colfirst, B->position->collast);
-    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, B->userinscription[0]->data, $position, B->userinscription);
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, B->userinscription[0]->data, B->position, B->userinscription);
 }
 
 expr(A) ::= QUANT(B). [ERROR_PREC] {
-    $position = new qtype_preg_position(B->position->indfirst, B->position->indlast,
-                                        B->position->linefirst, B->position->linelast,
-                                        B->position->colfirst, B->position->collast);
-    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER, B->userinscription[0]->data, $position, B->userinscription);
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER, B->userinscription[0]->data, B->position, B->userinscription);
 }
