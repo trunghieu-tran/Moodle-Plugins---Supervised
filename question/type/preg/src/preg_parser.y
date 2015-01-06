@@ -204,7 +204,7 @@
         if ($node->type !== qtype_preg_node::TYPE_LEAF_TEMPLATE_PARAM) {
             return $node;
         }
-        return $actualoperands[$node->number - 1];
+        return clone $actualoperands[$node->number - 1];
     }
 
     protected function create_template_node($originalnode) {
@@ -225,15 +225,18 @@
 
         // TODO: check errors
 
+        $options = new qtype_preg_handling_options();
+        $options->modifiers = qtype_preg_handling_options::string_to_modifiers($template->options);
+
         $theregex = '(?:' . $template->regex . ')';
         StringStreamController::createRef('regex', $theregex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
-        $lexer->set_options($this->options);
+        $lexer->set_options($options);
         $lexer->set_initial_subexpr($this->lexer->get_last_subexpr());
         $lexer->set_last_subexpr($this->lexer->get_last_subexpr());
         $lexer->set_max_subexpr($this->lexer->get_max_subexpr());
-        $parser = new qtype_preg_parser($lexer, $this->options);
+        $parser = new qtype_preg_parser($lexer, $options);
         $this->lexer->set_last_subexpr($lexer->get_last_subexpr());
         $this->lexer->set_max_subexpr($lexer->get_max_subexpr());
         fclose($pseudofile);
