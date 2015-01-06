@@ -16,7 +16,7 @@ function get_params(options) {
 }
 
 YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function(Y) {
-    var addedNode;
+    var addednode;
     var child;
     var after;
     var change = true;
@@ -25,7 +25,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
     var afteritemid;
     var level;
     var movingid;
-    var addedNodewasadd = false;
+    var addednodewasadd = false;
     var ancestor;
     var cloneancestor;
     var options = {};
@@ -35,7 +35,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
      *
      * @param string with GET-request
     */
-    function ajaxRequest(uri) {
+    function ajax_request(uri) {
         // Make the request
         Y.io(uri, {
             on: {
@@ -60,13 +60,13 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         if (child !== undefined && child !== null && !change) {
             child.remove();
         }
-        if (addedNodewasadd) {
-            addedNode.remove();
+        if (addednodewasadd) {
+            addednode.remove();
         }
         change = false;
         // Get contextid of dropped list.
         contextid = drop.getAttribute('data-id');
-        if (contextid  === null ||  contextid == '') {
+        if (contextid === null ||  contextid == '') {
             parent = drop.ancestor('ul[data-id]');
             if (parent !== null) {
                 contextid = parent.getAttribute('data-id');
@@ -87,31 +87,31 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         if (drop.get('tagName').toLowerCase() === 'li') {
             // No nested list.
             if (drop.one("ul") == undefined) {
-                addedNode = Y.Node.create( '<ul><div id = "placeholder"></div></ul>' );
-                addedNode.setAttribute("id", Y.guid() );
+                addednode = Y.Node.create( '<ul><div id = "placeholder"></div></ul>' );
+                addednode.setAttribute("id", Y.guid() );
                 tar1 = new Y.DD.Drop({
-                    node: addedNode.one('#placeholder')
+                    node: addednode.one('#placeholder')
                 });
                 // Add dragged node to list.
-                addedNode.append(child);
-                addedNode.append(drag);
-                addedNode.append(child);
-                drop.append(addedNode);
+                addednode.append(child);
+                addednode.append(drag);
+                addednode.append(child);
+                drop.append(addednode);
                 // Get id of parent node.
                 item = drop.one('.ajaxitem[data-id]');
                 beforeitemid = -1;
                 afteritemid = item.getAttribute('data-id');
                 level = 'inner';
-                addedNodewasadd = true;
+                addednodewasadd = true;
             } else {
                 // Add to nested list created before/
-                addedNodewasadd = false;
-                addedNode = drop.one("ul");
-                addedNode.append(drag);
+                addednodewasadd = false;
+                addednode = drop.one("ul");
+                addednode.append(drag);
                 // Get id of parent node.
-                if ((addedNode.get('children').size()-3) >= 0)
+                if ((addednode.get('children').size() - 3) >= 0)
                 {
-                    item = addedNode.get('children').item(addedNode.get('children').size()-3);
+                    item = addednode.get('children').item(addednode.get('children').size() - 3);
                     item = item.one('.ajaxitem[data-id]');
                     if (item) {
                         beforeitemid = -1;
@@ -119,7 +119,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
                         level = 'inner';
                     }
                 }
-                addedNode.append(child);
+                addednode.append(child);
             }
         } else {
             // Add node at the same level with other nodes in list/
@@ -253,10 +253,9 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
             uri = M.cfg.wwwroot + '/local/ajaxcategories/' + uri;
             console.log(uri);
             // Make ajax request.
-            ajaxRequest(uri);
+            ajax_request(uri);
         }
     });
-
 
     //Static Vars
     var goingUp = false, lastY = 0;

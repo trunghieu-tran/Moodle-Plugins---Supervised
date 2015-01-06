@@ -1,7 +1,8 @@
 ﻿<?php
+
 defined('MOODLE_INTERNAL') || die();
 
-// number of categories to display on page
+// Number of categories to display on page.
 define('QUESTION_PAGE_LENGTH', 25);
 
 require_once($CFG->libdir . '/listlib.php');
@@ -29,7 +30,8 @@ class ajax_question_category_list extends moodle_list {
     public $context = null;
     public $sortby = 'parent, sortorder, name';
 
-    public function __construct($type='ul', $attributes='', $editable = false, $pageurl=null, $page = 0, $pageparamname = 'page', $itemsperpage = 20, $context = null){
+    public function __construct($type='ul', $attributes='', $editable = false, $pageurl=null, $page = 0,
+                                $pageparamname = 'page', $itemsperpage = 20, $context = null) {
         parent::__construct('ul', $attributes, $editable, $pageurl, $page, 'cpage', $itemsperpage);
         $this->context = $context;
     }
@@ -47,7 +49,7 @@ class ajax_question_category_list extends moodle_list {
      *                                      'level' - 'normal' or 'inner'
      *                                      'dest' - destination list
      */
-    function change_category_list($movingid, $environment) {
+    public function change_category_list($movingid, $environment) {
         global $DB;
         // Get item by id.
         $item = $this->find_item($movingid);
@@ -64,7 +66,7 @@ class ajax_question_category_list extends moodle_list {
             }
         }
 
-        //  Define the place of replacing
+        // Define the place of replacing.
         if ($environment['after'] != -1) {
             // Replacing at the same level after some item.
             $afteritem = $environment['dest']->find_item($environment['after']);
@@ -76,7 +78,7 @@ class ajax_question_category_list extends moodle_list {
                     $newparent = 0;
                 }
 
-                $DB->set_field($environment['dest']->table, "parent", $newparent, array("id"=>$item->id));
+                $DB->set_field($environment['dest']->table, "parent", $newparent, array("id" => $item->id));
                 $newpeers = $environment['dest']->get_items_peers($afteritem->id);
                 var_dump($newpeers);
                 // Place of item after which should be added moving category.
@@ -87,27 +89,31 @@ class ajax_question_category_list extends moodle_list {
                 if ($key) {
                     // Replace moving category up.
                     if ($oldkey < $key) {
-
                         if ($key !== count($newpeers) - 1) {
-                           $neworder = array_merge(array_slice($newpeers, 0, $oldkey+1), array($item->id), array_slice($newpeers, $oldkey+1, $key-1), array_slice($newpeers, $key+1));
+                            $neworder = array_merge(array_slice($newpeers, 0, $oldkey + 1), array($item->id),
+                                                   array_slice($newpeers, $oldkey + 1, $key - 1), array_slice($newpeers, $key + 1));
                         } else {
-                            $neworder = array_merge(array_slice($newpeers, 0, $oldkey+1), array($item->id), array_slice($newpeers, $oldkey+1, $key - 2));
+                            $neworder = array_merge(array_slice($newpeers, 0, $oldkey + 1), array($item->id),
+                                                    array_slice($newpeers, $oldkey + 1, $key - 2));
                         }
                     } else {
                         // Replace moving category down.
-                        $neworder = array_merge(array_slice($newpeers, 0, $key), array_slice($newpeers, $key+1, $oldkey), array($item->id),  array_slice($newpeers, $oldkey +1));
+                        $neworder = array_merge(array_slice($newpeers, 0, $key), array_slice($newpeers, $key + 1, $oldkey),
+                                                array($item->id), array_slice($newpeers, $oldkey + 1));
                     }
                 } else {
-                    $neworder = array_merge(array_slice($newpeers, 0, $oldkey+1), array($item->id), array_slice($newpeers, $oldkey+1));
+                    $neworder = array_merge(array_slice($newpeers, 0, $oldkey + 1), array($item->id),
+                                            array_slice($newpeers, $oldkey + 1));
                 }
                 // Set new order of categories.
                 $environment['dest']->reorder_peers($neworder);
             } else {
                 // Create new nested list. Replace moving category to it.
-                $newlist = new ajax_question_category_list($this->type, $this->attributes, $this->editable, $this->pageurl, $this->page, $this->pageparamname,  $this->itemsperpage, $this->context);
+                $newlist = new ajax_question_category_list($this->type, $this->attributes, $this->editable, $this->pageurl, $this->page,
+                                                           $this->pageparamname, $this->itemsperpage, $this->context);
                 $newlist->parentitem = $afteritem;
                 $newparent = $afteritem->id;
-                $DB->set_field($environment['dest']->table, "parent", $newparent, array("id"=>$item->id));
+                $DB->set_field($environment['dest']->table, "parent", $newparent, array("id" => $item->id));
             }
         } else {
             // Replacing at the same level before some item.
@@ -117,7 +123,7 @@ class ajax_question_category_list extends moodle_list {
             } else {
                 $newparent = 0;
             }
-            $DB->set_field($environment['dest']->table, "parent", $newparent, array("id"=>$item->id));
+            $DB->set_field($environment['dest']->table, "parent", $newparent, array("id" => $item->id));
             $newpeers = $environment['dest']->get_items_peers($beforeitem->id);
             // Place of item after which should be added moving category.
             $oldkey = array_search($beforeitem->id, $newpeers);
@@ -125,7 +131,7 @@ class ajax_question_category_list extends moodle_list {
             $key = array_search($item->id, $newpeers);
             // If moving category was at the same list reoder categories in list.
             if ($key) {
-                $neworder = array_merge(array_slice($newpeers, 0, $oldkey), array($item->id), array_slice($newpeers, $oldkey, $key), array_slice($newpeers, $key+1));
+                $neworder = array_merge(array_slice($newpeers, 0, $oldkey), array($item->id), array_slice($newpeers, $oldkey, $key), array_slice($newpeers, $key + 1));
             } else {
                 $neworder = array_merge(array_slice($newpeers, 0, $oldkey), array($item->id), array_slice($newpeers, $oldkey));
             }
@@ -163,7 +169,7 @@ class ajax_question_category_list extends moodle_list {
                 );
                 // Add first placeholder for first item.
                 if ($first) {
-                    $html .= html_writer::start_tag('div' ,$placeholder);
+                    $html .= html_writer::start_tag('div', $placeholder);
                     $html .= html_writer::end_tag('div');
                 }
                 // Write item html.
@@ -173,12 +179,12 @@ class ajax_question_category_list extends moodle_list {
                 if ($this->editable) {
                     $item->set_icon_html($first, $last, $lastitem);
                 }
-                if ($itemhtml = $item->to_html($indent+1, $extraargs)) {
+                if ($itemhtml = $item->to_html($indent + 1, $extraargs)) {
                     $html .= $itemhtml;
                 }
                 $html .= html_writer::end_div();
                 $html .= html_writer::end_tag('li');
-                $html .= html_writer::start_tag('div' ,$placeholder);
+                $html .= html_writer::start_tag('div', $placeholder);
                 $html .= html_writer::end_tag('div');
                 $first = false;
                 $lastitem = $item;
@@ -187,12 +193,12 @@ class ajax_question_category_list extends moodle_list {
         } else {
             $html = '';
         }
-        if ($html) { //if there are list items to display then wrap them in ul / ol tag.
+        if ($html) {// if there are list items to display then wrap them in ul / ol tag.
             $tabs = str_repeat("\t", $indent);
-            $html = $tabs.'<'.$this->type.((!empty($this->attributes))?(' '.$this->attributes):'').">\n".$html;
+            $html = $tabs.'<'.$this->type.((!empty($this->attributes)) ? (' '.$this->attributes) : '').">\n".$html;
             $html .= $tabs."</".$this->type.">\n";
         } else {
-            $html ='';
+            $html = '';
         }
         return $html;
     }
@@ -214,21 +220,21 @@ class ajax_question_category_list_item extends list_item {
             if (isset($this->children->items)) {
                 foreach ($this->children->items as $item) {
                     $children[] = $item->id;
-                    $children = array_merge($children,$item->get_all_children());
+                    $children = array_merge($children, $item->get_all_children());
                 }
             }
         }
         return $children;
     }
 
-    public function set_icon_html($first, $last, $lastitem){
+    public function set_icon_html($first, $last, $lastitem) {
         global $CFG;
         $category = $this->item;
-        $url = new moodle_url('/question/category.php', ($this->parentlist->pageurl->params() + array('edit'=>$category->id)));
-        $this->icons['edit']= $this->image_icon(get_string('editthiscategory', 'question'), $url, 'edit');
+        $url = new moodle_url('/question/category.php', ($this->parentlist->pageurl->params() + array('edit' => $category->id)));
+        $this->icons['edit'] = $this->image_icon(get_string('editthiscategory', 'question'), $url, 'edit');
     }
 
-    public function item_html($extraargs = array()){
+    public function item_html($extraargs = array()) {
         global $CFG, $OUTPUT;
         $str = $extraargs['str'];
         $category = $this->item;
@@ -298,7 +304,7 @@ class ajax_question_category_object {
      *
      * Gets necessary strings and sets relevant path information
      */
-    public function ajax_question_category_object($page, $pageurl, $contexts, $currentcat, $defaultcategory, $todelete, $addcontexts) {
+    public function __construct($page, $pageurl, $contexts, $currentcat, $defaultcategory, $todelete, $addcontexts) {
         global $CFG, $COURSE, $OUTPUT;
 
         $this->tab = str_repeat('&nbsp;', $this->tabsize);
@@ -335,10 +341,11 @@ class ajax_question_category_object {
      */
     public function initialize($page, $contexts, $currentcat, $defaultcategory, $todelete, $addcontexts) {
         $lastlist = null;
-        foreach ($contexts as $context){
-            $this->editlists[$context->id] = new ajax_question_category_list('ul', 'id="ajaxcategorylist" data-id = "' . $context->id . '"', true, $this->pageurl, $page, 'cpage', QUESTION_PAGE_LENGTH, $context);
+        foreach ($contexts as $context) {
+            $this->editlists[$context->id] = new ajax_question_category_list('ul', 'id="ajaxcategorylist" data-id = "' . $context->id . '"',
+                                                                             true, $this->pageurl, $page, 'cpage', QUESTION_PAGE_LENGTH, $context);
             $this->editlists[$context->id]->lastlist =& $lastlist;
-            if ($lastlist!== null){
+            if ($lastlist !== null) {
                 $lastlist->nextlist =& $this->editlists[$context->id];
             }
             $lastlist =& $this->editlists[$context->id];
@@ -346,12 +353,12 @@ class ajax_question_category_object {
 
         $count = 1;
         $paged = false;
-        foreach ($this->editlists as $key => $list){
+        foreach ($this->editlists as $key => $list) {
             list($paged, $count) = $this->editlists[$key]->list_from_records($paged, $count);
         }
         $this->catform = new question_category_edit_form($this->pageurl, compact('contexts', 'currentcat'));
-        if (!$currentcat){
-            $this->catform->set_data(array('parent'=>$defaultcategory));
+        if (!$currentcat) {
+            $this->catform->set_data(array('parent' => $defaultcategory));
         }
     }
 
@@ -375,12 +382,11 @@ class ajax_question_category_object {
      */
     public function display_user_interface() {
 
-        /// Interface for editing existing categories
+        // Interface for editing existing categories
         $this->output_edit_lists();
 
-
         echo '<br />';
-        /// Interface for adding a new category:
+        // Interface for adding a new category:
         $this->output_new_table();
         echo '<br />';
 
@@ -404,9 +410,9 @@ class ajax_question_category_object {
 
         echo $OUTPUT->heading_with_help(get_string('editcategories', 'question'), 'editcategories', 'question');
 
-        foreach ($this->editlists as $context => $list){
-            $listhtml = $list->to_html(0, array('str'=>$this->str));
-            if ($listhtml){
+        foreach ($this->editlists as $context => $list) {
+            $listhtml = $list->to_html(0, array('str' => $this->str));
+            if ($listhtml) {
                 echo $OUTPUT->box_start('boxwidthwide boxaligncenter generalbox questioncategories contextlevel' . $list->context->contextlevel);
                 $fullcontext = context::instance_by_id($context);
                 echo $OUTPUT->heading(get_string('questioncatsfor', 'question', $fullcontext->get_context_name()), 3);
@@ -415,7 +421,7 @@ class ajax_question_category_object {
             }
         }
         echo $list->display_page_numbers();
-     }
+    }
 
     /**
      * gets all the courseids for the given categories
@@ -425,7 +431,7 @@ class ajax_question_category_object {
      */
     public function get_course_ids($categories) {
         $courseids = array();
-        foreach ($categories as $key=>$cat) {
+        foreach ($categories as $key => $cat) {
             $courseids[$key] = $cat->course;
             if (!empty($cat->children)) {
                 $courseids = array_merge($courseids, $this->get_course_ids($cat->children));
@@ -435,9 +441,9 @@ class ajax_question_category_object {
     }
 
     public function edit_single_category($categoryid) {
-    /// Interface for adding a new category
+        // Interface for adding a new category
         global $COURSE, $DB;
-        /// Interface for editing existing categories
+        // Interface for editing existing categories
         if ($category = $DB->get_record("question_categories", array("id" => $categoryid))) {
 
             $category->parent = "$category->parent,$category->contextid";
@@ -498,20 +504,20 @@ class ajax_question_category_object {
         if (!$category = $DB->get_record("question_categories", array("id" => $categoryid))) {  // security
             print_error('unknowcategory');
         }
-        /// Send the children categories to live with their grandparent
+        // Send the children categories to live with their grandparent
         $DB->set_field("question_categories", "parent", $category->parent, array("parent" => $category->id));
 
-        /// Finally delete the category itself
+        // Finally delete the category itself
         $DB->delete_records("question_categories", array("id" => $category->id));
     }
 
-    public function move_questions_and_delete_category($oldcat, $newcat){
+    public function move_questions_and_delete_category($oldcat, $newcat) {
         question_can_delete_cat($oldcat);
         $this->move_questions($oldcat, $newcat);
         $this->delete_category($oldcat);
     }
 
-    public function display_move_form($questionsincategory, $category){
+    public function display_move_form($questionsincategory, $category) {
         global $OUTPUT;
         $vars = new stdClass();
         $vars->name = $category->name;
@@ -520,7 +526,7 @@ class ajax_question_category_object {
         $this->moveform->display();
     }
 
-    public function move_questions($oldcat, $newcat){
+    public function move_questions($oldcat, $newcat) {
         global $DB;
         $questionids = $DB->get_records_select_menu('question',
                 'category = ? AND (parent = 0 OR parent = id)', array($oldcat), '', 'id,1');
@@ -536,12 +542,12 @@ class ajax_question_category_object {
             print_error('categorynamecantbeblank', 'question');
         }
         list($parentid, $contextid) = explode(',', $newparent);
-        //moodle_form makes sure select element output is legal no need for further cleaning
+        // moodle_form makes sure select element output is legal no need for further cleaning
         require_capability('moodle/question:managecategory', context::instance_by_id($contextid));
 
         if ($parentid) {
-            if(!($DB->get_field('question_categories', 'contextid', array('id' => $parentid)) == $contextid)) {
-                print_error('cannotinsertquestioncatecontext', 'question', '', array('cat'=>$newcategory, 'ctx'=>$contextid));
+            if (!($DB->get_field('question_categories', 'contextid', array('id' => $parentid)) == $contextid)) {
+                print_error('cannotinsertquestioncatecontext', 'question', '', array('cat' => $newcategory, 'ctx' => $contextid));
             }
         }
 
@@ -566,7 +572,7 @@ class ajax_question_category_object {
         if ($return) {
             return $categoryid;
         } else {
-            redirect($this->pageurl);//always redirect after successful action
+            redirect($this->pageurl);// always redirect after successful action
         }
     }
 

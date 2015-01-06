@@ -1,6 +1,5 @@
 <?php
 
-
 define('AJAX_SCRIPT', true);
 
 require_once("../../config.php");
@@ -10,7 +9,7 @@ require_once($CFG->dirroot."/local/ajaxcategories/category_class.php");
 $movingid = optional_param('movingid', 0, PARAM_INT);
 $before = optional_param('before', 0, PARAM_INT);
 $after = optional_param('after', 0, PARAM_INT);
-$level = optional_param('level', '',PARAM_ALPHA);
+$level = optional_param('level', '', PARAM_ALPHA);
 $dest = optional_param('dest', 0, PARAM_INT);
 
 list($thispageurl, $contexts, $cmid, $cm, $module, $pagevars) =
