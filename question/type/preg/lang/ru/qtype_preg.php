@@ -193,6 +193,8 @@ $string['char_code_too_big_node_error']            = 'Код символа {$a-
 $string['char_code_disallowed_node_error']         = 'Unicode-коды 0xd800 ... 0xdfff не разрешены.';
 $string['callout_big_number_node_error']           = 'Номер {$a->addinfo} callout слишком большой, не должен превышать 255.';
 $string['lnu_unsupported_node_error']              = 'Последовательности \L, \l, \N{name}, \U, и \u не поддерживаются.';
+$string['unknown_template_node_error']             = 'Неизвестный шаблон: {$a->addinfo}.';
+$string['wrong_template_params_count_node_error']  = 'Неверное количество параметров шаблона: {$a->addinfo->expected} ожидалось, {$a->addinfo->given} передано.';
 
 // Types and subtypes needed for authoring tools
 $string['leaf_charset_neg'] = 'отрицательный символьный класс';

@@ -310,7 +310,7 @@ class qtype_preg_parser#line 109 "../preg_parser.php"
         return clone $actualoperands[$node->number - 1];
     }
 
-    protected function create_template_node($originalnode) {
+    protected function create_template_node($originalnode, $closebrack = null) {
         $tleaf = $originalnode->type === qtype_preg_node::TYPE_LEAF_TEMPLATE;
         $tnode = $originalnode->type === qtype_preg_node::TYPE_NODE_TEMPLATE;
         if (!$tleaf && !$tnode) {
@@ -319,14 +319,30 @@ class qtype_preg_parser#line 109 "../preg_parser.php"
 
         if ($tnode) {
             foreach ($originalnode->operands as $key => $operand) {
-                $originalnode->operands[$key] = $this->create_template_node($operand);
+                $originalnode->operands[$key] = $this->create_template_node($operand, $closebrack);
             }
         }
 
         $templates = qtype_preg\template::available_templates();
+
+        if (!array_key_exists($originalnode->name, $templates)) {
+            $operands = $tleaf
+                      ? array()
+                      : $originalnode->operands;
+            return $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_TEMPLATE, $originalnode->name, $originalnode->position, $originalnode->userinscription, $operands);
+        }
+
         $template = $templates[$originalnode->name];
 
-        // TODO: check errors
+        if ($tnode && $template->placeholderscount !== count($originalnode->operands)) {
+            $position = new qtype_preg_position($originalnode->position->indfirst, $closebrack->position->indlast,
+                                                $originalnode->position->linefirst, $closebrack->position->linelast,
+                                                $originalnode->position->colfirst, $closebrack->position->collast);
+            $operands = $tleaf
+                      ? array()
+                      : $originalnode->operands;
+            return $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_TEMPLATE_PARAMS_COUNT, $originalnode->name, $position, $originalnode->userinscription, $operands);
+        }
 
         $options = new qtype_preg_handling_options();
         $options->modifiers = qtype_preg_handling_options::string_to_modifiers($template->options);
@@ -475,7 +491,7 @@ class qtype_preg_parser#line 109 "../preg_parser.php"
         }
         return false;
     }
-#line 482 "../preg_parser.php"
+#line 498 "../preg_parser.php"
 
 /* Next is all token values, as class constants
 */
@@ -1264,7 +1280,7 @@ static public $yy_action = array(
     **   function yy_r0($yymsp){ ... }           // User supplied code
     **  #line <lineno> <thisfile>
     */
-#line 393 "../preg_parser.y"
+#line 409 "../preg_parser.y"
     function yy_r0(){
     // Set the root node.
     $this->root = $this->yystack[$this->yyidx + 0]->minor;
@@ -1291,20 +1307,20 @@ static public $yy_action = array(
      // Assign identifiers.
     $this->assign_ids($this->root);
     }
-#line 1300 "../preg_parser.php"
-#line 420 "../preg_parser.y"
+#line 1316 "../preg_parser.php"
+#line 436 "../preg_parser.y"
     function yy_r1(){
     $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 1305 "../preg_parser.php"
-#line 424 "../preg_parser.y"
+#line 1321 "../preg_parser.php"
+#line 440 "../preg_parser.y"
     function yy_r2(){
     $this->_retvalue = $this->options->parsetemplates && !$this->options->preserveallnodes
       ? $this->create_template_node($this->yystack[$this->yyidx + 0]->minor)
       : $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 1312 "../preg_parser.php"
-#line 430 "../preg_parser.y"
+#line 1328 "../preg_parser.php"
+#line 446 "../preg_parser.y"
     function yy_r3(){
     if ($this->yystack[$this->yyidx + -1]->minor->type == qtype_preg_node::TYPE_NODE_CONCAT && $this->yystack[$this->yyidx + 0]->minor->type == qtype_preg_node::TYPE_NODE_CONCAT) {
         $this->yystack[$this->yyidx + -1]->minor->operands = array_merge($this->yystack[$this->yyidx + -1]->minor->operands, $this->yystack[$this->yyidx + 0]->minor->operands);
@@ -1322,8 +1338,8 @@ static public $yy_action = array(
     }
     $this->_retvalue->set_user_info($this->yystack[$this->yyidx + -1]->minor->position->compose($this->yystack[$this->yyidx + 0]->minor->position));
     }
-#line 1331 "../preg_parser.php"
-#line 448 "../preg_parser.y"
+#line 1347 "../preg_parser.php"
+#line 464 "../preg_parser.y"
     function yy_r4(){
     if ($this->yystack[$this->yyidx + -2]->minor->type == qtype_preg_node::TYPE_NODE_ALT && $this->yystack[$this->yyidx + 0]->minor->type == qtype_preg_node::TYPE_NODE_ALT) {
         $this->yystack[$this->yyidx + -2]->minor->operands = array_merge($this->yystack[$this->yyidx + -2]->minor->operands, $this->yystack[$this->yyidx + 0]->minor->operands);
@@ -1341,8 +1357,8 @@ static public $yy_action = array(
     }
     $this->_retvalue->set_user_info($this->yystack[$this->yyidx + -2]->minor->position->compose($this->yystack[$this->yyidx + 0]->minor->position), $this->yystack[$this->yyidx + -1]->minor->userinscription);
     }
-#line 1350 "../preg_parser.php"
-#line 466 "../preg_parser.y"
+#line 1366 "../preg_parser.php"
+#line 482 "../preg_parser.y"
     function yy_r5(){
     if ($this->yystack[$this->yyidx + -1]->minor->type == qtype_preg_node::TYPE_LEAF_META && $this->yystack[$this->yyidx + -1]->minor->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
         $this->_retvalue = $this->yystack[$this->yyidx + -1]->minor;
@@ -1362,8 +1378,8 @@ static public $yy_action = array(
     }
     $this->_retvalue->set_user_info($this->yystack[$this->yyidx + -1]->minor->position->compose($this->yystack[$this->yyidx + 0]->minor->position), $this->yystack[$this->yyidx + 0]->minor->userinscription);
     }
-#line 1371 "../preg_parser.php"
-#line 486 "../preg_parser.y"
+#line 1387 "../preg_parser.php"
+#line 502 "../preg_parser.y"
     function yy_r6(){
     if ($this->yystack[$this->yyidx + 0]->minor->type == qtype_preg_node::TYPE_LEAF_META && $this->yystack[$this->yyidx + 0]->minor->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
         $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
@@ -1383,33 +1399,33 @@ static public $yy_action = array(
     }
     $this->_retvalue->set_user_info($this->yystack[$this->yyidx + -1]->minor->position->compose($this->yystack[$this->yyidx + 0]->minor->position), $this->yystack[$this->yyidx + -1]->minor->userinscription);
     }
-#line 1392 "../preg_parser.php"
-#line 506 "../preg_parser.y"
+#line 1408 "../preg_parser.php"
+#line 522 "../preg_parser.y"
     function yy_r7(){
     $this->_retvalue = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
     $this->_retvalue->set_user_info($this->yystack[$this->yyidx + 0]->minor->position, $this->yystack[$this->yyidx + 0]->minor->userinscription);
     }
-#line 1398 "../preg_parser.php"
-#line 511 "../preg_parser.y"
+#line 1414 "../preg_parser.php"
+#line 527 "../preg_parser.y"
     function yy_r8(){
     $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     $this->_retvalue->set_user_info($this->yystack[$this->yyidx + -1]->minor->position->compose($this->yystack[$this->yyidx + 0]->minor->position), $this->yystack[$this->yyidx + 0]->minor->userinscription);
     $this->_retvalue->operands[0] = $this->yystack[$this->yyidx + -1]->minor;
     }
-#line 1405 "../preg_parser.php"
-#line 517 "../preg_parser.y"
+#line 1421 "../preg_parser.php"
+#line 533 "../preg_parser.y"
     function yy_r9(){
     $emptynode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
     $emptynode->set_user_info($this->yystack[$this->yyidx + 0]->minor->position->add_chars_right(-1), array_merge($this->yystack[$this->yyidx + -1]->minor->userinscription, $this->yystack[$this->yyidx + 0]->minor->userinscription));
     $this->_retvalue = $this->create_parens_node($this->yystack[$this->yyidx + -1]->minor, $emptynode, $this->yystack[$this->yyidx + 0]->minor);
     }
-#line 1412 "../preg_parser.php"
-#line 523 "../preg_parser.y"
+#line 1428 "../preg_parser.php"
+#line 539 "../preg_parser.y"
     function yy_r10(){
     $this->_retvalue = $this->create_parens_node($this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor);
     }
-#line 1417 "../preg_parser.php"
-#line 527 "../preg_parser.y"
+#line 1433 "../preg_parser.php"
+#line 543 "../preg_parser.y"
     function yy_r11(){
     if ($this->yystack[$this->yyidx + -4]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA || $this->yystack[$this->yyidx + -4]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA ||
         $this->yystack[$this->yyidx + -4]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB || $this->yystack[$this->yyidx + -4]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB) {
@@ -1418,8 +1434,8 @@ static public $yy_action = array(
         $this->_retvalue = $this->create_cond_subexpr_other_node($this->yystack[$this->yyidx + -4]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor);
     }
     }
-#line 1427 "../preg_parser.php"
-#line 536 "../preg_parser.y"
+#line 1443 "../preg_parser.php"
+#line 552 "../preg_parser.y"
     function yy_r12(){
     if ($this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA || $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA ||
         $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB || $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB) {
@@ -1428,8 +1444,8 @@ static public $yy_action = array(
         $this->_retvalue = $this->create_cond_subexpr_other_node($this->yystack[$this->yyidx + -3]->minor, null, $this->yystack[$this->yyidx + 0]->minor);
     }
     }
-#line 1437 "../preg_parser.php"
-#line 545 "../preg_parser.y"
+#line 1453 "../preg_parser.php"
+#line 561 "../preg_parser.y"
     function yy_r13(){
     if ($this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA || $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA ||
         $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB || $this->yystack[$this->yyidx + -3]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB) {
@@ -1438,8 +1454,8 @@ static public $yy_action = array(
         $this->_retvalue = $this->create_cond_subexpr_other_node($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + 0]->minor);
     }
     }
-#line 1447 "../preg_parser.php"
-#line 554 "../preg_parser.y"
+#line 1463 "../preg_parser.php"
+#line 570 "../preg_parser.y"
     function yy_r14(){
     if ($this->yystack[$this->yyidx + -2]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA || $this->yystack[$this->yyidx + -2]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA ||
         $this->yystack[$this->yyidx + -2]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB || $this->yystack[$this->yyidx + -2]->minor->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB) {
@@ -1448,118 +1464,91 @@ static public $yy_action = array(
         $this->_retvalue = $this->create_cond_subexpr_other_node($this->yystack[$this->yyidx + -2]->minor, null, $this->yystack[$this->yyidx + 0]->minor);
     }
     }
-#line 1457 "../preg_parser.php"
-#line 567 "../preg_parser.y"
+#line 1473 "../preg_parser.php"
+#line 583 "../preg_parser.y"
     function yy_r15(){
     $b = is_array($this->yystack[$this->yyidx + -2]->minor) ? $this->yystack[$this->yyidx + -2]->minor : array($this->yystack[$this->yyidx + -2]->minor);
     $d = is_array($this->yystack[$this->yyidx + 0]->minor) ? $this->yystack[$this->yyidx + 0]->minor : array($this->yystack[$this->yyidx + 0]->minor);
     $this->_retvalue = array_merge($b, $d);
     }
-#line 1464 "../preg_parser.php"
-#line 573 "../preg_parser.y"
+#line 1480 "../preg_parser.php"
+#line 589 "../preg_parser.y"
     function yy_r16(){
     $this->_retvalue = $this->yystack[$this->yyidx + -1]->minor;
     }
-#line 1469 "../preg_parser.php"
-#line 586 "../preg_parser.y"
+#line 1485 "../preg_parser.php"
+#line 602 "../preg_parser.y"
     function yy_r19(){
     $emptynode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
     $emptynode->set_user_info($this->yystack[$this->yyidx + 0]->minor->position->add_chars_right(-1), array_merge($this->yystack[$this->yyidx + -1]->minor->userinscription, $this->yystack[$this->yyidx + 0]->minor->userinscription));
     $this->_retvalue = $this->yystack[$this->yyidx + -1]->minor;
     $this->_retvalue->operands = array($emptynode);
+    if ($this->options->parsetemplates && !$this->options->preserveallnodes) {
+        $this->_retvalue = $this->create_template_node($this->_retvalue, $this->yystack[$this->yyidx + 0]->minor);
     }
-#line 1477 "../preg_parser.php"
-#line 593 "../preg_parser.y"
+    }
+#line 1496 "../preg_parser.php"
+#line 612 "../preg_parser.y"
     function yy_r20(){
     $this->_retvalue = $this->yystack[$this->yyidx + -2]->minor;
     $this->_retvalue->operands = is_array($this->yystack[$this->yyidx + -1]->minor) ? $this->yystack[$this->yyidx + -1]->minor : array($this->yystack[$this->yyidx + -1]->minor);
     if ($this->options->parsetemplates && !$this->options->preserveallnodes) {
-        $this->_retvalue = $this->create_template_node($this->_retvalue);
+        $this->_retvalue = $this->create_template_node($this->_retvalue, $this->yystack[$this->yyidx + 0]->minor);
     }
     }
-#line 1486 "../preg_parser.php"
-#line 606 "../preg_parser.y"
+#line 1505 "../preg_parser.php"
+#line 625 "../preg_parser.y"
     function yy_r21(){
-    $position = new qtype_preg_position($this->yystack[$this->yyidx + 0]->minor->position->indfirst, $this->yystack[$this->yyidx + 0]->minor->position->indlast,
-                                        $this->yystack[$this->yyidx + 0]->minor->position->linefirst, $this->yystack[$this->yyidx + 0]->minor->position->linelast,
-                                        $this->yystack[$this->yyidx + 0]->minor->position->colfirst, $this->yystack[$this->yyidx + 0]->minor->position->collast);
-    $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_OPEN_PAREN, $this->yystack[$this->yyidx + 0]->minor->userinscription[0]->data, $position, $this->yystack[$this->yyidx + 0]->minor->userinscription, array($this->yystack[$this->yyidx + -1]->minor));
+    $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_OPEN_PAREN, $this->yystack[$this->yyidx + 0]->minor->userinscription[0]->data, $this->yystack[$this->yyidx + 0]->minor->position, $this->yystack[$this->yyidx + 0]->minor->userinscription, array($this->yystack[$this->yyidx + -1]->minor));
     }
-#line 1494 "../preg_parser.php"
-#line 613 "../preg_parser.y"
+#line 1510 "../preg_parser.php"
+#line 629 "../preg_parser.y"
     function yy_r22(){
-    $position = new qtype_preg_position($this->yystack[$this->yyidx + 0]->minor->position->indfirst, $this->yystack[$this->yyidx + 0]->minor->position->indlast,
-                                        $this->yystack[$this->yyidx + 0]->minor->position->linefirst, $this->yystack[$this->yyidx + 0]->minor->position->linelast,
-                                        $this->yystack[$this->yyidx + 0]->minor->position->colfirst, $this->yystack[$this->yyidx + 0]->minor->position->collast);
     $b = is_array($this->yystack[$this->yyidx + -1]->minor) ? $this->yystack[$this->yyidx + -1]->minor : array($this->yystack[$this->yyidx + -1]->minor);
-    $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_OPEN_PAREN, $this->yystack[$this->yyidx + 0]->minor->userinscription[0]->data, $position, $this->yystack[$this->yyidx + 0]->minor->userinscription, $b);
+    $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_OPEN_PAREN, $this->yystack[$this->yyidx + 0]->minor->userinscription[0]->data, $this->yystack[$this->yyidx + 0]->minor->position, $this->yystack[$this->yyidx + 0]->minor->userinscription, $b);
     }
-#line 1503 "../preg_parser.php"
-#line 621 "../preg_parser.y"
+#line 1516 "../preg_parser.php"
+#line 634 "../preg_parser.y"
     function yy_r23(){
-    $position = new qtype_preg_position($this->yystack[$this->yyidx + 0]->minor->position->indfirst, $this->yystack[$this->yyidx + 0]->minor->position->indlast,
-                                        $this->yystack[$this->yyidx + 0]->minor->position->linefirst, $this->yystack[$this->yyidx + 0]->minor->position->linelast,
-                                        $this->yystack[$this->yyidx + 0]->minor->position->colfirst, $this->yystack[$this->yyidx + 0]->minor->position->collast);
-    $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_OPEN_PAREN, $this->yystack[$this->yyidx + 0]->minor->userinscription[0]->data, $position, $this->yystack[$this->yyidx + 0]->minor->userinscription);
+    $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_OPEN_PAREN, $this->yystack[$this->yyidx + 0]->minor->userinscription[0]->data, $this->yystack[$this->yyidx + 0]->minor->position, $this->yystack[$this->yyidx + 0]->minor->userinscription);
     }
-#line 1511 "../preg_parser.php"
-#line 628 "../preg_parser.y"
+#line 1521 "../preg_parser.php"
+#line 638 "../preg_parser.y"
     function yy_r24(){
-    $position = new qtype_preg_position($this->yystack[$this->yyidx + 0]->minor->position->indfirst, $this->yystack[$this->yyidx + 0]->minor->position->indlast,
-                                        $this->yystack[$this->yyidx + 0]->minor->position->linefirst, $this->yystack[$this->yyidx + 0]->minor->position->linelast,
-                                        $this->yystack[$this->yyidx + 0]->minor->position->colfirst, $this->yystack[$this->yyidx + 0]->minor->position->collast);
-    $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_OPEN_PAREN, $this->yystack[$this->yyidx + 0]->minor->userinscription[0]->data, $position, $this->yystack[$this->yyidx + 0]->minor->userinscription);
+    $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_OPEN_PAREN, $this->yystack[$this->yyidx + 0]->minor->userinscription[0]->data, $this->yystack[$this->yyidx + 0]->minor->position, $this->yystack[$this->yyidx + 0]->minor->userinscription);
     }
-#line 1519 "../preg_parser.php"
-#line 635 "../preg_parser.y"
-    function yy_r25(){
-    $position = new qtype_preg_position($this->yystack[$this->yyidx + -1]->minor->position->indfirst, $this->yystack[$this->yyidx + -1]->minor->position->indlast,
-                                        $this->yystack[$this->yyidx + -1]->minor->position->linefirst, $this->yystack[$this->yyidx + -1]->minor->position->linelast,
-                                        $this->yystack[$this->yyidx + -1]->minor->position->colfirst, $this->yystack[$this->yyidx + -1]->minor->position->collast);
-    $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, $this->yystack[$this->yyidx + -1]->minor->userinscription[0]->data, $position, $this->yystack[$this->yyidx + -1]->minor->userinscription, array($this->yystack[$this->yyidx + 0]->minor));
-    }
-#line 1527 "../preg_parser.php"
+#line 1526 "../preg_parser.php"
 #line 642 "../preg_parser.y"
+    function yy_r25(){
+    $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, $this->yystack[$this->yyidx + -1]->minor->userinscription[0]->data, $this->yystack[$this->yyidx + -1]->minor->position, $this->yystack[$this->yyidx + -1]->minor->userinscription, array($this->yystack[$this->yyidx + 0]->minor));
+    }
+#line 1531 "../preg_parser.php"
+#line 646 "../preg_parser.y"
     function yy_r26(){
-    $position = new qtype_preg_position($this->yystack[$this->yyidx + -1]->minor->position->indfirst, $this->yystack[$this->yyidx + -1]->minor->position->indlast,
-                                        $this->yystack[$this->yyidx + -1]->minor->position->linefirst, $this->yystack[$this->yyidx + -1]->minor->position->linelast,
-                                        $this->yystack[$this->yyidx + -1]->minor->position->colfirst, $this->yystack[$this->yyidx + -1]->minor->position->collast);
     $c = is_array($this->yystack[$this->yyidx + 0]->minor) ? $this->yystack[$this->yyidx + 0]->minor : array($this->yystack[$this->yyidx + 0]->minor);
-    $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_CLOSE_PAREN, $this->yystack[$this->yyidx + -1]->minor->userinscription[0]->data, $position, $this->yystack[$this->yyidx + -1]->minor->userinscription, $c);
+    $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_CLOSE_PAREN, $this->yystack[$this->yyidx + -1]->minor->userinscription[0]->data, $this->yystack[$this->yyidx + -1]->minor->position, $this->yystack[$this->yyidx + -1]->minor->userinscription, $c);
     }
-#line 1536 "../preg_parser.php"
-#line 650 "../preg_parser.y"
+#line 1537 "../preg_parser.php"
+#line 651 "../preg_parser.y"
     function yy_r27(){
-    $position = new qtype_preg_position($this->yystack[$this->yyidx + 0]->minor->position->indfirst, $this->yystack[$this->yyidx + 0]->minor->position->indlast,
-                                        $this->yystack[$this->yyidx + 0]->minor->position->linefirst, $this->yystack[$this->yyidx + 0]->minor->position->linelast,
-                                        $this->yystack[$this->yyidx + 0]->minor->position->colfirst, $this->yystack[$this->yyidx + 0]->minor->position->collast);
-    $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, $this->yystack[$this->yyidx + 0]->minor->userinscription[0]->data, $position, $this->yystack[$this->yyidx + 0]->minor->userinscription);
+    $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, $this->yystack[$this->yyidx + 0]->minor->userinscription[0]->data, $this->yystack[$this->yyidx + 0]->minor->position, $this->yystack[$this->yyidx + 0]->minor->userinscription);
     }
-#line 1544 "../preg_parser.php"
-#line 657 "../preg_parser.y"
+#line 1542 "../preg_parser.php"
+#line 655 "../preg_parser.y"
     function yy_r28(){
-    $position = new qtype_preg_position($this->yystack[$this->yyidx + 0]->minor->position->indfirst, $this->yystack[$this->yyidx + 0]->minor->position->indlast,
-                                        $this->yystack[$this->yyidx + 0]->minor->position->linefirst, $this->yystack[$this->yyidx + 0]->minor->position->linelast,
-                                        $this->yystack[$this->yyidx + 0]->minor->position->colfirst, $this->yystack[$this->yyidx + 0]->minor->position->collast);
-    $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_CLOSE_PAREN, $this->yystack[$this->yyidx + 0]->minor->userinscription[0]->data, $position, $this->yystack[$this->yyidx + 0]->minor->userinscription);
+    $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_CLOSE_PAREN, $this->yystack[$this->yyidx + 0]->minor->userinscription[0]->data, $this->yystack[$this->yyidx + 0]->minor->position, $this->yystack[$this->yyidx + 0]->minor->userinscription);
+    }
+#line 1547 "../preg_parser.php"
+#line 659 "../preg_parser.y"
+    function yy_r29(){
+    $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, $this->yystack[$this->yyidx + -3]->minor->userinscription[0]->data, $this->yystack[$this->yyidx + -3]->minor->position, $this->yystack[$this->yyidx + -3]->minor->userinscription, array($this->yystack[$this->yyidx + 0]->minor, $this->yystack[$this->yyidx + -2]->minor));
     }
 #line 1552 "../preg_parser.php"
-#line 664 "../preg_parser.y"
-    function yy_r29(){
-    $position = new qtype_preg_position($this->yystack[$this->yyidx + -3]->minor->position->indfirst, $this->yystack[$this->yyidx + -3]->minor->position->indlast,
-                                        $this->yystack[$this->yyidx + -3]->minor->position->linefirst, $this->yystack[$this->yyidx + -3]->minor->position->linelast,
-                                        $this->yystack[$this->yyidx + -3]->minor->position->colfirst, $this->yystack[$this->yyidx + -3]->minor->position->collast);
-    $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, $this->yystack[$this->yyidx + -3]->minor->userinscription[0]->data, $position, $this->yystack[$this->yyidx + -3]->minor->userinscription, array($this->yystack[$this->yyidx + 0]->minor, $this->yystack[$this->yyidx + -2]->minor));
-    }
-#line 1560 "../preg_parser.php"
-#line 685 "../preg_parser.y"
+#line 671 "../preg_parser.y"
     function yy_r32(){
-    $position = new qtype_preg_position($this->yystack[$this->yyidx + 0]->minor->position->indfirst, $this->yystack[$this->yyidx + 0]->minor->position->indlast,
-                                        $this->yystack[$this->yyidx + 0]->minor->position->linefirst, $this->yystack[$this->yyidx + 0]->minor->position->linelast,
-                                        $this->yystack[$this->yyidx + 0]->minor->position->colfirst, $this->yystack[$this->yyidx + 0]->minor->position->collast);
-    $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER, $this->yystack[$this->yyidx + 0]->minor->userinscription[0]->data, $position, $this->yystack[$this->yyidx + 0]->minor->userinscription);
+    $this->_retvalue = $this->create_error_node(qtype_preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER, $this->yystack[$this->yyidx + 0]->minor->userinscription[0]->data, $this->yystack[$this->yyidx + 0]->minor->position, $this->yystack[$this->yyidx + 0]->minor->userinscription);
     }
-#line 1568 "../preg_parser.php"
+#line 1557 "../preg_parser.php"
 
     /**
      * placeholder for the left hand side in a reduce operation.
@@ -1660,12 +1649,12 @@ static public $yy_action = array(
         }
         /* Here code is inserted which will be executed whenever the
         ** parser fails */
-#line 374 "../preg_parser.y"
+#line 390 "../preg_parser.y"
 
     if (count($this->errornodes) === 0) {
         $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_ERROR, null, new qtype_preg_position(), array());
     }
-#line 1675 "../preg_parser.php"
+#line 1664 "../preg_parser.php"
     }
 
     /**

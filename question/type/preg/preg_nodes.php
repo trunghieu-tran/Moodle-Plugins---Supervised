@@ -2057,8 +2057,10 @@ class qtype_preg_node_error extends qtype_preg_operator {
     const SUBTYPE_CHAR_CODE_DISALLOWED         = 'char_code_disallowed_node_error';           // Character code disallowed.
     const SUBTYPE_CALLOUT_BIG_NUMBER           = 'callout_big_number_node_error';             // Too big number in (?C...).
     const SUBTYPE_LNU_UNSUPPORTED              = 'lnu_unsupported_node_error';                // \L, \l, \N{name}, \U, and \u are unsupported.
+    const SUBTYPE_UNKNOWN_TEMPLATE             = 'unknown_template_node_error';               // Unknown template name.
+    const SUBTYPE_WRONG_TEMPLATE_PARAMS_COUNT  = 'wrong_template_params_count_node_error';    // Incorrect number of parameters for a template.
 
-    /** Additional info, should be a string. */
+    /** Additional info. */
     public $addinfo;
 
     public function __construct($subtype = null, $addinfo = null) {
