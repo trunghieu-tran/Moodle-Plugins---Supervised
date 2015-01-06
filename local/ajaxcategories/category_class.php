@@ -80,7 +80,7 @@ class ajax_question_category_list extends moodle_list {
         }
         $item = $this->find_item($movingid);
         //  Define the place of replacing
-        if ($environment['after'] != -1 && $environment['level'] != "inner") {
+        if ($environment['after'] != -1) {
             // Replacing at the same level after some item.
             $afteritem = $environment['dest']->find_item($environment['after']);
             if ($environment['level'] != "inner") {
@@ -90,10 +90,16 @@ class ajax_question_category_list extends moodle_list {
                 } else {
                     $newparent = 0;
                 }
+
                 $DB->set_field($this->table, "parent", $newparent, array("id"=>$item->id));
                 $newpeers = $this->get_items_peers($afteritem->id);
                 $oldkey = array_search($afteritem->id, $newpeers);
-                $neworder = array_merge(array_slice($newpeers, 0, $oldkey+1), array($item->id), array_slice($newpeers, $oldkey+1));
+                $key = array_search($item->id, $newpeers);
+                if ($oldkey < $key) {
+                    $neworder = array_merge(array_slice($newpeers, 0, $oldkey+1), array($item->id), array_slice($newpeers, $oldkey+1, $key-1), array_slice($newpeers, $key+1));
+                } else {
+                    $neworder = array_merge(array_slice($newpeers, 0, $key), array_slice($newpeers, $key+1, $oldkey), array($item->id),  array_slice($newpeers, $oldkey +1));
+                }
                 $this->reorder_peers($neworder);
             } else {
                 $newlist = new ajax_question_category_list($this->type, $this->attributes, $this->editable, $this->pageurl, $this->page, $this->pageparamname,  $this->itemsperpage, $this->context);
@@ -103,7 +109,6 @@ class ajax_question_category_list extends moodle_list {
             }
         } else {
             $beforeitem = $environment['dest']->find_item($environment['before']);
-            //var_dump($beforeitem);
             if (isset($beforeitem->parentlist->parentitem)) {
 
                 $newparent = $beforeitem->parentlist->parentitem->id;
@@ -112,13 +117,10 @@ class ajax_question_category_list extends moodle_list {
             }
             $DB->set_field($this->table, "parent", $newparent, array("id"=>$item->id));
             $newpeers = $this->get_items_peers($beforeitem->id);
-            var_dump($newpeers);
+
             $oldkey = array_search($beforeitem->id, $newpeers);
             $key = array_search($item->id, $newpeers);
             $neworder = array_merge(array_slice($newpeers, 0, $oldkey), array($item->id), array_slice($newpeers, $oldkey, $key), array_slice($newpeers, $key+1));
-
-            var_dump($neworder);
-            var_dump($key);
             $this->reorder_peers($neworder);
         }
     }
