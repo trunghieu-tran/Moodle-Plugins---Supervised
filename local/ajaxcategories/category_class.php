@@ -62,6 +62,7 @@ class ajax_question_category_list extends moodle_list {
         $this->records = get_categories_for_contexts($this->context->id, $this->sortby);
     }
 
+
     /**
      * Replace category item in choosen place.
      *
@@ -73,12 +74,22 @@ class ajax_question_category_list extends moodle_list {
      */
     function change_category_list($movingid, $environment) {
         global $DB;
-        // Change context.
-        if ($environment['dest']->context != $this->context->id) {
-            // Moving to a new context. Must move files belonging to questions.
-            question_move_category_to_context($movingid, $this->context, $environment['dest']->context);
-        }
+
         $item = $this->find_item($movingid);
+        // Change context.
+        if ($environment['dest']->context->id != $this->context->id) {
+            // Moving to a new context. Must move files belonging to questions.
+            $children = $item->get_all_children();
+            $children[] = $movingid;
+            var_dump($children);
+            foreach ($children as $child) {
+                $oldcat = $DB->get_record('question_categories', array('id' => $child), '*', MUST_EXIST);
+                $oldcat->contextid = $environment['dest']->context->id;
+                $DB->update_record('question_categories', $oldcat);
+            }
+
+        }
+
         //  Define the place of replacing
         if ($environment['after'] != -1) {
             // Replacing at the same level after some item.
@@ -91,8 +102,8 @@ class ajax_question_category_list extends moodle_list {
                     $newparent = 0;
                 }
 
-                $DB->set_field($this->table, "parent", $newparent, array("id"=>$item->id));
-                $newpeers = $this->get_items_peers($afteritem->id);
+                $DB->set_field($environment['dest']->table, "parent", $newparent, array("id"=>$item->id));
+                $newpeers = $environment['dest']->get_items_peers($afteritem->id);
                 var_dump($newpeers);
                 $oldkey = array_search($afteritem->id, $newpeers);
                 $key = array_search($item->id, $newpeers);
@@ -107,12 +118,12 @@ class ajax_question_category_list extends moodle_list {
                     $neworder = array_merge(array_slice($newpeers, 0, $oldkey+1), array($item->id), array_slice($newpeers, $oldkey+1));
                 }
                 var_dump($neworder);
-                $this->reorder_peers($neworder);
+                $environment['dest']->reorder_peers($neworder);
             } else {
                 $newlist = new ajax_question_category_list($this->type, $this->attributes, $this->editable, $this->pageurl, $this->page, $this->pageparamname,  $this->itemsperpage, $this->context);
                 $newlist->parentitem = $afteritem;
                 $newparent = $afteritem->id;
-                $DB->set_field($this->table, "parent", $newparent, array("id"=>$item->id));
+                $DB->set_field($environment['dest']->table, "parent", $newparent, array("id"=>$item->id));
             }
         } else {
             $beforeitem = $environment['dest']->find_item($environment['before']);
@@ -121,9 +132,9 @@ class ajax_question_category_list extends moodle_list {
             } else {
                 $newparent = 0;
             }
-            $DB->set_field($this->table, "parent", $newparent, array("id"=>$item->id));
-            $newpeers = $this->get_items_peers($beforeitem->id);
-
+            $DB->set_field($environment['dest']->table, "parent", $newparent, array("id"=>$item->id));
+            $newpeers = $environment['dest']->get_items_peers($beforeitem->id);
+            var_dump($newpeers);
             $oldkey = array_search($beforeitem->id, $newpeers);
             $key = array_search($item->id, $newpeers);
             if ($key) {
@@ -131,7 +142,8 @@ class ajax_question_category_list extends moodle_list {
             } else {
                 $neworder = array_merge(array_slice($newpeers, 0, $oldkey), array($item->id), array_slice($newpeers, $oldkey));
             }
-            $this->reorder_peers($neworder);
+            var_dump($neworder);
+            $environment['dest']->reorder_peers($neworder);
         }
     }
 
@@ -208,6 +220,19 @@ class ajax_question_category_list extends moodle_list {
  *
  */
 class ajax_question_category_list_item extends list_item {
+    public function get_all_children() {
+        $children = array();
+        if (isset($this->children)) {
+            if (isset($this->children->items)) {
+                foreach ($this->children->items as $item) {
+                    $children[] = $item->id;
+                    $children = array_merge($children,$item->get_all_children());
+                }
+            }
+        }
+        return $children;
+    }
+
     public function set_icon_html($first, $last, $lastitem){
         global $CFG;
         $category = $this->item;
