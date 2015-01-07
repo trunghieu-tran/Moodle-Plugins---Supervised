@@ -2836,6 +2836,26 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
+    function data_for_test_extended_local() {
+        $test1 = array( 'str'=>'abcdefg',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>7));
+
+        $test2 = array( 'str'=>'ab: c   d  e fg',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2),
+                        'left'=>array(5),
+                        'next'=>'c');
+
+        return array('regex'=>'ab(?x: c   d  e )fg',
+                     'tests'=>array($test1, $test2),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+    }
+
     // Tests for cases with ambiguity - subexpressions, quantifiers and backreferences.
     function data_for_test_empty_match() {
         $test1 = array( 'str'=>'abcd',
