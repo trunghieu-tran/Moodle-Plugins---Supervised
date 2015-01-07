@@ -80,7 +80,6 @@ class ajax_question_category_list extends moodle_list {
 
                 $DB->set_field($environment['dest']->table, "parent", $newparent, array("id" => $item->id));
                 $newpeers = $environment['dest']->get_items_peers($afteritem->id);
-                var_dump($newpeers);
                 // Place of item after which should be added moving category.
                 $oldkey = array_search($afteritem->id, $newpeers);
                 // Place of moving category.
@@ -89,13 +88,12 @@ class ajax_question_category_list extends moodle_list {
                 if ($key) {
                     // Replace moving category up.
                     if ($oldkey < $key) {
-                        if ($key !== count($newpeers) - 1) {
-                            $neworder = array_merge(array_slice($newpeers, 0, $oldkey + 1), array($item->id),
-                                                   array_slice($newpeers, $oldkey + 1, $key - 1), array_slice($newpeers, $key + 1));
-                        } else {
-                            $neworder = array_merge(array_slice($newpeers, 0, $oldkey + 1), array($item->id),
-                                                    array_slice($newpeers, $oldkey + 1, $key - 2));
-                        }
+                        $neworder = array_merge(array_slice($newpeers, 0, $oldkey + 1), array($item->id));
+                        $left = array_slice($newpeers, $oldkey + 1);
+                        $keyleft = array_search($item->id, $left);
+                        unset($left[$keyleft]);
+                        $left = array_values($left);
+                        $neworder = array_merge($neworder, $left);
                     } else {
                         // Replace moving category down.
                         $neworder = array_merge(array_slice($newpeers, 0, $key), array_slice($newpeers, $key + 1, $oldkey),
