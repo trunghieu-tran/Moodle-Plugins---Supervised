@@ -644,17 +644,49 @@ class qtype_preg_regex_handler {
      * @param string regex - regular expression for building tree.
      */
     protected function build_tree($regex) {
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $this->lexer = new qtype_preg_lexer($pseudofile);
-        $this->lexer->set_options($this->options);
-        $this->parser = new qtype_preg_parser($this->lexer, $this->options);
-        fclose($pseudofile);
+        $tokens = array();
+        if ($this->options->parsetemplates && !$this->options->preserveallnodes) {
+            // Do preprocessing if templates parsing is needed
+            $resultregex = '';
+            $tokens = qtype_preg\template::process_regex($regex, $this->options, $this->lexer, $resultregex);
+        } else {
+            StringStreamController::createRef('regex', $regex);
+            $pseudofile = fopen('string://regex', 'r');
+            $this->lexer = new qtype_preg_lexer($pseudofile);
+            $this->lexer->set_options($this->options);
+            while (($token = $this->lexer->nextToken()) !== null) {
+                if (is_array($token)) {
+                    foreach ($token as $curtoken) {
+                        $tokens[] = $curtoken;
+                    }
+                } else {
+                    $tokens[] = $token;
+                }
+            }
+            fclose($pseudofile);
+        }
 
-        // Lexer finds errors for unclosed character sets or wrong modifiers.
-        // Parser finds other errors and stores them inside AST nodes.
-        // Parser accumulates both kinds of error nodes (lexing and parsing).
-        foreach ($this->parser->get_error_nodes() as $node) {
+        // Pass tokens to the parser.
+        $this->parser = new qtype_preg_parser($this->options);
+        foreach ($tokens as $token) {
+            $this->parser->doParse($token->type, $token->value);
+        }
+
+        // Lexer returns errors for an unclosed character set or wrong modifiers.
+        $lexerrors = $this->lexer->get_error_nodes();
+        foreach ($lexerrors as $node) {
+            if ($node->subtype == qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET || $node->subtype == qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING) {
+                $this->parser->doParse(qtype_preg_parser::PARSELEAF, $node);
+            }
+            $this->errornodes[] = $node;
+            $this->errors[] = new qtype_preg_parsing_error($regex, $node);
+        }
+
+        $this->parser->doParse(0, 0);
+
+        // Parser contains other errors inside AST nodes.
+        $parseerrors = $this->parser->get_error_nodes();
+        foreach ($parseerrors as $node) {
             $this->errornodes[] = $node;
             // There can be a specific accepting error.
             if ($node->subtype == qtype_preg_node_error::SUBTYPE_LNU_UNSUPPORTED) {

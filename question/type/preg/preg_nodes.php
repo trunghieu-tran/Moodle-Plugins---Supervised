@@ -219,6 +219,14 @@ class qtype_preg_lexem {
         $this->position = $position;
         $this->userinscription = $userinscription;
     }
+
+    public function plain_userinscription() {
+        $result = '';
+        foreach ($this->userinscription as $ui) {
+            $result .= $ui;
+        }
+        return $result;
+    }
 }
 
 /**
@@ -304,7 +312,7 @@ abstract class qtype_preg_node {
     public $errors = array();
     /** An instance of qtype_preg_position. */
     public $position = null;
-    /** An instance of qtype_preg_userinscription. */
+    /** An array of qtype_preg_userinscription objects. */
     public $userinscription = null;
     /** Identifier of this node. */
     public $id = -1;
@@ -422,6 +430,14 @@ abstract class qtype_preg_node {
     public function set_user_info($position, $userinscription = array()) {
         $this->position = $position;
         $this->userinscription = $userinscription;
+    }
+
+    public function plain_userinscription() {
+        $result = '';
+        foreach ($this->userinscription as $ui) {
+            $result .= $ui;
+        }
+        return $result;
     }
 
     /**
