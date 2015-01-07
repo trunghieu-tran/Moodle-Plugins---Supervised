@@ -56,10 +56,9 @@ class qtype_preg_matching_options_test extends PHPUnit_Framework_TestCase {
             $classname = 'qtype_preg_' . $matchername;
             $failmsg = $matchername . ' has failed';
             // Native notation.
-            // Line breaks should be ignored.
             $options = clone $this->options;
             $options->notation = 'native';
-            $matcher = new $classname("1\naA\n", $options);
+            $matcher = new $classname("1aA", $options);
             // Simple match.
             $results = $matcher->match('1aA');
             $this->assertTrue($results->full, $failmsg);
@@ -106,10 +105,9 @@ class qtype_preg_matching_options_test extends PHPUnit_Framework_TestCase {
 
             // Moodle shortanswer notation.
             // Just string with * wildcard matching any number of any characters.
-            // Line breaks should be ignored.
             $options = clone $this->options;
             $options->notation = 'mdlshortanswer';
-            $matcher = new $classname("1+*a\nA", $options);
+            $matcher = new $classname("1+*aA", $options);
             // Simple match.
             $results = $matcher->match('1+ aA');
             $this->assertTrue($results->full, $failmsg);
@@ -129,11 +127,10 @@ class qtype_preg_matching_options_test extends PHPUnit_Framework_TestCase {
             $classname = 'qtype_preg_' . $matchername;
             $failmsg = $matchername . ' has failed';
             // Native notation.
-            // Line breaks should be ignored.
             $options = clone $this->options;
             $options->exactmatch = true;
             $options->notation = 'native';
-            $matcher = new $classname("1\naA\n", $options);
+            $matcher = new $classname("1aA", $options);
             // Simple match.
             $results = $matcher->match('1aA');
             $this->assertTrue($results->full, $failmsg);
@@ -193,11 +190,10 @@ class qtype_preg_matching_options_test extends PHPUnit_Framework_TestCase {
 
             // Moodle shortanswer notation.
             // Just string with * wildcard matching any number of any characters.
-            // Line breaks should be ignored.
             $options = clone $this->options;
             $options->exactmatch = true;
             $options->notation = 'mdlshortanswer';
-            $matcher = new $classname("1+*a\nA", $options);
+            $matcher = new $classname("1+*aA", $options);
             // Simple match.
             $results = $matcher->match('1+ aA');
             $this->assertTrue($results->full, $failmsg);
@@ -221,11 +217,10 @@ class qtype_preg_matching_options_test extends PHPUnit_Framework_TestCase {
             $classname = 'qtype_preg_' . $matchername;
             $failmsg = $matchername . ' has failed';
             // Native notation.
-            // Line breaks should be ignored.
             $options = clone $this->options;
             $options->modifiers = $this->question->get_modifiers(false);
             $options->notation = 'native';
-            $matcher = new $classname("a\nbc\n", $options);
+            $matcher = new $classname("abc", $options);
             // Simple match.
             $results = $matcher->match('abc');
             $this->assertTrue($results->full, $failmsg);
@@ -267,11 +262,10 @@ class qtype_preg_matching_options_test extends PHPUnit_Framework_TestCase {
 
             // Moodle shortanswer notation.
             // Just string with * wildcard matching any number of any characters.
-            // Line breaks should be ignored.
             $options = clone $this->options;
             $options->modifiers = $this->question->get_modifiers(false);
             $options->notation = 'mdlshortanswer';
-            $matcher = new $classname("a+*b\nc", $options);
+            $matcher = new $classname("a+*bc", $options);
             // Simple match.
             $results = $matcher->match('A+ bC');
             $this->assertTrue($results->full, $failmsg);
