@@ -30,6 +30,9 @@
     // Map subexpression number => nodes (possibly duplicates).
     private $subexpr_number_to_nodes_map;
 
+    // Map template node index in string => actual parsed node.
+    private $parsed_templates;
+
     public function __construct($lexer, $options = null) {
         $this->root = null;
         $this->lexer = $lexer;
@@ -42,6 +45,7 @@
         $this->subpatt_counter = 0;
         $this->subpatt_number_to_node_map = array();
         $this->subexpr_number_to_nodes_map = array();
+        $this->parsed_templates = array();
 
         // Do parsing.
 
@@ -50,10 +54,12 @@
         while (($token = $this->lexer->nextToken()) !== null) {
             if (!is_array($token)) {
 //                echo "token: {$token->value->userinscription[0]}\n";
+                $this->parse_template($token);
                 $this->doParse($token->type, $token->value);
             } else {
                 foreach ($token as $curtoken) {
 //                    echo "token: {$curtoken->value->userinscription[0]}\n";
+                    $this->parse_template($curtoken);
                     $this->doParse($curtoken->type, $curtoken->value);
                 }
             }
@@ -208,43 +214,66 @@
     }
 
     protected function create_template_node($originalnode, $closebrack = null) {
-        $tleaf = $originalnode->type === qtype_preg_node::TYPE_LEAF_TEMPLATE;
-        $tnode = $originalnode->type === qtype_preg_node::TYPE_NODE_TEMPLATE;
-        if (!$tleaf && !$tnode) {
+        if (!$this->options->parsetemplates || $this->options->preserveallnodes) {
             return $originalnode;
         }
-
-        if ($tnode) {
-            foreach ($originalnode->operands as $key => $operand) {
-                $originalnode->operands[$key] = $this->create_template_node($operand, $closebrack);
+        $tnode = $originalnode->type === qtype_preg_node::TYPE_NODE_TEMPLATE;
+        $key = $originalnode->position->indfirst;
+        $parsed = $this->parsed_templates[$key];
+        if ($parsed->type === qtype_preg_node::TYPE_NODE_ERROR) {
+            // Unknown template
+            if ($tnode) {
+                $parsed->operands = $originalnode->operands;
             }
+            return $parsed;
         }
 
         $templates = qtype_preg\template::available_templates();
-
-        if (!array_key_exists($originalnode->name, $templates)) {
-            $operands = $tleaf
-                      ? array()
-                      : $originalnode->operands;
-            return $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_TEMPLATE, $originalnode->name, $originalnode->position, $originalnode->userinscription, $operands);
-        }
-
         $template = $templates[$originalnode->name];
 
-        if ($tnode && $template->placeholderscount !== count($originalnode->operands)) {
+        if (($template->placeholderscount === 0 && $tnode) ||    // Template leaf called as a node
+            ($template->placeholderscount > 0 && !$tnode)  ||    // Template node called as a leaf
+            ($template->placeholderscount > 0 && $tnode && $template->placeholderscount !== count($originalnode->operands))) {  // Template node with incorrect number of arguments
+
             $position = new qtype_preg_position($originalnode->position->indfirst, $closebrack->position->indlast,
                                                 $originalnode->position->linefirst, $closebrack->position->linelast,
                                                 $originalnode->position->colfirst, $closebrack->position->collast);
-            $operands = $tleaf
-                      ? array()
-                      : $originalnode->operands;
+            $operands = $tnode
+                      ? $originalnode->operands
+                      : array();
             return $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_TEMPLATE_PARAMS_COUNT, $originalnode->name, $position, $originalnode->userinscription, $operands);
         }
+
+
+        if ($tnode) {
+            $parsed = $this->substitute_template_placeholders($parsed, $originalnode->operands);
+        }
+
+        return $parsed;
+    }
+
+    protected function parse_template($token) {
+        if (!$this->options->parsetemplates || $this->options->preserveallnodes) {
+            return;
+        }
+        if ($token->type !== qtype_preg_parser::TEMPLATEPARSELEAF && $token->type !== qtype_preg_parser::TEMPLATEOPENBRACK) {
+            return;
+        }
+
+        $key = $token->value->position->indfirst;
+
+        $templates = qtype_preg\template::available_templates();
+        if (!array_key_exists($token->value->name, $templates)) {
+            $this->parsed_templates[$key] = $this->create_error_node(qtype_preg_node_error::SUBTYPE_UNKNOWN_TEMPLATE, $token->value->name, $token->value->position, $token->value->userinscription, array());
+            return;
+        }
+
+        $template = $templates[$token->value->name];
 
         $options = new qtype_preg_handling_options();
         $options->modifiers = qtype_preg_handling_options::string_to_modifiers($template->options);
 
-        $theregex = '(?:' . $template->regex . ')';
+        $theregex = '(?:' . $template->regex . ')';                         // Add top-level grouping
         StringStreamController::createRef('regex', $theregex);
         $pseudofile = fopen('string://regex', 'r');
         $lexer = new qtype_preg_lexer($pseudofile);
@@ -257,12 +286,7 @@
         $this->lexer->set_max_subexpr($lexer->get_max_subexpr());
         fclose($pseudofile);
 
-        $result = $parser->get_root()->operands[0]; // Can skip explicit top-level grouping now
-        if ($tnode) {
-            $result = $this->substitute_template_placeholders($result, $originalnode->operands);
-        }
-
-        return $result;
+        $this->parsed_templates[$key] = $parser->get_root()->operands[0];   // Skip top-level grouping added above
     }
 
     protected function build_subexpr_number_to_nodes_map($node) {
@@ -440,9 +464,7 @@ expr(A) ::= PARSELEAF(B). {
 }
 
 expr(A) ::= TEMPLATEPARSELEAF(B). {
-    A = $this->options->parsetemplates && !$this->options->preserveallnodes
-      ? $this->create_template_node(B)
-      : B;
+    A = $this->create_template_node(B);
 }
 
 expr(A) ::= expr(B) expr(C). [CONC] {
@@ -604,19 +626,13 @@ expr(A) ::= TEMPLATESEP(B). [TEMPLATESEP_SHORTEST] {
 expr(A) ::= TEMPLATEOPENBRACK(B) TEMPLATECLOSEBRACK(C). {
     $emptynode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
     $emptynode->set_user_info(C->position->add_chars_right(-1), array_merge(B->userinscription, C->userinscription));
-    A = B;
-    A->operands = array($emptynode);
-    if ($this->options->parsetemplates && !$this->options->preserveallnodes) {
-        A = $this->create_template_node(A, C);
-    }
+    B->operands = array($emptynode);
+    A = $this->create_template_node(B, C);
 }
 
 expr(A) ::= TEMPLATEOPENBRACK(B) expr(C) TEMPLATECLOSEBRACK(D). {
-    A = B;
-    A->operands = is_array(C) ? C : array(C);
-    if ($this->options->parsetemplates && !$this->options->preserveallnodes) {
-        A = $this->create_template_node(A, D);
-    }
+    B->operands = is_array(C) ? C : array(C);
+    A = $this->create_template_node(B, D);
 }
 
 /**************************************************
