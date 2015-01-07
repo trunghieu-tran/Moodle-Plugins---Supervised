@@ -118,7 +118,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
                     if (item) {
                         beforeitemid = -1;
                         afteritemid = item.getAttribute('data-id');
-                        level = 'inner';
+                        level = 'normal';
                     }
                 }
                 addednode.append(child);
@@ -152,7 +152,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
                     if (item !== undefined && item !== null) {
                         beforeitemid = -1;
                         afteritemid = item.getAttribute('data-id');
-                        level = 'normal';
+                        level = 'inner';
                     }
                 }
                 // Add dragged node to list.
