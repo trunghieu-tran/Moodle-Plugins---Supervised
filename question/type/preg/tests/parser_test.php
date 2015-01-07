@@ -14,6 +14,18 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 
+// Set templates for testing purposes
+qtype_preg\template::set_available_templates(array(
+    'word' => new qtype_preg\template('word', '\w+'),
+    'integer' => new qtype_preg\template('integer', '[+-]?\d+'),
+    'word_and_integer' => new qtype_preg\template('word_and_integer', '(?###word)(?###integer)'),
+    'parens_req' => new qtype_preg\template('parens_req', '(   \(    (?:$$1|(?-1))   \)  )', 'x', 1),
+    'parens_opt' => new qtype_preg\template('parens_opt', '$$1|(?###parens_req<)$$1(?###>)', '', 1),
+    'brackets_req' => new qtype_preg\template('brackets_req', '(\[(?:$$1|(?-1))\])', '', 1),
+    'word_in_parens' => new qtype_preg\template('word_in_parens', '(?###parens_req<)(?###word)(?###>)'),
+    'word_in_parens_in_brackets' => new qtype_preg\template('word_in_parens_in_brackets', '(?###brackets_req<)(?###parens_req<)(?###word)(?###>)(?###>)'),
+));
+
 class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
 
     /**
@@ -653,34 +665,36 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $handler = $this->run_handler('(?###smth<)');
         $errors = $handler->get_error_nodes();
         $root = $handler->get_ast_root();
-        $this->assertTrue(count($errors) === 1);
+        $this->assertTrue(count($errors) === 2);
         $this->assertTrue($errors[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
-        $this->assertTrue($errors[0]->subtype === qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_CLOSE_PAREN);
-        $handler = $this->run_handler('(?###smth<)a');
+        $this->assertTrue($errors[0]->subtype === qtype_preg_node_error::SUBTYPE_UNKNOWN_TEMPLATE);
+        $this->assertTrue($errors[1]->type === qtype_preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errors[1]->subtype === qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_CLOSE_PAREN);
+        $handler = $this->run_handler('(?###parens_req<)a');
         $errors = $handler->get_error_nodes();
         $root = $handler->get_ast_root();
         $this->assertTrue(count($errors) === 1);
         $this->assertTrue($errors[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
         $this->assertTrue($errors[0]->subtype === qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_CLOSE_PAREN);
-        $handler = $this->run_handler('(?###smth<)a(?###,)b');
+        $handler = $this->run_handler('(?###parens_req<)a(?###,)b');
         $errors = $handler->get_error_nodes();
         $root = $handler->get_ast_root();
         $this->assertTrue(count($errors) === 1);
         $this->assertTrue($errors[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
         $this->assertTrue($errors[0]->subtype === qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_CLOSE_PAREN);
-        $handler = $this->run_handler('(?###smth<)a(?###,)');
+        $handler = $this->run_handler('(?###parens_req<)a(?###,)');
         $errors = $handler->get_error_nodes();
         $root = $handler->get_ast_root();
         $this->assertTrue(count($errors) === 1);
         $this->assertTrue($errors[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
         $this->assertTrue($errors[0]->subtype === qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_CLOSE_PAREN);
-        $handler = $this->run_handler('(?###smth<)(?###,)b');
+        $handler = $this->run_handler('(?###parens_req<)(?###,)b');
         $errors = $handler->get_error_nodes();
         $root = $handler->get_ast_root();
         $this->assertTrue(count($errors) === 1);
         $this->assertTrue($errors[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
         $this->assertTrue($errors[0]->subtype === qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_CLOSE_PAREN);
-        $handler = $this->run_handler('(?###smth<)(?###,)');
+        $handler = $this->run_handler('(?###parens_req<)(?###,)');
         $errors = $handler->get_error_nodes();
         $root = $handler->get_ast_root();
         $this->assertTrue(count($errors) === 1);
