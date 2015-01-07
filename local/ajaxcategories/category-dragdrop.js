@@ -169,8 +169,8 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         var drag = e.target;
         var dragnode = drag.get('node');
         // Get copy of parent.
-        cloneancestor = dragnode.get('parentNode').cloneNode(true);
-        ancestor = dragnode.get('parentNode');
+        cloneancestor = dragnode.get('parentNode').get('parentNode').cloneNode(true);
+        ancestor = dragnode.get('parentNode').get('parentNode');
         //Set new style
         drag.get('node').setStyle('opacity', '.25');
         // Remove bottom placeholder.
@@ -189,7 +189,11 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         // Get id of dragged category.
         movingid = item.getAttribute('data-id');
         // Remove dragged node from old place.
+        var oldparent = dragnode.get('parentNode');
         drag.get('node').remove();
+        if (oldparent.get('children').size() == 1) {
+            oldparent.remove();
+        }
     });
 
     //Listen for a drag:end events
