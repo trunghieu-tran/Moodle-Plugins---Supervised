@@ -29,6 +29,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
     var ancestor;
     var cloneancestor;
     var options = {};
+    var childadded;
 
     /**
      * Make ajax request.
@@ -60,10 +61,11 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         if (child !== undefined && child !== null && !change) {
             child.remove();
         }
-        if (addednodewasadd) {
+        if (addednodewasadd && !childadded) {
             addednode.remove();
         }
         change = false;
+        childadded = false;
         // Get contextid of dropped list.
         contextid = drop.getAttribute('data-id');
         if (contextid === null ||  contextid == '') {
@@ -205,6 +207,9 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
             opacity: '1'
         });
         change = true;
+        if (level == 'inner') {
+            childadded = true;
+        }
         // Check count of top categories in each context.
         // Get top items.
         var topitems = Y.Node.all('ul[data-id]');
