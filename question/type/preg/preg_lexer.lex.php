@@ -187,15 +187,6 @@ class qtype_preg_lexer extends JLexBase  {
         }
         return null;
     }
-    public function set_initial_subexpr($value = 0) {
-        $this->initialsubexpr = $value;
-    }
-    public function set_last_subexpr($value = 0) {
-        $this->lastsubexpr = $value;
-    }
-    public function set_max_subexpr($value = 0) {
-        $this->maxsubexpr = max($this->maxsubexpr, $value);
-    }
     public function get_skipped_positions() {
         return $this->skipped_positions;
     }
@@ -7349,7 +7340,7 @@ array(
         } else if ($this->comment === '##>') {
             // Template close bracket
             $closebr = new qtype_preg_lexem();
-            $closebr->set_user_info($position, array(new qtype_preg_userinscription('(?##>)')));
+            $closebr->set_user_info($position, array(new qtype_preg_userinscription('(?###>)')));
             $result = new JLexToken(qtype_preg_parser::TEMPLATECLOSEBRACK, $closebr);
         } else if (core_text::substr($this->comment, 0, 2) === '##' && core_text::substr($this->comment, -1) === '<') {
             // Template open bracket

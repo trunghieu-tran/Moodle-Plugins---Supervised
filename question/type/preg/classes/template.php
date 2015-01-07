@@ -63,6 +63,17 @@ class template {
         $this->placeholderscount = $placeholderscount;
     }
 
+    private function get_options_str($positive = true) {
+        $result = '';
+        foreach (array('i', 'm', 's', 'x') as $option) {
+            $contains = strstr($this->options, $option) !== false;
+            if ($positive === $contains) {
+                $result .= $option;
+            }
+        }
+        return $result;
+    }
+
     /**
      * Returns all templates that should be recognized by parser.
      */
@@ -71,8 +82,10 @@ class template {
             template::$templates = array(
                 'word' => new template('word', '\w+', '', array('en' => 'word', 'ru' => 'слово')),
                 'integer' => new template('integer', '[+-]?\d+', '', array('en' => 'integer', 'ru' => 'целое число')),
-                'parens_req' => new template('parens_req', '(   \(    (?:$$1|(?-1))   \)  )', 'x', array('en' => '$$1 in parens', 'ru' => '$$1 в скобках'), 1),
+                'parens_req' => new template('parens_req', '(   \(    (?:(?-1)|$$1)   \)  )', 'x', array('en' => '$$1 in parens', 'ru' => '$$1 в скобках'), 1),
                 'parens_opt' => new template('parens_opt', '$$1|(?###parens_req<)$$1(?###>)', '', array('en' => '$$1 in parens or not', 'ru' => '$$1 в скобках или без'), 1),
+                'brackets_req' => new template('brackets_req', '(   \[   (?:(?-1)|$$1)   \]   )', 'x', array('en' => '$$1 in brackets', 'ru' => '$$1 в квадратных скобках'), 1),
+                'brackets_opt' => new template('brackets_opt', '$$1|(?###brackets_req<)$$1(?###>)', '', array('en' => '$$1 in brackets or not', 'ru' => '$$1 в квадратных скобках или без'), 1),
             );
         }
         return template::$templates;
@@ -99,5 +112,150 @@ class template {
      */
     public static function set_available_templates($value) {
         template::$templates = $value;
+    }
+
+    /**
+     * Gets regex, returns tokens.
+     */
+    public static function process_regex($regex, $options, &$lexer, &$resultregex) {
+        $mods = $options->modifiers_to_string();
+        $pos = '';
+        $neg = '';
+        foreach (array('i', 'm', 's', 'x') as $option) {
+            $contains = strstr($mods, $option) !== false;
+            if ($contains) {
+                $pos .= $option;
+            } else {
+                $neg .= $option;
+            }
+        }
+
+
+        $hastemplates = false;
+        $tokens = self::tokenize_regex($regex, $options, $lexer, $hastemplates);
+        $processedregex = self::process_regex_tokens($tokens, $pos, $neg);
+
+        $newlexer = null;
+        $newhastemplates = false;
+        $newtokens = self::tokenize_regex($processedregex, $options, $newlexer, $newhastemplates);
+        if ($newhastemplates) {
+            // If there are still some templates, do a recursive call
+            $newtokens = self::process_regex($processedregex, $options, $newlexer, $resultregex);
+        } else {
+            // Else save the result
+            $resultregex = $processedregex;
+        }
+        return $newtokens;
+    }
+
+    private static function tokenize_regex($regex, $options, &$lexer, &$hastemplates) {
+        \StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new \qtype_preg_lexer($pseudofile);
+        $lexer->set_options($options);
+        $hastemplates = false;
+
+        $result = array();
+        while (($token = $lexer->nextToken()) !== null) {
+            if (is_array($token)) {
+                foreach ($token as $curtoken) {
+                    $result[] = $curtoken;
+                    $hastemplates = $hastemplates || ($curtoken->type === \qtype_preg_parser::TEMPLATEPARSELEAF || $curtoken->type === \qtype_preg_parser::TEMPLATEOPENBRACK);
+                }
+            } else {
+                $result[] = $token;
+                $hastemplates = $hastemplates || ($token->type === \qtype_preg_parser::TEMPLATEPARSELEAF || $token->type === \qtype_preg_parser::TEMPLATEOPENBRACK);
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Gets tokens, returns regex.
+     */
+    private static function process_regex_tokens($tokens, $pos, $neg) {
+        $result = '';
+        $errors = array();
+        $templates = self::available_templates();
+        $opentemplates = array(null);   // stack of opening 'parens' (?###template<). First one is a fictive element for the whole regex
+        $operands = array(array(''));   // stack of lists of operands. First one is fictive element for the whole regex
+
+        foreach ($tokens as $token) {
+            $node = $token->value;
+            $counttemplates = count($opentemplates);
+            $countoperands = count($operands);
+
+            // There can be fictive lexemes
+            if ($token->value === null) {
+                continue;
+            }
+
+            // Non-template token?
+            if ($token->type !== \qtype_preg_parser::TEMPLATEPARSELEAF &&
+                $token->type !== \qtype_preg_parser::TEMPLATEOPENBRACK &&
+                $token->type !== \qtype_preg_parser::TEMPLATESEP &&
+                $token->type !== \qtype_preg_parser::TEMPLATECLOSEBRACK) {
+
+                $operands[$countoperands - 1][count($operands[$countoperands - 1]) - 1] .= $node->plain_userinscription();
+                continue;
+            }
+
+            if ($token->type === \qtype_preg_parser::TEMPLATEPARSELEAF || $token->type === \qtype_preg_parser::TEMPLATEOPENBRACK) {
+                // Is there a template with such name?
+                if (!array_key_exists($node->name, $templates)) {
+                    $error = new \qtype_preg_node_error(\qtype_preg_node_error::SUBTYPE_UNKNOWN_TEMPLATE, $node->name);
+                    $error->set_user_info($node->position, $node->userinscription);
+                    continue;
+                }
+
+                $template = $templates[$node->name];
+                $positiveopts = $template->get_options_str(true);
+                $negativeopts = $template->get_options_str(false);
+            }
+
+            // Is it simply a template leaf?
+            if ($token->type === \qtype_preg_parser::TEMPLATEPARSELEAF) {
+                $operands[$countoperands - 1][count($operands[$countoperands - 1]) - 1] .= "(?{$positiveopts}-{$negativeopts}:{$template->regex})";
+                continue;
+            }
+
+            // Is it an opening 'paren'?
+            if ($token->type === \qtype_preg_parser::TEMPLATEOPENBRACK) {
+                // Push a new template and new operands list
+                $opentemplates[] = $template;
+                $operands[] = array('');
+                continue;
+            }
+
+            // Is it a separator
+            if ($token->type === \qtype_preg_parser::TEMPLATESEP) {
+                // Handle situations like (?###,)(?###,)
+                if ($operands[$countoperands - 1][count($operands[$countoperands - 1]) - 1] === '') {
+                    $operands[$countoperands - 1][count($operands[$countoperands - 1]) - 1] = '(?:)';
+                }
+                $operands[$countoperands - 1][] = '';
+                continue;
+            }
+
+            // Is it a closing 'paren'?
+            if ($token->type === \qtype_preg_parser::TEMPLATECLOSEBRACK) {
+                // Substitute all actual operands to the template
+                $lasttemplate = $opentemplates[$counttemplates - 1];
+                $res = $lasttemplate->regex;
+                // Because we wrap operands into (?mods:), no special actions neede for situations like (?###template<)(?###>)
+                // TODO: errors
+                for ($i = 1; $i <= $lasttemplate->placeholderscount; ++$i) {
+                    $res = str_replace("\$\${$i}", "(?{$pos}-{$neg}:{$operands[$countoperands - 1][$i - 1]})", $res);
+                }
+                // Pop the template which is now ready; concatenate it to the previous operand
+                $template = array_pop($opentemplates);
+                $positiveopts = $template->get_options_str(true);
+                $negativeopts = $template->get_options_str(false);
+                array_pop($operands);
+                $operands[$countoperands - 2][count($operands[$countoperands - 2]) - 1] .= "(?{$positiveopts}-{$negativeopts}:{$res})";
+                continue;
+            }
+        }
+        return $operands[0][0];
     }
 }
