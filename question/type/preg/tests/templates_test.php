@@ -37,6 +37,7 @@ class qtype_preg_templates_test extends PHPUnit_Framework_TestCase {
         $handler = new qtype_preg_fa_matcher("(?###word_in_parens)");
         $root = $handler->get_ast_root();
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        $this->assertTrue($root->number === 1);
         $this->assertTrue(count($root->operands) === 1);
         $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_NODE_CONCAT);
         $this->assertTrue($root->operands[0]->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
@@ -51,9 +52,10 @@ class qtype_preg_templates_test extends PHPUnit_Framework_TestCase {
         $root = $handler->get_ast_root();
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_ALT);
         $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        $this->assertTrue($root->operands[0]->number === 1);
         $this->assertTrue($root->operands[0]->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
-
         $this->assertTrue($root->operands[1]->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        $this->assertTrue($root->operands[1]->number === 2);
         $this->assertTrue($root->operands[1]->operands[0]->type === qtype_preg_node::TYPE_NODE_CONCAT);
         $this->assertTrue($root->operands[1]->operands[0]->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[1]->operands[0]->operands[1]->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
@@ -62,6 +64,36 @@ class qtype_preg_templates_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[1]->operands[0]->operands[1]->operands[0]->operands[0] !== $root->operands[0]);
         $this->assertTrue($root->operands[1]->operands[0]->operands[1]->operands[0]->operands[1]->type === qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL);
         $this->assertTrue($root->operands[1]->operands[0]->operands[2]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+    }
+
+    public function test_template_subexpr_numbering() {
+        $handler = new qtype_preg_fa_matcher('(?###parens_req<)(a)(b)(?###>)(?###parens_req<)(c)(?###>)(d)');
+        $root = $handler->get_ast_root();
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_CONCAT);
+
+        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        //$this->assertTrue($root->operands[0]->number === 1);
+        $this->assertTrue($root->operands[0]->operands[0]->type === qtype_preg_node::TYPE_NODE_CONCAT);
+        $this->assertTrue($root->operands[0]->operands[0]->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[0]->operands[0]->operands[1]->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        $this->assertTrue($root->operands[0]->operands[0]->operands[1]->operands[0]->type === qtype_preg_node::TYPE_NODE_ALT);
+        $this->assertTrue($root->operands[0]->operands[0]->operands[1]->operands[0]->operands[0]->type === qtype_preg_node::TYPE_NODE_CONCAT);
+        $this->assertTrue($root->operands[0]->operands[0]->operands[1]->operands[0]->operands[0]->operands[0]->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        //$this->assertTrue($root->operands[0]->operands[0]->operands[1]->operands[0]->operands[0]->operands[0]->number === 2);
+        $this->assertTrue($root->operands[0]->operands[0]->operands[1]->operands[0]->operands[0]->operands[1]->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        //$this->assertTrue($root->operands[0]->operands[0]->operands[1]->operands[0]->operands[0]->operands[1]->number === 3);
+
+        $this->assertTrue($root->operands[1]->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        //$this->assertTrue($root->operands[1]->number === 4);
+        $this->assertTrue($root->operands[1]->operands[0]->type === qtype_preg_node::TYPE_NODE_CONCAT);
+        $this->assertTrue($root->operands[1]->operands[0]->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[1]->operands[0]->operands[1]->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        $this->assertTrue($root->operands[1]->operands[0]->operands[1]->operands[0]->type === qtype_preg_node::TYPE_NODE_ALT);
+        $this->assertTrue($root->operands[1]->operands[0]->operands[1]->operands[0]->operands[0]->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        //$this->assertTrue($root->operands[1]->operands[0]->operands[1]->operands[0]->operands[0]->number === 5);
+
+        $this->assertTrue($root->operands[2]->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        //$this->assertTrue($root->operands[2]->number === 6);
     }
 
     public function test_template_leaf() {
