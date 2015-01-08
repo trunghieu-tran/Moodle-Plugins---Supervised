@@ -655,6 +655,9 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
                         } else {
                             $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), $dist, false, '');
                         }
+                        ////////////////////////////////////////////////////////////////
+                        $pair->operations=$this->redaction($this->value, $other->value);
+                        ////////////////////////////////////////////////////////////////
                         $possiblepairs[] = $pair;
 /*
 			$result = $this->additional_generation($other[$k]);
@@ -789,6 +792,8 @@ class block_formal_langs_matched_tokens_pair {
      * @var string
      */
     public $messageid;
+    
+    public $operations;
 
     public function __construct($correcttokens, $comparedtokens, $mistakeweight, $specific = false, $messageid = '') {
         $this->correcttokens = $correcttokens;
