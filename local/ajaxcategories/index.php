@@ -1,4 +1,18 @@
 <?php
+// This file is part of ajaxcategories plugin - https://code.google.com/p/oasychev-moodle-plugins/
+//
+// Ajaxcategories plugin is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 require_once("../../config.php");
 require_once($CFG->dirroot."/question/editlib.php");
@@ -58,7 +72,7 @@ if ($param->moveupcontext || $param->movedowncontext) {
 }
 
 if ($param->delete && ($questionstomove = $DB->count_records("question", array("category" => $param->delete)))) {
-    if (!$category = $DB->get_record("question_categories", array("id" => $param->delete))) {  // security
+    if (!$category = $DB->get_record("question_categories", array("id" => $param->delete))) {
         print_error('nocate', 'question', $thispageurl->out(), $param->delete);
     }
     $categorycontext = context::instance_by_id($category->contextid);
@@ -67,7 +81,7 @@ if ($param->delete && ($questionstomove = $DB->count_records("question", array("
     if ($qcobject->moveform->is_cancelled()) {
         redirect($thispageurl);
     } else if ($formdata = $qcobject->moveform->get_data()) {
-        // 'confirm' is the category to move existing questions to
+        // Confirm is the category to move existing questions to.
         list($tocategoryid, $tocontextid) = explode(',', $formdata->category);
         $qcobject->move_questions_and_delete_category($formdata->delete, $tocategoryid);
         $thispageurl->remove_params('cat', 'category');
@@ -82,7 +96,7 @@ if ($qcobject->catform->is_cancelled()) {
 } else if ($catformdata = $qcobject->catform->get_data()) {
     $catformdata->infoformat = $catformdata->info['format'];
     $catformdata->info       = $catformdata->info['text'];
-    if (!$catformdata->id) {// new category
+    if (!$catformdata->id) {
         $qcobject->add_category($catformdata->parent, $catformdata->name,
                 $catformdata->info, false, $catformdata->infoformat);
     } else {
@@ -91,7 +105,7 @@ if ($qcobject->catform->is_cancelled()) {
     }
     redirect($thispageurl);
 } else if ((!empty($param->delete) and (!$questionstomove) and confirm_sesskey())) {
-    $qcobject->delete_category($param->delete);// delete the category now no questions to move
+    $qcobject->delete_category($param->delete);
     $thispageurl->remove_params('cat', 'category');
     redirect($thispageurl);
 }

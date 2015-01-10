@@ -1,9 +1,22 @@
 ﻿<?php
+// This file is part of ajaxcategories plugin - https://code.google.com/p/oasychev-moodle-plugins/
+//
+// Ajaxcategories plugin is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 defined('MOODLE_INTERNAL') || die();
 
 // Number of categories to display on page.
-//define('QUESTION_PAGE_LENGTH', 25);
 
 require_once($CFG->libdir . '/listlib.php');
 require_once($CFG->dirroot . '/question/category_form.php');
@@ -107,8 +120,8 @@ class ajax_question_category_list extends moodle_list {
                 $environment['dest']->reorder_peers($neworder);
             } else {
                 // Create new nested list. Replace moving category to it.
-                $newlist = new ajax_question_category_list($this->type, $this->attributes, $this->editable, $this->pageurl, $this->page,
-                                                           $this->pageparamname, $this->itemsperpage, $this->context);
+                $newlist = new ajax_question_category_list($this->type, $this->attributes, $this->editable, $this->pageurl,
+                                                           $this->page, $this->pageparamname, $this->itemsperpage, $this->context);
                 $newlist->parentitem = $afteritem;
                 $newparent = $afteritem->id;
                 $DB->set_field($environment['dest']->table, "parent", $newparent, array("id" => $item->id));
@@ -129,7 +142,8 @@ class ajax_question_category_list extends moodle_list {
             $key = array_search($item->id, $newpeers);
             // If moving category was at the same list reoder categories in list.
             if ($key) {
-                $neworder = array_merge(array_slice($newpeers, 0, $oldkey), array($item->id), array_slice($newpeers, $oldkey, $key), array_slice($newpeers, $key + 1));
+                $neworder = array_merge(array_slice($newpeers, 0, $oldkey), array($item->id),
+                                        array_slice($newpeers, $oldkey, $key), array_slice($newpeers, $key + 1));
             } else {
                 $neworder = array_merge(array_slice($newpeers, 0, $oldkey), array($item->id), array_slice($newpeers, $oldkey));
             }
@@ -191,7 +205,7 @@ class ajax_question_category_list extends moodle_list {
         } else {
             $html = '';
         }
-        if ($html) {// if there are list items to display then wrap them in ul / ol tag.
+        if ($html) {// If there are list items to display then wrap them in ul / ol tag.
             $tabs = str_repeat("\t", $indent);
             $html = $tabs.'<'.$this->type.((!empty($this->attributes)) ? (' '.$this->attributes) : '').">\n".$html;
             $html .= $tabs."</".$this->type.">\n";
@@ -255,7 +269,7 @@ class ajax_question_category_list_item extends question_category_list_item {
         $item .= format_text($category->info, $category->infoformat,
                 array('context' => $this->parentlist->context, 'noclean' => true));
 
-        // don't allow delete if this is the last category in this context.
+        // Don't allow delete if this is the last category in this context.
         if (count($this->parentlist->records) != 1) {
             $deleteurl = new moodle_url($this->parentlist->pageurl, array('delete' => $this->id, 'sesskey' => sesskey()));
             $item .= html_writer::link($deleteurl,
@@ -274,24 +288,15 @@ class ajax_question_category_list_item extends question_category_list_item {
  */
 class ajax_question_category_object extends question_category_object {
 
-
-    /**
-     * Constructor
-     *
-     * Gets necessary strings and sets relevant path information
-     */
-    public function __construct($page, $pageurl, $contexts, $currentcat, $defaultcategory, $todelete, $addcontexts) {
-        parent::__construct($page, $pageurl, $contexts, $currentcat, $defaultcategory, $todelete, $addcontexts);
-    }
-
     /**
      * Initializes this classes general category-related variables
      */
     public function initialize($page, $contexts, $currentcat, $defaultcategory, $todelete, $addcontexts) {
         $lastlist = null;
         foreach ($contexts as $context) {
-            $this->editlists[$context->id] = new ajax_question_category_list('ul', 'id="ajaxcategorylist" data-id = "' . $context->id . '"',
-                                                                             true, $this->pageurl, $page, 'cpage', QUESTION_PAGE_LENGTH, $context);
+            $this->editlists[$context->id] = new ajax_question_category_list('ul', 'id="ajaxcategorylist" data-id = "' .
+                                                                             $context->id . '"', true, $this->pageurl, $page,
+                                                                             'cpage', QUESTION_PAGE_LENGTH, $context);
             $this->editlists[$context->id]->lastlist =& $lastlist;
             if ($lastlist !== null) {
                 $lastlist->nextlist =& $this->editlists[$context->id];
