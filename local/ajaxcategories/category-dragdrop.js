@@ -45,6 +45,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
     var cloneancestor;
     var options = {};
     var childadded;
+    var clonedrag;
 
     /**
      * Make ajax request.
@@ -146,7 +147,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
                 item = drop.get('nextSibling');
                 // Get id of item which should be undo dragged node.
                 if (item !== undefined && item !== null) {
-                    if (item.get('nextSibling')) {
+                    if (item.get('nextSibling')!== undefined && item.get('nextSibling') !== null) {
                         if (item.get('nextSibling').get('tagName').toLowerCase() === 'li') {
                             item = item.get('nextSibling');
                         }
@@ -183,11 +184,20 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         //Get our drag object
         var drag = e.target;
         var dragnode = drag.get('node');
+        var clone;
+        beforeitemid = -1;
+        afteritemid = -1;
         // Get copy of parent.
         cloneancestor = dragnode.get('parentNode').get('parentNode').cloneNode(true);
         ancestor = dragnode.get('parentNode').get('parentNode');
+        clonedrag = null;
         //Set new style
         drag.get('node').setStyle('opacity', '.25');
+        var nestedlist = drag.get('node').one('ul');
+        if (nestedlist !== null && nestedlist !== undefined) {
+            clonedrag = drag.get('node').one('ul').cloneNode(true);
+            drag.get('node').one('ul').remove();
+        }
         // Remove bottom placeholder.
         var next = drag.get('node').get('nextSibling');
         if (next !== null) {
@@ -198,7 +208,8 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         drag.get('dragNode').setStyles({
             opacity: '.5',
             borderColor: drag.get('node').getStyle('borderColor'),
-            backgroundColor: drag.get('node').getStyle('backgroundColor')
+            backgroundColor: drag.get('node').getStyle('backgroundColor'),
+            height: 21
         });
         var item = drag.get('node').one('.ajaxitem[data-id]');
         // Get id of dragged category.
@@ -214,7 +225,9 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
     //Listen for a drag:end events
     Y.DD.DDM.on('drag:end', function(e) {
         var drag = e.target;
+
         var item = drag.get('node').one("ul");
+
         // Get ul with context id.
         while (item !== undefined && item !== null) {
             item.setAttribute('data-id', contextid);
@@ -261,7 +274,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
             }
         });
         // If dropped place is invalid, return category to start position.
-        if (beforeitemid == -1 && afteritemid == -1 || beforeitemid === undefined || afteritemid == undefined) {
+        if (beforeitemid == -1 && afteritemid == -1 || beforeitemid === undefined || afteritemid === undefined) {
             ancestor.replace(cloneancestor);
         } else {
             // Fill options.
@@ -279,6 +292,15 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
             // Make ajax request.
             ajax_request(uri);
         }
+        /*if (clonedrag.hasClass('yui3-dd-drop yui3-dd-draggable yui3-dd-dragging')) {
+            console.log('aaaaaaaaaaaaaa');
+            clonedrag.removeClass('yui3-dd-dragging');
+        }*/
+        if (clonedrag !== null) {
+            drag.get('node').append(clonedrag);
+        }
+
+        clonedrag = null;
     });
 
     //Static Vars
