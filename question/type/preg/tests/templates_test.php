@@ -21,17 +21,35 @@ require_once($CFG->dirroot . '/question/type/preg/fa_matcher/fa_matcher.php');
 
 // Set templates for testing purposes
 qtype_preg\template::set_available_templates(array(
-    'word' => new qtype_preg\template('word', '\w+'),
-    'integer' => new qtype_preg\template('integer', '[+-]?\d+'),
-    'word_and_integer' => new qtype_preg\template('word_and_integer', '(?###word)(?###integer)'),
-    'parens_req' => new qtype_preg\template('parens_req', '(   \(    (?:$$1|(?-1))   \)  )', 'x', 1),
-    'parens_opt' => new qtype_preg\template('parens_opt', '$$1|(?###parens_req<)$$1(?###>)', '', 1),
-    'brackets_req' => new qtype_preg\template('brackets_req', '(\[(?:$$1|(?-1))\])', '', 1),
-    'word_in_parens' => new qtype_preg\template('word_in_parens', '(?###parens_req<)(?###word)(?###>)'),
-    'word_in_parens_in_brackets' => new qtype_preg\template('word_in_parens_in_brackets', '(?###brackets_req<)(?###parens_req<)(?###word)(?###>)(?###>)'),
+    'word' => new qtype_preg\template('word', '\w+', '', array('en' => 'word', 'ru' => 'слово')),
+    'integer' => new qtype_preg\template('integer', '[+-]?\d+', '', array('en' => 'integer', 'ru' => 'integer')),
+    'word_and_integer' => new qtype_preg\template('word_and_integer', '(?###word)(?###integer)', '' , array('en' => 'word', 'ru' => 'слово')),
+    'parens_req' => new qtype_preg\template('parens_req', '(   \(    (?:$$1|(?-1))   \)  )', 'x', array('en' => '$$1 in parens', 'ru' => '$$1 в скобках'), 1),
+    'parens_opt' => new qtype_preg\template('parens_opt', '$$1|(?###parens_req<)$$1(?###>)', '', array('en' => '$$1 in parens or not', 'ru' => '$$1 в скобках или без'), 1),
+    'brackets_req' => new qtype_preg\template('brackets_req', '(\[(?:$$1|(?-1))\])', '', array('en' => '$$1 in brackets', 'ru' => '$$1 в квадратных скобках'), 1),
+    'word_in_parens' => new qtype_preg\template('word_in_parens', '(?###parens_req<)(?###word)(?###>)', '', array('en' => 'word in parens', 'ru' => 'слово в скобках')),
+    'word_in_parens_in_brackets' => new qtype_preg\template('word_in_parens_in_brackets', '(?###brackets_req<)(?###parens_req<)(?###word)(?###>)(?###>)', '', array('en' => 'word in parens in brackets', 'ru' => 'слово в квадратных и обычных скобках')),
 ));
 
 class qtype_preg_templates_test extends PHPUnit_Framework_TestCase {
+
+    /**
+     * @dataProvider descriptions_provider
+     */
+    public function test_descriptions($name, $en, $ru) {
+        $template = qtype_preg\template::available_templates()[$name];
+        // TODO - set langauge
+        $descr = $template->get_description();
+        $this->assertEquals($en, $descr);
+    }
+
+    public function descriptions_provider()
+    {
+        return array(
+            array('word', 'word', 'слово'),
+            array('parens_req', '$$1 in parens', '$$1 в скобках')
+        );
+    }
 
     public function test_template_parsing() {
         $handler = new qtype_preg_fa_matcher("(?###word_in_parens)");

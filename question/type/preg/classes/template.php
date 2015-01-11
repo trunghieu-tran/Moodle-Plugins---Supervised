@@ -55,7 +55,7 @@ class template {
     /** Descriptions */
     private $descriptions;
 
-    public function __construct($name = '', $regex = '', $options = '', $descriptions, $placeholderscount = 0) {
+    public function __construct($name = '', $regex = '', $options = '', $descriptions = array(), $placeholderscount = 0) {
         $this->name = $name;
         $this->regex = $regex;
         $this->options = $options;
