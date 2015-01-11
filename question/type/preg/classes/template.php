@@ -44,13 +44,22 @@ class template {
     /** Number of such placeholders in this template. */
     public $placeholderscount;
 
-    /** All available templates. Can be changed from outside for testing purposes. */
+    /**
+     * All available templates. Can be changed from outside for testing purposes.
+     * placeholders syntax:
+     * same as in regex, but can contain required form definition for description generation
+     * like $$g1 (g - is required form for description generation, and will be ignored in other functions)
+     */
     private static $templates;
 
-    public function __construct($name = '', $regex = '', $options = '', $placeholderscount = 0) {
+    /** Descriptions */
+    private $descriptions;
+
+    public function __construct($name = '', $regex = '', $options = '', $descriptions, $placeholderscount = 0) {
         $this->name = $name;
         $this->regex = $regex;
         $this->options = $options;
+        $this->descriptions = $descriptions;
         $this->placeholderscount = $placeholderscount;
     }
 
@@ -60,13 +69,29 @@ class template {
     public static function available_templates() {
         if (template::$templates === null) {
             template::$templates = array(
-                'word' => new template('word', '\w+'),
-                'integer' => new template('integer', '[+-]?\d+'),
-                'parens_req' => new template('parens_req', '(   \(    (?:$$1|(?-1))   \)  )', 'x', 1),
-                'parens_opt' => new template('parens_opt', '$$1|(?###parens_req<)$$1(?###>)', '', 1),
+                'word' => new template('word', '\w+', '', array('en' => 'word', 'ru' => 'слово')),
+                'integer' => new template('integer', '[+-]?\d+', '', array('en' => 'integer', 'ru' => 'целое число')),
+                'parens_req' => new template('parens_req', '(   \(    (?:$$1|(?-1))   \)  )', 'x', array('en' => '$$1 in parens', 'ru' => '$$1 в скобках'), 1),
+                'parens_opt' => new template('parens_opt', '$$1|(?###parens_req<)$$1(?###>)', '', array('en' => '$$1 in parens or not', 'ru' => '$$1 в скобках или без'), 1),
             );
         }
         return template::$templates;
+    }
+
+    public function get_description() {
+        $description = false;
+        $mylang = current_language();
+        $parentlang = get_parent_language($mylang);
+        if (array_key_exists($mylang, $this->descriptions)) {
+            $description = $this->descriptions[$mylang];
+        } else if (array_key_exists($parentlang, $this->descriptions)) {
+            $description = $this->descriptions[$parentlang];
+        } else if (array_key_exists('en', $this->descriptions)) {
+            $description = $this->descriptions['en'];
+        } else {
+            $description = reset($this->descriptions); // dont use in foreach
+        }
+        return $description;
     }
 
     /**

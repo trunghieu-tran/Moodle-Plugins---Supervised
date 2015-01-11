@@ -844,6 +844,73 @@ class qtype_preg_description_node_cond_subexpr extends qtype_preg_description_op
     }
 }
 
+class qtype_preg_description_node_template extends qtype_preg_description_operator
+{
+    public $regex;
+    public $template;
+
+    /**
+     * Construct array of operands, using method qtype_regex_handler::from_preg_node()
+     *
+     * @param qtype_preg_node $node Reference to automatically generated (by handler) abstract node.
+     * @param type $matcher Reference to handler, which generates nodes.
+     */
+    public function __construct($node, $matcher) {
+        parent::__construct($node, $matcher);
+        $templatename = $this->pregnode->name;
+        $this->template = qtype_preg\template::available_templates()[$templatename];
+        $this->regex = $matcher->from_preg_node($this->template->regex); // TODO - options
+        /*foreach ($this->pregnode->operands as $operand) {
+            array_push($this->operands, $matcher->from_preg_node($operand));
+        }*/
+    }
+
+    /**
+     * Override of abstract qtype_preg_description_operator::pattern()
+     */
+    public function pattern($node_parent = null, $form = null) {
+        return $templatedescr = $this->template->get_description();
+    }
+}
+
+class qtype_preg_description_leaf_template extends qtype_preg_description_leaf {
+    public function __construct($node, $matcher) {
+        parent::__construct($node, $matcher);
+        $templatename = $this->pregnode->name;
+        $this->template = qtype_preg\template::available_templates()[$templatename];
+        $this->regex = $matcher->from_preg_node($this->template->regex); // TODO - options
+        /*foreach ($this->pregnode->operands as $operand) {
+            array_push($this->operands, $matcher->from_preg_node($operand));
+        }*/
+    }
+
+    /**
+     * Override of abstract qtype_preg_description_operator::pattern()
+     */
+    public function pattern($node_parent = null, $form = null) {
+        return $templatedescr = $this->template->get_description();
+    }
+}
+
+class qtype_preg_description_leaf_template_param extends qtype_preg_description_leaf {
+    public function __construct($node, $matcher) {
+        parent::__construct($node, $matcher);
+        $templatename = $this->pregnode->name;
+        $this->template = qtype_preg\template::available_templates()[$templatename];
+        $this->regex = $matcher->from_preg_node($this->template->regex); // TODO - options
+        /*foreach ($this->pregnode->operands as $operand) {
+            array_push($this->operands, $matcher->from_preg_node($operand));
+        }*/
+    }
+
+    /**
+     * Override of abstract qtype_preg_description_operator::pattern()
+     */
+    public function pattern($node_parent = null, $form = null) {
+        return $templatedescr = $this->template->get_description();
+    }
+}
+
 class qtype_preg_description_node_error extends qtype_preg_description_operator {
 
     public function pattern($node_parent = null, $form = null) {
