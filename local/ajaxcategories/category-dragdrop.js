@@ -46,6 +46,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
     var options = {};
     var childadded;
     var clonedrag;
+    var lefthtml;
 
     /**
      * Make ajax request.
@@ -185,6 +186,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         var drag = e.target;
         var dragnode = drag.get('node');
         var clone;
+        lefthtml = null;
         beforeitemid = -1;
         afteritemid = -1;
         // Get copy of parent.
@@ -198,11 +200,19 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
             clonedrag = drag.get('node').one('ul').cloneNode(true);
             drag.get('node').one('ul').remove();
         }
+        var html = drag.get('node').get('innerHTML');
+        var index = html.indexOf('</b>');
+        lefthtml = '</a></b>' + html.substring(index + 4);
+        html = html.substring(0, index - 4);
+        html += '...' + '</a></b></div>';
+        console.log(html);
         // Remove bottom placeholder.
         var next = drag.get('node').get('nextSibling');
         if (next !== null) {
             next.remove();
         }
+        drag.get('node').set('innerHTML', html);
+        //console.log(drag.get('node').get('innerHTML'));
         //Set new style
         drag.get('dragNode').set('innerHTML', drag.get('node').get('innerHTML'));
         drag.get('dragNode').setStyles({
@@ -296,7 +306,11 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
             console.log('aaaaaaaaaaaaaa');
             clonedrag.removeClass('yui3-dd-dragging');
         }*/
-        if (clonedrag !== null) {
+        var html = drag.get('node').get('innerHTML');
+        html = html.substring(0, html.lastIndexOf('...</a></b>'));
+        console.log(html);
+        drag.get('node').set('innerHTML', html + lefthtml)
+        if (clonedrag !== null && clonedrag !== undefined) {
             drag.get('node').append(clonedrag);
         }
 
