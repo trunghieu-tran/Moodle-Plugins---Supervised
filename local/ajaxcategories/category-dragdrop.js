@@ -260,37 +260,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         if (level == 'inner') {
             childadded = true;
         }
-        // Check count of top categories in each context.
-        // Get top items.
-        var topitems = Y.Node.all('ul[data-id]');
-        topitems.each(function(value, key) {
-            var parentnode = value.get('parentNode');
-            if (!parentnode.hasClass('ajaxitem')) {
-                var childrennodes = parentnode.one('ul').get("children");
-                var childrencount = 0;
-                // Count children of node.
-                childrennodes.each(function(child, key) {
-                    if (child.get('tagName').toLowerCase() === 'li') {
-                        childrencount++;
-                    }
-                });
-                // In case if top categories in context more than one add drag-handle.
-                if (childrencount > 1) {
-                    childrennodes.each(function(child, key) {
-                        if (child.get('tagName').toLowerCase() === 'li' && child.one('#ajaxitem') !== null && !child.one('#ajaxitem').get("children").item(0).hasClass('drag-handle')) {
-                            child.one('#ajaxitem').prepend(draghandle.cloneNode(true));
-                        }
-                    });
-                } else {
-                    // In case of single top category remove drag-handle.
-                    childrennodes.each(function(child, key) {
-                        if (child.get('tagName').toLowerCase() === 'li' && child.one('#ajaxitem') !== null && child.one('#ajaxitem').get("children").item(0).hasClass('drag-handle')) {
-                            child.one('#ajaxitem').get("children").item(0).remove();
-                        }
-                    });
-                }
-            }
-        });
+
         // If dropped place is invalid, return category to start position.
         if (beforeitemid == -1 && afteritemid == -1 || beforeitemid === undefined || afteritemid === undefined) {
             ancestor.replace(cloneancestor);
@@ -322,7 +292,38 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         if (clonedrag !== null && clonedrag !== undefined) {
             drag.get('node').get('parentNode').append(clonedrag);
         }
-
+        // Check count of top categories in each context.
+        // Get top items.
+        var topitems = Y.Node.all('ul[data-id]');
+        topitems.each(function(value, key) {
+            var parentnode = value.ancestor('div');
+            if (parentnode !== null && parentnode !== undefined) {
+                var childrennodes = parentnode.one('ul').get('children');
+                var childrencount = 0;
+                // Count children of node.
+                childrennodes.each(function(child, key) {
+                    if (child.get('tagName').toLowerCase() === 'li') {
+                        childrencount++;
+                    }
+                });
+                // In case if top categories in context more than one add drag-handle.
+                if (childrencount > 1) {
+                    childrennodes.each(function(child, key) {
+                        console.log(child.get('innerHTML'));
+                        if (child.get('tagName').toLowerCase() === 'li' && child.one('#ajaxitem') !== null && !child.one('#ajaxitem').get("children").item(0).hasClass('drag-handle')) {
+                            child.one('#ajaxitem').prepend(draghandle.cloneNode(true));
+                        }
+                    });
+                } else {
+                    // In case of single top category remove drag-handle.
+                    childrennodes.each(function(child, key) {
+                        if (child.get('tagName').toLowerCase() === 'li' && child.one('#ajaxitem') !== null && child.one('#ajaxitem').get("children").item(0).hasClass('drag-handle')) {
+                            child.one('#ajaxitem').get("children").item(0).remove();
+                        }
+                    });
+                }
+            }
+        });
         clonedrag = null;
     });
 
