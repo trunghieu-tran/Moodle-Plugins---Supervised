@@ -47,6 +47,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
     var childadded;
     var clonedrag;
     var lefthtml;
+    var realhtml;
 
     /**
      * Make ajax request.
@@ -146,7 +147,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
             }
         } else {
             // Add node at the same level with other nodes in list.
-            if (drop.one('#placeholder') !== undefined) {
+            if (drop.get('id') === 'placeholder') {
                 beforeitemid = -1;
                 afteritemid = -1;
                 item = drop.get('nextSibling');
@@ -178,6 +179,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
                 }
                 // Add dragged node to list.
                 if (drop !== null) {
+                    console.log(drop.get('parentNode').get('innerHTML'));
                     drop.insert(child, 'after');
                     drop.insert(drag, 'after');
                 }
@@ -186,40 +188,55 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         }
     });
 
-    //Listen for all drag:start events
-    Y.DD.DDM.on('drag:start', function(e) {
-        //Get our drag object
+    Y.DD.DDM.on('drag:mouseDown', function(e) {
         var drag = e.target;
-        var dragnode = drag.get('node');
-        var clone;
-        lefthtml = null;
-        beforeitemid = -1;
-        afteritemid = -1;
-        // Get copy of parent.
-        cloneancestor = dragnode.get('parentNode').get('parentNode').get('parentNode').cloneNode(true);
-        ancestor = dragnode.get('parentNode').get('parentNode').get('parentNode');
-        clonedrag = null;
-
+        var wasname = false;
         var nestedlist = drag.get('node').get('parentNode').one('ul');
         if (nestedlist !== null && nestedlist !== undefined) {
             clonedrag = drag.get('node').get('parentNode').one('ul').cloneNode(true);
             drag.get('node').get('parentNode').one('ul').remove();
         }
         var html = drag.get('node').get('innerHTML');
-        //console.log(html);
         var index = html.indexOf('</b>');
         lefthtml = '</a></b>' + html.substring(index + 4);
+        var childrennodes = drag.get('node').get('children');
+        childrennodes.each(function(child, key) {
+            if (wasname) {
+                child.remove();
+            }
+            if (child.get('tagName').toLowerCase() === 'b') {
+                wasname = true;
+            }
+        });
+    });
+
+    //Listen for all drag:start events
+    Y.DD.DDM.on('drag:start', function(e) {
+        //Get our drag object
+        var drag = e.target;
+        var dragnode = drag.get('node');
+        var clone;
+        beforeitemid = -1;
+        afteritemid = -1;
+        // Get copy of parent.
+        cloneancestor = dragnode.get('parentNode').get('parentNode').get('parentNode').cloneNode(true);
+        ancestor = dragnode.get('parentNode').get('parentNode').get('parentNode');
+        var html = drag.get('node').get('innerHTML');
+        //console.log(html);
+        var index = html.indexOf('</b>');
+        //lefthtml = '</a></b>' + html.substring(index + 4);
         html = html.substring(0, index - 4);
         html = '<li>' + html + '...' + '</a></b></li>';
+        drag.get('node').set('innerHTML', html);
         //console.log(html);
         //Set new style
         drag.get('node').setStyle('opacity', '.25');
         // Remove bottom placeholder.
-        var next = drag.get('node').get('parentNode').get('nextSibling');
+        var next = drag.get('node').get('parentNode').get('previousSibling');
         if (next !== null) {
             next.remove();
         }
-        drag.get('node').set('innerHTML', html);
+
         //console.log(drag.get('node').get('innerHTML'));
         //Set new style
         drag.get('dragNode').set('innerHTML', drag.get('node').get('innerHTML'));
@@ -286,7 +303,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         }*/
         var html = drag.get('node').get('innerHTML');
         html = html.substring(4, html.lastIndexOf('...</a></b>'));
-        console.log(html);
+        //console.log(html);
         drag.get('node').set('innerHTML', html + lefthtml);
         drag.get('node').wrap('<li id = "ajaxlistitem"></li>');
         if (clonedrag !== null && clonedrag !== undefined) {
@@ -309,7 +326,6 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
                 // In case if top categories in context more than one add drag-handle.
                 if (childrencount > 1) {
                     childrennodes.each(function(child, key) {
-                        console.log(child.get('innerHTML'));
                         if (child.get('tagName').toLowerCase() === 'li' && child.one('#ajaxitem') !== null && !child.one('#ajaxitem').get("children").item(0).hasClass('drag-handle')) {
                             child.one('#ajaxitem').prepend(draghandle.cloneNode(true));
                         }
