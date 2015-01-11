@@ -310,6 +310,29 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
         );
     }
 
+    /**
+     * @dataProvider templates_provider
+     */
+    public function test_templates($regex,$expected_en,$expected_ru)
+    {
+        $handler = new qtype_preg_description_tool($regex);
+        $root = $handler->get_ast_root();
+        //var_dump($handler);
+        //$result = $handler->description('%%tests%%','%%tests%%');
+        //$this->assertEquals($expected_en, $result);
+        $this->assertTrue(false);
+    }
+
+    public function templates_provider()
+    {
+        return array(
+            array('(?###word)', 'tbd', 'tbd'),
+            array('(?###integer)', 'tbd', 'tbd'),
+            array('(?###parens_req<)a(?###>)', 'tbd', 'tbd'),
+            array('(?###parens_opt<)a(?###>)', 'tbd', 'tbd'),
+        );
+    }
+
     //------------------------------------------------------------------
 
     /**
