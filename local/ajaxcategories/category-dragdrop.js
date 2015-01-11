@@ -73,7 +73,8 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         var drop = e.drop.get('node');
 
         // Get parent node of drop node.
-        var parent = drop.ancestor();
+        var parent = drop.get('parentNode');
+
         // Remove old nodes created for previous drag-and-drop.
         if (child !== undefined && child !== null && !change) {
             child.remove();
@@ -102,6 +103,9 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         tar = new Y.DD.Drop({
             node: child
         });
+        if (parent !== null && parent.get('tagName').toLowerCase() === 'li') {
+            drop = parent;
+        }
         // Add category as a child.
         if (drop.get('tagName').toLowerCase() === 'li') {
             // No nested list.
@@ -141,7 +145,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
                 addednode.append(child);
             }
         } else {
-            // Add node at the same level with other nodes in list/
+            // Add node at the same level with other nodes in list.
             if (drop.one('#placeholder') !== undefined) {
                 beforeitemid = -1;
                 afteritemid = -1;
@@ -149,7 +153,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
                 // Get id of item which should be undo dragged node.
                 if (item !== undefined && item !== null) {
                     if (item.get('nextSibling')!== undefined && item.get('nextSibling') !== null) {
-                        if (item.get('nextSibling').get('tagName').toLowerCase() === 'li') {
+                        if (item.get('nextSibling').get('tagName') !== undefined && item.get('nextSibling').get('tagName').toLowerCase() === 'li') {
                             item = item.get('nextSibling');
                         }
                     }
@@ -173,8 +177,10 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
                     }
                 }
                 // Add dragged node to list.
-                drop.insert(child, 'after');
-                drop.insert(drag, 'after');
+                if (drop !== null) {
+                    drop.insert(child, 'after');
+                    drop.insert(drag, 'after');
+                }
                 level = 'normal';
             }
         }
@@ -190,24 +196,26 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         beforeitemid = -1;
         afteritemid = -1;
         // Get copy of parent.
-        cloneancestor = dragnode.get('parentNode').get('parentNode').cloneNode(true);
-        ancestor = dragnode.get('parentNode').get('parentNode');
+        cloneancestor = dragnode.get('parentNode').get('parentNode').get('parentNode').cloneNode(true);
+        ancestor = dragnode.get('parentNode').get('parentNode').get('parentNode');
         clonedrag = null;
-        //Set new style
-        drag.get('node').setStyle('opacity', '.25');
-        var nestedlist = drag.get('node').one('ul');
+
+        var nestedlist = drag.get('node').get('parentNode').one('ul');
         if (nestedlist !== null && nestedlist !== undefined) {
-            clonedrag = drag.get('node').one('ul').cloneNode(true);
-            drag.get('node').one('ul').remove();
+            clonedrag = drag.get('node').get('parentNode').one('ul').cloneNode(true);
+            drag.get('node').get('parentNode').one('ul').remove();
         }
         var html = drag.get('node').get('innerHTML');
+        //console.log(html);
         var index = html.indexOf('</b>');
         lefthtml = '</a></b>' + html.substring(index + 4);
         html = html.substring(0, index - 4);
-        html += '...' + '</a></b></div>';
-        console.log(html);
+        html = '<li>' + html + '...' + '</a></b></li>';
+        //console.log(html);
+        //Set new style
+        drag.get('node').setStyle('opacity', '.25');
         // Remove bottom placeholder.
-        var next = drag.get('node').get('nextSibling');
+        var next = drag.get('node').get('parentNode').get('nextSibling');
         if (next !== null) {
             next.remove();
         }
@@ -221,12 +229,12 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
             backgroundColor: drag.get('node').getStyle('backgroundColor'),
             height: 21
         });
-        var item = drag.get('node').one('.ajaxitem[data-id]');
+        var item = drag.get('node');
         // Get id of dragged category.
         movingid = item.getAttribute('data-id');
         // Remove dragged node from old place.
-        var oldparent = dragnode.get('parentNode');
-        drag.get('node').remove();
+        var oldparent = dragnode.get('parentNode').get('parentNode');
+        drag.get('node').get('parentNode').remove();
         if (oldparent.get('children').size() == 1) {
             oldparent.remove();
         }
@@ -298,7 +306,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
             var uri = "changer.php" + location.search + '&';
             uri += get_params(options);
             uri = M.cfg.wwwroot + '/local/ajaxcategories/' + uri;
-            console.log(uri);
+            //console.log(uri);
             // Make ajax request.
             ajax_request(uri);
         }
@@ -307,11 +315,12 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
             clonedrag.removeClass('yui3-dd-dragging');
         }*/
         var html = drag.get('node').get('innerHTML');
-        html = html.substring(0, html.lastIndexOf('...</a></b>'));
+        html = html.substring(4, html.lastIndexOf('...</a></b>'));
         console.log(html);
-        drag.get('node').set('innerHTML', html + lefthtml)
+        drag.get('node').set('innerHTML', html + lefthtml);
+        drag.get('node').wrap('<li id = "ajaxlistitem"></li>');
         if (clonedrag !== null && clonedrag !== undefined) {
-            drag.get('node').append(clonedrag);
+            drag.get('node').get('parentNode').append(clonedrag);
         }
 
         clonedrag = null;
@@ -320,7 +329,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
     //Static Vars
     var goingUp = false, lastY = 0;
     // Draggable nodes
-    var items = Y.Node.all('#ajaxcategorylist li');
+    var items = Y.Node.all('#ajaxitem');
     items.each(function(v, k) {
         var dd = new Y.DD.Drag({
             node: v,

@@ -194,7 +194,7 @@ class ajax_question_category_list extends moodle_list {
                 if ($itemhtml = $item->to_html($indent + 1, $extraargs)) {
                     $html .= $itemhtml;
                 }
-                $html .= html_writer::end_div();
+
                 $html .= html_writer::end_tag('li');
                 $html .= html_writer::start_tag('div', $placeholder);
                 $html .= html_writer::end_tag('div');
@@ -244,6 +244,29 @@ class ajax_question_category_list_item extends question_category_list_item {
         $category = $this->item;
         $url = new moodle_url('/question/category.php', ($this->parentlist->pageurl->params() + array('edit' => $category->id)));
         $this->icons['edit'] = $this->image_icon(get_string('editthiscategory', 'question'), $url, 'edit');
+
+    }
+
+    /**
+     * Returns html
+     *
+     * @param integer $indent
+     * @param array $extraargs any extra data that is needed to print the list item
+     *                            may be used by sub class.
+     * @return string html
+     */
+    public function to_html($indent = 0, $extraargs = array()) {
+        if (!$this->display) {
+            return '';
+        }
+        $tabs = str_repeat("\t", $indent);
+
+        if (isset($this->children)) {
+            $childrenhtml = $this->children->to_html($indent+1, $extraargs);
+        } else {
+            $childrenhtml = '';
+        }
+        return $this->item_html($extraargs).'&nbsp;'.(join($this->icons, '')) . html_writer::end_div() . (($childrenhtml !='')?("\n".$childrenhtml):'');
     }
 
     public function item_html($extraargs = array()) {
@@ -277,7 +300,6 @@ class ajax_question_category_list_item extends question_category_list_item {
                             'class' => 'iconsmall', 'alt' => $str->delete)),
                     array('title' => $str->delete));
         }
-
         return $item;
     }
 }
