@@ -44,7 +44,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
     var ancestor;
     var cloneancestor;
     var options = {};
-    var childadded;
+    var childadded = false;
     var clonedrag;
     var lefthtml;
     var realhtml;
@@ -112,11 +112,12 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         if (child !== undefined && child !== null && !change) {
             child.remove();
         }
+
         if (addednodewasadd && !childadded) {
             addednode.remove();
         }
         change = false;
-        childadded = false;
+
         // Get contextid of dropped list.
         contextid = drop.getAttribute('data-id');
         if (contextid === null ||  contextid == '') {
@@ -142,7 +143,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         // Add category as a child.
         if (drop.get('tagName').toLowerCase() === 'li') {
             // No nested list.
-            if (drop.one("ul") == undefined) {
+            if (drop.one("ul") === undefined || drop.one("ul") === null) {
                 addednode = Y.Node.create( '<ul><div id = "placeholder"></div></ul>' );
                 tar1 = new Y.DD.Drop({
                     node: addednode.one('#placeholder')
@@ -158,6 +159,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
                 afteritemid = item.getAttribute('data-id');
                 level = 'inner';
                 addednodewasadd = true;
+                childadded = false;
             } else {
                 // Add to nested list created before/
                 addednodewasadd = false;
