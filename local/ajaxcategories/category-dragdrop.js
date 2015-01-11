@@ -112,7 +112,6 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
             // No nested list.
             if (drop.one("ul") == undefined) {
                 addednode = Y.Node.create( '<ul><div id = "placeholder"></div></ul>' );
-                addednode.setAttribute("id", Y.guid() );
                 tar1 = new Y.DD.Drop({
                     node: addednode.one('#placeholder')
                 });
@@ -178,8 +177,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
                     }
                 }
                 // Add dragged node to list.
-                if (drop !== null) {
-                    console.log(drop.get('parentNode').get('innerHTML'));
+                if (drop.get('parentNode') !== null) {
                     drop.insert(child, 'after');
                     drop.insert(drag, 'after');
                 }
@@ -259,6 +257,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
 
     //Listen for a drag:end events
     Y.DD.DDM.on('drag:end', function(e) {
+        console.log('aaaaaaaaaaa');
         var drag = e.target;
 
         var item = drag.get('node').one("ul");
@@ -308,6 +307,35 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         drag.get('node').wrap('<li id = "ajaxlistitem"></li>');
         if (clonedrag !== null && clonedrag !== undefined) {
             drag.get('node').get('parentNode').append(clonedrag);
+            items = clonedrag.all('#ajaxitem');
+
+            items.each(function(v, k) {
+            var dd = new Y.DD.Drag({
+                node: v,
+                //Make it Drop target and pass this config to the Drop constructor
+                target: {
+                    padding: '0 0 0 0'
+                }
+            }).plug(Y.Plugin.DDProxy, {
+                //Don't move the node at the end of the drag
+                moveOnEnd: false
+            }).plug(Y.Plugin.DDConstrained, {
+                //Keep it inside the #play node
+                constrain2node: '#main'
+            });
+            dd.addHandle('.drag-handle');
+            });
+
+            // Droppable nodes.
+            uls = clonedrag.all('#placeholder');
+                uls.each(function(v, k) {
+                    var tar = new Y.DD.Drop({
+                        node: v
+                    });
+                });
+
+
+            draghandle = Y.Node.one('.drag-handle').cloneNode(true);
         }
         // Check count of top categories in each context.
         // Get top items.
@@ -343,6 +371,9 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         clonedrag = null;
     });
 
+    Y.DD.DDM.on('drop:exit', function(e) {
+        console.log('bbbbbbbbb');
+    });
     //Static Vars
     var goingUp = false, lastY = 0;
     // Draggable nodes
