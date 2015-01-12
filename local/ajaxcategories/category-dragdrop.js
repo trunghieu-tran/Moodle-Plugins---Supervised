@@ -64,8 +64,8 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         });
     }
 
-    function register_nested_lists() {
-        items = clonedrag.all('#ajaxitem');
+    function register_nodes(node) {
+        items = node.all('#ajaxitem');
 
             items.each(function(v, k) {
             var dd = new Y.DD.Drag({
@@ -85,7 +85,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
             });
 
             // Droppable nodes.
-            uls = clonedrag.all('#placeholder');
+            uls = node.all('#placeholder');
                 uls.each(function(v, k) {
                     var tar = new Y.DD.Drop({
                         node: v
@@ -223,6 +223,9 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
     Y.DD.DDM.on('drag:mouseDown', function(e) {
         var drag = e.target;
         var wasname = false;
+        // Get copy of parent.
+        cloneancestor = drag.get('node').get('parentNode').get('parentNode').get('parentNode').cloneNode(true);
+        ancestor = drag.get('node').get('parentNode').get('parentNode').get('parentNode');
         var nestedlist = drag.get('node').get('parentNode').one('ul');
         if (nestedlist !== null && nestedlist !== undefined) {
             clonedrag = drag.get('node').get('parentNode').one('ul').cloneNode(true);
@@ -250,9 +253,6 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         var clone;
         beforeitemid = -1;
         afteritemid = -1;
-        // Get copy of parent.
-        cloneancestor = dragnode.get('parentNode').get('parentNode').get('parentNode').cloneNode(true);
-        ancestor = dragnode.get('parentNode').get('parentNode').get('parentNode');
         var html = drag.get('node').get('innerHTML');
         //console.log(html);
         var index = html.indexOf('</b>');
@@ -314,6 +314,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         // If dropped place is invalid, return category to start position.
         if (beforeitemid == -1 && afteritemid == -1 || beforeitemid === undefined || afteritemid === undefined) {
             ancestor.replace(cloneancestor);
+            register_nodes(cloneancestor);
         } else {
             // Fill options.
             options['movingid'] = movingid;
@@ -341,7 +342,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         drag.get('node').wrap('<li id = "ajaxlistitem"></li>');
         if (clonedrag !== null && clonedrag !== undefined) {
             drag.get('node').get('parentNode').append(clonedrag);
-            register_nested_lists();
+            register_nodes(clonedrag);
         }
         // Check count of top categories in each context.
         // Get top items.
@@ -385,7 +386,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         drag.get('node').set('innerHTML', html);
         if (clonedrag !== null && clonedrag !== undefined) {
             drag.get('node').get('parentNode').append(clonedrag);
-            register_nested_lists();
+            register_nodes(clonedrag);
         }
         clonedrag = null;
     });
