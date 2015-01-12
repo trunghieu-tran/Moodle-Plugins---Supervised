@@ -262,11 +262,12 @@ class ajax_question_category_list_item extends question_category_list_item {
         $tabs = str_repeat("\t", $indent);
 
         if (isset($this->children)) {
-            $childrenhtml = $this->children->to_html($indent+1, $extraargs);
+            $childrenhtml = $this->children->to_html($indent + 1, $extraargs);
         } else {
             $childrenhtml = '';
         }
-        return $this->item_html($extraargs).'&nbsp;'.(join($this->icons, '')) . html_writer::end_div() . (($childrenhtml !='')?("\n".$childrenhtml):'');
+        return $this->item_html($extraargs).'&nbsp;'.(join($this->icons, '')) .
+               html_writer::end_div() . (($childrenhtml != '') ? ("\n".$childrenhtml) : '');
     }
 
     public function item_html($extraargs = array()) {

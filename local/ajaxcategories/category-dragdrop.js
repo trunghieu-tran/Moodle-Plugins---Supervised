@@ -47,7 +47,6 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
     var childadded = false;
     var clonedrag;
     var lefthtml;
-    var realhtml;
 
     /**
      * Make ajax request.
@@ -64,17 +63,22 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         });
     }
 
+    /**
+     * Register right nodes to be draggable and droppable.
+     *
+     * @param node which contains nodes for registration.
+    */
     function register_nodes(node) {
         items = node.all('#ajaxitem');
 
-            items.each(function(v, k) {
-            var dd = new Y.DD.Drag({
-                node: v,
-                //Make it Drop target and pass this config to the Drop constructor
-                target: {
-                    padding: '0 0 0 0'
-                }
-            }).plug(Y.Plugin.DDProxy, {
+        items.each(function(v, k) {
+        var dd = new Y.DD.Drag({
+            node: v,
+            //Make it Drop target and pass this config to the Drop constructor
+            target: {
+                padding: '0 0 0 0'
+            }
+        }).plug(Y.Plugin.DDProxy, {
                 //Don't move the node at the end of the drag
                 moveOnEnd: false
             }).plug(Y.Plugin.DDConstrained, {
@@ -82,18 +86,17 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
                 constrain2node: '#main'
             });
             dd.addHandle('.drag-handle');
+        });
+
+        // Droppable nodes.
+        uls = node.all('#placeholder');
+        uls.each(function(v, k) {
+            var tar = new Y.DD.Drop({
+                node: v
             });
+        });
 
-            // Droppable nodes.
-            uls = node.all('#placeholder');
-                uls.each(function(v, k) {
-                    var tar = new Y.DD.Drop({
-                        node: v
-                    });
-                });
-
-
-            draghandle = Y.Node.one('.drag-handle').cloneNode(true);
+        draghandle = Y.Node.one('.drag-handle').cloneNode(true);
     }
 
     //Listen for all drop:over events
@@ -161,7 +164,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
                 addednodewasadd = true;
                 childadded = false;
             } else {
-                // Add to nested list created before/
+                // Add to nested list created before.
                 addednodewasadd = false;
                 addednode = drop.one("ul");
                 addednode.append(drag);
@@ -186,7 +189,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
                 item = drop.get('nextSibling');
                 // Get id of item which should be undo dragged node.
                 if (item !== undefined && item !== null) {
-                    if (item.get('nextSibling')!== undefined && item.get('nextSibling') !== null) {
+                    if (item.get('nextSibling') !== undefined && item.get('nextSibling') !== null) {
                         if (item.get('nextSibling').get('tagName') !== undefined && item.get('nextSibling').get('tagName').toLowerCase() === 'li') {
                             item = item.get('nextSibling');
                         }
@@ -253,14 +256,12 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         var clone;
         beforeitemid = -1;
         afteritemid = -1;
+
         var html = drag.get('node').get('innerHTML');
-        //console.log(html);
         var index = html.indexOf('</b>');
-        //lefthtml = '</a></b>' + html.substring(index + 4);
         html = html.substring(0, index - 4);
         html = '<li>' + html + '...' + '</a></b></li>';
         drag.get('node').set('innerHTML', html);
-        //console.log(html);
         //Set new style
         drag.get('node').setStyle('opacity', '.25');
         // Remove bottom placeholder.
@@ -269,7 +270,6 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
             next.remove();
         }
 
-        //console.log(drag.get('node').get('innerHTML'));
         //Set new style
         drag.get('dragNode').set('innerHTML', drag.get('node').get('innerHTML'));
         drag.get('dragNode').setStyles({
@@ -291,9 +291,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
 
     //Listen for a drag:end events
     Y.DD.DDM.on('drag:end', function(e) {
-        console.log('aaaaaaaaaaa');
         var drag = e.target;
-
         var item = drag.get('node').one("ul");
 
         // Get ul with context id.
@@ -327,17 +325,11 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
             var uri = "changer.php" + location.search + '&';
             uri += get_params(options);
             uri = M.cfg.wwwroot + '/local/ajaxcategories/' + uri;
-            //console.log(uri);
             // Make ajax request.
             ajax_request(uri);
         }
-        /*if (clonedrag.hasClass('yui3-dd-drop yui3-dd-draggable yui3-dd-dragging')) {
-            console.log('aaaaaaaaaaaaaa');
-            clonedrag.removeClass('yui3-dd-dragging');
-        }*/
         var html = drag.get('node').get('innerHTML');
         html = html.substring(4, html.lastIndexOf('...</a></b>'));
-        //console.log(html);
         drag.get('node').set('innerHTML', html + lefthtml);
         drag.get('node').wrap('<li id = "ajaxlistitem"></li>');
         if (clonedrag !== null && clonedrag !== undefined) {
@@ -390,8 +382,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         }
         clonedrag = null;
     });
-    //Static Vars
-    var goingUp = false, lastY = 0;
+
     // Draggable nodes
     var items = Y.Node.all('#ajaxitem');
     items.each(function(v, k) {
