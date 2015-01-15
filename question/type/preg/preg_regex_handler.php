@@ -648,7 +648,16 @@ class qtype_preg_regex_handler {
         if ($this->options->parsetemplates && !$this->options->preserveallnodes) {
             // Do preprocessing if templates parsing is needed
             $resultregex = '';
-            $tokens = qtype_preg\template::process_regex($regex, $this->options, $this->lexer, $resultregex);
+            $preprocessingerrors = array();
+            $tokens = qtype_preg\template::process_regex($regex, $this->options, $this->lexer, $preprocessingerrors, $resultregex);
+            foreach ($preprocessingerrors as $node) {
+                $this->errornodes[] = $node;
+                $this->errors[] = new qtype_preg_parsing_error($regex, $node);
+            }
+            // If there were errors, $tokens will be empty. This is not OK for matching or whatever applications that need processing
+            if (empty($tokens)) {
+                return;
+            }
         } else {
             StringStreamController::createRef('regex', $regex);
             $pseudofile = fopen('string://regex', 'r');
