@@ -639,62 +639,36 @@ class qtype_preg_regex_handler {
         return false;
     }
 
-    /**
-     * Does lexical and syntaxical analysis of the regex and builds an abstract syntax tree, saving root node in $this->astroot.
-     * @param string regex - regular expression for building tree.
-     */
-    protected function build_tree($regex) {
-        $tokens = array();
-        if ($this->options->parsetemplates && !$this->options->preserveallnodes) {
-            // Do preprocessing if templates parsing is needed
-            $resultregex = '';
-            $preprocessingerrors = array();
-            $tokens = qtype_preg\template::process_regex($regex, $this->options, $this->lexer, $preprocessingerrors, $resultregex);
-            foreach ($preprocessingerrors as $node) {
-                $this->errornodes[] = $node;
-                $this->errors[] = new qtype_preg_parsing_error($regex, $node);
-            }
-            // If there were errors, $tokens will be empty. This is not OK for matching or whatever applications that need processing
-            if (empty($tokens)) {
-                return;
-            }
-        } else {
-            StringStreamController::createRef('regex', $regex);
-            $pseudofile = fopen('string://regex', 'r');
-            $this->lexer = new qtype_preg_lexer($pseudofile);
-            $this->lexer->set_options($this->options);
-            while (($token = $this->lexer->nextToken()) !== null) {
-                if (is_array($token)) {
-                    foreach ($token as $curtoken) {
-                        $tokens[] = $curtoken;
-                    }
-                } else {
-                    $tokens[] = $token;
-                }
-            }
-            fclose($pseudofile);
-        }
+    protected function find_errors($regex, &$lexer, &$parser) {
+        // All errors are found with preserveallnodes == true.
+        $options = clone $this->options;
+        $options->preserveallnodes = true;
 
-        // Pass tokens to the parser.
-        $this->parser = new qtype_preg_parser($this->options);
+        // Tokenize regex.
+        $hastemplates = false;
+        $tokens = qtype_preg_lexer::tokenize_regex($regex, $options, $lexer, $hastemplates);
+
+        // Parse tokens.
+        $parser = new qtype_preg_parser($options);
         foreach ($tokens as $token) {
-            $this->parser->doParse($token->type, $token->value);
+            $parser->doParse($token->type, $token->value);
         }
 
-        // Lexer returns errors for an unclosed character set or wrong modifiers.
-        $lexerrors = $this->lexer->get_error_nodes();
+        // Parse specific lexer errors.
+        $lexerrors = $lexer->get_error_nodes();
         foreach ($lexerrors as $node) {
             if ($node->subtype == qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET || $node->subtype == qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING) {
-                $this->parser->doParse(qtype_preg_parser::PARSELEAF, $node);
+                $parser->doParse(qtype_preg_parser::PARSELEAF, $node);
             }
             $this->errornodes[] = $node;
             $this->errors[] = new qtype_preg_parsing_error($regex, $node);
         }
 
-        $this->parser->doParse(0, 0);
+        // Parsing is finished.
+        $parser->doParse(0, 0);
 
         // Parser contains other errors inside AST nodes.
-        $parseerrors = $this->parser->get_error_nodes();
+        $parseerrors = $parser->get_error_nodes();
         foreach ($parseerrors as $node) {
             $this->errornodes[] = $node;
             // There can be a specific accepting error.
@@ -705,17 +679,44 @@ class qtype_preg_regex_handler {
                 $this->errors[] = new qtype_preg_parsing_error($regex, $node);
             }
         }
+    }
 
-        // Set AST and DST roots.
+    /**
+     * Does lexical and syntaxical analysis of the regex and builds an abstract syntax tree, saving root node in $this->astroot.
+     * @param string regex - regular expression for building tree.
+     */
+    protected function build_tree($regex) {
+        // Find errors first. If there is one, save the AST as is and exit.
+        $this->find_errors($regex, $this->lexer, $this->parser);
         $this->astroot = $this->parser->get_root();
-        if ($this->astroot !== null && !$this->errors_exist()) { // Add necessary nodes.
-            if ($this->options->exactmatch) {
+
+        if (!$this->errors_exist()) {
+            // No errors in the regex. Parse again if needed (preserveallnodes == false)
+            if (!$this->options->preserveallnodes) {
+                // Use templates preprocessor.
+                $resultregex = '';
+                $tokens = qtype_preg\template::process_regex($regex, $this->options, $this->lexer, $resultregex);
+
+                // Pass tokens to the parser.
+                $this->parser = new qtype_preg_parser($this->options);
+                foreach ($tokens as $token) {
+                    $this->parser->doParse($token->type, $token->value);
+                }
+
+                // Parsing is finished.
+                $this->parser->doParse(0, 0);
+
+                $this->astroot = $this->parser->get_root();
+            }
+
+            // Add necessary nodes.
+            if ($this->astroot !== null && $this->options->exactmatch) {
                 $newroot = $this->add_exact_match_nodes($this->astroot);
                 $this->astroot->subpattern = -1;
                 $this->astroot = $newroot;
                 $this->astroot->subpattern = 0;
             }
-            if ($this->options->selection->indfirst != -2) {
+            if ($this->astroot !== null && $this->options->selection->indfirst != -2) {
                 $newroot = $this->add_selection_nodes($this->astroot);
                 $this->astroot->subpattern = -1;
                 $this->astroot = $newroot;
@@ -723,7 +724,7 @@ class qtype_preg_regex_handler {
             }
         }
 
-        if ($this->astroot != null) {
+        if ($this->astroot !== null) {
             $this->dstroot = $this->from_preg_node(clone $this->astroot);
         }
     }
