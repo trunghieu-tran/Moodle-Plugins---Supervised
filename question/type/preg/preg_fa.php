@@ -496,19 +496,27 @@ class qtype_preg_fa_transition {
             $resulttran = new qtype_preg_fa_transition(0, $other->pregleaf, 1, self::ORIGIN_TRANSITION_INTER, $other->consumeschars);
             $assert = $this->intersect_asserts($other);
             $resulttran->mergedbefore = $assert->mergedbefore;
-            $resulttran->mergedafter = $assert->mergedafter;
+            if ($thishastags) {
+                $resulttran->mergedafter = array_merge($assert->mergedafter, array($this));
+            } else {
+                $resulttran->mergedafter = $assert->mergedafter;
+            }
             $resulttran->loopsback = $this->loopsback || $other->loopsback;
-            $this->unite_tags($other, $resulttran);
+            //$this->unite_tags($other, $resulttran);
             return $resulttran;
         }
         if ($other->is_eps() && $this->consumeschars == false) {
             $resulttran = new qtype_preg_fa_transition(0, $this->pregleaf, 1, self::ORIGIN_TRANSITION_INTER, $this->consumeschars);
 
             $assert = $this->intersect_asserts($other);
-            $resulttran->mergedbefore = $assert->mergedbefore;
+            if ($otherhastags) {
+                $resulttran->mergedbefore = array_merge(array($other), $assert->mergedbefore);
+            } else {
+                $resulttran->mergedbefore = $assert->mergedbefore;
+            }
             $resulttran->mergedafter = $assert->mergedafter;
             $resulttran->loopsback = $this->loopsback || $other->loopsback;
-            $this->unite_tags($other, $resulttran);
+            //$this->unite_tags($other, $resulttran);
             return $resulttran;
         }
         if ($this->is_unmerged_assert() && $this->consumeschars == false && (!$other->is_eps() && !$other->is_unmerged_assert())
