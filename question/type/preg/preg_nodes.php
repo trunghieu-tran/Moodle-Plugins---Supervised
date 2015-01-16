@@ -279,8 +279,6 @@ abstract class qtype_preg_node {
     const TYPE_LEAF_SUBEXPR_CALL = 'leaf_subexpr_call';
     /** Template leaf (without params). */
     const TYPE_LEAF_TEMPLATE = 'leaf_template';
-    /** Template node parameter $$1 or alike. */
-    const TYPE_LEAF_TEMPLATE_PARAM = 'leaf_template_param';
     /** Backtracking control, newline conventions etc sequences. */
     const TYPE_LEAF_CONTROL = 'leaf_control';
     /** Option set. */
@@ -1623,20 +1621,6 @@ class qtype_preg_leaf_template extends qtype_preg_leaf {
     public function __construct($name = '') {
         $this->type = qtype_preg_node::TYPE_LEAF_TEMPLATE;
         $this->name = $name;
-    }
-    public function match($str, $pos, &$length, $matcherstateobj = null) {
-        return false;
-    }
-    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
-        return array(self::NEXT_CHAR_CANNOT_GENERATE, null);
-    }
-}
-
-class qtype_preg_leaf_template_param extends qtype_preg_leaf {
-    public $number;
-    public function __construct($number) {
-        $this->type = qtype_preg_node::TYPE_LEAF_TEMPLATE_PARAM;
-        $this->number = $number;
     }
     public function match($str, $pos, &$length, $matcherstateobj = null) {
         return false;
