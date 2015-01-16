@@ -99,6 +99,26 @@ class qtype_preg_lexer extends JLexBase  {
     protected $charset_count = 0;
     // Characters of the charset.
     protected $charset_set = '';
+    public static function tokenize_regex($regex, $options, &$lexer, &$hastemplates) {
+        StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new qtype_preg_lexer($pseudofile);
+        $lexer->set_options($options);
+        $hastemplates = false;
+        $result = array();
+        while (($token = $lexer->nextToken()) !== null) {
+            if (is_array($token)) {
+                foreach ($token as $curtoken) {
+                    $result[] = $curtoken;
+                    $hastemplates = $hastemplates || ($curtoken->type === qtype_preg_parser::TEMPLATEPARSELEAF || $curtoken->type === qtype_preg_parser::TEMPLATEOPENBRACK);
+                }
+            } else {
+                $result[] = $token;
+                $hastemplates = $hastemplates || ($token->type === qtype_preg_parser::TEMPLATEPARSELEAF || $token->type === qtype_preg_parser::TEMPLATEOPENBRACK);
+            }
+        }
+        return $result;
+    }
     public static function char_escape_sequences_outside_charset() {
         return array('\a',
                      '\c',
@@ -7344,13 +7364,25 @@ array(
             $result = new JLexToken(qtype_preg_parser::TEMPLATECLOSEBRACK, $closebr);
         } else if (core_text::substr($this->comment, 0, 2) === '##' && core_text::substr($this->comment, -1) === '<') {
             // Template open bracket
-            $node = new qtype_preg_node_template(core_text::substr($this->comment, 2, $this->comment_length - 3));
+            $name = core_text::substr($this->comment, 2, $this->comment_length - 3);
+            $available = qtype_preg\template::available_templates();
+            $node = new qtype_preg_node_template($name);
             $node->set_user_info($position, array(new qtype_preg_userinscription('(?#' . $this->comment . ')')));
+            if (!array_key_exists($name, $available)) {
+                $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_TEMPLATE, $name, $node);
+                $error->position = $position;
+            }
             $result = new JLexToken(qtype_preg_parser::TEMPLATEOPENBRACK, $node);
         } else if (core_text::substr($this->comment, 0, 2) === '##') {
             // Template leaf
-            $node = new qtype_preg_leaf_template(core_text::substr($this->comment, 2));
+            $name = core_text::substr($this->comment, 2);
+            $available = qtype_preg\template::available_templates();
+            $node = new qtype_preg_leaf_template($name);
             $node->set_user_info($position, array(new qtype_preg_userinscription('(?#' . $this->comment . ')')));
+            if (!array_key_exists($name, $available)) {
+                $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_TEMPLATE, $name, $node);
+                $error->position = $position;
+            }
             $result = new JLexToken(qtype_preg_parser::TEMPLATEPARSELEAF, $node);
         }
     }

@@ -117,7 +117,7 @@ class template {
     /**
      * Gets regex, returns tokens.
      */
-    public static function process_regex($regex, $options, &$lexer, &$errors, &$resultregex) {
+    public static function process_regex($regex, $options, &$lexer, &$resultregex) {
         $mods = $options->modifiers_to_string();
         $pos = '';
         $neg = '';
@@ -132,15 +132,21 @@ class template {
 
 
         $hastemplates = false;
-        $tokens = self::tokenize_regex($regex, $options, $lexer, $hastemplates);
-        $processedregex = self::process_regex_tokens($tokens, $pos, $neg, $errors);
+        $tokens = \qtype_preg_lexer::tokenize_regex($regex, $options, $lexer, $hastemplates);
+        if (!$hastemplates) {
+            // Original regex does not contain templates. Return these tokens.
+            $resultregex = $regex;
+            return $tokens;
+        }
+
+        $processedregex = self::process_regex_tokens($tokens, $pos, $neg);
 
         $newlexer = null;
         $newhastemplates = false;
-        $newtokens = self::tokenize_regex($processedregex, $options, $newlexer, $newhastemplates);
+        $newtokens = \qtype_preg_lexer::tokenize_regex($processedregex, $options, $newlexer, $newhastemplates);
         if ($newhastemplates) {
             // If there are still some templates, do a recursive call
-            $newtokens = self::process_regex($processedregex, $options, $newlexer, $errors, $resultregex);
+            $newtokens = self::process_regex($processedregex, $options, $newlexer, $resultregex);
         } else {
             // Else save the result
             $resultregex = $processedregex;
@@ -148,39 +154,14 @@ class template {
         return $newtokens;
     }
 
-    private static function tokenize_regex($regex, $options, &$lexer, &$hastemplates) {
-        \StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $lexer = new \qtype_preg_lexer($pseudofile);
-        $lexer->set_options($options);
-        $hastemplates = false;
-
-        $result = array();
-        while (($token = $lexer->nextToken()) !== null) {
-            if (is_array($token)) {
-                foreach ($token as $curtoken) {
-                    $result[] = $curtoken;
-                    $hastemplates = $hastemplates || ($curtoken->type === \qtype_preg_parser::TEMPLATEPARSELEAF || $curtoken->type === \qtype_preg_parser::TEMPLATEOPENBRACK);
-                }
-            } else {
-                $result[] = $token;
-                $hastemplates = $hastemplates || ($token->type === \qtype_preg_parser::TEMPLATEPARSELEAF || $token->type === \qtype_preg_parser::TEMPLATEOPENBRACK);
-            }
-        }
-        return $result;
-    }
-
     /**
      * Gets tokens, returns regex.
      */
-    private static function process_regex_tokens($tokens, $pos, $neg, &$errors) {
+    private static function process_regex_tokens($tokens, $pos, $neg) {
         $result = '';
-        $errors = array();
         $templates = self::available_templates();
         $opentemplates = array(null);   // stack of opening 'parens' (?###template<). First one is a fictive element for the whole regex
         $operands = array(array(''));   // stack of lists of operands. First one is fictive element for the whole regex
-
-        $firstopenparen = null;         // for syntax errors reporting
 
         foreach ($tokens as $token) {
             $node = $token->value;
@@ -207,46 +188,21 @@ class template {
             $negativeopts = '';
 
             if ($token->type === \qtype_preg_parser::TEMPLATEPARSELEAF || $token->type === \qtype_preg_parser::TEMPLATEOPENBRACK) {
-                // Is there a template with such name?
-                if (!array_key_exists($node->name, $templates)) {
-                    $error = new \qtype_preg_node_error(\qtype_preg_node_error::SUBTYPE_UNKNOWN_TEMPLATE, $node->name);
-                    $error->set_user_info($node->position, $node->userinscription);
-                    $errors[] = $error;
-                } else {
-                    $template = $templates[$node->name];
-                    $positiveopts = $template->get_options_str(true);
-                    $negativeopts = $template->get_options_str(false);
-                }
+                $template = $templates[$node->name];
+                $positiveopts = $template->get_options_str(true);
+                $negativeopts = $template->get_options_str(false);
             }
 
             // Is it simply a template leaf?
             if ($token->type === \qtype_preg_parser::TEMPLATEPARSELEAF && $template !== null) {
-                // Check if a node called as a leaf
-                if ($template->placeholderscount > 0) {
-                    $error = new \qtype_preg_node_error(\qtype_preg_node_error::SUBTYPE_WRONG_TEMPLATE_PARAMS_COUNT, $node->plain_userinscription());
-                    $error->set_user_info($node->position, $node->userinscription);
-                    $errors[] = $error;
-                }
                 $operands[$countoperands - 1][count($operands[$countoperands - 1]) - 1] .= "(?{$positiveopts}-{$negativeopts}:{$template->regex})";
                 continue;
             }
 
             // Is it an opening 'paren'?
             if ($token->type === \qtype_preg_parser::TEMPLATEOPENBRACK) {
-                if ($firstopenparen === null) {
-                    $firstopenparen = $token->value;
-                }
-                // Check if a leaf called as a node
-                if ($template !== null && $template->placeholderscount === 0) {
-                    $error = new \qtype_preg_node_error(\qtype_preg_node_error::SUBTYPE_WRONG_TEMPLATE_PARAMS_COUNT, $node->plain_userinscription());
-                    $error->set_user_info($node->position, $node->userinscription);
-                    $errors[] = $error;
-                }
                 // Push a new template and new operands list
-                $tmp = new \stdClass();
-                $tmp->token = $token;
-                $tmp->template = $template;
-                $opentemplates[] = $tmp;
+                $opentemplates[] = $template;
                 $operands[] = array('');
                 continue;
             }
@@ -263,53 +219,27 @@ class template {
 
             // Is it a closing 'paren'?
             if ($token->type === \qtype_preg_parser::TEMPLATECLOSEBRACK) {
-                // Check for unopened paren
-                if (count($opentemplates) === 1) {
-                    $error = new \qtype_preg_node_error(\qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_OPEN_PAREN, $node->plain_userinscription());
-                    $error->set_user_info($node->position, $node->userinscription);
-                    $errors[] = $error;
-                    break;
-                }
-                // Pop the template which is now ready; regardless possible error of wrong params count
+                // Pop the template which is now ready
                 $template = array_pop($opentemplates);
                 $lastoperands = array_pop($operands);
 
-                if ($template->template !== null) {
+                if ($template !== null) {
                     // Substitute all actual operands to the template
-                    $res = $template->template->regex;
-
-                    // Check if the number of operands is correct
-                    if ($template->template->placeholderscount !== count($lastoperands)) {
-                        $position = new \qtype_preg_position($template->token->value->position->indfirst, $node->position->indlast,
-                                                             $template->token->value->position->linefirst, $node->position->linelast,
-                                                             $template->token->value->position->colfirst, $node->position->collast);
-
-                        $error = new \qtype_preg_node_error(\qtype_preg_node_error::SUBTYPE_WRONG_TEMPLATE_PARAMS_COUNT, null);
-                        $error->set_user_info($position, $template->token->value->userinscription);
-                        $errors[] = $error;
-                        continue;
-                    }
+                    $res = $template->regex;
 
                     // Because we wrap operands into (?mods:), no special actions neede for situations like (?###template<)(?###>)
-                    for ($i = 1; $i <= $template->template->placeholderscount; ++$i) {
+                    for ($i = 1; $i <= $template->placeholderscount; ++$i) {
                         $res = str_replace("\$\${$i}", "(?{$pos}-{$neg}:{$lastoperands[$i - 1]})", $res);
                     }
 
                     // Concatenate the template to the previous operand
-                    $positiveopts = $template->template->get_options_str(true);
-                    $negativeopts = $template->template->get_options_str(false);
+                    $positiveopts = $template->get_options_str(true);
+                    $negativeopts = $template->get_options_str(false);
                     $operands[$countoperands - 2][count($operands[$countoperands - 2]) - 1] .= "(?{$positiveopts}-{$negativeopts}:{$res})";
                 }
 
                 continue;
             }
-        }
-        // Check for unclosed paren
-        if (count($opentemplates) > 1) {
-            $error = new \qtype_preg_node_error(\qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_CLOSE_PAREN, $firstopenparen->plain_userinscription());
-            $error->set_user_info($firstopenparen->position, $firstopenparen->userinscription);
-            $errors[] = $error;
-            return '';
         }
         return $operands[0][0];
     }

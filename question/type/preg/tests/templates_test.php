@@ -56,27 +56,26 @@ class qtype_preg_templates_test extends PHPUnit_Framework_TestCase {
         $options = new qtype_preg_handling_options();
         $options->set_modifier(qtype_preg_handling_options::MODIFIER_MULTILINE);
         $lexer = null;
-        $errors = array();
         $processed = '';
 
         $original = 'abc(def)+[a-zs-!f]';
-        qtype_preg\template::process_regex($original, $options, $lexer, $errors, $processed);
+        qtype_preg\template::process_regex($original, $options, $lexer, $processed);
         $this->assertTrue($processed === $original);
 
         $original = 'ab(?###word)cd';
-        qtype_preg\template::process_regex($original, $options, $lexer, $errors, $processed);
+        qtype_preg\template::process_regex($original, $options, $lexer, $processed);
         $this->assertTrue($processed === 'ab(?i-msx:\w+)cd');
 
         $original = 'ab(?###two_words)cd';
-        qtype_preg\template::process_regex($original, $options, $lexer, $errors, $processed);
+        qtype_preg\template::process_regex($original, $options, $lexer, $processed);
         $this->assertTrue($processed === 'ab(?-imsx:(?i-msx:\w+)(?i-msx:\w+))cd');
 
         $original = '(?###parens_req<)a(?###>)';
-        qtype_preg\template::process_regex($original, $options, $lexer, $errors, $processed);
+        qtype_preg\template::process_regex($original, $options, $lexer, $processed);
         //$this->assertTrue($processed === 'ab(?-imsx:(?i-msx:\w+)(?i-msx:\w+))cd');
 
         $original = '(?###parens_opt<)(?###brackets_req<) x (?###>)(?###>)';
-        qtype_preg\template::process_regex($original, $options, $lexer, $errors, $processed);
+        qtype_preg\template::process_regex($original, $options, $lexer, $processed);
 
         /*$handler = new qtype_preg_fa_matcher("(?###word_in_parens)");
         $root = $handler->get_ast_root();
@@ -321,6 +320,7 @@ class qtype_preg_templates_test extends PHPUnit_Framework_TestCase {
     }
 
     public function test_template_errors() {
+        // Wrong leaf name
         $matcher = new qtype_preg_fa_matcher('(?###somethingweird)');
         $errors = $matcher->get_error_nodes();
         $this->assertTrue(count($errors) === 1);
@@ -329,6 +329,34 @@ class qtype_preg_templates_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errors[0]->position->colfirst === 0);
         $this->assertTrue($errors[0]->position->collast === 19);
 
+        // Wrong node name
+        $matcher = new qtype_preg_fa_matcher('(?###somethingweird<)a(?###,)b(?###>)');
+        $errors = $matcher->get_error_nodes();
+        $this->assertTrue(count($errors) === 1);
+        $this->assertTrue($errors[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errors[0]->subtype === qtype_preg_node_error::SUBTYPE_UNKNOWN_TEMPLATE);
+        $this->assertTrue($errors[0]->position->colfirst === 0);
+        $this->assertTrue($errors[0]->position->collast === 20);
+
+        // Leaf called as a node
+        $matcher = new qtype_preg_fa_matcher('(?###word<)(?###>)');
+        $errors = $matcher->get_error_nodes();
+        $this->assertTrue(count($errors) === 1);
+        $this->assertTrue($errors[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errors[0]->subtype === qtype_preg_node_error::SUBTYPE_WRONG_TEMPLATE_PARAMS_COUNT);
+        $this->assertTrue($errors[0]->position->colfirst === 0);
+        $this->assertTrue($errors[0]->position->collast === 17);
+
+        // Node called as a leaf
+        $matcher = new qtype_preg_fa_matcher('(?###parens_req)');
+        $errors = $matcher->get_error_nodes();
+        $this->assertTrue(count($errors) === 1);
+        $this->assertTrue($errors[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
+        $this->assertTrue($errors[0]->subtype === qtype_preg_node_error::SUBTYPE_WRONG_TEMPLATE_PARAMS_COUNT);
+        $this->assertTrue($errors[0]->position->colfirst === 0);
+        $this->assertTrue($errors[0]->position->collast === 15);
+
+        // Wrong parameters count
         $matcher = new qtype_preg_fa_matcher('(?###parens_req<)a(?###,)b(?###>)');
         $errors = $matcher->get_error_nodes();
         $this->assertTrue(count($errors) === 1);
