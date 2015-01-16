@@ -892,25 +892,6 @@ class qtype_preg_description_leaf_template extends qtype_preg_description_leaf {
     }
 }
 
-class qtype_preg_description_leaf_template_param extends qtype_preg_description_leaf {
-    public function __construct($node, $matcher) {
-        parent::__construct($node, $matcher);
-        $templatename = $this->pregnode->name;
-        $this->template = qtype_preg\template::available_templates()[$templatename];
-        $this->regex = $matcher->from_preg_node($this->template->regex); // TODO - options
-        /*foreach ($this->pregnode->operands as $operand) {
-            array_push($this->operands, $matcher->from_preg_node($operand));
-        }*/
-    }
-
-    /**
-     * Override of abstract qtype_preg_description_operator::pattern()
-     */
-    public function pattern($node_parent = null, $form = null) {
-        return $templatedescr = $this->template->get_description();
-    }
-}
-
 class qtype_preg_description_node_error extends qtype_preg_description_operator {
 
     public function pattern($node_parent = null, $form = null) {

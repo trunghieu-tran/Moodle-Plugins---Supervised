@@ -1783,21 +1783,6 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
 <YYINITIAL> "^" {
     return $this->assertion_for_circumflex();
 }
-<YYINITIAL> "$$"{DIGIT}+ {
-    $text = $this->yytext();
-    if ($this->options->parsetemplates) {
-        $number = (int)substr($text, 2);
-        $node = new qtype_preg_leaf_template_param($number);
-        $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
-        return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
-    }
-    $result = array(
-        $this->assertion_for_dollar(),
-        $this->assertion_for_dollar()
-    );
-    return array_merge($result, $this->string_to_tokens(substr($text)));
-
-}
 <YYINITIAL> "$" {
     return $this->assertion_for_dollar();
 }
