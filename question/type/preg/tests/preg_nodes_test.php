@@ -275,6 +275,11 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $node = $root->node_by_regex_fragment(0, 1, $idcounter);
         $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_CONCAT);
 
+        // Selection '(' to be expanded.
+        $root = clone $handler->get_ast_root();
+        $node = $root->node_by_regex_fragment(5, 5, $idcounter);
+        $this->assertTrue($node->type == qtype_preg_node::TYPE_NODE_SUBEXPR);
+
         // Exact selection 'b'.
         $root = clone $handler->get_ast_root();
         $node = $root->node_by_regex_fragment(7, 7, $idcounter);
