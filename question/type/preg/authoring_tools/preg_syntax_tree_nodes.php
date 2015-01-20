@@ -439,6 +439,17 @@ class qtype_preg_syntax_tree_leaf_options extends qtype_preg_syntax_tree_leaf {
     }
 }
 
+class qtype_preg_syntax_tree_leaf_template extends qtype_preg_syntax_tree_leaf {
+
+    public function tooltip() {
+        return '';
+    }
+
+    public function shape_color() {
+        return 'blue';
+    }
+}
+
 class qtype_preg_syntax_tree_node_quant extends qtype_preg_syntax_tree_operator {
 
     public function tooltip() {
@@ -510,5 +521,20 @@ class qtype_preg_syntax_tree_node_error extends qtype_preg_syntax_tree_operator 
 
     public function shape_color() {
         return 'red';
+    }
+}
+
+class qtype_preg_syntax_tree_node_template extends qtype_preg_syntax_tree_operator {
+
+    public function label() {
+        return parent::label() . '...(?:###>)';
+    }
+
+    public function tooltip() {
+        return '';
+    }
+
+    public function shape_color() {
+        return 'blue';
     }
 }
