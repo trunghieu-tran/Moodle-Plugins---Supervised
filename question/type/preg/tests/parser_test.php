@@ -101,6 +101,10 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $handler = $this->run_handler('(ab)');
         $root = $handler->get_ast_root();
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        $this->assertTrue($root->position->colfirst === 0);
+        $this->assertTrue($root->position->collast === 3);
+        $this->assertTrue($root->position->linefirst === 0);
+        $this->assertTrue($root->position->linelast === 0);
         $this->assertTrue($root->userinscription[0]->data === '(...)');
         $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_NODE_CONCAT);
         $this->assertTrue($root->operands[0]->userinscription === array());
