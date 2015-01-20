@@ -509,32 +509,30 @@ expr(A) ::= TEMPLATESEP(B). [TEMPLATESEP_SHORTEST] {
 expr(A) ::= TEMPLATEOPENBRACK(B) TEMPLATECLOSEBRACK(C). {
     $emptynode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
     $emptynode->set_user_info(C->position->add_chars_right(-1), array_merge(B->userinscription, C->userinscription));
-    B->operands = array($emptynode);
+    $position = B->position->compose(C->position);
     A = B;
+    A->operands = array($emptynode);
+    A->position = $position;
     $available = qtype_preg\template::available_templates();
     if (array_key_exists(A->name, $available)) {
         $template = $available[A->name];
         if ($template->placeholderscount === 0) {
             // Template leaf called as a node
-            $position = new qtype_preg_position(B->position->indfirst, C->position->indlast,
-                                                B->position->linefirst, C->position->linelast,
-                                                B->position->colfirst, C->position->collast);
             $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_TEMPLATE_PARAMS_COUNT, A->name, $position, A->userinscription, array());
         }
     }
 }
 
 expr(A) ::= TEMPLATEOPENBRACK(B) expr(C) TEMPLATECLOSEBRACK(D). {
+    $position = B->position->compose(D->position);
     A = B;
     A->operands = is_array(C) ? C : array(C);
+    A->position = $position;
     $available = qtype_preg\template::available_templates();
     if (array_key_exists(A->name, $available)) {
         $template = $available[A->name];
         if ($template->placeholderscount !== count(A->operands)) {
             // Wrong number of parameters
-            $position = new qtype_preg_position(B->position->indfirst, D->position->indlast,
-                                                B->position->linefirst, D->position->linelast,
-                                                B->position->colfirst, D->position->collast);
             $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_TEMPLATE_PARAMS_COUNT, A->name, $position, A->userinscription, array());
         }
     }
