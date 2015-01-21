@@ -86,7 +86,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
         $handler = new qtype_preg_description_tool('(a)\1');
         //var_dump($handler);
         $result = $handler->description('%%tests%%','%%tests%%');
-        $expected = 'subpattern #1: [ <span style="color:blue">a</span> ] then text that matched by subpattern #1';
+        $expected = 'subpattern #1: [ <span style="color:blue">a</span> ] then text matched by subpattern #1';
         $this->assertEquals($expected, $result);
     }
 
@@ -284,7 +284,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     public function postprocessing_provider()
     {
         return array(
-          array('([abc])','subpattern #1: [one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">b</span>, <span style="color:blue">c</span>]','рус - TODO'),
+          array('([abc])','subpattern #1: [ one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">b</span>, <span style="color:blue">c</span>; ]','рус - TODO'),
           array('[^\S]','a white space','рус - TODO'),
         );
     }
@@ -305,7 +305,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     public function subexpression_provider()
     {
         return array(
-          array('(?:[abc])','grouping: [ one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">b</span>, <span style="color:blue">c</span> ]','рус - TODO'),
+          array('(?:[abc])','grouping: [ one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">b</span>, <span style="color:blue">c</span>; ]','рус - TODO'),
           //array('(?|(a)|(b))','1','рус - TODO'), doesnt work now
         );
     }
