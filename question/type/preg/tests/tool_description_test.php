@@ -318,18 +318,18 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
         $handler = new qtype_preg_description_tool($regex);
         $root = $handler->get_ast_root();
         //var_dump($handler);
-        //$result = $handler->description('%%tests%%','%%tests%%');
-        //$this->assertEquals($expected_en, $result);
-        $this->assertTrue(false);
+        $result = $handler->description('%%tests%%','%%tests%%');
+        $this->assertEquals($expected_en, $result);
+        //$this->assertTrue(false);
     }
 
     public function templates_provider()
     {
         return array(
-            array('(?###word)', 'tbd', 'tbd'),
-            array('(?###integer)', 'tbd', 'tbd'),
-            array('(?###parens_req<)a(?###>)', 'tbd', 'tbd'),
-            array('(?###parens_opt<)a(?###>)', 'tbd', 'tbd'),
+            array('(?###word)', 'word', 'tbd'),
+            array('(?###integer)', 'integer', 'tbd'),
+            array('(?###parens_req<)a(?###>)', '$$1 in parens', 'tbd'),
+            array('(?###parens_opt<)a(?###>)', '$$1 in parens or not', 'tbd'),
         );
     }
 
