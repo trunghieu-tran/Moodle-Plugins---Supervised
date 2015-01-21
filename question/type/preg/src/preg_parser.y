@@ -332,6 +332,10 @@ start ::= expr(B). {
 
      // Assign identifiers.
     $this->assign_ids($this->root);
+
+    // Calculate nullable, firstpos, lastpos and followpos for all nodes.
+    $followpos = array();   // TODO: make a field + getter if this is needed
+    $this->root->calculate_nflf($followpos);
 }
 
 expr(A) ::= PARSELEAF(B). {

@@ -316,6 +316,10 @@ abstract class qtype_preg_node {
     public $id = -1;
     /** Subpattern number. */
     public $subpattern = -1;
+    /** Nullable, firstpos, lastpos used to be needed for nfa/dfa construction. Now they are needed for authoring tools. */
+    public $nullable = null;
+    public $firstpos = null;
+    public $lastpos = null;
 
     public function __construct() {
 
@@ -332,6 +336,12 @@ abstract class qtype_preg_node {
      * a subpattern is a leaf, or a subexpression, or a quantifier.
      */
     abstract public function is_subpattern();
+
+    /**
+     * Calculates nullable, firstpos, lastpos and followpos for this node.
+     * @param followpos array to store the followpos map.
+     */
+    abstract public function calculate_nflf(&$followpos);
 
     /**
      * Finds the nearest suitable subtree by given indexes in the regex string. If the node is N-ary,
@@ -472,6 +482,13 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
         return true;    // Any leaf is a subpattern.
     }
 
+    public function calculate_nflf(&$followpos) {
+        // The following is true for almost all leafs, except emptiness.
+        $this->nullable = false;
+        $this->firstpos = array($this->id);
+        $this->lastpos = array($this->id);
+    }
+
     public function lang_key($usedescription = false) {
         $result = parent::lang_key($usedescription);
         if ($usedescription && $this->negative) {
@@ -598,6 +615,22 @@ abstract class qtype_preg_operator extends qtype_preg_node {
         // When clonning an operator we also want its subtree to be cloned.
         foreach ($this->operands as $i => $operand) {
             $this->operands[$i] = clone $operand;
+        }
+    }
+
+    public function calculate_nflf(&$followpos) {
+        // Calculate nflf for all operands.
+        foreach ($this->operands as $operand) {
+            $operand->calculate_nflf($followpos);
+        }
+        if (count($this->operands) > 0) {
+            $this->nullable = $this->operands[0]->nullable;
+            $this->firstpos = $this->operands[0]->firstpos;
+            $this->lastpos = $this->operands[0]->lastpos;
+        } else {
+            $this->nullable = false;
+            $this->firstpos = array();
+            $this->lastpos = array();
         }
     }
 
@@ -1138,6 +1171,15 @@ class qtype_preg_leaf_meta extends qtype_preg_leaf {
     public function __construct($subtype = null) {
         $this->type = qtype_preg_node::TYPE_LEAF_META;
         $this->subtype = $subtype;
+    }
+
+    public function calculate_nflf(&$followpos) {
+        parent::calculate_nflf($followpos);
+        if ($this->subtype == self::SUBTYPE_EMPTY) {
+            $this->nullable = true;
+            $this->firstpos = array();
+            $this->lastpos = array();
+        }
     }
 
     // TODO - ui_nodename().
@@ -1755,6 +1797,12 @@ class qtype_preg_node_finite_quant extends qtype_preg_operator {
         return true;    // Finite quantifier is a subpattern.
     }
 
+    public function calculate_nflf(&$followpos) {
+        parent::calculate_nflf($followpos);
+        $this->nullable = $this->nullable || $this->leftborder == 0;
+        // TODO - followpos for situations like {2,10}
+    }
+
     public function lang_key($usedescription = false) {
         $result = parent::lang_key($usedescription);
         if ($usedescription) {
@@ -1812,6 +1860,21 @@ class qtype_preg_node_infinite_quant extends qtype_preg_operator {
         return true;    // Infinite quantifier is a subpattern.
     }
 
+    public function calculate_nflf(&$followpos) {
+        parent::calculate_nflf($followpos);
+        $this->nullable = $this->nullable || $this->leftborder == 0;
+        /*foreach ($this->lastpos as $lastpos) {
+            if (!isset($followpos[$lastpos])) {
+                $followpos[$lastpos] = array();
+            }
+            foreach ($this->operands[0]->firstpos as $firstpos) {
+                if (!in_array($firstpos, $followpos[$lastpos])) {
+                    $followpos[$lastpos][] = $firstpos;
+                }
+            }
+        }*/
+    }
+
     public function lang_key($usedescription = false) {
         $result = parent::lang_key($usedescription);
         if ($usedescription) {
@@ -1851,6 +1914,75 @@ class qtype_preg_node_concat extends qtype_preg_operator {
     public function is_subpattern() {
         return false;    // Concatenation is not a subpattern.
     }
+
+    public function calculate_nflf(&$followpos) {
+        parent::calculate_nflf($followpos);
+        $this->nullable = true;
+        $this->firstpos = array();
+        $this->lastpos = array();
+        $count = count($this->operands);
+        // Nullable and firstpos are calculated as always.
+        for ($i = 0; $i < $count; $i++) {
+            $operand = $this->operands[$i];
+            if ($i == 0 || $this->nullable) {
+                $this->firstpos = array_merge($this->firstpos, $operand->firstpos);
+            }
+            if (!$operand->nullable) {
+                $this->nullable = false;
+            }
+        }
+        // Lastpos is calculated backwards.
+        for ($i = $count - 1; $i >= 0; $i--) {
+            $operand = $this->operands[$i];
+            $this->lastpos = array_merge($this->lastpos, $operand->lastpos);
+            if (!$operand->nullable) {
+                break;
+            }
+        }
+
+        // Followpos is calculated for each operand except the last one.
+        /*$followpos_prev = array(); // followpos calculated on the previous step.
+        for ($i = $count - 2; $i >= 0; $i--) {
+            $left = $this->operands[$i];
+            $right = $this->operands[$i + 1];
+            $followpos_new = array(); // followpos calculated on this step.
+
+            foreach ($left->lastpos as $lastpos) {
+                if (!isset($followpos[$lastpos])) {
+                    $followpos[$lastpos] = array();
+                }
+                if (!isset($followpos_new[$lastpos])) {
+                    $followpos_new[$lastpos] = array();
+                }
+
+                foreach ($right->firstpos as $firstpos) {
+                    if (!in_array($firstpos, $followpos[$lastpos])) {
+                        $followpos[$lastpos][] = $firstpos;
+                        $followpos_new[$lastpos][] = $firstpos;
+                    }
+                }
+
+                // Right operand is not nullable; continue.
+                if (!$right->nullable || $i == $count - 2) {
+                    continue;
+                }
+
+                // Right operand is nullable. Copy its follopos to current node.
+                foreach ($followpos_prev as $from => $to) {
+                    if (!isset($followpos[$from])) {
+                        $followpos[$from] = array();
+                    }
+                    foreach ($to as $tmp) {
+                        if (!in_array($tmp, $followpos[$lastpos])) {
+                            $followpos[$lastpos][] = $tmp;
+                            $followpos_new[$lastpos][] = $tmp;
+                        }
+                    }
+                }
+            }
+            $followpos_prev = $followpos_new;
+        }*/
+    }
 }
 
 /**
@@ -1865,6 +1997,21 @@ class qtype_preg_node_alt extends qtype_preg_operator {
 
     public function is_subpattern() {
         return false;    // Alternation is not a subpattern.
+    }
+
+    public function calculate_nflf(&$followpos) {
+        parent::calculate_nflf($followpos);
+        $this->nullable = false;
+        $this->firstpos = array();
+        $this->lastpos = array();
+        for ($i = 0; $i < count($this->operands); $i++) {
+            $operand = $this->operands[$i];
+            if ($operand->nullable) {
+                $this->nullable = true;
+            }
+            $this->firstpos = array_merge($this->firstpos, $operand->firstpos);
+            $this->lastpos = array_merge($this->lastpos, $operand->lastpos);
+        }
     }
 }
 
@@ -1893,6 +2040,13 @@ class qtype_preg_node_assert extends qtype_preg_operator {
 
     public function is_subpattern() {
         return true;    // Lookaround assertion is a subpattern.
+    }
+
+    public function calculate_nflf(&$followpos) {
+        // parent::calculate_nflf($followpos);
+        $this->nullable = false;
+        $this->firstpos = array($this->id);
+        $this->lastpos = array($this->id);
     }
 
     // TODO - ui_nodename().
@@ -1981,6 +2135,11 @@ class qtype_preg_node_cond_subexpr extends qtype_preg_operator {
 
     public function is_subpattern() {
         return true;    // Conditional subexpression is a subpattern.
+    }
+
+    public function calculate_nflf(&$followpos) {
+        parent::calculate_nflf($followpos);
+        // TODO what should be here?
     }
 
     public function lang_key($usedescription = false) {
