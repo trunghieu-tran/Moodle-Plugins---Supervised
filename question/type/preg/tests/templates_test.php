@@ -365,4 +365,26 @@ class qtype_preg_templates_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errors[0]->position->colfirst === 0);
         $this->assertTrue($errors[0]->position->collast === 32);
     }
+
+    public function test_recursive_dependencies() {
+        $available = qtype_preg\template::available_templates();
+
+        // Check correct case
+        $res = qtype_preg\template::check_dependencies($available);
+        $this->assertTrue($res === true);
+
+        // Check direct recursion
+        $res = qtype_preg\template::check_dependencies(array_merge($available, array('recursive' => new qtype_preg\template('recursive', '(?###recursive<)', '', array()))));
+        $this->assertTrue($res === false);
+
+        // Check indirect recursion
+        $res = qtype_preg\template::check_dependencies(array_merge($available, array('recursive1' => new qtype_preg\template('recursive1', '(?###recursive2<)', '', array()),
+                                                                                     'recursive2' => new qtype_preg\template('recursive2', '(?###recursive1<)', '', array())
+                                                                                     )));
+        $this->assertTrue($res === false);
+
+        // Check unexisting dependencies
+        $res = qtype_preg\template::check_dependencies(array_merge($available, array('coffe' => new qtype_preg\template('coffe', '(?###milk<)', '', array()))));
+        $this->assertTrue($res === false);
+    }
 }
