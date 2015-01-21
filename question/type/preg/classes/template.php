@@ -75,6 +75,16 @@ class template {
     }
 
     /**
+     * Returns list of template names, called from this template.
+     */
+    public function get_dependency_templates() {
+        $pattern = '/[(][?]###([^<,>)]+)[<]?[)]/';    // What a mess :(
+        $matches = array();
+        preg_match_all($pattern, $this->regex, $matches);
+        return array_unique($matches[1]);
+    }
+
+    /**
      * Returns all templates that should be recognized by parser.
      */
     public static function available_templates() {
@@ -89,6 +99,45 @@ class template {
             );
         }
         return template::$templates;
+    }
+
+    /**
+     * Checks if a list of templates has recursive dependencies, or unexisting dependencies.
+     * $templates should be a superset of available templates.
+     * Call this function before adding user templates
+     */
+    public static function check_dependencies($templates) {
+        foreach ($templates as $template) {
+            $checked = array();
+            $alldependencies = array();
+            $curdependencies = $template->get_dependency_templates();
+            while (!empty($curdependencies)) {
+                $curdependency = array_pop($curdependencies);
+                if (in_array($curdependency, $checked)) {
+                    continue;
+                }
+                // Check if the dependency exists
+                if (!array_key_exists($curdependency, $templates)) {
+                    return false;
+                }
+                // Add to all dependencies
+                if (!in_array($curdependency, $alldependencies)) {
+                    $alldependencies[] = $curdependency;
+                }
+                // Mark as checked
+                if (!in_array($curdependency, $checked)) {
+                    $checked[] = $curdependency;
+                }
+                // Process child rependencies
+                $deptemplate = $templates[$curdependency];
+                $depdependencies = $deptemplate->get_dependency_templates();
+                $curdependencies = array_merge($curdependencies, $depdependencies);
+            }
+            if (in_array($template->name, $alldependencies)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public function get_description() {
