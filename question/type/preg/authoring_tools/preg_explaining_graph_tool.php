@@ -74,6 +74,8 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
      */
     protected function is_preg_node_acceptable($pregnode) {
         switch ($pregnode->type) {
+            case qtype_preg_node::TYPE_NODE_TEMPLATE:
+            case qtype_preg_node::TYPE_LEAF_TEMPLATE:
             case qtype_preg_node::TYPE_LEAF_CONTROL:
                 return get_string($pregnode->type, 'qtype_preg');
             default:
