@@ -461,6 +461,12 @@ abstract class qtype_preg_node {
     public function ui_nodename() {
         return get_string($this->type, 'qtype_preg');
     }
+
+    /**
+     * @param $node other node
+     * @return bool is $node equals to this node
+     */
+    public function is_equal($node) {} // TODO - make it abstract
 }
 
 /**
@@ -904,6 +910,14 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
             $charset = null;
         }
         return $charset;
+    }
+
+    /**
+     * @param $node other node
+     * @return bool is $node equals to this node
+     */
+    public function is_equal($node) {
+        return ($node instanceof qtype_preg_leaf_charset) && ($this->ranges() == $node->ranges());
     }
 }
 

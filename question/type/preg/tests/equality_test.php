@@ -16,22 +16,38 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
+
 global $CFG;
 //require_once($CFG->dirroot . '/question/type/preg/fa_matcher/fa_matcher.php');
 
 
 class qtype_preg_equality_test extends PHPUnit_Framework_TestCase {
 
-    public function simple_provider()
+    /**
+     * @dataProvider trivial_provider
+     */
+    public function test_trivial($regex1, $regex2) {
+        $h1 = new qtype_preg_regex_handler($regex1);
+        $h2 = new qtype_preg_regex_handler($regex2);
+        $root1 = $h1->get_ast_root();
+        $ranges1 = $root1->ranges();
+        $root2 = $h2->get_ast_root();
+        $ranges2 = $root2->ranges();
+        $this->assertTrue($h1->get_ast_root()->is_equal($h2->get_ast_root()));
+    }
+
+    public function trivial_provider()
     {
         return array(
+            array('[[:digit:]abce]', '[ea-c[:digit:]]')/*,
             array('a|b|c', 'c|b|a'),
             array('abc', 'abc'),
             array('b(a|b|c)(?1)', 'b(abc)(?:a|b|c)'),
             array('b(<a>a|b|c)(?&a)', 'b(a|b|c)(?1)'),
             array("((?<a>can)\s+not|(?&a)(?:'|`|)t)", "((can)\s+not|(?2)(?:'|`|)t)"),
             //array('[abc]', 'a|b|c'),
-            array("((?<a>can)\s+not|(?&a)(?:'|`|)t)", "((?<a>can)\s+not|(?&a)(?:'|`|)t)")
+            array("((?<a>can)\s+not|(?&a)(?:'|`|)t)", "((?<a>can)\s+not|(?&a)(?:'|`|)t)")*/
         );
     }
 
@@ -109,12 +125,5 @@ class qtype_preg_equality_test extends PHPUnit_Framework_TestCase {
             array('[a-c]|[0-9]|[d-f]', '[0-9]|[a-f]'),
             array('[[:ascii:]]|\d', '[[:ascii:]]')
         );
-    }
-
-    /**
-     * @dataProvider simple_provider
-     */
-    public function test_simple($left, $right) {
-        $this->assertTrue(false);
     }
 }
