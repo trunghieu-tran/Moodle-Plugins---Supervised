@@ -497,7 +497,7 @@ class qtype_preg_fa_transition {
             $assert = $this->intersect_asserts($other);
             $resulttran->mergedbefore = $assert->mergedbefore;
             if ($thishastags) {
-                $resulttran->mergedafter = array_merge($assert->mergedafter, array($this));
+                $resulttran->mergedafter = array_merge($assert->mergedafter, array(clone $this));
             } else {
                 $resulttran->mergedafter = $assert->mergedafter;
             }
@@ -510,7 +510,7 @@ class qtype_preg_fa_transition {
 
             $assert = $this->intersect_asserts($other);
             if ($otherhastags) {
-                $resulttran->mergedbefore = array_merge(array($other), $assert->mergedbefore);
+                $resulttran->mergedbefore = array_merge($assert->mergedbefore,array(clone $other));
             } else {
                 $resulttran->mergedbefore = $assert->mergedbefore;
             }
