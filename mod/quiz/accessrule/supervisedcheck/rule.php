@@ -177,7 +177,7 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
             }
             // Delete any remaining old rules.
             foreach ($oldrules as $oldrule) {
-                $DB->delete_records('quizaccess_supervisedcheck', array('id' => $oldrule->id));
+                delete_settings($oldrule);
             }
         } else {
             // Update an existing rule if possible.
@@ -194,7 +194,7 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
             $DB->update_record('quizaccess_supervisedcheck', $rule);
             // Delete any remaining old rules.
             foreach ($oldrules as $oldrule) {
-                $DB->delete_records('quizaccess_supervisedcheck', array('id' => $oldrule->id));
+                delete_settings($oldrule);
             }
         }
     }
