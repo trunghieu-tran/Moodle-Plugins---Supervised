@@ -248,4 +248,9 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
 
         return $errors;
     }
+    
+    public static function delete_settings($quiz) {
+        global $DB;
+        $DB->delete_records('quizaccess_supervisedcheck', array('quizid' => $quiz->id));
+    }
 }
