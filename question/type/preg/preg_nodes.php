@@ -463,10 +463,14 @@ abstract class qtype_preg_node {
     }
 
     /**
-     * @param $node other node
+     * @param $node qtype_preg_node other node
      * @return bool is $node equals to this node
      */
-    public function is_equal($node) {} // TODO - make it abstract
+    public function is_equal($node) {
+        return is_a($this, get_class($node)) // subclass?
+            && $this->type == $node->type
+            && $this->subtype == $node->subtype;
+    }
 }
 
 /**
@@ -693,6 +697,30 @@ abstract class qtype_preg_operator extends qtype_preg_node {
     public function expand_all(&$idcounter, $expandsubtree = false) {
         $this->expand(0, count($this->operands) - 1, $idcounter, $expandsubtree);
     }
+
+    /**
+     * @param $node qtype_preg_node other node
+     * @return bool is $node equals to this node
+     */
+    public function is_equal($node) {
+        return parent::is_equal($node) && $this->is_operands_equal($node);
+    }
+
+    public function is_operands_equal($node) {
+        $operands_arr1 = $this->operands;
+        $operands_arr2 = $node->operands;
+        if (count($operands_arr1) !== count($operands_arr2)) {
+            return false;
+        } else {
+            $result = true;
+            foreach ($operands_arr1 as $index => $operands1) {
+                $inner_result = $operands1->is_equal($operands_arr2[$index]);
+                $result = $result && $inner_result;
+                if ($result === false) break;
+            }
+            return $result;
+        }
+    }
 }
 
 /**
@@ -913,11 +941,11 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
     }
 
     /**
-     * @param $node other node
+     * @param $node qtype_preg_node other node
      * @return bool is $node equals to this node
      */
     public function is_equal($node) {
-        return ($node instanceof qtype_preg_leaf_charset) && ($this->ranges() == $node->ranges());
+        return parent::is_equal($node) && ($this->ranges() == $node->ranges());
     }
 }
 
@@ -1214,6 +1242,7 @@ class qtype_preg_leaf_meta extends qtype_preg_leaf {
     public function tohr() {
         return 'ε';
     }
+
 }
 
 /**
@@ -1492,6 +1521,14 @@ class qtype_preg_leaf_assert_subexpr extends qtype_preg_leaf_assert {
         return $this->negative ? '!(' . $subexpr . ')'
                                : '(' . $subexpr . ')';
     }
+
+    /**
+     * @param $node qtype_preg_node other node
+     * @return bool is $node equals to this node
+     */
+    public function is_equal($node) {
+        return parent::is_equal($node) && $this->name==$node->name && $this->number==$node->number;
+    }
 }
 
 /**
@@ -1528,6 +1565,14 @@ class qtype_preg_leaf_assert_recursion extends qtype_preg_leaf_assert {
         $subexpr = $this->name !== null ? $this->name : $this->number;
         return $this->negative ? '!(' . $subexpr . ')'
                                : '(' . $subexpr . ')';
+    }
+
+    /**
+     * @param $node qtype_preg_node other node
+     * @return bool is $node equals to this node
+     */
+    public function is_equal($node) {
+        return parent::is_equal($node) && $this->name==$node->name && $this->number==$node->number;
     }
 }
 
@@ -1628,6 +1673,14 @@ class qtype_preg_leaf_backref extends qtype_preg_leaf {
         $subexpr = $this->name !== null ? $this->name : $this->number;
         return 'backref #' . $subexpr;
     }
+
+    /**
+     * @param $node qtype_preg_node other node
+     * @return bool is $node equals to this node
+     */
+    public function is_equal($node) {
+        return parent::is_equal($node) /*&& $this->name==$node->name*/ && $this->number==$node->number;
+    }
 }
 
 class qtype_preg_leaf_subexpr_call extends qtype_preg_leaf {
@@ -1670,6 +1723,14 @@ class qtype_preg_leaf_subexpr_call extends qtype_preg_leaf {
     public function tohr() {
         return 'subexpression call';
     }
+
+    /**
+     * @param $node qtype_preg_node other node
+     * @return bool is $node equals to this node
+     */
+    public function is_equal($node) {
+        return parent::is_equal($node) /*&& $this->name==$node->name*/ && $this->number==$node->number;
+    }
 }
 
 class qtype_preg_leaf_template extends qtype_preg_leaf {
@@ -1683,6 +1744,14 @@ class qtype_preg_leaf_template extends qtype_preg_leaf {
     }
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
         return array(self::NEXT_CHAR_CANNOT_GENERATE, null);
+    }
+
+    /**
+     * @param $node qtype_preg_node other node
+     * @return bool is $node equals to this node
+     */
+    public function is_equal($node) {
+        return parent::is_equal($node) && $this->name==$node->name;
     }
 }
 
@@ -1750,6 +1819,14 @@ class qtype_preg_leaf_control extends qtype_preg_leaf {
     public function tohr() {
         return 'control';
     }
+
+    /**
+     * @param $node qtype_preg_node other node
+     * @return bool is $node equals to this node
+     */
+    public function is_equal($node) {
+        return parent::is_equal($node) && $this->name==$node->name;
+    }
 }
 
 class qtype_preg_leaf_options extends qtype_preg_leaf {
@@ -1777,6 +1854,16 @@ class qtype_preg_leaf_options extends qtype_preg_leaf {
             $result .= '-'.$this->negopt;
         }
         return $result.')';
+    }
+
+    /**
+     * @param $node qtype_preg_node other node
+     * @return bool is $node equals to this node
+     */
+    public function is_equal($node) {
+        return parent::is_equal($node)
+            && count(array_diff(str_split($this->posopt), str_split($node->posopt)))==0
+            && count(array_diff(str_split($this->negopt), str_split($node->negopt)))==0;
     }
 }
 
@@ -1845,6 +1932,19 @@ class qtype_preg_node_finite_quant extends qtype_preg_operator {
     }
 
     // TODO - ui_nodename().
+
+    /**
+     * @param $node qtype_preg_node other node
+     * @return bool is $node equals to this node
+     */
+    public function is_equal($node) {
+        return parent::is_equal($node)
+            && $this->lazy==$node->lazy
+            && $this->greedy==$node->greedy
+            && $this->possessive==$node->possessive
+            && $this->leftborder==$node->leftborder
+            && $this->rightborder==$node->rightborder;
+    }
 }
 
 /**
@@ -1913,6 +2013,18 @@ class qtype_preg_node_infinite_quant extends qtype_preg_operator {
     }
 
     // TODO - ui_nodename().
+
+    /**
+     * @param $node qtype_preg_node other node
+     * @return bool is $node equals to this node
+     */
+    public function is_equal($node) {
+        return parent::is_equal($node)
+        && $this->lazy==$node->lazy
+        && $this->greedy==$node->greedy
+        && $this->possessive==$node->possessive
+        && $this->leftborder==$node->leftborder;
+    }
 }
 
 /**
@@ -2027,6 +2139,34 @@ class qtype_preg_node_alt extends qtype_preg_operator {
             $this->lastpos = array_merge($this->lastpos, $operand->lastpos);
         }
     }
+
+    /**
+     * @param $node qtype_preg_node other node
+     * @return bool is $node equals to this node
+     */
+    public function is_equal($node) {
+        return qtype_preg_node::is_equal($node) && $this->is_operands_equal($node, false);
+    }
+
+    public function is_operands_equal($node) { // TODO - check we are not in n-arn mode
+        $operands_arr1 = $this->operands;
+        $operands_arr2 = $node->operands;
+        if (count($operands_arr1) !== count($operands_arr2)) {
+            return false;
+        } else {
+            $result = true;
+            foreach ($operands_arr1 as $operands1) {
+                $inner_result = false;
+                foreach ($operands_arr2 as $operands2) {
+                    $inner_result = $inner_result || $operands1->is_equal($operands2);
+                    if ($inner_result === true) break;
+                }
+                $result = $result && $inner_result;
+                if ($result === false) break;
+            }
+            return $result;
+        }
+    }
 }
 
 /**
@@ -2106,6 +2246,16 @@ class qtype_preg_node_subexpr extends qtype_preg_operator {
     }
 
     // TODO - ui_nodename().
+
+    /**
+     * @param $node qtype_preg_node other node
+     * @return bool is $node equals to this node
+     */
+    public function is_equal($node) {
+        return parent::is_equal($node)
+            && $this->number==$node->number
+            /*&& $this->name==$node->name*/;
+    }
 }
 
 /**
@@ -2173,6 +2323,16 @@ class qtype_preg_node_cond_subexpr extends qtype_preg_operator {
     }
 
     // TODO - ui_nodename().
+
+    /**
+     * @param $node qtype_preg_node other node
+     * @return bool is $node equals to this node
+     */
+    public function is_equal($node) {
+        return parent::is_equal($node)
+            && $this->number==$node->number
+            /*&& $this->name==$node->name*/;
+    }
 }
 
 class qtype_preg_node_template extends qtype_preg_operator {
@@ -2183,6 +2343,15 @@ class qtype_preg_node_template extends qtype_preg_operator {
     }
     public function is_subpattern() {
         return false;   // TODO: child's value?
+    }
+
+    /**
+     * @param $node qtype_preg_node other node
+     * @return bool is $node equals to this node
+     */
+    public function is_equal($node) {
+        return parent::is_equal($node)
+            && $this->name==$node->name;
     }
 }
 
@@ -2260,5 +2429,13 @@ class qtype_preg_node_error extends qtype_preg_operator {
         $a->collast = $this->position->collast;
         $a->addinfo = $this->addinfo;
         return get_string($this->subtype, 'qtype_preg', $a);
+    }
+
+    /**
+     * @param $node qtype_preg_node other node
+     * @return bool is $node equals to this node
+     */
+    public function is_equal($node) {
+        return $this === $node;
     }
 }
