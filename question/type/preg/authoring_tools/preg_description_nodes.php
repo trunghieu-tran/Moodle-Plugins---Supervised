@@ -116,13 +116,16 @@ abstract class qtype_preg_description_node {
     }
 
     /**
-     * Puts $s instead of %s in numbering pattern. Puts node id instead of %n.
+     * Wraps $s into pattern $numbering_pattern
+     * %content will be replaced with generated string
+     * %idclass will be replaced with 'description_node_IDENTIFIER'
+     * %optionalclasses will be replaced with style classes (with space prefix!)
+     * %optionalclassesdevider will be replaced with space if %optionalclasses is no null
+     * %style will be replaced with style classes
      *
      * @param type $s this string will be placed instead of %s
      */
     protected function numbering_pattern($numbering_pattern, $s) { // TODO - rename
-        //return qtype_poasquestion\string::replace('%s', $s, qtype_poasquestion\string::replace('%n', $this->pregnode->id, $numbering_pattern));
-        $result = $s;
         $classes = array();
         $bgclor = 'white';
 
@@ -134,12 +137,15 @@ abstract class qtype_preg_description_node {
             $bgclor = 'orange';
         }
 
-        if ($numbering_pattern !== "%%tests%%" && (count($classes) !== 0 || $bgclor !== '')) {
-            $classesstr = count($classes) ? ' class="' . implode(' ', $classes) . '"' : '';
-            $stylestr = $bgclor!==null ? ' style="background: ' . $bgclor . '"' : '';
-            $result = '<span' . $classesstr . $stylestr . '>' . $result . '</span>';
-        }
+        $classesstr = count($classes) ? implode(' ', $classes) : '';
+        $classesstrdivider = count($classes) ? ' ' : '';
+        $stylestr = $bgclor!==null ? 'background: ' . $bgclor : '';
 
+        $result = qtype_poasquestion\string::replace('%content', $s, $numbering_pattern);
+        $result = qtype_poasquestion\string::replace('%idclass', 'description_node_'.$this->pregnode->id, $result);
+        $result = qtype_poasquestion\string::replace('%optionalclassesdevider', $classesstrdivider, $result);
+        $result = qtype_poasquestion\string::replace('%optionalclasses', $classesstr, $result);
+        $result = qtype_poasquestion\string::replace('%style', $stylestr, $result);
         return $result;
     }
 }
