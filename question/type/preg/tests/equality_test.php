@@ -36,7 +36,7 @@ class qtype_preg_equality_test extends PHPUnit_Framework_TestCase {
         //$ranges1 = $root1->ranges();
         $root2 = $h2->get_ast_root();
         //$ranges2 = $root2->ranges();
-        $actual = $root1->is_equal($root2);
+        $actual = $root1->is_equal($root2, 0);
         $this->assertEquals($expected, $actual, "\"$regex1\" is_equal \"$regex2\"" );
     }
 
