@@ -50,6 +50,7 @@ class qtype_preg_explaining_graph_tool_node {
     const TYPE_BOUNDARY    = 'node_boundary';
     const TYPE_VOID        = 'node_void';
     const TYPE_OPTION      = 'node_option';
+    const TYPE_TEMPLATE    = 'node_template';
     const TYPE_OTHER       = 'node_other';
 
     public function __construct($lbl, $shp, $clr, $ownr, $id, $stl = 'solid', $fll = 'white') {

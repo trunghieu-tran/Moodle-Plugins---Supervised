@@ -390,6 +390,42 @@ class qtype_preg_explaining_graph_leaf_options extends qtype_preg_explaining_gra
     }
 }
 
+class qtype_preg_explaining_graph_leaf_template extends qtype_preg_explaining_graph_leaf {
+
+    /**
+     * Returns value of node which will be in graph.
+     * @return string Value of node.
+     */
+    public function get_value()
+    {
+        $templatename = $this->pregnode->name;
+        $template = qtype_preg\template::available_templates()[$templatename];
+        return array($template->get_description());
+    }
+
+    /**
+     * Returns color of node which will be in graph.
+     * @return string Color of node.
+     */
+    public function get_color()
+    {
+        return 'black';
+    }
+
+    public function get_shape() {
+        return 'hexagon';
+    }
+
+    /**
+     * Returns type of node which will use in postprocessing.
+     * @return string Type of node.
+     */
+    public function get_type()
+    {
+        return qtype_preg_explaining_graph_tool_node::TYPE_TEMPLATE;
+    }
+}
+
 /**
  * Class for tree's operator.
  */
@@ -571,7 +607,7 @@ class qtype_preg_explaining_graph_node_subexpr extends qtype_preg_explaining_gra
         }
 
         $label = '';
-        if ($this->pregnode->number != -1) {
+        if ($this->pregnode->number != null) {
             $label = get_string($this->pregnode->lang_key(true), 'qtype_preg', $this->pregnode);
             $label = qtype_poasquestion\string::replace(': [ {$a->firstoperand} ]', '', $label);
             $label = qtype_poasquestion\string::replace('"', '\\"', $label);
@@ -785,3 +821,59 @@ class qtype_preg_explaining_graph_node_assert extends qtype_preg_explaining_grap
     }
 }
 
+class qtype_preg_explaining_graph_node_template extends qtype_preg_explaining_graph_operator {
+
+    /**
+     * Processes a tree's operator for creating a part of explainning graph.
+     * @param qtype_preg_explaining_graph_tool_subgraph $graph Current explainning graph.
+     */
+    protected function process_operator($graph) {
+        if ($this->pregnode->operands[0]->type != qtype_preg_node::TYPE_LEAF_META) {
+            if ($this->pregnode->operands[0]->type == qtype_preg_node::TYPE_LEAF_OPTIONS) {
+                $operand = new qtype_preg_explaining_graph_tool_subgraph('');
+                $operand->style = 'solid';
+
+                $operand->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $operand, -1);
+                $operand->entries[] = end($operand->nodes);
+                $operand->exits[] = end($operand->nodes);
+            } else {
+                $operand = $this->operands[0]->create_graph();
+            }
+        } else {
+            $operand = new qtype_preg_explaining_graph_tool_subgraph('');
+            $operand->style = 'solid';
+            if ($this->operands[0]->is_selected()) {
+                $operand->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('');
+                $operand->subgraphs[0]->style = 'solid';
+                $operand->subgraphs[0]->color = 'darkgreen';
+                $operand->subgraphs[0]->isselection = true;
+                $operand->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $operand->subgraphs[0], -1);
+                $operand->entries[] = end($operand->subgraphs[0]->nodes);
+                $operand->exits[] = end($operand->subgraphs[0]->nodes);
+            } else {
+                $operand->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $operand, -1);
+                $operand->entries[] = end($operand->nodes);
+                $operand->exits[] = end($operand->nodes);
+            }
+        }
+
+        $label = get_string('description_node_template', 'qtype_preg');
+
+        $templatename = $this->pregnode->name;
+        $template = qtype_preg\template::available_templates()[$templatename];
+        $label .= '\n""' . $template->get_description() . '"';
+
+        $template = new qtype_preg_explaining_graph_tool_subgraph(
+            $label,
+            $this->pregnode->id. '_' . $this->pregnode->position->indfirst . '_' . $this->pregnode->position->indlast
+        );
+        $template->tooltip = "template";
+        $template->style = ($this->pregnode->userinscription[0]->data != '(?i:...)') ? 'solid' : 'filled';
+        $template->color = ($this->pregnode->userinscription[0]->data != '(?i:...)') ? 'black' : 'lightgrey';
+        $template->assume_subgraph($operand);
+
+        $graph->subgraphs[] = $template;
+        $graph->entries[] = end($operand->entries);
+        $graph->exits[] = end($operand->exits);
+    }
+}
