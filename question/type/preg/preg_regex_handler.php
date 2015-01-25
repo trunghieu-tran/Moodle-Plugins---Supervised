@@ -803,4 +803,26 @@ class qtype_preg_regex_handler {
         }
         return null;
     }
+
+    /**
+     * Checks that the two nodes are equivalent
+     * @param $handler qtype_preg_regex_handler other node
+     * @return bool is $handler fully equals to this handler
+     */
+    public function is_equal($handler) {
+        $thisroot = $this->get_ast_root();
+        $otherroot = $handler->get_ast_root();
+        return $thisroot->is_equal($otherroot, 0);
+    }
+
+    /**
+     * Finds all occurrences of $node subtree in the current tree
+     * @param $handler qtype_preg_regex_handler subtree to find
+     * @return array array of roots of founded subtrees
+     */
+    public function find_all_subtrees($handler) {
+        $thisroot = $this->get_ast_root();
+        $otherroot = $handler->get_ast_root();
+        return $thisroot->find_all_subtrees($otherroot, 0);
+    }
 }
