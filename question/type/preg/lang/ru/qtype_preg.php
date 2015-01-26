@@ -262,6 +262,12 @@ $string['description_leaf_subexpr_call_all_recursive'] = 'рекурсивный
 $string['description_leaf_subexpr_call_name_recursive'] = 'рекурсивный вызов подмаски "{$a}"';
 // TYPE_LEAF_TEMPLATE
 $string['description_leaf_template'] = 'шаблон без параметров';
+$string['description_template_word'] = 'любое слово';
+$string['description_template_integer'] = 'любое число, включая + или -';
+$string['description_template_parens_req'] = 'текст в круглых скобках';
+$string['description_template_parens_opt'] = 'текст в круглых скобках или без';
+$string['description_template_brackets_req'] = 'текст в квадратных скобках';
+$string['description_template_brackets_opt'] = 'тект в квадратных скобках или без';
 // TYPE_LEAF_CONTROL
 $string['description_accept_leaf_control'] = 'спровоцировать удачное совпадение';
 $string['description_fail_leaf_control'] = 'спровоцировать неудачу';
