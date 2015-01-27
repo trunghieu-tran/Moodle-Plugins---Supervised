@@ -651,23 +651,23 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
                     // possible pair (typo)
                     $dist = $this->possible_pair($other[$k], $max, $options);
                     if ($dist != -1) {     
-			if ($this->check_specific_error($other[$k])) {
+			            if ($this->check_specific_error($other[$k])) {
                             $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), $dist, true, '');
                         } else {
                             $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), $dist, false, '');
                         }
                         ////////////////////////////////////////////////////////////////
-                        $pair->operations=$this->redaction($this->value, $other->value);
+                        $pair->operations=$this->redaction($this->value, $other[$k]->value);
                         ////////////////////////////////////////////////////////////////
                         $possiblepairs[] = $pair;
-/*
-			$result = $this->additional_generation($other[$k]);
-			if (count ($result)>0) {
+                        /*
+			            $result = $this->additional_generation($other[$k]);
+			            if (count ($result)>0) {
                             for ($i=0; $i<count($result); $i++) {
                                 $possiblepairs[]=$result[$i];
                             }
                         }
-*/
+                        */
                     }
                     // possible pair (extra separator)
                     if ($k+1 != count($other)) {
