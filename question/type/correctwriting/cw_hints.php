@@ -93,9 +93,9 @@ class qtype_correctwriting_hintwhatis extends qtype_poasquestion\hint {
 
     public function render_hint($renderer, question_attempt $qa, question_display_options $options, $response = null) {
         if ($this->mistake !== null) {
-            $hinttext = new qtype_poasquestion_string($this->mistake->token_descriptions(true));
+            $hinttext = new qtype_poasquestion\string($this->mistake->token_descriptions(true));
             // Capitalize first letter.
-            $hinttext[0] = textlib::strtoupper($hinttext[0]);
+            $hinttext[0] = core_text::strtoupper($hinttext[0]);
             return $hinttext;
         }
     }
@@ -177,8 +177,8 @@ class qtype_correctwriting_hintwheretxt extends qtype_poasquestion\hint {
                 $hinttext = get_string('wheretxtbetween', 'qtype_correctwriting', $a);
             }
             // Capitalize first letter.
-            $hinttext = textlib::strtoupper(textlib::substr($hinttext, 0, 1))
-                      . textlib::substr($hinttext, 1);
+            $hinttext = core_text::strtoupper(core_text::substr($hinttext, 0, 1))
+                      . core_text::substr($hinttext, 1);
         }
         return $hinttext;
     }
@@ -247,7 +247,7 @@ class qtype_correctwriting_hintwherepic extends qtype_poasquestion\hint {
         /* @var qtype_correctwriting_sequence_mistake $selmistake */
         $selmistake = $this->mistake;
         $absent = 'absent_';
-        if (textlib::substr($selmistake->mistake_key(), 0, textlib::strlen($absent)) == $absent) {
+        if (core_text::substr($selmistake->mistake_key(), 0, core_text::strlen($absent)) == $absent) {
             $imagedata = $this->prepare_image_data_for_absent_mistake();
         } else {
             $imagedata = $this->prepare_image_data_for_moved_mistake();
