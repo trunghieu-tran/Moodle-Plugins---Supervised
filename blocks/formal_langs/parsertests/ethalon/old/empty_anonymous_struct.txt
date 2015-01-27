@@ -1,0 +1,17 @@
+[
+ (program) {
+  (stmt_list) {
+   (stmt_or_defined_macro) {
+    (class_or_union_or_struct) {
+     struct
+     (structure_body) {
+      {
+      }
+     }
+     A
+     ;
+    }
+   }
+  }
+ }
+]

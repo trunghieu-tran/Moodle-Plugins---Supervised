@@ -1,0 +1,29 @@
+[
+ (program) {
+  (stmt_list) {
+   (stmt_or_defined_macro) {
+    (namespace) {
+     (namespace_definition_start) {
+      namespace
+      A
+     }
+     (namespace_body) {
+      {
+      (stmt_list) {
+       (stmt_or_defined_macro) {
+        (class_or_union_or_struct) {
+         (identified_type_meta_specifier_with_template_def) {
+          class
+          B
+         }
+         ;
+        }
+       }
+      }
+      }
+     }
+    }
+   }
+  }
+ }
+]

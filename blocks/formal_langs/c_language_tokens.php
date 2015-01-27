@@ -100,8 +100,8 @@ class block_formal_langs_c_token_numeric extends block_formal_langs_c_token_base
     protected function numeric_value() {
         $v = (string)($this->value());
         $result = 0;
-        if (textlib::strpos($v, '.')  === false) {
-            if (textlib::strpos($v, 'x') !== false || textlib::strpos($v, 'X') !== false) {
+        if (core_text::strpos($v, '.')  === false) {
+            if (core_text::strpos($v, 'x') !== false || core_text::strpos($v, 'X') !== false) {
                 $result = hexdec($v);
             } else {
                 if ($v != '0' && $v[0] == '0') {

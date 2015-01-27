@@ -1,0 +1,28 @@
+[
+ (program) {
+  /* 2 + 3 */
+  (stmt_list) {
+   (stmt_or_defined_macro) {
+    (stmt) {
+     (variable_declaration) {
+      (builtintype) {
+       (int) {
+        int
+        // some random typename
+       }
+      }
+      (identifier) {
+       a
+       (comment_list) {
+        /* Just simple object name */
+        /* a is nice name for variable */
+       }
+      }
+     }
+     ;
+     /* Just a comment for semicolon */
+    }
+   }
+  }
+ }
+]

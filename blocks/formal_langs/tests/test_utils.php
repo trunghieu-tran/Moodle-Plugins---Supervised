@@ -522,7 +522,7 @@ class block_formal_langs_parser_rule_helper {
         $prec = false;
         foreach($leftpart as $part) {
             $trimpart = trim($part);
-            if (textlib::strlen($trimpart) != 0) {
+            if (core_text::strlen($trimpart) != 0) {
                 if ($trimpart == '%prec') {
                     $prec = true;
                 } else {
@@ -565,7 +565,7 @@ class block_formal_langs_parser_rule_helper {
         $prec = 1;
         foreach($wdata as $string) {
             $tr = trim($string);
-            if (textlib::strlen($tr) != 0) {
+            if (core_text::strlen($tr) != 0) {
                 if ($tr[0] != '%') {
                     $ruledata = $this->rule($tr);
                     $rules[] = $ruledata['rule'];
@@ -669,7 +669,7 @@ class block_formal_langs_lexical_test_helper {
         $denormalizedrules = array();
         $result = array();
         foreach($rules as $rule) {
-            if (textlib::strlen($rule)) {
+            if (core_text::strlen($rule)) {
                 $ruleparts = explode(',', $rule);
                 $oldstate = intval($ruleparts[0]);
                 $type = $ruleparts[1];
