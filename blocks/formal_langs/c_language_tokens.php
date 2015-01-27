@@ -58,14 +58,34 @@ class block_formal_langs_c_token_keyword extends block_formal_langs_c_token_base
  */ 
 class block_formal_langs_c_token_typename extends block_formal_langs_c_token_base
 {
-
+    public function additional_generation($token) {
+       /* $arraypairs = array();        
+        if ($this->value == 'char') {
+            $arraypairs[] = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($token->tokenindex), 0, false, '');
+        }
+        if ()
+*/
+	return $arraypairs;
+    }
 }
 
 /** Describes an identifier
  */ 
 class block_formal_langs_c_token_identifier extends block_formal_langs_c_token_base
 {
-
+    public function check_specific_error ($token) {
+        if ($this->value=='acos') {
+            if ($token->value=='cos') {
+                return 1;
+            }
+        }
+        if ($this->value=='cos') {
+            if ($token->value=='acos') {
+                return 1;
+            }
+        }
+        return 0;
+    }
 }
 
 
@@ -139,7 +159,24 @@ class block_formal_langs_c_token_string extends block_formal_langs_c_token_base
  */ 
 class block_formal_langs_c_token_operators extends block_formal_langs_c_token_base
 {
-
+    public function check_specific_error ($token) {
+        if ($this->value == '==') {
+            if ($token->value == '=') {
+                return 1;
+            }
+        }
+        if ($this->value == ';') {
+            if ($token->value == ',') {
+                return 1;
+            }
+        }
+        if ($this->value == ',') {
+            if ($token->value == ';') {
+                return 1;
+            }
+        }
+        return 0;
+    }
 }
 
 /** Describes an ellipsis
