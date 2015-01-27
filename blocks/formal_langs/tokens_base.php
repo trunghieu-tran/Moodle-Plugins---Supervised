@@ -2068,6 +2068,12 @@ class block_formal_langs_string_pair {
         $correctstream = $correctstring->stream;
         $comparedstream = $comparedstring->stream;
         $bestgroups = $correctstream->look_for_token_pairs($comparedstream, $threshold, $options, true);
+        if(count($bestgroups) == 0) {
+            $stringpair = new $classname($correctstring, $comparedstring, array());
+            $arraystringpairs = array();
+            $arraystringpairs[] = $stringpair;
+            return $arraystringpairs;
+        }
         $arraystringpairs = array();
         for ($i = 0; $i < count($bestgroups); $i++) {
             $stringpair = new $classname($correctstring, $comparedstring, $bestgroups[$i]);
@@ -2084,12 +2090,12 @@ class block_formal_langs_string_pair {
         $correctstream = $correctstring->stream;
         $comparedstream = $comparedstring->stream;
         $bestgroups = $correctstream->look_for_token_pairs($comparedstream, $threshold, $options, false);
-	if(count($bestgroups)==0) {
-		$stringpair = new $classname($correctstring, $comparedstring, array());
-		$arraystringpairs = array();
-		$arraystringpairs[] = $stringpair;
-		return $arraystringpairs;
-	}
+        if(count($bestgroups) == 0) {
+            $stringpair = new $classname($correctstring, $comparedstring, array());
+            $arraystringpairs = array();
+            $arraystringpairs[] = $stringpair;
+            return $arraystringpairs;
+        }
         $arraystringpairs = array();
         for ($i = 0; $i < count($bestgroups); $i++) {
             $stringpair = new $classname($correctstring, $comparedstring, $bestgroups[$i]);
@@ -2211,7 +2217,7 @@ class block_formal_langs_string_pair {
      */
     public function node_description($nodenumber, $quotevalue = true, $at = false) {
         $correctindexs = $this->count_indexes_incorrect($nodenumber);
-        $comparedindexs = $this->count_indexs_incorrect($nodenumber);
+        $comparedindexs = $this->count_indexes_incorrect($nodenumber);
         // typo
         if (count($correctindexs)==1 && count($comparedindexs)==1) {
             $index = $this->index_pair_from_lexeme($nodenumber);
