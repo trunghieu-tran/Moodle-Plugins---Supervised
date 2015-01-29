@@ -977,9 +977,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 $result->remove_unreachable_states();
             }
 
-            global $CFG;
+            /*global $CFG;
             $CFG->pathtodot = '/usr/bin/dot';
-            $result->fa_to_dot('svg', '/home/user/fa.svg');
+            $result->fa_to_dot('svg', '/home/user/fa.svg');*/
 
         //} catch (Exception $e) {
           //  $result = null;
