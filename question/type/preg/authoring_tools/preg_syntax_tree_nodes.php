@@ -442,7 +442,11 @@ class qtype_preg_syntax_tree_leaf_options extends qtype_preg_syntax_tree_leaf {
 class qtype_preg_syntax_tree_leaf_template extends qtype_preg_syntax_tree_leaf {
 
     public function tooltip() {
-        return '';
+        if ($this->pregnode->name != '') {
+            return get_string('leaf_template', 'qtype_preg') . '&#10;' . get_string('description_template_' . $this->pregnode->name, 'qtype_preg');
+        }
+
+        return 'unknown template';
     }
 
     public function shape_color() {
@@ -531,7 +535,11 @@ class qtype_preg_syntax_tree_node_template extends qtype_preg_syntax_tree_operat
     }
 
     public function tooltip() {
-        return '';
+        if ($this->pregnode->name != '') {
+            return get_string('node_template', 'qtype_preg') . '&#10;' . get_string('description_template_' . $this->pregnode->name, 'qtype_preg');
+        }
+
+        return 'unknown template';
     }
 
     public function shape_color() {
