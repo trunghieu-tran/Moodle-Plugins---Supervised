@@ -910,6 +910,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
         if ($result->extendedmatch !== null) {
             $result->extendedmatch = $result->extendedmatch->to_matching_results();
+            $result->extendedmatch->extendedmatch = null;   // Holy cow, this is ugly
         }
 
         return $result->to_matching_results();
