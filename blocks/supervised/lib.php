@@ -168,7 +168,7 @@ function cleanup($courseid) {
  *
  * @return array active sessions
  */
-function user_active_sessions() {
+function user_active_sessions($lessontypes, &$error) {
     require_once('sessions/sessionstate.php');
     require_once('sessions/lib.php');
     global $USER, $DB, $COURSE;
