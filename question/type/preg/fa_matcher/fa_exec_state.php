@@ -476,6 +476,32 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
         return $subexpr === 0 || $this->subexpr() === $subexpr; // (R) or (R0) means any recoursive call
     }
 
+    /**
+     * Helper method to detect the actual length without leading and trailing non-consuming transitions;
+     */
+    public function length_minus_nonconsuming() {
+        $subpatt = $this->matcher->get_ast_root()->subpattern;
+        if (!isset($this->stack[0]->matches[$subpatt])) {
+            return 0;   // Ain't no match at all!!!
+        }
+
+        $cur = $this->stack[0]->matches[$subpatt][0];
+        $index = $cur[0];
+        $length = $cur[1];
+        if ($length !== qtype_preg_matching_results::NO_MATCH_FOUND) {
+            // Full match length was set by tags, it is already correct.
+            return $length;
+        }
+
+        // Partial match yet
+        $transition = $this->last_transition();
+        $firstskippedcount = $cur[0] - $this->startpos;
+        $lastskippedcount = ($transition === null || $transition->consumeschars)
+                          ? 0
+                          : $this->last_match_len();
+        return $this->length - $firstskippedcount - $lastskippedcount;
+    }
+
     public function to_matching_results() {
         $index = array();
         $length = array();
@@ -496,13 +522,13 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
         }
 
         // Some stuff for partial matches.
-        $firstskippedcount = 0;
+        //$firstskippedcount = 0;
         if ($length[0] === qtype_preg_matching_results::NO_MATCH_FOUND) {
             $cur = $this->current_match(0);
             if ($cur !== null && $cur[0] !== qtype_preg_matching_results::NO_MATCH_FOUND) {
-                $firstskippedcount = $cur[0] - $this->startpos;
+                //$firstskippedcount = $cur[0] - $this->startpos;
                 $index[0] = $cur[0];
-                $length[0] = $this->length - $firstskippedcount;
+                $length[0] = $this->length_minus_nonconsuming();
             }
         }
         /*if ($length[-2] === qtype_preg_matching_results::NO_MATCH_FOUND) {
@@ -543,10 +569,12 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
         }
 
         // Choose the longest match
-        if ($this->length > $other->length) {
+        $this_length = $this->length_minus_nonconsuming();
+        $other_length = $other->length_minus_nonconsuming();
+        if ($this_length > $other_length) {
             //echo "wins 1\n";
             return true;
-        } else if ($other->length > $this->length) {
+        } else if ($other_length > $this_length) {
             //echo "wins 2\n";
             return false;
         }
