@@ -70,22 +70,8 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
         $lessontypes = array_keys($lessontypesdb);
         $error = "";
         // Get user's active sessions.
-        $sessions = user_active_sessions();
-        if (empty($sessions)) {
-            // We havn't active sessions with current user ip and group.
-            return get_string('iperror', 'quizaccess_supervisedcheck');
-        }
-
-        // Filter sessions by lessontype and userid.
-        foreach ($sessions as $id => $session) {
-            // Check if current session's lessontype is in passed $lessontypes array.
-            $islessontype = in_array($session->lessontypeid, $lessontypes);
-            if ( !$islessontype ) {
-                // Remove current session.
-                unset($sessions[$id]);
-            }
-        }
-
+        $sessions = user_active_sessions($lessontypes,$error);
+        
         if (!empty($sessions)) {
             return false;
         } else {
