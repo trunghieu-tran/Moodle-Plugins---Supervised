@@ -98,6 +98,15 @@
         return $result;
     }
 
+    protected function add_cond_subexpr_negative_branch($node) {
+        $shift = (int)$node->is_condition_assertion();
+
+        // Add an eps leaf if there's only positive branch.
+        if (count($node->operands) - $shift == 1) {
+            $node->operands[] = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        }
+    }
+
     protected function create_cond_subexpr_assertion_node($node, $assertbody, $exprnode, $closeparen) {
         if ($node->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA) {
             $subtype = qtype_preg_node_assert::SUBTYPE_PLA;
@@ -137,6 +146,8 @@
             $node->operands[] = $exprnode;
         }
 
+        $this->add_cond_subexpr_negative_branch($node);
+
         $node->set_user_info($position, array(new qtype_preg_userinscription($node->userinscription[0] . '...)...|...)')));
         return $node;
     }
@@ -159,6 +170,8 @@
         } else {
             $node->operands[0] = $exprnode;
         }
+
+        $this->add_cond_subexpr_negative_branch($node);
 
         $node->set_user_info($position, array(new qtype_preg_userinscription($node->userinscription[0] . '...|...)')));
         return $node;
@@ -452,8 +465,7 @@ expr(A) ::= OPENBRACK(B) expr(C) CLOSEBRACK(D). {
 }
 
 expr(A) ::= CONDSUBEXPR(B) expr(C) CLOSEBRACK(D) expr(E) CLOSEBRACK(F). {
-    if (B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA || B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA ||
-        B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB || B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB) {
+    if (B->is_condition_assertion()) {
         A = $this->create_cond_subexpr_assertion_node(B, C, E, F);
     } else {
         A = $this->create_cond_subexpr_other_node(B, E, F);
@@ -461,8 +473,7 @@ expr(A) ::= CONDSUBEXPR(B) expr(C) CLOSEBRACK(D) expr(E) CLOSEBRACK(F). {
 }
 
 expr(A) ::= CONDSUBEXPR(B) expr(C) CLOSEBRACK(D) CLOSEBRACK(E). {
-    if (B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA || B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA ||
-        B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB || B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB) {
+    if (B->is_condition_assertion()) {
         A = $this->create_cond_subexpr_assertion_node(B, C, null, E);
     } else {
         A = $this->create_cond_subexpr_other_node(B, null, E);
@@ -470,8 +481,7 @@ expr(A) ::= CONDSUBEXPR(B) expr(C) CLOSEBRACK(D) CLOSEBRACK(E). {
 }
 
 expr(A) ::= CONDSUBEXPR(B) CLOSEBRACK(C) expr(D) CLOSEBRACK(E). {
-    if (B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA || B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA ||
-        B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB || B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB) {
+    if (B->is_condition_assertion()) {
         A = $this->create_cond_subexpr_assertion_node(B, null, D, E);
     } else {
         A = $this->create_cond_subexpr_other_node(B, D, E);
@@ -479,8 +489,7 @@ expr(A) ::= CONDSUBEXPR(B) CLOSEBRACK(C) expr(D) CLOSEBRACK(E). {
 }
 
 expr(A) ::= CONDSUBEXPR(B) CLOSEBRACK(C) CLOSEBRACK(D). {
-    if (B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA || B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA ||
-        B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB || B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB) {
+    if (B->is_condition_assertion()) {
         A = $this->create_cond_subexpr_assertion_node(B, null, null, D);
     } else {
         A = $this->create_cond_subexpr_other_node(B, null, D);
