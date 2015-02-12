@@ -183,8 +183,12 @@ function user_active_sessions($lessontypes, &$error) {
         $useringroup = $DB->record_exists('block_supervised_user', array('sessionid' => $id, 'userid' => $USER->id));
         // Check if the ip of current user is in classroom's subnet.
         $userinsubnet = address_in_subnet($USER->lastip, $session->iplist);
-
-        if ( !($useringroup && $userinsubnet) ) {
+        if($lessontypes != null) {
+            $userinlessontype = in_array($session->lessontypeid, $lessontypes);
+        } else {
+            $userinlessontype = true;
+        }
+        if ( !($useringroup && $userinsubnet && $userinlessontype) ) {
             unset($sessions[$id]);  // Remove current session.
         }
     }
