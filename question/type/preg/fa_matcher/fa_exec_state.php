@@ -485,17 +485,9 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
             return 0;   // Ain't no match at all!!!
         }
 
-        $cur = $this->stack[0]->matches[$subpatt][0];
-        $index = $cur[0];
-        $length = $cur[1];
-        if ($length !== qtype_preg_matching_results::NO_MATCH_FOUND) {
-            // Full match length was set by tags, it is already correct.
-            return $length;
-        }
-
-        // Partial match yet
+        $tmp = $this->stack[0]->matches[$subpatt][0];
         $transition = $this->last_transition();
-        $firstskippedcount = $cur[0] - $this->startpos;
+        $firstskippedcount = $tmp[0] - $this->startpos;
         $lastskippedcount = ($transition === null || $transition->consumeschars)
                           ? 0
                           : $this->last_match_len();
