@@ -68,7 +68,7 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
         // If we are here, check is required.
         // Reorganize $lessontypesdb array.
         $lessontypes = array_keys($lessontypesdb);
-
+        $error = "";
         // Get user's active sessions.
         $sessions = user_active_sessions();
         if (empty($sessions)) {
