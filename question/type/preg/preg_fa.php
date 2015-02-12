@@ -230,26 +230,6 @@ class qtype_preg_fa_transition {
         return array(qtype_preg_leaf::NEXT_CHAR_OK, new qtype_poasquestion\string(core_text::code2utf8($result_ranges[0][0])));
     }
 
-    public function match($str, $pos, &$length, $matcherstateobj = null) {
-        $result = true;
-        if (!$this->is_eps() && !$this->is_unmerged_assert() && $this->pregleaf->type !== qtype_preg_node::TYPE_LEAF_BACKREF) {
-        foreach ($this->mergedbefore as $before) {
-            if ($before->is_end_anchor()) {
-                $char = $str[$pos];
-                $result = $char === "\n";
-            }
-        }
-        foreach ($this->mergedafter as $after) {
-            if ($after->is_start_anchor()) {
-                $char = $str[$pos];
-                $result = $char === "\n";
-            }
-        }
-    }
-        $result = $result && $this->pregleaf->match($str, $pos, $length, $matcherstateobj);
-        return $result;
-    }
-
     public function is_start_anchor() {
         return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $this->pregleaf->is_start_anchor()) /*&& empty($this->mergedbefore))*/;
     }

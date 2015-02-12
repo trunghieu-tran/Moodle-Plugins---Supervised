@@ -201,7 +201,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
         foreach ($transitions as $tr) {
             $tmplength = 0;
-            $result = $tr->match($str, $curpos, $tmplength, $newstate);
+            $result = $tr->pregleaf->match($str, $curpos, $tmplength, $newstate);
             if ($result) {
                 $this->after_transition_passed($newstate, $tr, $curpos, $tmplength);
             } else {
