@@ -87,7 +87,8 @@ abstract class qtype_preg_fa_node {
 
         $thetransition->opentags[] = $this->pregnode;
 
-        if ($thetransition->minopentag === null || $this->pregnode->subpattern < $thetransition->minopentag->subpattern) {
+        if ($this->pregnode->subpattern !== -2 &&
+            ($thetransition->minopentag === null || $this->pregnode->subpattern < $thetransition->minopentag->subpattern)) {
             $thetransition->minopentag = $this->pregnode;
         }
     }
