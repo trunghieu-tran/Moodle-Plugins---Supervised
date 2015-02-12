@@ -2000,10 +2000,10 @@ class qtype_preg_cross_tests_from_preg_merging {
         $test2 = array( 'str'=>"ac",
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0, 1=>1),
-                        'length'=>array(0=>2, 1=>1),
-                        'left'=>array(1),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1),
+                        'left'=>array(2),
+                        'next'=>'\n');
 
         return array('regex'=>'(?m)a(\n|c)(^b)',
                      'tests'=>array($test1, $test2),
@@ -2101,7 +2101,7 @@ class qtype_preg_cross_tests_from_preg_merging {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
-                        'length'=>array(0=>1),
+                        'length'=>array(0=>2),
                         'left'=>array(2),
                         'next'=>'\n');
 
