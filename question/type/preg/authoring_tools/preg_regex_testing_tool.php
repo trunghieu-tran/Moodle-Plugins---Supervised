@@ -117,7 +117,9 @@ class qtype_preg_regex_testing_tool implements qtype_preg_i_authoring_tool {
         $result = '';
         foreach ($strings as $string) {
             $matchresults = $this->matcher->match($string);
-            $result .= $hintmatch->render_colored_string_by_matchresults($renderer, $matchresults, true) . '<br />';
+            $hintmessage = $hintmatch->render_colored_string_by_matchresults($renderer, $matchresults, true);
+            $hintmessage = html_writer::tag('span', $hintmessage, array('id' => 'qtype-preg-colored-string'));
+            $result .=  $hintmessage . html_writer::empty_tag('br');
         }
         return $result;
     }
