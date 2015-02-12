@@ -176,8 +176,14 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
                 $DB->update_record('quizaccess_supervisedcheck', $rule);
             }
             // Delete any remaining old rules.
-            foreach ($oldrules as $oldrule) {
-                delete_settings($oldrule);
+            if(!empty($oldrules)) {
+                foreach ($oldrules as $oldrule) {
+                    array_push($oldrulesid, $oldrule->id);
+                }
+                list($insql, $inparams) = $DB->get_in_or_equal($oldrulesid);
+                $sqlstring = " id ";
+                $sqlstring .= $insql;
+                $DB->delete_records_select('quizaccess_supervisedcheck', $sqlstring, $inparams);
             }
         } else {
             // Update an existing rule if possible.
@@ -193,8 +199,14 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
             $rule->supervisedmode       = $quiz->supervisedmode;   // ...0 or 1.
             $DB->update_record('quizaccess_supervisedcheck', $rule);
             // Delete any remaining old rules.
-            foreach ($oldrules as $oldrule) {
-                delete_settings($oldrule);
+            if(!empty($oldrules)) {
+                foreach ($oldrules as $oldrule) {
+                    array_push($oldrulesid, $oldrule->id);
+                }
+                list($insql, $inparams) = $DB->get_in_or_equal($oldrulesid);
+                $sqlstring = " id ";
+                $sqlstring .= $insql;
+                $DB->delete_records_select('quizaccess_supervisedcheck', $sqlstring, $inparams);
             }
         }
     }
