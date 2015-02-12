@@ -1016,11 +1016,6 @@ class qtype_preg_fa_node_cond_subexpr extends qtype_preg_fa_operator {
 
         $shift = (int)$node->is_condition_assertion();
 
-        // Add an eps leaf if there's only positive branch.
-        if (count($node->operands) - $shift == 1) {
-            $node->operands[] = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-        }
-
         // Form the assertion nodes.
         switch ($this->pregnode->subtype) {
         case qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR:
