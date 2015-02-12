@@ -691,6 +691,8 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
             $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED, '', $node);
         }
 
+        $this->nodes_with_subexpr_refs[] = $node;
+
         $closebr = new qtype_preg_lexem();
         $closebr->set_user_info($this->current_position_for_node());
 
