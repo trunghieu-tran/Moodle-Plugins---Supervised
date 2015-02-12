@@ -525,13 +525,13 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
                 $length[0] = $this->length_minus_nonconsuming();
             }
         }
-        /*if ($length[-2] === qtype_preg_matching_results::NO_MATCH_FOUND) {
+        if ($length[-2] === qtype_preg_matching_results::NO_MATCH_FOUND) {
             $cur = $this->current_match(-2);
             if ($cur !== null && $cur[0] !== qtype_preg_matching_results::NO_MATCH_FOUND) {
                 $index[-2] = $cur[0];
-                $length[-2] = $this->length - $cur[0];
+                $length[-2] = $this->length_minus_nonconsuming() - $cur[0];
             }
-        }*/
+        }
         $result = new qtype_preg_matching_results($this->is_full(), $index, $length, $this->left, $this->extendedmatch);
         $result->set_source_info($this->str, $this->matcher->get_max_subexpr(), $this->matcher->get_subexpr_name_to_number_map());
         return $result;
