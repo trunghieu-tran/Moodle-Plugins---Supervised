@@ -179,7 +179,6 @@ class template {
             }
         }
 
-
         $hastemplates = false;
         $tokens = \qtype_preg_lexer::tokenize_regex($regex, $options, $lexer, $hastemplates);
         if (!$hastemplates) {
@@ -200,6 +199,10 @@ class template {
             // Else save the result
             $resultregex = $processedregex;
         }
+
+        // Remember the actual lexer
+        $lexer = $newlexer;
+
         return $newtokens;
     }
 

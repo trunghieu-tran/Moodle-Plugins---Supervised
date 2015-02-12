@@ -533,6 +533,7 @@ class qtype_preg_lexer extends JLexBase  {
             // Error: assertion expected.
             $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED, '', $node);
         }
+        $this->nodes_with_subexpr_refs[] = $node;
         $closebr = new qtype_preg_lexem();
         $closebr->set_user_info($this->current_position_for_node());
         return array(new JLexToken(qtype_preg_parser::CONDSUBEXPR, $node),
