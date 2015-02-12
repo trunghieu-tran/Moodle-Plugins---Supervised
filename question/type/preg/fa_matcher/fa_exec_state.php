@@ -170,6 +170,7 @@ class qtype_preg_fa_stack_item {
             // Starting indexes are always the same, equal $strpos
             $index = $strpos;
             $this->set_current_match($tag->subpattern, $index, qtype_preg_matching_results::NO_MATCH_FOUND);
+            //echo "open tag {$tag->subpattern}: ($index, -1)\n";
         }
 
         // Set matches to ($strpos, length) for the ending iterations.
@@ -182,6 +183,7 @@ class qtype_preg_fa_stack_item {
             $length = $strpos - $index + $matchlen;
             if ($index !== qtype_preg_matching_results::NO_MATCH_FOUND) {
                 $this->set_current_match($tag->subpattern, $index, $length);
+                //echo "close tag {$tag->subpattern}: ($index, $length)\n";
             }
         }
 
