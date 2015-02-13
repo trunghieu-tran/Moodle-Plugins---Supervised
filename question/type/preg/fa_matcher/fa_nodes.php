@@ -156,7 +156,7 @@ abstract class qtype_preg_fa_node {
         $outtransitions = $automaton->get_adjacent_transitions($del->to, true);
         // Cycled last states.
 
-        if ($del->from == $del->to && in_array($del->to, $endstates) || !$del->consumeschars)
+        if (in_array($del->to, $endstates) || !$del->consumeschars)
         {
             return false;
         }
