@@ -163,9 +163,11 @@ abstract class qtype_preg_fa_node {
         // Get transitions for merging back.
         if (($del->is_unmerged_assert() && $del->is_start_anchor()) || ($del->is_eps() && in_array($del->to, $endstates))) {
             $transitions = $automaton->get_adjacent_transitions($del->from, false);
+            $back = true;
         } else {
             // Get transitions for merging forward.
             $transitions = $automaton->get_adjacent_transitions($del->to, true);
+            $back = false;
             // Case of changeing assrts' places while merging.//TO THINK AND TODO!!!
             /*if ($del->is_unmerged_assert() && $del->is_conditional_assert()) {
                 $oppositetransitions = $automaton->get_adjacent_transitions($del->from, false);
@@ -217,7 +219,13 @@ abstract class qtype_preg_fa_node {
                 $tran->greediness = qtype_preg_fa_transition::min_greediness($tran->greediness, $del->greediness);
                 $merged = array_merge($delclone->mergedbefore, array($delclone), $delclone->mergedafter);
                 // Work with tags.
-                if ($del->is_unmerged_assert() && $del->is_start_anchor() || ($del->is_eps() && in_array($del->to, $endstates))) {
+                if (!$tran->consumeschars && $del->is_eps() && $del->from !== $del->to) {
+                    if ($back) {
+                        $tran->mergedbefore = array_merge($tran->mergedbefore, $merged);
+                    } else {
+                        $tran->mergedafter = array_merge($merged, $tran->mergedafter);
+                    }
+                } else if ($del->is_unmerged_assert() && $del->is_start_anchor() || ($del->is_eps() && in_array($del->to, $endstates))) {
                     $tran->mergedafter = array_merge($tran->mergedafter, $merged);
                 } else {
                     $tran->mergedbefore = array_merge($merged, $tran->mergedbefore);
