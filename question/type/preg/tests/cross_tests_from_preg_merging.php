@@ -1158,7 +1158,7 @@ class qtype_preg_cross_tests_from_preg_merging {
         $test4 = array( 'str'=>'b+',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>1, 1=>0, 2=>1),
+                        'index_first'=>array(0=>1, 1=>1, 2=>1),
                         'length'=>array(0=>1, 1=>0, 2=>1));
 
         $test5 = array( 'str'=>'b ',
