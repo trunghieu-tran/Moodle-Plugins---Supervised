@@ -305,12 +305,12 @@ abstract class qtype_preg_fa_node {
             if (!$negative) {
                 $result[] = $tranbigw;
                 $result[] = $tranw;
-                $result[] = $tranw;
+                $result[] = clone $tranw;
             } else {
                 // Case \B.
                 $result[] = $tranw;
                 $result[] = $tranbigw;
-                $result[] = $tranbigw;
+                $result[] = clone $tranbigw;
             }
             $result[] = $transitiondollar;
         }
