@@ -2159,26 +2159,33 @@ class block_formal_langs_string_pair {
         $correctstream = $this->correctstring->stream;   // correct lexems
         $streamcorrected = new block_formal_langs_token_stream();
         $streamcorrected->tokens = array();     // corrected lexems
+        $matchedpairs = array();
+        if (is_object($this->matches())) {
+            $matchedpairs = $this->matches()->matchedpairs;
+        }
         // TODO Birukova - change tokens using pairs
         for ($i = 0; $i < count($newstream->tokens); $i++) {
-            $flag = 0;
-            for ($j = 0; $j < count($this->matches); $j++) {
-                // not second
-                if (count($this->matches()->matchedpairs[$j]->comparedtokens) == 2) {
-                    if ($this->matches()->matchedpairs[$j]->comparedtokens[1] == $i) {
-                        $flag = 1;
+            $ispresentedinmatches = false;
+            for ($j = 0; $j < count($matchedpairs); $j++) {
+                /**
+                 * @var block_formal_langs_matched_tokens_pair $matchedpair
+                 */
+                $matchedpair = $matchedpairs[$j];
+                if (in_array($i, $matchedpair->comparedtokens)) {
+                    $ispresentedinmatches = true;
+                    if (count($matchedpair->comparedtokens) != 1) {
+                        // Note, that we must update $i if multiple tokens are merged into one
+                        // because next should walk into next compared token
+                        $i = max($matchedpair->comparedtokens);
                     }
-                }
-                // write correcttokens
-                if ($this->matches()->matchedpairs[$j]->comparedtokens[0]==$i) {
-                    for ($k = 0; $k<count($this->matches()->matchedpairs[$j]->correcttokens); $k++) {
-                        $streamcorrected->tokens[] = $correctstream->tokens[$this->matches()->matchedpairs[$j]->correcttokens[$k]];
+                    // Multiple tokens can be merged into one
+                    for($k = 0; $k < count($matchedpair->correcttokens); $k++) {
+                        $streamcorrected->tokens[] = $correctstream->tokens[$matchedpair->correcttokens[$k]];
                     }
-                    $flag = 1;
                 }
             }
-            // write comparedtoken
-            if ($flag == 0) {
+            // write compared token if no stuff is presented
+            if (!$ispresentedinmatches) {
                 $streamcorrected->tokens[] = $newstream->tokens[$i];
             }
         }
