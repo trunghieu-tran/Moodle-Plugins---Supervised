@@ -44,27 +44,23 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
     protected $aretokensequencesequal = false;
 
     /**
+     * A string with processed enumerations
+     * @var null|block_formal_langs_processed_string
+     */
+    protected $enumprocessedstring = null;
+
+    /**
+     * A group of matches, filled by enumerations data
+     * @var null|block_formal_langs_matches_group
+     */
+    protected $enummatches = null;
+
+    /**
      * A mistake set for arrays
      *
      * @var array
      */
     protected $mistakes = array();
-
-    /**
-     * A token mappings for each of analyzers
-     * as 'analyzer class name' => mappings for tokens of each of lexeme
-     * of transformed by lexer to previous. Order of key creation matters,
-     * A mapping is array of two arrays. First array is indexes of string, corrected
-     * by analyzer and second is array of source indexes of previous analyzed string.
-     *
-     * You can align two arrays as following
-     * array(
-     *   First array - corrected lexemes array( 0, 1 ), array( 2 ), array(3 ),
-     *   Second array - source lexemes   array( 0 )  , array(1, 2), array(3)
-     * )
-     * @var array
-     */
-    public $tokenmappings = array();
 
     /**
      * Holds sequence of scanned analyzers to know how far we should go
@@ -73,69 +69,189 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
     public $analyzersequence = array();
 
     /**
-     * Indexes of skipped lexemes from teacher's answer
-     * @var array
+     * Returns mapped index from enum processed string to compared string
+     * @param int $index index part
+     * @return int resulting index
      */
-    public $skippedlexemesindexes = array();
-    /**
-     * Indexes of added lexemes from student's answer
-     * @var array
-     */
-    public $addedlexemesindexes = array();
-    /**
-     * Indexes of moved lexemes from teacher's answer, using student answer's as a key
-     * @var array
-     */
-    public $movedlexemesindexes = array();
-
+    public function map_from_enumprocessed_string_to_compared_string($index) {
+        return $this->map_from_corrected_string_to_compared_string(
+            $this->map_from_enumprocessed_string_to_corrected_string($index)
+        );
+    }
 
     /**
-     * Maps index from source token index of one analyzer to
-     * source token index, entered by user
-     * @param int $source индекс исходной лексемы
-     * @param string $sourceanalyzer анализатор, строке которого соответствует индекс
-     * @return array результирующие индексы
+     * Returns mapped index from enum processed string to correct string
+     * @param int $index index part
+     * @return int resulting index
      */
-    protected function map_index_to_source_string($source, $sourceanalyzer) {
-        // If no analyzers - just return source
-        if (count($this->tokenmappings) == 0) {
-            return $source;
-        }
+    public function map_from_enumprocessed_string_to_correct_string($index) {
+        return $this->map_from_corrected_string_to_correct_string(
+            $this->map_from_enumprocessed_string_to_corrected_string($index)
+        );
+    }
 
-        $currentnalyzerindex = $this->analyzersequence[count($this->analyzersequence) - 1];
-        if (testlib::strlen($sourceanalyzer) != 0) {
-            $foundanalyzer = array_search($sourceanalyzer, $this->analyzersequence);
-            if ($foundanalyzer !== false) {
-                $currentnalyzerindex = $foundanalyzer;
+    /**
+     * Returns mapped index from enum processed string to corrected string
+     * @param int $index index part
+     * @return int resulting index
+     */
+    public function map_from_enumprocessed_string_to_corrected_string($index) {
+        if ($this->enummatches != null) {
+            $matchedpairs = $this->enummatches->matchedpairs;
+            for($i = 0; $i < count($matchedpairs); $i++) {
+                /** @var block_formal_langs_matched_tokens_pair $matchedpair */
+                $matchedpair = $matchedpairs[$i];
+                // NOTE THAT WE STORE NEW POSITIONS IN CORRECT TOKENS, NOT COMPARED ONE
+                if (in_array($index, $matchedpair->correcttokens)) {
+                    return max($matchedpair->comparedtokens);
+                }
             }
         }
+        return $index;
+    }
 
-        $result = array( $source );
-        $newresult = array();
-        if ($currentnalyzerindex > 0) {
-            for($i = $currentnalyzerindex - 1; $i > -1 ; $i--) {
-                $mappings = $this->tokenmappings[$this->analyzersequence[$currentnalyzerindex]];
-                for($j = 0; $j < count($mappings[0]); $j++) {
-                    // If any results from source is in array, than we must merge results
-                    $intersections = array_intersect($mappings[0][$j], $result);
-                    if (count($intersections)) {
-                        if (count($newresult)) {
-                            $newresult = array_merge($newresult, $mappings[1][$j]);
-                        } else {
-                            $newresult = $mappings[1][$j];
-                        }
+    /**
+     * Returns mapped index from from corrected string to correct_string
+     * @param $index
+     * @return index from correct string (-1 if not found)
+     */
+    public function map_from_corrected_string_to_correct_string($index) {
+        // TODO: correct_mistakes() should not be duplicated here.
+        // But it is!
+        $newstream = $this->comparedstring->stream;   // incorrect lexems
+        $correctstream = $this->correctstring->stream;   // correct lexems
+        $streamcorrected = array();     // corrected lexems
+        $matchedpairs = array();
+        $mappings = array();
+        if (is_object($this->matches())) {
+            $matchedpairs = $this->matches()->matchedpairs;
+        }
+        for ($i = 0; $i < count($newstream->tokens); $i++) {
+            $ispresentedinmatches = false;
+            for ($j = 0; $j < count($matchedpairs); $j++) {
+                /**
+                 * @var block_formal_langs_matched_tokens_pair $matchedpair
+                 */
+                $matchedpair = $matchedpairs[$j];
+                if (in_array($i, $matchedpair->comparedtokens)) {
+                    $ispresentedinmatches = true;
+                    if (count($matchedpair->comparedtokens) != 1) {
+                        // Note, that we must update $i if multiple tokens are merged into one
+                        // because next should walk into next compared token
+                        $i = max($matchedpair->comparedtokens);
+                    }
+                    // Multiple tokens can be merged into one
+                    for($k = 0; $k < count($matchedpair->correcttokens); $k++) {
+                        $mappings[count($streamcorrected)] = $matchedpair->correcttokens[$k];
+                        $streamcorrected[] = $correctstream->tokens[$matchedpair->correcttokens[$k]];
                     }
                 }
-                if (count($newresult)) {
-                    $result = $newresult;
-                }
             }
+            // write compared token if no stuff is presented
+            if (!$ispresentedinmatches) {
+                $streamcorrected[] = $newstream->tokens[$i];
+            }
+        }
+        $result = -1;
+        if (array_key_exists($index, $mappings)) {
+            $result = $mappings[$index];
         }
         return $result;
     }
 
+
+    /**
+     * Returns mapped index from from corrected string to compared string
+     * @param $index
+     * @return index from correct string (-1 if not found)
+     */
+    public function map_from_corrected_string_to_compared_string($index) {
+        // TODO: correct_mistakes() should not be duplicated here.
+        // But it is!
+        $newstream = $this->comparedstring->stream;   // incorrect lexems
+        $correctstream = $this->correctstring->stream;   // correct lexems
+        $streamcorrected = array();     // corrected lexems
+        $matchedpairs = array();
+        $mappings = array();
+        if (is_object($this->matches())) {
+            $matchedpairs = $this->matches()->matchedpairs;
+        }
+        for ($i = 0; $i < count($newstream->tokens); $i++) {
+            $ispresentedinmatches = false;
+            for ($j = 0; $j < count($matchedpairs); $j++) {
+                /**
+                 * @var block_formal_langs_matched_tokens_pair $matchedpair
+                 */
+                $matchedpair = $matchedpairs[$j];
+                if (in_array($i, $matchedpair->comparedtokens)) {
+                    $ispresentedinmatches = true;
+                    if (count($matchedpair->comparedtokens) != 1) {
+                        // Note, that we must update $i if multiple tokens are merged into one
+                        // because next should walk into next compared token
+                        $i = max($matchedpair->comparedtokens);
+                    }
+                    // Multiple tokens can be merged into one
+                    for($k = 0; $k < count($matchedpair->correcttokens); $k++) {
+                        $mappings[count($streamcorrected)] = $i;
+                        $streamcorrected[] = $correctstream->tokens[$matchedpair->correcttokens[$k]];
+                    }
+                }
+            }
+            // write compared token if no stuff is presented
+            if (!$ispresentedinmatches) {
+                $mappings[count($streamcorrected)] = $i;
+                $streamcorrected[] = $newstream->tokens[$i];
+            }
+        }
+        $result = -1;
+        if (array_key_exists($index, $mappings)) {
+            $result = $mappings[$index];
+        }
+        return $result;
+    }
+
+    /**
+     * Returns matches as set by enum analyzer
+     * @return block_formal_langs_matches_group|null
+     */
+    public function enum_matches() {
+        return $this->enummatches;
+    }
+
+    /**
+     * A matches, as set by enum analyzer
+     * @param block_formal_langs_matches_group $matches
+     */
+    public function set_enum_matches($matches) {
+        $this->enummatches = $matches;
+    }
+
+    /**
+     * Returns processed string, returned enum_analyzer.
+     * It's like corrected, but with enum positions swapped
+     * @return block_formal_langs_processed_string|null
+     */
+    public function enum_processed_string()  {
+        if ($this->enumprocessedstring == null) {
+            return $this->correctedstring();
+        }
+        return $this->enumprocessedstring;
+    }
+
+    /**
+     * Sets processed string, returned by enum analyzer
+     * It's like corrected, but with enum positions swapped
+     * @param block_formal_langs_processed_string $string
+     */
+    public function set_enum_processed_string($string) {
+        $this->enumprocessedstring = $string;
+    }
+
     public function __clone() {
         parent::__clone();
+        if (is_object($this->enumprocessedstring)) {
+            $this->enumprocessedstring = clone $this->enumprocessedstring;
+        }
         $oldmistakes = $this->mistakes;
         if (is_array($oldmistakes)) {
             foreach($oldmistakes as $type => $mistakes) {
