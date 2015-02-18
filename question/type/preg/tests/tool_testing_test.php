@@ -77,7 +77,7 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position());
         $json = $tool->generate_json();
         $str = strip_tags($json['regex_test'], '<span><br><b>');
-        $this->assertEquals($str, '<span id="qtype-preg-colored-string"><span class="correct">a</span><br /><span class="correct">b</span></span><br />');
+        $this->assertEquals($str, '<span id="qtype-preg-colored-string"><span class="correct">a</span></span><br /><span id="qtype-preg-colored-string"><span class="correct">b</span></span><br />');
     }
 
     function test_empty_strings() {
