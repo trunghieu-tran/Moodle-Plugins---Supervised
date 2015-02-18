@@ -46,6 +46,9 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
      */
     private $floatfields = array('hintgradeborder' => array('default' => 0.9, 'advanced' => true, 'min' => 0, 'max' => 1),           // Hint grade border.
                                  'maxmistakepercentage' => array('default' => 0.7, 'advanced' => true, 'min' => 0, 'max' => 1),      // Max mistake percentage.
+                                 'lexicalerrorthreshold' =>  array('default' => 0.33, 'advanced' => true, 'required' => false, 'min' => 0, 'max' => 1), //Lexical error threshold field
+                                 'absentmistakeweight' => array('default' => 0.1, 'advanced' => true, 'min' => 0, 'max' => 1, 'required' => true),  //Absent token mistake weight field
+                                 'addedmistakeweight' => array('default' => 0.1, 'advanced' => true, 'min' => 0, 'max' => 1, 'required' => true),    //Extra token mistake weight field
                                 );
 
     private $hintfloatfields = array('whatishintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2),       // "What is" hint penalty.
@@ -182,7 +185,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             $mform->addElement('header', $name . 'hdr', $uiname);
             $mform->addHelpButton($name . 'hdr', $name, 'qtype_correctwriting');
             // Add control whether to use analyzer.
-            $a = textlib::strtolower(textlib::substr($uiname, 0, 1)) . textlib::substr($uiname, 1);// Decapitalise first letter.
+            $a = core_text::strtolower(core_text::substr($uiname, 0, 1)) . core_text::substr($uiname, 1);// Decapitalise first letter.
             $formname = 'is' . str_replace('_', '', $name) . 'enabled';
             $mform->addElement('selectyesno', $formname, get_string('usesomething', 'qtype_correctwriting', $a));
             $mform->setType($formname, PARAM_BOOL);
@@ -227,9 +230,9 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $rows = count($textdata);
         $cols = 1;
         for ($i = 0; $i < count($textdata); $i++) {
-            $len = textlib::strlen($textdata[$i]);
+            $len = core_text::strlen($textdata[$i]);
             if ($len > $cols) {
-                $cols = textlib::strlen($textdata[$i]);
+                $cols = core_text::strlen($textdata[$i]);
             }
         }
         // A tab for IE-like browser
@@ -392,7 +395,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $max = 0;
         if (count($lines) != 0) {
             foreach($lines as $line) {
-                $max = max($max, textlib::strlen($line));
+                $max = max($max, core_text::strlen($line));
             }
         }
         if ($max < 80) {
@@ -561,11 +564,11 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                 $tokenpos = $token->position();
                 $emesg = $error->errormessage . $br;
                 $left = $tokenpos->colstart();
-                $emesg .= ($left <= 0) ? '' : textlib::substr($value, 0, $left);
+                $emesg .= ($left <= 0) ? '' : core_text::substr($value, 0, $left);
                 $left =  $tokenpos->colend() -  $tokenpos->colstart() + 1;
-                $middlepart = ($left <= 0) ? '' : textlib::substr($value,  $tokenpos->colstart() , $left);
+                $middlepart = ($left <= 0) ? '' : core_text::substr($value,  $tokenpos->colstart() , $left);
                 $emesg .= '<b>' . $middlepart . '</b>';
-                $emesg .= textlib::substr($value, $tokenpos->colend() + 1);
+                $emesg .= core_text::substr($value, $tokenpos->colend() + 1);
                 $errormessages[] = $emesg;
                 $result = implode($br, $errormessages);
             }
@@ -618,7 +621,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                         if (array_key_exists($fieldkey, $errors) == false) {
                             $errors[$fieldkey] = get_string('parseerror', 'qtype_correctwriting');
                         } else {
-                            if (textlib::strlen($errors[$fieldkey]) == 0) {
+                            if (core_text::strlen($errors[$fieldkey]) == 0) {
                                 $errors[$fieldkey] = get_string('parseerror', 'qtype_correctwriting');
                             } else {
                                 $errors[$fieldkey] .= $br . get_string('parseerror', 'qtype_correctwriting');
@@ -644,7 +647,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                             if (array_key_exists($fieldkey, $errors) == false) {
                                 $errors[$fieldkey] = $mesg;
                             } else {
-                                if (textlib::strlen($errors[$fieldkey]) == 0) {
+                                if (core_text::strlen($errors[$fieldkey]) == 0) {
                                     $errors[$fieldkey] = $mesg;
                                 } else {
                                     $errors[$fieldkey] .= $br . $mesg;
