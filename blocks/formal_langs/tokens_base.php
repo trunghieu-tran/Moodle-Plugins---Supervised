@@ -656,7 +656,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
                             $pair = new block_formal_langs_typo_pair(array($this->tokenindex), array($k), $dist, false, '');
                         }
                         ////////////////////////////////////////////////////////////////
-                        $pair->editops=$this->redaction($this->value, $other->value);
+                        $pair->editops=$this->redaction($this->value, $other[$k]->value);
                         ////////////////////////////////////////////////////////////////
                         $possiblepairs[] = $pair;
 /*
