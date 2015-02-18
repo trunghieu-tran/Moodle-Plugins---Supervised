@@ -599,7 +599,21 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
     public function check_specific_error ($token) {
         return 0;
     }
-
+    /*
+    public function search_specific_error_on_list ($token, $specific_lexems_list) {
+        $flag=0;
+        for ($i=0; $i<count($specific_lexems_list); $i++){
+            if ($this->value==$specific_lexems_list[$i]->value) {
+                for ($j=0; $j<count($specific_lexems_list);$j++) {
+                    if ($token->value==$specific_lexems_list[$i]->value) {
+                        $flag=1;
+                    }
+                }
+            }
+        }
+        return $flag;
+    }
+*/
     /**
      * Base lexical mistakes handler. Looks for possible matches for this
      * token in other answer and return an array of them.
@@ -653,7 +667,11 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
                         if ($this->check_specific_error($other[$k])) {
                             $pair = new block_formal_langs_typo_pair(array($this->tokenindex), array($k), $dist, true, '');
                         } else {
-                            $pair = new block_formal_langs_typo_pair(array($this->tokenindex), array($k), $dist, false, '');
+//                            if ($this->search_specific_error_on_list($other[$k], $specific_lexem_list)) {
+//                                $pair = new block_formal_langs_typo_pair(array($this->tokenindex), array($k), $dist, true, '');
+//                            } else {
+                                $pair = new block_formal_langs_typo_pair(array($this->tokenindex), array($k), $dist, false, '');
+//                            }
                         }
                         ////////////////////////////////////////////////////////////////
                         $pair->editops=$this->redaction($this->value, $other[$k]->value);
