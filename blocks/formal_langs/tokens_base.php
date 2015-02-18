@@ -600,7 +600,21 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
     public function check_specific_error ($token) {
         return 0;
     }
-
+    /*
+    public function search_specific_error_on_list ($token, $specific_lexems_list) {
+        $flag=0;
+        for ($i=0; $i<count($specific_lexems_list); $i++){
+            if ($this->value==$specific_lexems_list[$i]->value) {
+                for ($j=0; $j<count($specific_lexems_list);$j++) {
+                    if ($token->value==$specific_lexems_list[$i]->value) {
+                        $flag=1;
+                    }
+                }
+            }
+        }
+        return $flag;
+    }
+*/
     /**
      * Base lexical mistakes handler. Looks for possible matches for this
      * token in other answer and return an array of them.
@@ -619,7 +633,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * $answertokens or $responsetokens field inside (it is filling from outside)
      */
     public function look_for_matches($other, $threshold, $iscorrect, block_formal_langs_comparing_options $options, $bypass) {      
-	if ($bypass == true) {
+        if ($bypass == true) {
             $possiblepairs = array();
             if($options->usecase == true){
                 for ($k=0; $k < count($other); $k++) {
@@ -629,16 +643,16 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
                     }
                 }
             } else {
-		//если usecase false
-		for ($k=0; $k < count($other); $k++) {
-		$str1 = strtolower($other[$k]->value);
-		$str2 = strtolower($this->value);
+            //если usecase false
+            for ($k=0; $k < count($other); $k++) {
+                $str1 = strtolower($other[$k]->value);
+                $str2 = strtolower($this->value);
                     if($str1 == $str2) {
                         $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), 0, false, '');
                         $possiblepairs[] = $pair;
                     }
                 }
-	     }
+            }
         } else {
             // TODO: generic mistakes handling
             $result = textlib::strlen($this->value) - textlib::strlen($this->value) * $threshold;
@@ -651,18 +665,22 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
                     // possible pair (typo)
                     $dist = $this->possible_pair($other[$k], $max, $options);
                     if ($dist != -1) {     
-			            if ($this->check_specific_error($other[$k])) {
-                            $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), $dist, true, '');
+                        if ($this->check_specific_error($other[$k])) {
+                            $pair = new block_formal_langs_typo_pair(array($this->tokenindex), array($k), $dist, true, '');
                         } else {
-                            $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), $dist, false, '');
+//                            if ($this->search_specific_error_on_list($other[$k], $specific_lexem_list)) {
+//                                $pair = new block_formal_langs_typo_pair(array($this->tokenindex), array($k), $dist, true, '');
+//                            } else {
+                                $pair = new block_formal_langs_typo_pair(array($this->tokenindex), array($k), $dist, false, '');
+//                            }
                         }
                         ////////////////////////////////////////////////////////////////
-                        $pair->operations=$this->redaction($this->value, $other[$k]->value);
+                        $pair->editops=$this->redaction($this->value, $other[$k]->value);
                         ////////////////////////////////////////////////////////////////
                         $possiblepairs[] = $pair;
                         /*
-			            $result = $this->additional_generation($other[$k]);
-			            if (count ($result)>0) {
+                        $result = $this->additional_generation($other[$k]);
+                        if (count ($result)>0) {
                             for ($i=0; $i<count($result); $i++) {
                                 $possiblepairs[]=$result[$i];
                             }
@@ -794,7 +812,6 @@ class block_formal_langs_matched_tokens_pair {
      */
     public $messageid;
     
-    public $operations;
 
     public function __construct($correcttokens, $comparedtokens, $mistakeweight, $specific = false, $messageid = '') {
         $this->correcttokens = $correcttokens;
