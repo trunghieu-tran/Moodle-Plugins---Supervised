@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/blocks/formal_langs/tokens_base.php');
+require_once($CFG->dirroot . '/question/type/correctwriting/enum_token_pair.php');
 
 // A string pair with lcs, used in sequence analyzer
 class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
@@ -47,13 +48,13 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
      * A string with processed enumerations
      * @var null|block_formal_langs_processed_string
      */
-    protected $enumprocessedstring = null;
+    protected $enumcorrectstring = null;
 
     /**
-     * A group of matches, filled by enumerations data
-     * @var null|block_formal_langs_matches_group
+     * A group of matches, filled by enum analyzer
+     * @var array of qtype_correctwriting_enum_token_pair
      */
-    protected $enummatches = null;
+    protected $enummatches = array();
 
     /**
      * A mistake set for arrays
@@ -68,16 +69,6 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
      */
     public $analyzersequence = array();
 
-    /**
-     * Returns mapped index from enum processed string to compared string
-     * @param int $index index part
-     * @return int resulting index
-     */
-    public function map_from_enumprocessed_string_to_compared_string($index) {
-        return $this->map_from_corrected_string_to_compared_string(
-            $this->map_from_enumprocessed_string_to_corrected_string($index)
-        );
-    }
 
     /**
      * Returns mapped index from enum processed string to correct string
@@ -231,26 +222,26 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
      * It's like corrected, but with enum positions swapped
      * @return block_formal_langs_processed_string|null
      */
-    public function enum_processed_string()  {
-        if ($this->enumprocessedstring == null) {
-            return $this->correctedstring();
+    public function enum_correct_string()  {
+        if ($this->enumcorrectstring == null) {
+            return $this->correctstring();
         }
-        return $this->enumprocessedstring;
+        return $this->enumcorrectstring;
     }
 
     /**
-     * Sets processed string, returned by enum analyzer
+     * Sets processed correct string, returned by enum analyzer
      * It's like corrected, but with enum positions swapped
      * @param block_formal_langs_processed_string $string
      */
-    public function set_enum_processed_string($string) {
-        $this->enumprocessedstring = $string;
+    public function set_enum_correct_string($string) {
+        $this->enumcorrectstring = $string;
     }
 
     public function __clone() {
         parent::__clone();
-        if (is_object($this->enumprocessedstring)) {
-            $this->enumprocessedstring = clone $this->enumprocessedstring;
+        if (is_object($this->enumcorrectstring)) {
+            $this->enumcorrectstring = clone $this->enumcorrectstring;
         }
         $oldmistakes = $this->mistakes;
         if (is_array($oldmistakes)) {
