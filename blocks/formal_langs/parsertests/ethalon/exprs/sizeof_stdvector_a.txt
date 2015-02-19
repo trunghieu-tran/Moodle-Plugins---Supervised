@@ -1,0 +1,18 @@
+[
+ (sizeof) {
+  sizeof
+  (
+  (scoped_identifier) {
+   (namespace_resolve) {
+    (namespace_resolve) {
+     std
+     ::
+    }
+    vector
+    ::
+   }
+   a
+  }
+  )
+ }
+]

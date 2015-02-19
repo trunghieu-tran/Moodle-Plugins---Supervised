@@ -1,0 +1,76 @@
+[
+ (program) {
+  (stmt_list) {
+   (stmt_or_defined_macro) {
+    (stmt) {
+     (variable_declaration) {
+      (builtintype) {
+       int
+      }
+      (assign) {
+       (lvalue) {
+        (
+        (arg_list) {
+         (lvalue) {
+          *
+          (lvalue) {
+           *
+           (lvalue) {
+            (
+            (arg_list) {
+             (lvalue) {
+              *
+              f
+             }
+            }
+            )
+            (formal_args_list_with_or_without_const) {
+             (formal_args_list) {
+              (
+              (arg_list) {
+               (arg_list) {
+                (builtintype) {
+                 double
+                }
+               }
+               ,
+               (builtintype) {
+                int
+               }
+              }
+              )
+             }
+            }
+           }
+          }
+         }
+        }
+        )
+        (formal_args_list_with_or_without_const) {
+         (formal_args_list) {
+          (
+          (arg_list) {
+           (arg_list) {
+            (builtintype) {
+             double
+            }
+           }
+           ,
+           (builtintype) {
+            double
+           }
+          }
+          )
+         }
+        }
+       }
+       =
+       null
+      }
+     }
+     ;
+    }
+   }
+  }
+ }
+]

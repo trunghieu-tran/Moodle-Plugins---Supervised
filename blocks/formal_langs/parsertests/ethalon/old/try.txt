@@ -1,0 +1,89 @@
+[
+ (program) {
+  (stmt_list) {
+   (stmt_list) {
+    (stmt_or_defined_macro) {
+     (typedef_declaration) {
+      typedef
+      (builtintype) {
+       int
+      }
+      Exception
+      ;
+     }
+    }
+   }
+   (stmt_or_defined_macro) {
+    (stmt) {
+     (try_catch) {
+      (try) {
+       try
+       {
+       (stmt_list) {
+        (stmt_or_defined_macro) {
+         (stmt) {
+          (expr_assign) {
+           a
+           =
+           (expr_function_call) {
+            unescaped_call
+            (
+            )
+           }
+          }
+          ;
+         }
+        }
+       }
+       }
+      }
+      (catch_list) {
+       (catch_list) {
+        (catch) {
+         catch
+         (
+         (expr_prec_11_or_ellipsis) {
+          (variable_declaration) {
+           Exception
+           ex
+          }
+         }
+         )
+         {
+         (stmt_list) {
+          (stmt_or_defined_macro) {
+           (stmt) {
+            (variable_declaration) {
+             (builtintype) {
+              int
+             }
+             (assign) {
+              a
+              =
+              2
+             }
+            }
+            ;
+           }
+          }
+         }
+         }
+        }
+       }
+       (catch) {
+        catch
+        (
+        (expr_prec_11_or_ellipsis) {
+         ...
+        }
+        )
+        {
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+]
