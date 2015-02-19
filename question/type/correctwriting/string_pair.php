@@ -99,7 +99,7 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
 
     /**
      * A matches, as set by enum analyzer
-     * @param arrray $matches
+     * @param array $matches
      */
     public function set_enum_correct_to_correct($matches) {
         $this->enumcorrectcorrect = $matches;
