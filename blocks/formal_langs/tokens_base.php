@@ -2012,6 +2012,12 @@ class block_formal_langs_string_pair {
      */
     protected $correctedstring;
 
+    /**
+     * Array of matches between corrected and compared, where keys are indexes from corrected string
+     * and values are array of matched indexes from compared
+     * @var array
+     */
+    protected $correctedtocompared;
 
     public function __clone() {
         $this->correctstring = clone $this->correctstring;
@@ -2149,7 +2155,8 @@ class block_formal_langs_string_pair {
     /**
      * Correct mistakes in compared string using array of matched pairs and correct string.
      *
-     * @return a new token stream where comparedtokens changed to correcttokens if mistakeweight > 0 for the pair
+     * @return array, with a new token stream where comparedtokens changed to correcttokens if mistakeweight > 0 for the pair and
+     * other array, where matches between corrected and compared are stored
      */
     protected function correct_mistakes() {
         // TODO Birukova - create a new string from $comparedstring and matches
@@ -2160,6 +2167,7 @@ class block_formal_langs_string_pair {
         $streamcorrected = new block_formal_langs_token_stream();
         $streamcorrected->tokens = array();     // corrected lexems
         $matchedpairs = array();
+        $correctedtocompared = array();
         if (is_object($this->matches())) {
             $matchedpairs = $this->matches()->matchedpairs;
         }
@@ -2180,22 +2188,22 @@ class block_formal_langs_string_pair {
                     }
                     // Multiple tokens can be merged into one
                     for($k = 0; $k < count($matchedpair->correcttokens); $k++) {
+                        $correctedtocompared[count($streamcorrected->tokens)] = $matchedpair->comparedtokens;
                         $streamcorrected->tokens[] = $correctstream->tokens[$matchedpair->correcttokens[$k]];
                     }
                 }
             }
             // write compared token if no stuff is presented
             if (!$ispresentedinmatches) {
+                $correctedtocompared[count($streamcorrected->tokens)] = array( $i );
                 $streamcorrected->tokens[] = $newstream->tokens[$i];
             }
         }
         $lang = $this->correctstring->language;
         $this->correctedstring = new block_formal_langs_processed_string ($lang);
         $this->correctedstring->set_corrected_stream($streamcorrected);
+        $this->correctedtocompared = $correctedtocompared;
         return $this->correctedstring;
-        // Mamontov - added a simple stub, to make possible for sequence analyzer to work with
-        // corrected string
-        // return $this->comparedstring;
     }
 
 
