@@ -2207,6 +2207,40 @@ class block_formal_langs_string_pair {
     }
 
 
+    /**
+     * Returns mapped index from from corrected string to compared string.
+     * Array of indexes could be returned if both are mapped.
+     * @param $index
+     * @return array of indexes from compared string (array with -1 if not found)
+     */
+    public function map_from_corrected_string_to_compared_string($index) {
+        return $this->map($index, $this->correctedtocompared, false, array($index));
+    }
+
+
+    /**
+     * Maps from source to destination
+     * @param int $index index in source string
+     * @param array $source array of source mapping
+     * @param bool $flip whether we should flip the mappings
+     * @param mixed $default a default value for flipping
+     * @return mixed result
+     */
+    protected function map($index, $source, $flip, $default) {
+        $result = $default;
+        if (count($source)) {
+            $f = $source;
+            if ($flip) {
+                $f = array_flip($f);
+            }
+            if (array_key_exists($index, $f)) {
+                return $f[$index];
+            }
+        }
+        return $result;
+    }
+
+
     private function count_indexes_correct($nodenumber) {
         $count = 0;
         return $count;
