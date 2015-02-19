@@ -25,7 +25,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/blocks/formal_langs/tokens_base.php');
-require_once($CFG->dirroot . '/question/type/correctwriting/enum_token_pair.php');
 
 // A string pair with lcs, used in sequence analyzer
 class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
@@ -51,10 +50,11 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
     protected $enumcorrectstring = null;
 
     /**
-     * A group of matches, filled by enum analyzer
-     * @var array of qtype_correctwriting_enum_token_pair
+     * Array, where keys are indexes from string , filled by enum analyzer
+     * and values, are indexes from correct string
+     * @var array
      */
-    protected $enummatches = array();
+    protected $enumcorrectcorrect = array();
 
     /**
      * A mistake set for arrays
@@ -71,150 +71,38 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
 
 
     /**
-     * Returns mapped index from enum processed string to correct string
+     * Returns mapped index from correct string to enum correct string
      * @param int $index index part
      * @return int resulting index
      */
-    public function map_from_enumprocessed_string_to_correct_string($index) {
-        return $this->map_from_corrected_string_to_correct_string(
-            $this->map_from_enumprocessed_string_to_corrected_string($index)
-        );
+    public function map_from_correct_string_to_enum_correct_string($index) {
+        return $this->map($index, $this->enumcorrectcorrect, true, $index);
     }
 
     /**
-     * Returns mapped index from enum processed string to corrected string
-     * @param int $index index part
-     * @return int resulting index
-     */
-    public function map_from_enumprocessed_string_to_corrected_string($index) {
-        if ($this->enummatches != null) {
-            $matchedpairs = $this->enummatches->matchedpairs;
-            for($i = 0; $i < count($matchedpairs); $i++) {
-                /** @var block_formal_langs_matched_tokens_pair $matchedpair */
-                $matchedpair = $matchedpairs[$i];
-                // NOTE THAT WE STORE NEW POSITIONS IN CORRECT TOKENS, NOT COMPARED ONE
-                if (in_array($index, $matchedpair->correcttokens)) {
-                    return max($matchedpair->comparedtokens);
-                }
-            }
-        }
-        return $index;
-    }
-
-    /**
-     * Returns mapped index from from corrected string to correct_string
+     * Returns mapped index from enum correct string to correct string
      * @param $index
-     * @return index from correct string (-1 if not found)
+     * @return int
      */
-    public function map_from_corrected_string_to_correct_string($index) {
-        // TODO: correct_mistakes() should not be duplicated here.
-        // But it is!
-        $newstream = $this->comparedstring->stream;   // incorrect lexems
-        $correctstream = $this->correctstring->stream;   // correct lexems
-        $streamcorrected = array();     // corrected lexems
-        $matchedpairs = array();
-        $mappings = array();
-        if (is_object($this->matches())) {
-            $matchedpairs = $this->matches()->matchedpairs;
-        }
-        for ($i = 0; $i < count($newstream->tokens); $i++) {
-            $ispresentedinmatches = false;
-            for ($j = 0; $j < count($matchedpairs); $j++) {
-                /**
-                 * @var block_formal_langs_matched_tokens_pair $matchedpair
-                 */
-                $matchedpair = $matchedpairs[$j];
-                if (in_array($i, $matchedpair->comparedtokens)) {
-                    $ispresentedinmatches = true;
-                    if (count($matchedpair->comparedtokens) != 1) {
-                        // Note, that we must update $i if multiple tokens are merged into one
-                        // because next should walk into next compared token
-                        $i = max($matchedpair->comparedtokens);
-                    }
-                    // Multiple tokens can be merged into one
-                    for($k = 0; $k < count($matchedpair->correcttokens); $k++) {
-                        $mappings[count($streamcorrected)] = $matchedpair->correcttokens[$k];
-                        $streamcorrected[] = $correctstream->tokens[$matchedpair->correcttokens[$k]];
-                    }
-                }
-            }
-            // write compared token if no stuff is presented
-            if (!$ispresentedinmatches) {
-                $streamcorrected[] = $newstream->tokens[$i];
-            }
-        }
-        $result = -1;
-        if (array_key_exists($index, $mappings)) {
-            $result = $mappings[$index];
-        }
-        return $result;
+    public function map_from_enum_correct_string_to_correct_string($index) {
+        return $this->map($index, $this->enumcorrectcorrect, false, $index);
     }
 
-
-    /**
-     * Returns mapped index from from corrected string to compared string
-     * @param $index
-     * @return index from correct string (-1 if not found)
-     */
-    public function map_from_corrected_string_to_compared_string($index) {
-        // TODO: correct_mistakes() should not be duplicated here.
-        // But it is!
-        $newstream = $this->comparedstring->stream;   // incorrect lexems
-        $correctstream = $this->correctstring->stream;   // correct lexems
-        $streamcorrected = array();     // corrected lexems
-        $matchedpairs = array();
-        $mappings = array();
-        if (is_object($this->matches())) {
-            $matchedpairs = $this->matches()->matchedpairs;
-        }
-        for ($i = 0; $i < count($newstream->tokens); $i++) {
-            $ispresentedinmatches = false;
-            for ($j = 0; $j < count($matchedpairs); $j++) {
-                /**
-                 * @var block_formal_langs_matched_tokens_pair $matchedpair
-                 */
-                $matchedpair = $matchedpairs[$j];
-                if (in_array($i, $matchedpair->comparedtokens)) {
-                    $ispresentedinmatches = true;
-                    if (count($matchedpair->comparedtokens) != 1) {
-                        // Note, that we must update $i if multiple tokens are merged into one
-                        // because next should walk into next compared token
-                        $i = max($matchedpair->comparedtokens);
-                    }
-                    // Multiple tokens can be merged into one
-                    for($k = 0; $k < count($matchedpair->correcttokens); $k++) {
-                        $mappings[count($streamcorrected)] = $i;
-                        $streamcorrected[] = $correctstream->tokens[$matchedpair->correcttokens[$k]];
-                    }
-                }
-            }
-            // write compared token if no stuff is presented
-            if (!$ispresentedinmatches) {
-                $mappings[count($streamcorrected)] = $i;
-                $streamcorrected[] = $newstream->tokens[$i];
-            }
-        }
-        $result = -1;
-        if (array_key_exists($index, $mappings)) {
-            $result = $mappings[$index];
-        }
-        return $result;
-    }
 
     /**
      * Returns matches as set by enum analyzer
-     * @return block_formal_langs_matches_group|null
+     * @return arrray|null
      */
-    public function enum_matches() {
-        return $this->enummatches;
+    public function enum_correct_to_correct() {
+        return $this->enumcorrectcorrect;
     }
 
     /**
      * A matches, as set by enum analyzer
-     * @param block_formal_langs_matches_group $matches
+     * @param arrray $matches
      */
-    public function set_enum_matches($matches) {
-        $this->enummatches = $matches;
+    public function set_enum_correct_to_correct($matches) {
+        $this->enumcorrectcorrect = $matches;
     }
 
     /**
@@ -329,6 +217,8 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
      */
     public function lcs() {
         return $this->lcs;
-    }    
+    }
+
+
 
 }
