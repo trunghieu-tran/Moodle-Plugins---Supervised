@@ -179,7 +179,7 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
             // Delete any remaining old rules.
             if(!empty($oldrules)) {
                 foreach ($oldrules as $oldrule) {
-                    array_push($oldrulesid, $oldrule->id);
+                    $oldrulesids = $oldrule->id;
                 }
                 list($insql, $inparams) = $DB->get_in_or_equal($oldrulesid);
                 $sqlstring = " id ";
@@ -203,7 +203,7 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
             // Delete any remaining old rules.
             if(!empty($oldrules)) {
                 foreach ($oldrules as $oldrule) {
-                    array_push($oldrulesid, $oldrule->id);
+                    $oldrulesids = $oldrule->id;
                 }
                 list($insql, $inparams) = $DB->get_in_or_equal($oldrulesid);
                 $sqlstring = " id ";
