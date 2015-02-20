@@ -4792,7 +4792,9 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(1),
+                        'ext_index_first'=>array(0=>1),
+                        'ext_length'=>array(0=>1),
+                        'left'=>array(2),
                         'next'=>'\w',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -4801,7 +4803,9 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(1),
+                        'ext_index_first'=>array(0=>2),
+                        'ext_length'=>array(0=>1),
+                        'left'=>array(2),
                         'next'=>'\w',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -4810,12 +4814,15 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(1),
+                        'ext_index_first'=>array(0=>2),
+                        'ext_length'=>array(0=>1),
+                        'left'=>array(2),
                         'next'=>'\w',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'\Ba\B',
-                     'tests'=>array($test2, $test3, $test4));
+                     'tests'=>array($test2, $test3, $test4),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_325() {
