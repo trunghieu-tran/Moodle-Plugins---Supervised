@@ -109,6 +109,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $stackitem->subexpr = $subexpr;
         $stackitem->recursionstartpos = $startpos;
         $stackitem->state = $state;
+        $stackitem->full = false;
         $stackitem->next_char_flags = 0x00;
         $stackitem->matches = array();
         $stackitem->subexpr_to_subpatt = array(0 => $this->astroot);   // Remember this explicitly
@@ -204,6 +205,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             $result = $tr->pregleaf->match($str, $curpos, $tmplength, $newstate);
             if ($result) {
                 $this->after_transition_passed($newstate, $tr, $curpos, $tmplength);
+                //echo "passed $tr\n";
             } else {
                 $newstate->length += $tmplength;
             }
@@ -214,6 +216,12 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
             if (!$result) {
                 $full = false;
+                break;
+            }
+
+            // Unbelievable crutch: we should stop matching merged transitions that
+            // could be placed outside this subexpression in the original automaton
+            if ($newstate->recursion_level() > 0 && $newstate->is_subexpr_captured_top($newstate->subexpr())) {
                 break;
             }
         }
@@ -559,6 +567,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 $cursubexpr = $curstate->subexpr();
                 $recursionlevel = $curstate->recursion_level();
                 $transitions = $this->automaton->get_adjacent_transitions($curstate->state(), true);
+
+                //echo "\n";
+
                 foreach ($transitions as $transition) {
                     $length = 0;
                     $full = true;
@@ -571,12 +582,15 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                         if ($recursionlevel === $maxrecursionlevel) {
                             continue;
                         }
+
                         $newstate = $this->match_recursive_transition_begin($curstate, $transition, $str, $curpos, $length, $full);
+
                         if ($full) {
                             $startstates = $this->automaton->start_states($transition->pregleaf->number);
                             foreach ($startstates as $state) {
                                 $newnewstate = clone $newstate;
                                 $newnewstate->stack[] = $this->create_fa_exec_stack_item($transition->pregleaf->number, $state, $curpos);
+                                //echo "add recursive state {$newnewstate->state()}\n";
                                 $reached[] = $newnewstate;
                             }
                         }
@@ -586,7 +600,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
                         if ($full) {
 
-                            //echo "level $recursionlevel: MATCHED $transition at pos $curpos (char '$char'). length changed {$curstate->length} : {$newstate->length}\n\n";
+                            //echo "level $recursionlevel: MATCHED $transition at pos $curpos (char '$char'). length changed {$curstate->length} : {$newstate->length}\n";
                             //echo $newstate->subpatts_to_string();
 
                             // Filter out states that did not start the actual subexpression call.
@@ -609,6 +623,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                                 if ($transition->greediness == qtype_preg_fa_transition::GREED_LAZY) {
                                     $lazystates[] = $newstate;
                                 } else {
+                                    //echo "add state {$newstate->state()}\n";
                                     $reached[] = $newstate;
                                 }
                             }
@@ -701,6 +716,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 $cursubexpr = $curstate->subexpr();
                 $recursionlevel = $curstate->recursion_level();
                 $transitions = $this->automaton->get_adjacent_transitions($curstate->state(), true);
+
+                //echo "\n";
+
                 foreach ($transitions as $transition) {
                     if ($transition->pregleaf->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
                         continue;
@@ -734,7 +752,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
                         if ($full) {
 
-                            //echo "level $recursionlevel: MATCHED $transition at pos $curpos (char '$char'). length changed {$curstate->length} : {$newstate->length}\n\n";
+                            //echo "level $recursionlevel: MATCHED $transition at pos $curpos (char '$char'). length changed {$curstate->length} : {$newstate->length}\n";
                             //echo $newstate->subpatts_to_string();
 
                             // Filter out states that did not start the actual subexpression call.
@@ -980,7 +998,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
             /*global $CFG;
             $CFG->pathtodot = '/usr/bin/dot';
-            $result->fa_to_dot('svg', '/home/user/fa.svg');*/
+            $namesuffix = $mergeassertions ? "merged" : "original";
+            $result->fa_to_dot('svg', "/home/user/fa_$namesuffix.svg");*/
 
         //} catch (Exception $e) {
           //  $result = null;
