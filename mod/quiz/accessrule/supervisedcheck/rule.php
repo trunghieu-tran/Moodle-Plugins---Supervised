@@ -181,7 +181,7 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
                 foreach ($oldrules as $oldrule) {
                     $oldrulesids = $oldrule->id;
                 }
-                list($insql, $inparams) = $DB->get_in_or_equal($oldrulesid);
+                list($insql, $inparams) = $DB->get_in_or_equal($oldrulesids);
                 $sqlstring = " id ";
                 $sqlstring .= $insql;
                 $DB->delete_records_select('quizaccess_supervisedcheck', $sqlstring, $inparams);
@@ -205,7 +205,7 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
                 foreach ($oldrules as $oldrule) {
                     $oldrulesids = $oldrule->id;
                 }
-                list($insql, $inparams) = $DB->get_in_or_equal($oldrulesid);
+                list($insql, $inparams) = $DB->get_in_or_equal($oldrulesids);
                 $sqlstring = " id ";
                 $sqlstring .= $insql;
                 $DB->delete_records_select('quizaccess_supervisedcheck', $sqlstring, $inparams);
