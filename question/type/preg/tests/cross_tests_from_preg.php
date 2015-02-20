@@ -589,7 +589,7 @@ class qtype_preg_cross_tests_from_preg {
 
         return array('regex'=>'^[a-z 0-9]\b[a-z 0-9]\B[a-z 0-9]',
                      'tests'=>array($test1, $test2, $test3),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_simple_2() {
@@ -601,7 +601,7 @@ class qtype_preg_cross_tests_from_preg {
 
         return array('regex'=>'[A-Z0-5=]\b[0-5A-R=]',
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_simple_3() {
@@ -615,7 +615,7 @@ class qtype_preg_cross_tests_from_preg {
 
         return array('regex'=>'\b[0-5A-R]',
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_simple_4() {
@@ -627,7 +627,7 @@ class qtype_preg_cross_tests_from_preg {
 
         return array('regex'=>'[A-Z0-5]\B[0-5A-R]',
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_simple_5() {
@@ -655,7 +655,7 @@ class qtype_preg_cross_tests_from_preg {
 
         return array('regex'=>'[A-Z0-5 ]+\b[0-5A-R ]+',
                      'tests'=>array($test1, /*$test2,*/ $test3),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_simple_6() {
@@ -677,7 +677,7 @@ class qtype_preg_cross_tests_from_preg {
 
         return array('regex'=>'abc$',
                      'tests'=>array($test1, $test2),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_simple_7() {
@@ -699,7 +699,7 @@ class qtype_preg_cross_tests_from_preg {
 
         return array('regex'=>'a|(b$)c',
                      'tests'=>array($test1, $test2),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_simple_7_1() {
@@ -721,7 +721,7 @@ class qtype_preg_cross_tests_from_preg {
 
         return array('regex'=>'a\Z[c\n]',
                      'tests'=>array($test1, $test2),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_simple_8() {
@@ -735,7 +735,7 @@ class qtype_preg_cross_tests_from_preg {
 
         return array('regex'=>'$abca',
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_simple_9() {
@@ -749,7 +749,7 @@ class qtype_preg_cross_tests_from_preg {
 
         return array('regex'=>'abc^',
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_simple_10() {
@@ -767,7 +767,7 @@ class qtype_preg_cross_tests_from_preg {
 
         return array('regex'=>'a|(^)c',
                      'tests'=>array($test1, $test2),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_simple_11() {
@@ -779,7 +779,7 @@ class qtype_preg_cross_tests_from_preg {
 
         return array('regex'=>'^abca',
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_simple_12() {
@@ -799,7 +799,7 @@ class qtype_preg_cross_tests_from_preg {
 
         return array('regex'=>'^ab',
                      'tests'=>array($test1, $test2),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_DFA));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_DFA, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_simple_13() {
@@ -821,7 +821,7 @@ class qtype_preg_cross_tests_from_preg {
 
         return array('regex'=>'ab$',
                      'tests'=>array($test1, $test2),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_DFA));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_DFA, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_simple_14() {
@@ -851,7 +851,7 @@ class qtype_preg_cross_tests_from_preg {
 
         return array('regex'=>'^ab$',
                      'tests'=>array($test1, $test2, $test3),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_DFA));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_DFA, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     /*function data_for_test_assertions_simple_15() {
