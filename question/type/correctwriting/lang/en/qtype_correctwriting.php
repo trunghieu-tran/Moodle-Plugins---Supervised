@@ -49,6 +49,8 @@ $string['langid_help'] = 'This language will be used to tokenize answers and res
 $string['lexemedescriptions'] = 'Descriptions for the tokens';
 $string['lexical_analyzer'] = 'Typo analysis';
 $string['lexical_analyzer_help'] = 'Typo analysis assumes, that student can have mistakes inside of tokens. Turn it off if any mistakes inside of lexemes should be treated other lexemes';
+$string['lexicalanalyzerlistsettingname'] = 'Lists of tokens for determining special mistakes, when correcting lexical mistakes is performed';
+$string['lexicalanalyzerlistsettingdescription'] = 'Some lexemes should be processed by special rules, when performing correcting lexical mistakes. Set this list, if some tokens require this.';
 $string['lexicalerrorthreshold'] = 'Lexical error threshold';
 $string['lexicalerrorthreshold_help'] = 'A maximum <a href = "http://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance">Damerau-Levenshtein distance</a> between correct and incorrect words for incorrect word to be considered a typo. Enter it as a fraction of the length of the correct word.';
 $string['lexicalerrorweight'] = 'Penalty for lexical mistake';
