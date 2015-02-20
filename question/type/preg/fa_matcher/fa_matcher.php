@@ -628,7 +628,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                                 }
                             }
 
-                            if (!$skip && $recursionlevel === 0 && $newstate->is_full()) {
+                            if (!$skip && $newstate->recursion_level() === 0 && $newstate->is_full()) {
                                 $fullmatches[] = $newstate;
                             }
                         }
