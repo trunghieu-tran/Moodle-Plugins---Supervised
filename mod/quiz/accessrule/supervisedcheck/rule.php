@@ -175,6 +175,7 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
                 $rule->supervisedmode       = $quiz->supervisedmode; // ...must be 2.
                 $DB->update_record('quizaccess_supervisedcheck', $rule);
             }
+            $oldrulesids = array();
             // Delete any remaining old rules.
             if(!empty($oldrules)) {
                 foreach ($oldrules as $oldrule) {
@@ -198,6 +199,7 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
             $rule->lessontypeid         = -1;
             $rule->supervisedmode       = $quiz->supervisedmode;   // ...0 or 1.
             $DB->update_record('quizaccess_supervisedcheck', $rule);
+            $oldrulesids = array();
             // Delete any remaining old rules.
             if(!empty($oldrules)) {
                 foreach ($oldrules as $oldrule) {
