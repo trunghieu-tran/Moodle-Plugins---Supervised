@@ -214,7 +214,7 @@ class qtype_preg_fa_stack_item {
             for ($i = $count - 1; $i > 0; $i--) {
                 $penult = $repetitions[$i - 1];
                 $last = $repetitions[$i];
-                if (qtype_preg_fa_exec_state::is_completely_captured($last[0], $last[1]) && $penult === $last) {
+                if ($penult === $last) {
                     return true;
                 }
             }
@@ -371,10 +371,10 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
      * @param subpatt - subpattern number.
      * @param wholestack - should we scan the whole stack, or just the top item.
      */
-    protected function current_match($subpatt, $wholestack = false) {
-        $array = $wholestack
+    protected function current_match($subpatt/*, $wholestack = false*/) {
+        $array = /*$wholestack
                ? array_reverse($this->stack)
-               : array(end($this->stack));
+               :*/ array(end($this->stack));
         foreach ($array as $item) {
             $tmp = $item->current_match($subpatt);
             if ($tmp !== null) {
@@ -399,9 +399,9 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
      * @param subpatt - subpattern number.
      * @param wholestack - should we scan the whole stack, or just the top item.
      */
-    protected function last_match($subpatt, $wholestack = false) {
+    protected function last_match($subpatt/*, $wholestack = false*/) {
         if ($this->matcher->get_options()->mode === qtype_preg_handling_options::MODE_POSIX) {
-            $result = $this->current_match($subpatt, $wholestack);
+            $result = $this->current_match($subpatt/*, $wholestack*/);
             if ($result === null) {
                 return null;
             }
@@ -409,9 +409,9 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
                                                                    : $result;
         }
 
-        $array = $wholestack
+        $array =/* $wholestack
                ? array_reverse($this->stack)
-               : array(end($this->stack));
+               :*/ array(end($this->stack));
 
         $hasattempts = false;
 
@@ -468,6 +468,12 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
 
     public function is_subexpr_captured($subexpr = 0) {
         $last = $this->last_subexpr_match($subexpr);
+        return $last !== null && self::is_completely_captured($last[0], $last[1]);
+    }
+
+    public function is_subexpr_captured_top($subexpr = 0) {
+        $end = end($this->stack);
+        $last = $end->last_subexpr_match($this->matcher->get_options()->mode, $subexpr);
         return $last !== null && self::is_completely_captured($last[0], $last[1]);
     }
 
@@ -541,8 +547,12 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
      * Checks if this state contains null iterations, for example \b*. Such states should be skipped during matching.
      */
     public function has_null_iterations() {
-        $end = end($this->stack);
-        return $end->has_null_iterations();
+        foreach ($this->stack as $stackitem) {
+            if ($stackitem->has_null_iterations()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
