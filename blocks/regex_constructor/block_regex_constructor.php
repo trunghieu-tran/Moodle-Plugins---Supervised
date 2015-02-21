@@ -81,6 +81,11 @@ class block_regex_constructor extends block_base {
             $CFG->wwwroot,
             'TODO - poasquestion_text_and_button_objname',  // 'M.poasquestion_text_and_button' ?
         );
+        $this->page->requires->yui_module('moodle-form-shortforms',
+        'M.form.shortforms',
+        array(
+            array("formid"=>"mformauthoring")
+        ));
         $this->page->requires->js_init_call('M.preg_authoring_tools_script.init', $pregjsargs, true, $pregjsmodule);
 
         return $this->content;
