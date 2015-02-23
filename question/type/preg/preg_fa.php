@@ -426,15 +426,15 @@ class qtype_preg_fa_transition {
             $label = $before->pregleaf->leaf_tohr();
             $lab .= $open . ' ' . $label . ' ' . $close;
             $lab .= '(' . $before->from . ',' . $before->to . ')';
-            $lab .= "\n";
+            $lab .= '<BR/>';
         }
         $open = $this->tags_before_transition();
         $close = $this->tags_after_transition();
         $label = $this->pregleaf->leaf_tohr();
-        $lab .= $open . ' ' . $label . ' ' . $close;
+        $lab .= '<B>' . $open . ' ' . $label . ' ' . $close . '</B>';
 
         foreach ($this->mergedafter as $after) {
-            $lab .= "\n";
+            $lab .= '<BR/>';
             $open = $after->tags_before_transition();
             $close = $after->tags_after_transition();
             $label = $after->pregleaf->leaf_tohr();
@@ -444,7 +444,7 @@ class qtype_preg_fa_transition {
 
         $lab = str_replace('\\', '\\\\', $lab);
         $lab = str_replace('"', '\"', $lab);
-        $lab = '"' . $lab . '"';
+        $lab = '<' . $lab . '>';
 
         $thickness = 2;
         if ($this->greediness == self::GREED_LAZY) {
