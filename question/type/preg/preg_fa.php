@@ -814,6 +814,10 @@ class qtype_preg_fa {
             $innertransitions = array();
             foreach ($innerclosure as $state) {
                 $innertransitions = array_merge($innertransitions, $this->get_adjacent_transitions($state, false));
+
+                // Crutch: logically, we do not need outer transitions of the start state, but when FA transformation is on,
+                // this leads to lack of backtrack states because of merged transitions
+                $innertransitions = array_merge($innertransitions, $this->get_adjacent_transitions($state, true));
             }
             // Get quantifier's end state's outer epsilon closure
             $outerclosure = array();
@@ -823,6 +827,10 @@ class qtype_preg_fa {
             $outertransitions = array();
             foreach ($outerclosure as $state) {
                 $outertransitions = array_merge($outertransitions, $this->get_adjacent_transitions($state, true));
+
+                // Crutch: logically, we do not need inner transitions of the end state, but when FA transformation is on,
+                // this leads to lack of backtrack states because of merged transitions
+                $outertransitions = array_merge($outertransitions, $this->get_adjacent_transitions($state, false));
             }
             // Check for intersections.
             $add = false;
