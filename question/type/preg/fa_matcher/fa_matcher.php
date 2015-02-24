@@ -151,8 +151,11 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
         foreach ($transitions as $tr) {
 
+            //echo "lookin at $tr\n";
+
             // One more crutch. Are there merged transitions?
-            if (count($transitions) > 1) {
+            if (count($transitions) > 1 && $tr !== $transition) {
+                //echo "inside if\n";
                 $is_assert = $tr->pregleaf->type === qtype_preg_node::TYPE_LEAF_ASSERT;
                 $affects_generation = $is_assert && ($tr->pregleaf->is_start_anchor() || $tr->pregleaf->is_end_anchor());
 
@@ -160,15 +163,17 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 // Otherwise, we should call next_character here.
                 if ($affects_generation) {
                     $this->after_transition_passed($newstate, $tr, $curpos, 0);
+                    //echo "continue\n";
                     continue;
                 }
             }
 
             list($flag, $newchr) = $tr->next_character($str, $newstate->str, $curpos, 0, $newstate);
             if ($flag === qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE) {
+                //echo "return null\n";
                 return null;
             }
-            //echo "lookin at $transition: $flag '$newchr'\n";
+            //echo "generated: $flag '$newchr'\n";
 
             $length = 0;
 
