@@ -147,12 +147,23 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
      */
     protected function generate_char_by_transition($curstate, $transition, $str, $curpos) {
         $newstate = clone $curstate;
-        $transitions = array_merge(/*$transition->mergedbefore,*/ array($transition)/*, $transition->mergedafter*/);
+        $transitions = array_merge($transition->mergedbefore, array($transition), $transition->mergedafter);
 
-        foreach ($transition->mergedbefore as $tr) {
-            $this->after_transition_passed($newstate, $tr, $curpos, 0);
-        }
         foreach ($transitions as $tr) {
+
+            // One more crutch. Are there merged transitions?
+            if (count($transitions) > 1) {
+                $is_assert = $tr->pregleaf->type === qtype_preg_node::TYPE_LEAF_ASSERT;
+                $affects_generation = $is_assert && ($tr->pregleaf->is_start_anchor() || $tr->pregleaf->is_end_anchor());
+
+                // If this is is an anchor, everything is handled in the main transition.
+                // Otherwise, we should call next_character here.
+                if ($affects_generation) {
+                    $this->after_transition_passed($newstate, $tr, $curpos, 0);
+                    continue;
+                }
+            }
+
             list($flag, $newchr) = $tr->next_character($str, $newstate->str, $curpos, 0, $newstate);
             if ($flag === qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE) {
                 return null;
@@ -162,7 +173,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             $length = 0;
 
             // TODO: ^ and \A
-
 
             if (is_object($newchr) && $newchr->length() > 0) {
                 // If we had to end the generation, but generated something, cut out this path
