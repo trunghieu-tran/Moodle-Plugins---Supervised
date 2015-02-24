@@ -30,9 +30,27 @@ require_once($CFG->dirroot.'/question/type/correctwriting/response_mistakes.php'
 // A marker class to indicate errors from lexical analyzer. We need them to indicate
 // what lexemes was corrected by analyzer.
 class qtype_correctwriting_lexical_mistake extends qtype_correctwriting_response_mistake {
-
+    /*! A pair of tokens, linked with lexeical mistake
+        @var block_formal_langs_token_pair
+     */
+    public $tokenpair;
+    
+    /*! Mistakekey
+        @var string
+    */
+    public $str;
+    
     public function mistake_key() {
-        return '';//TODO - implement actually
+        return $this->str;//TODO - implement actually
+    }
+    
+    public function supported_hints() {
+        return array('whatis');
+    }
+    
+    public function __construct($tokenpair){
+        $this->tokenpair = $tokenpair;
+        $this->str='typo_'.$this->tokenpair->correcttokens[0];
     }
 }
 
