@@ -486,24 +486,8 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                     continue;
                 }
 
-                // Get matcher for the regex.
-                $timestart = round(microtime(true) * 1000);
-                $options->mode = in_array(self::TAG_MODE_POSIX, $regextags) ? qtype_preg_handling_options::MODE_POSIX : qtype_preg_handling_options::MODE_PCRE;
-                $options->modifiers = qtype_preg_handling_options::string_to_modifiers($modifiersstr);
-                $options->debugmode = in_array(self::TAG_DEBUG_MODE, $regextags);
-                $options->mergeassertions = in_array(self::TAG_FAIL_MODE_MERGE, $regextags);
-                $options->extensionneeded = !in_array(self::TAG_DONT_CHECK_PARTIAL, $regextags);
-                $matcher = $this->get_matcher($this->engine_name(), $regex, $options);
-                $timeend = round(microtime(true) * 1000);
-                if ($timeend - $timestart > self::MAX_BUILDING_TIME) {
-                    $slowbuildtests[] = $classname . ' : ' . $methodname;
-                }
-
-                // Skip to the next regex if there's something wrong.
-                if ($this->check_for_errors($matcher)) {
-                    $skipcount += count($data['tests']);
-                    continue;
-                }
+                $matcher_merged = null;
+                $matcher_unmerged = null;
 
                 // Iterate over all tests.
                 foreach ($data['tests'] as $expected) {
@@ -519,6 +503,36 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                     if (count(array_intersect($blacklist, $tags)) > 0) {
                         continue;
                     }
+
+                    // Lazy matcher building.
+                    $merge = in_array(self::TAG_FAIL_MODE_MERGE, $tags);
+                    if (($merge && $matcher_merged === null) || (!$merge && $matcher_unmerged === null)) {
+                        $timestart = round(microtime(true) * 1000);
+                        $options->mode = in_array(self::TAG_MODE_POSIX, $regextags) ? qtype_preg_handling_options::MODE_POSIX : qtype_preg_handling_options::MODE_PCRE;
+                        $options->modifiers = qtype_preg_handling_options::string_to_modifiers($modifiersstr);
+                        $options->debugmode = in_array(self::TAG_DEBUG_MODE, $regextags);
+                        $options->mergeassertions = $merge;
+                        $options->extensionneeded = !in_array(self::TAG_DONT_CHECK_PARTIAL, $regextags);
+                        $tmpmatcher = $this->get_matcher($this->engine_name(), $regex, $options);
+                        $timeend = round(microtime(true) * 1000);
+                        if ($timeend - $timestart > self::MAX_BUILDING_TIME) {
+                            $slowbuildtests[] = $classname . ' : ' . $methodname;
+                        }
+
+                        // Move to the next test if there's something wrong.
+                        if ($this->check_for_errors($tmpmatcher)) {
+                            $skipcount += count($data['tests']);
+                            continue;
+                        }
+
+                        if ($merge) {
+                            $matcher_merged = $tmpmatcher;
+                        } else {
+                            $matcher_unmerged = $tmpmatcher;
+                        }
+                    }
+
+                    $matcher = $merge ? $matcher_merged : $matcher_unmerged;
 
                     // There can be exceptions during matching.
                     $timestart = round(microtime(true) * 1000);
