@@ -519,16 +519,16 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                             $slowbuildtests[] = $classname . ' : ' . $methodname;
                         }
 
-                        // Move to the next test if there's something wrong.
-                        if ($this->check_for_errors($tmpmatcher)) {
-                            $skipcount += count($data['tests']);
-                            continue;
-                        }
-
                         if ($merge) {
                             $matcher_merged = $tmpmatcher;
                         } else {
                             $matcher_unmerged = $tmpmatcher;
+                        }
+
+                        // Move to the next test if there's something wrong.
+                        if ($this->check_for_errors($tmpmatcher)) {
+                            $skipcount += count($data['tests']);
+                            continue;
                         }
                     }
 
