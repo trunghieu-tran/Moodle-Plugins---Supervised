@@ -2158,7 +2158,7 @@ class qtype_preg_cross_tests_from_preg_merging {
                         'length'=>array(0=>2, 1=>1));
 
         $test2 = array( 'str'=>"ab",
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),

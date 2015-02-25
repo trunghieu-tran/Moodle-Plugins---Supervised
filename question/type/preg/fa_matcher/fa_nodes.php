@@ -29,6 +29,7 @@ global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_fa.php');
+require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 
 /**
  * Abstract class for both nodes (operators) and leafs (operands).
@@ -154,6 +155,13 @@ abstract class qtype_preg_fa_node {
         $clonetransitions = array();
         $tagsets = array();
         $oppositetransitions = array();
+        $intersection = null;
+        $flag = new qtype_preg_charset_flag();
+        $flag->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string("\n"));
+        $charset = new qtype_preg_leaf_charset();
+        $charset->flags = array(array($flag));
+        $charset->userinscription = array(new qtype_preg_userinscription("\n"));
+        $righttran = new qtype_preg_fa_transition(0, $charset, 1);
         $outtransitions = $automaton->get_adjacent_transitions($del->to, true);
         // Cycled last states.
 
@@ -227,6 +235,9 @@ abstract class qtype_preg_fa_node {
                         $tran->mergedafter = array_merge($merged, $tran->mergedafter);
                     }
                 } else if ($del->is_unmerged_assert() && $del->is_start_anchor() || ($del->is_eps() && in_array($del->to, $endstates))) {
+                    if ($del->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
+
+                    }
                     $tran->mergedafter = array_merge($tran->mergedafter, $merged);
                 } else {
                     $tran->mergedbefore = array_merge($merged, $tran->mergedbefore);
@@ -241,16 +252,32 @@ abstract class qtype_preg_fa_node {
         if (count($transitions) != 0 ) {
             if (!($del->is_unmerged_assert() && $del->pregleaf->is_start_anchor()) && !($del->is_eps() && in_array($del->to, $endstates))) {
                 foreach ($clonetransitions as &$tran) {
-                    $tran->from = $del->from;
-                    $tran->redirect_merged_transitions();
-                    $automaton->add_transition($tran);
+                    if ($del->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR && !$tran->is_unmerged_assert()) {
+                        $intersection = $tran->intersect($righttran);
+                        if ($intersection !== null) {
+                            $tran->pregleaf = $intersection->pregleaf;
+                        }
+                    }
+                    if ($intersection !== null || $del->pregleaf->subtype != qtype_preg_leaf_assert::SUBTYPE_DOLLAR || $tran->is_unmerged_assert()) {
+                        $tran->from = $del->from;
+                        $tran->redirect_merged_transitions();
+                        $automaton->add_transition($tran);
+                    }
+
                 }
             } else {
                 foreach ($clonetransitions as &$tran) {
-                    $tran->to = $del->to;
-                    $tran->redirect_merged_transitions();
-                    $automaton->add_transition($tran);
-
+                    if ($del->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX && !$tran->is_unmerged_assert()) {
+                        $intersection = $tran->intersect($righttran);
+                        if ($intersection !== null) {
+                            $tran->pregleaf = $intersection->pregleaf;
+                        }
+                    }
+                    if ($intersection !== null || $del->pregleaf->subtype != qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX || $tran->is_unmerged_assert()) {
+                        $tran->to = $del->to;
+                        $tran->redirect_merged_transitions();
+                        $automaton->add_transition($tran);
+                    }
                 }
             }
             if (!($del->is_end_anchor() && in_array($del->to, $endstates)) && !($transition->from == $transition->to && ($transition->is_unmerged_assert() || $transition->is_eps()))) {
