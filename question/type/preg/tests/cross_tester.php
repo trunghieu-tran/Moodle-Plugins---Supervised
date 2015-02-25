@@ -524,15 +524,15 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
                         } else {
                             $matcher_unmerged = $tmpmatcher;
                         }
-
-                        // Move to the next test if there's something wrong.
-                        if ($this->check_for_errors($tmpmatcher)) {
-                            $skipcount += count($data['tests']);
-                            continue;
-                        }
                     }
 
                     $matcher = $merge ? $matcher_merged : $matcher_unmerged;
+
+                    // Move to the next test if there's something wrong.
+                    if ($matcher === null || $this->check_for_errors($matcher)) {
+                        ++$skipcount;
+                        continue;
+                    }
 
                     // There can be exceptions during matching.
                     $timestart = round(microtime(true) * 1000);
