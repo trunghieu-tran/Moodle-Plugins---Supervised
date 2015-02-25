@@ -2468,13 +2468,13 @@ class qtype_preg_cross_tests_from_pcre {
                         'next'=>'[^a]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
-        $test7 = array( 'str'=>"b\bc",
+        $test7 = array( 'str'=>"b" . chr(8) . "c",
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0,1=>0,2=>1,3=>2),
-                        'length'=>array(0=>4,1=>1,2=>1,3=>0),
-                        'left'=>array(1),
-                        'next'=>'[^\d]',
+                        'index_first'=>array(0=>0,1=>0),
+                        'length'=>array(0=>1,1=>1),
+                        'left'=>array(4),
+                        'next'=>'[^\b]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test8 = array( 'str'=>'baccd',
