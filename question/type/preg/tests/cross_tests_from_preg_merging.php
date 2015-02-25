@@ -2021,7 +2021,7 @@ class qtype_preg_cross_tests_from_preg_merging {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0, 1=>1),
-                        'length'=>array(0=>1, 1=>1),
+                        'length'=>array(0=>2, 1=>1),
                         'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
@@ -2190,8 +2190,8 @@ class qtype_preg_cross_tests_from_preg_merging {
         $test3 = array( 'str'=>"ab",
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>1),
+                        'index_first'=>array(0=>0,1=>0),
+                        'length'=>array(0=>1,1=>1),
                         'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
