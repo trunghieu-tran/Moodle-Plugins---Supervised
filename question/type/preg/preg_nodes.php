@@ -761,8 +761,6 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
     public $flags = null;   // array(array());
     /** A range is a pair of integers, ranges are 3-dimensional array of integers or 2-dimensional array of pairs. */
     protected $ranges = array();
-    /** Array of assertion flags (it's impossible to calculate an assertion as a range), each asserts[i] is an array of 0/1/2 asserts as flags; for ranges[i]. */
-    protected $asserts = array();
 
     protected $cachedranges = null;
 

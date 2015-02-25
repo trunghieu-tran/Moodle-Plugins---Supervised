@@ -451,6 +451,8 @@ abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
         $options = new qtype_preg_matching_options();  // Forced subexpression catupring.
         $blacklist = array_merge($this->blacklist_tags(), $this->blacklist);
 
+        echo "\n";
+
         foreach ($this->testdataobjects as $testdataobj) {
             $testmethods = get_class_methods($testdataobj);
             $classname = get_class($testdataobj);
