@@ -125,6 +125,9 @@ class qtype_preg_fa_transition {
         }
     }
 
+    /**
+     * Generates a character considering merged transitions that affect the resulting char (^ \A $ \Z \z)
+     */
     public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
 
         if ($this->pregleaf->type != qtype_preg_node::TYPE_LEAF_CHARSET) {
@@ -143,35 +146,26 @@ class qtype_preg_fa_transition {
         $circumflex = array('before' => false, 'after' => false);
         $dollar = array('before' => false, 'after' => false);
         $capz = array('before' => false, 'after' => false);
-        $condassert = array('before' => false, 'after' => false);
-        $thecondassert = null;
-        $key = 'before';
-        $epscount = 0;
 
+        $key = 'before';
         foreach (array($this->mergedbefore, $this->mergedafter) as $assertions) {
             foreach ($assertions as $assertion) {
-                if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z) {
+                switch ($assertion->pregleaf->subtype) {
+                case qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z:
                     return array(qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, null);
-                }
-                if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_ESC_A) {
+                case qtype_preg_leaf_assert::SUBTYPE_ESC_A:
                     return array(qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, null);
-                }
-                if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
+                case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
                     $circumflex[$key] = true;
-                }
-                else if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR) {
+                    break;
+                case qtype_preg_leaf_assert::SUBTYPE_DOLLAR:
                     $dollar[$key] = true;
-                }
-                else if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z) {
+                    break;
+                case qtype_preg_leaf_assert::SUBTYPE_CAPITAL_ESC_Z:
                     $capz[$key] = true;
-                }
-                else if ($assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_SUBEXPR ||
-                         $assertion->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_RECURSION) {
-                    $condassert[$key] = true;
-                    $thecondassert = $assertion;
-                }
-                else if ($assertion->pregleaf->subtype = qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
-                    $epscount++;
+                    break;
+                default:
+                    break;
                 }
             }
             $key = 'after';
@@ -216,14 +210,6 @@ class qtype_preg_fa_transition {
             if (!empty($tmp)) {
                 $result_ranges = $tmp;
                 break;
-            }
-        }
-
-        // Here result_ranges is guaranteed to be non-empty
-        if ($condassert['before']) {
-            list($flag, $ch) = $thecondassert->next_character($originalstr, $newstr, $pos, $length, $matcherstateobj);
-            if ($flag != qtype_preg_leaf::NEXT_CHAR_OK) {
-                return array(qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, null);
             }
         }
 
