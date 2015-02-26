@@ -27,9 +27,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 
-$plugin->version   = 2014022202;                    // The current module version (Date: YYYYMMDDXX)
-$plugin->requires  = 2013110500;                    // Requires this Moodle version
+$plugin->version   = 2015022700;                    // The current module version (Date: YYYYMMDDXX)
+$plugin->requires  = 2014111000;                    // Requires this Moodle version
 $plugin->component = 'quizaccess_supervisedcheck';  // Full name of the plugin (used for diagnostics).
-$plugin->dependencies = array('block_supervised' => 2014022201);
-$plugin->release    = 'Supervised check quiz access rule 2.6';
+$plugin->dependencies = array('block_supervised' => 2015022700);
+$plugin->release    = 'Supervised check quiz access rule 2.8';
 $plugin->maturity   = MATURITY_STABLE;
