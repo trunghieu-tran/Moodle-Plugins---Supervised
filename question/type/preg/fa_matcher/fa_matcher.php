@@ -1011,6 +1011,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 $result->remove_unreachable_states();
             }
 
+            if (empty($result->adjacencymatrix)) {
+                throw new qtype_preg_automaton_empty('');
+            }
             /*global $CFG;
             $CFG->pathtodot = '/usr/bin/dot';
             $namesuffix = $mergeassertions ? "merged" : "original";
