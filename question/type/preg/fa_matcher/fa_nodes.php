@@ -235,9 +235,6 @@ abstract class qtype_preg_fa_node {
                         $tran->mergedafter = array_merge($merged, $tran->mergedafter);
                     }
                 } else if ($del->is_unmerged_assert() && $del->is_start_anchor() || ($del->is_eps() && in_array($del->to, $endstates))) {
-                    if ($del->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX) {
-
-                    }
                     $tran->mergedafter = array_merge($tran->mergedafter, $merged);
                 } else {
                     $tran->mergedbefore = array_merge($merged, $tran->mergedbefore);
