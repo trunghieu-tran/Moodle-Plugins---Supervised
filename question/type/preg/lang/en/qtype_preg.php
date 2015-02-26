@@ -44,7 +44,6 @@ $string['hintnextchar'] = 'next correct character';
 $string['hintnextlexem'] = 'next correct {$a}';
 $string['langselect'] = 'Language';
 $string['langselect_help'] = 'For next lexem hint you should choose a language, which is used to break answers down to lexemes. Each language has it own rules for lexemes. Languages are defined using \'Formal languages block\'';
-$string['largefa'] = 'Too large finite automaton';
 $string['lexemusername'] = 'Student-visible name for lexem';
 $string['lexemusername_help'] = 'Your students probably won\'t know that an atomic part of the language they learn is called <b>lexem</b>. They may prefer to call it "word" or "number" or something. You may define a name for lexem that would be shown on the "Hint next lexem" button there.';
 $string['maxerrorsshowndescription'] = 'Maximum number of errors shown for each regular expression in the question editing form';
@@ -215,6 +214,7 @@ $string['fa_transition_limit_description'] = 'Max number of transitions in FA. T
 $string['fa_recursion_limit'] = 'Recursion limit';
 $string['fa_recursion_limit_description'] = 'Max recursion level when matching patterns with (?R) using the FA engine. Tunes time and memory limits and prevents from indefinite recursive loops.';
 $string['too_large_fa'] = 'Regular expression is too complex to be matched by {$a->engine} due to the time and/or memory limits. Please try another matching engine, ask your administrator to <a href="{$a->link}">increase time and memory limits</a> or simplify you regular expression.';
+$string['empty_fa'] = 'No string can be matched by this regular expression (finite automaton is empty).';
 
 /********** Strings for authoring tools form**********************/
 $string['authoring_form_page_header'] = 'Regex constructor';

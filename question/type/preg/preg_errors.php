@@ -135,3 +135,18 @@ class qtype_preg_too_complex_error extends qtype_preg_error {
         parent::__construct($errormsg, $regex, $position);
     }
 }
+
+class qtype_preg_empty_fa_error extends qtype_preg_error {
+
+    public function __construct($regex, $position = null) {
+        global $CFG;
+
+        if ($position === null) {
+            $position = new qtype_preg_position(0, core_text::strlen($regex) - 1, -1, -1, -1, -1);  // TODO
+        }
+
+        $errormsg = get_string('empty_fa', 'qtype_preg');
+
+        parent::__construct($errormsg, $regex, $position);
+    }
+}

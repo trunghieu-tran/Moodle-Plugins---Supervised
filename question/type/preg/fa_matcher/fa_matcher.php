@@ -1000,28 +1000,24 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
         //$mergeassertions = true;
 
-        // The create_automaton() can throw an exception in case of too large finite automaton.
-        //try {
-            $stack = array();
-            $this->dstroot->create_automaton($result, $stack, $mergeassertions);
-            $body = array_pop($stack);
-            $result->calculate_subexpr_start_and_end_states();
+        $stack = array();
+        $this->dstroot->create_automaton($result, $stack, $mergeassertions);
+        $body = array_pop($stack);
+        $result->calculate_subexpr_start_and_end_states();
 
-            if ($mergeassertions) {
-                $result->remove_unreachable_states();
-            }
+        if ($mergeassertions) {
+            $result->remove_unreachable_states();
+        }
 
-            if (empty($result->adjacencymatrix)) {
-                throw new qtype_preg_automaton_empty('');
-            }
-            /*global $CFG;
-            $CFG->pathtodot = '/usr/bin/dot';
-            $namesuffix = $mergeassertions ? "merged" : "original";
-            $result->fa_to_dot('svg', "/home/user/fa_$namesuffix.svg");*/
+        if (empty($result->adjacencymatrix)) {
+            throw new qtype_preg_empty_fa_exception('');
+        }
 
-        //} catch (Exception $e) {
-          //  $result = null;
-        //}
+        /*global $CFG;
+        $CFG->pathtodot = '/usr/bin/dot';
+        $namesuffix = $mergeassertions ? "merged" : "original";
+        $result->fa_to_dot('svg', "/home/user/fa_$namesuffix.svg");*/
+
         return $result;
     }
 
@@ -1064,9 +1060,13 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             return;
         }
 
-        $this->automaton = self::build_fa($this->options->mergeassertions);
-        if ($this->automaton === null) {
+        try {
+            $this->automaton = self::build_fa($this->options->mergeassertions);
+        } catch (qtype_preg_toolargefa_exception $e) {
             $this->errors[] = new qtype_preg_too_complex_error($regex, $this);
+            return;
+        } catch (qtype_preg_empty_fa_exception $e) {
+            $this->errors[] = new qtype_preg_empty_fa_error($regex);
             return;
         }
 
