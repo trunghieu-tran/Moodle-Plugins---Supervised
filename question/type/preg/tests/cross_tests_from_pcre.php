@@ -5358,9 +5358,36 @@ class qtype_preg_cross_tests_from_pcre {
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
+        $test4 = array( 'str'=>'*** Failers',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        $test5 = array( 'str'=>'A]C',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        $test6 = array( 'str'=>'B',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
+                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
         return array('regex'=>'$b',
                      'modifiers'=>'i',
-                     'tests'=>array($test1, $test2, $test3));
+                     'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
     }
 
     function data_for_test_432() {
