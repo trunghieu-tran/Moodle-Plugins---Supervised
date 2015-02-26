@@ -57,6 +57,15 @@ class qtype_preg_toolargefa_exception extends qtype_preg_exception {
 }
 
 /**
+ * Class for exceptions caused by empty automaton which can be after merging.
+ */
+class qtype_preg_empty_fa_exception extends qtype_preg_exception {
+    public function __construct($errorcode, $a = null, $debuginfo = null) {
+        parent::__construct($errorcode, $a, $debuginfo);
+    }
+}
+
+/**
  * Class for exceptions caused by empty pathtodot option.
  */
 class qtype_preg_pathtodot_empty extends qtype_preg_exception {
@@ -82,13 +91,3 @@ class qtype_preg_dot_error extends qtype_preg_exception {
         parent::__construct($errorcode, $a, $debuginfo);
     }
 }
-
-/**
- * Class for exceptions caused by empty automota which can be after merging/
- */
-class qtype_preg_automaton_empty extends qtype_preg_exception {
-    public function __construct($errorcode, $a = null, $debuginfo = null) {
-        parent::__construct($errorcode, $a, $debuginfo);
-    }
-}
-
