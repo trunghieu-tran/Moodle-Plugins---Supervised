@@ -211,8 +211,8 @@ $string['fa_state_limit'] = 'Automata size limit: states';
 $string['fa_state_limit_description'] = 'Max number of states in FA. Tunes time and memory limits for the FA engine when matching complex regexes.';
 $string['fa_transition_limit'] = 'Automata size limit: transitions';
 $string['fa_transition_limit_description'] = 'Max number of transitions in FA. Tunes time and memory limits for the FA engine when matching complex regexes.';
-$string['fa_recursion_limit'] = 'Recursion limit';
-$string['fa_recursion_limit_description'] = 'Max recursion level when matching patterns with (?R) using the FA engine. Tunes time and memory limits and prevents from indefinite recursive loops.';
+$string['fa_simulation_state_limit'] = 'Automata simulation limit: states';
+$string['fa_simulation_state_limit_description'] = 'When matching a string with a regex containing backreferences or recurion, one FA state can be reached using different paths. This means that there are several "simulation states" created for one "structural state". This settings lets you control the overall count of such simulation states.';
 $string['too_large_fa'] = 'Regular expression is too complex to be matched by {$a->engine} due to the time and/or memory limits. Please try another matching engine, ask your administrator to <a href="{$a->link}">increase time and memory limits</a> or simplify you regular expression.';
 $string['empty_fa'] = 'No string can be matched by this regular expression (finite automaton is empty).';
 
