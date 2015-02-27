@@ -677,6 +677,22 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         return $result;
     }
 
+    protected static function create_index($recursionlevel, $statenumber) {
+        $result = new stdClass();
+        $result->recursionlevel = $recursionlevel;
+        $result->state = $statenumber;
+        return $result;
+    }
+
+    protected static function ensure_index_exists(&$states, $recursionlevel, $statenumber) {
+        if (!isset($states[$recursionlevel])) {
+            $states[$recursionlevel] = array();
+        }
+        if (!isset($states[$recursionlevel][$statenumber])) {
+            $states[$recursionlevel][$statenumber] = null;
+        }
+    }
+
     /**
      * This method should be used if there are no backreferences in the regex.
      * Returns array of all possible matches.
@@ -687,10 +703,10 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                            ? $CFG->qtype_preg_fa_recursion_limit
                            : 1000;
 
-        $states = array();           // Objects of qtype_preg_fa_exec_state.
-        $curstates = array();        // Numbers of states which the automaton is in at the current wave front.
-        $lazystates = array();       // States (objects!) reached lazily.
-        $partialmatches = array();   // Possible partial matches.
+        $states = array('0' => array()); // Objects of qtype_preg_fa_exec_state. First dimension is recursion level, second is state number.
+        $curstates = array();          // Indexes of states which the automaton is in at the current wave front. Use stdClass with "recursionlevel" and "state" fields.
+        $lazystates = array();         // States (objects!) reached lazily.
+        $partialmatches = array();     // Possible partial matches.
 
         $startstates = $this->automaton->start_states(0);
 
@@ -698,35 +714,39 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
         // Create an array of processing states for all fa states (the only initial state, other states are null yet).
         foreach ($this->automaton->get_states() as $curstate) {
-            $states[$curstate] = in_array($curstate, $startstates)
-                               ? $this->create_initial_state($curstate, $str, $startpos)
-                               : null;
+            $states['0'][$curstate] = array();
+            $states['0'][$curstate] = in_array($curstate, $startstates)
+                                  ? $this->create_initial_state($curstate, $str, $startpos)
+                                  : null;
         }
 
+        $reached = array();
+
         // Get an epsilon-closure of the initial state.
-        foreach ($states as $state) {
+        foreach ($states['0'] as $state) {
             if ($state !== null) {
-                $curstates[] = $state;
+                $reached[] = $state;
             }
         }
 
-        $closure = $this->epsilon_closure($curstates, $str);
-        $lazystates = array_merge($lazystates, $closure[qtype_preg_fa_transition::GREED_LAZY]);
+        $closure = $this->epsilon_closure($reached, $str);
+        $lazystates = $closure[qtype_preg_fa_transition::GREED_LAZY];
         $closure = $closure[qtype_preg_fa_transition::GREED_GREEDY];
-        $curstates = array();
-        foreach ($closure as $curclosure) {
-            $states[$curclosure->state()] = $curclosure;
-            $curstates[] = $curclosure->state();
-            $endstatereached = $endstatereached || $curclosure->is_full();
+
+        foreach ($closure as $state) {
+            $states['0'][$state->state()] = $state;
+            $curstates[] = self::create_index('0', $state->state());
+            $endstatereached = $endstatereached || $state->is_full();
         }
 
         // Do search.
         while (!empty($curstates)) {
-            $reached = array();
+            $reached = array(); // $reached uses stdClass with "recursionlevel" and "state" fields as well
             // We'll replace curstates with reached by the end of this loop.
             while (!empty($curstates)) {
                 // Get the current state and iterate over all transitions.
-                $curstate = $states[array_pop($curstates)];
+                $index = array_pop($curstates);
+                $curstate = $states[$index->recursionlevel][$index->state];
                 $curpos = $startpos + $curstate->length;
                 $cursubexpr = $curstate->subexpr();
                 $recursionlevel = $curstate->recursion_level();
@@ -756,8 +776,11 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                             foreach ($startstates as $state) {
                                 $newnewstate = clone $newstate;
                                 $newnewstate->stack[] = $this->create_fa_exec_stack_item($transition->pregleaf->number, $state, $curpos);
-                                if (!isset($reached[$state]) || $newnewstate->leftmost_longest($reached[$state])) {  // $reached contains a worse state
-                                    $reached[$state] = $newnewstate;
+                                $index = self::create_index($newnewstate->recursive_calls_sequence(), $newnewstate->state());
+                                self::ensure_index_exists($reached, $index->recursionlevel, $index->state);
+                                if ($reached[$index->recursionlevel][$index->state] === null || $newnewstate->leftmost_longest($reached[$index->recursionlevel][$index->state])) {
+                                    //echo "add recursive state {$newnewstate->state()} for subexpr {$transition->pregleaf->number}\n";
+                                    $reached[$index->recursionlevel][$index->state] = $newnewstate;
                                 }
                             }
                         }
@@ -780,6 +803,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                                 $topitem = array_pop($newstate->stack);
                                 $recursionmatch = $topitem->last_subexpr_match($this->get_options()->mode, $topitem->subexpr);
                                 $newstate = $this->match_recursive_transition_end($newstate, $topitem->recursionstartpos, $recursionmatch[1], $str, $curpos, $length, $full);
+                                //$newtopitem = end($newstate->stack);
+                                //echo "ended matching of {$topitem->subexpr}, now matching {$newtopitem->subexpr} from state {$newstate->state()}\n";
                             }
 
                             $skip = $skip || !$full;
@@ -789,9 +814,11 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                                 if ($transition->greediness == qtype_preg_fa_transition::GREED_LAZY) {
                                     $lazystates[] = $newstate;
                                 } else {
-                                    $number = $newstate->state();
-                                    if (!isset($reached[$number]) || $newstate->leftmost_longest($reached[$number])) {  // $reached contains a worse state
-                                        $reached[$number] = $newstate;
+                                    $index = self::create_index($newstate->recursive_calls_sequence(), $newstate->state());
+                                    self::ensure_index_exists($reached, $index->recursionlevel, $index->state);
+                                    if ($reached[$index->recursionlevel][$index->state] === null || $newstate->leftmost_longest($reached[$index->recursionlevel][$index->state])) {
+                                        //echo "add state {$newstate->state()}\n";
+                                        $reached[$index->recursionlevel][$index->state] = $newstate;
                                     }
                                 }
                             }
@@ -808,21 +835,29 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
             // If there's no full match yet and no states reached, try the lazy ones.
             if (!$endstatereached && empty($reached) && !empty($lazystates)) {
-                $reached[] = array_pop($lazystates);
+                $lazy = array_pop($lazystates);
+                $index = self::create_index($lazy->recursive_calls_sequence(), $lazy->state());
+                self::ensure_index_exists($reached, $index->recursionlevel, $index->state);
+                $reached[$index->recursionlevel][$index->state] = $lazy;
             }
 
-            $reached = $this->epsilon_closure($reached, $str);
-            $lazystates = array_merge($lazystates, $reached[qtype_preg_fa_transition::GREED_LAZY]);
-            $reached = $reached[qtype_preg_fa_transition::GREED_GREEDY];
+            foreach ($reached as $recursionlevel => $reachedforlevel) {
+                $reached[$recursionlevel] = $this->epsilon_closure($reachedforlevel, $str);
+                $lazystates = array_merge($lazystates, $reached[$recursionlevel][qtype_preg_fa_transition::GREED_LAZY]);
+                $reached[$recursionlevel] = $reached[$recursionlevel][qtype_preg_fa_transition::GREED_GREEDY];
+            }
 
-            // Replace curstates with reached.
-            foreach ($reached as $newstate) {
-                // Currently stored state needs replacement if it's null, or if it's worse than the new state.
-                $number = $newstate->state();
-                if ($states[$number] === null || $newstate->leftmost_longest($states[$number])) {
-                    $states[$number] = $newstate;
-                    $curstates[] = $number;
-                    $endstatereached = $endstatereached || ($newstate->recursion_level() === 0 && $newstate->is_full());
+
+            // Iterate over reached states. Get epsilon-closure for each recursion level.
+            foreach ($reached as $newstates) {
+                foreach ($newstates as $newstate) {
+                    $index = self::create_index($newstate->recursive_calls_sequence(), $newstate->state());
+                    self::ensure_index_exists($states, $index->recursionlevel, $index->state);
+                    if ($states[$index->recursionlevel][$index->state] === null || $newstate->leftmost_longest($states[$index->recursionlevel][$index->state])) {
+                        $states[$index->recursionlevel][$index->state] = $newstate;
+                        $curstates[] = $index;
+                        $endstatereached = $endstatereached || ($newstate->recursion_level() === 0 && $newstate->is_full());
+                    }
                 }
             }
         }
@@ -830,8 +865,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         // Return array of all possible matches.
         $result = array();
         foreach ($this->automaton->end_states(0) as $endstate) {
-            if ($states[$endstate] !== null) {
-                $result[] = $states[$endstate];
+            if ($states['0'][$endstate] !== null) {
+                $result[] = $states['0'][$endstate];
             }
         }
         if (empty($result)) {

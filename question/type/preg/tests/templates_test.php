@@ -387,4 +387,20 @@ class qtype_preg_templates_test extends PHPUnit_Framework_TestCase {
         $res = qtype_preg\template::check_dependencies(array_merge($available, array('coffe' => new qtype_preg\template('coffe', '(?###milk<)', '', array()))));
         $this->assertTrue($res === false);
     }
+
+    public function test_template_realworld_1() {
+        $matcher = new qtype_preg_fa_matcher('^(?###parens_req<)(?###parens_req<)(?###word)(?###>)\+(?###parens_req<)1(?###>)(?###>)$');
+
+        $str = '((((sdf)+(1))))';
+        $res = $matcher->match($str);
+        $this->assertTrue($res->full);
+        $this->assertTrue($res->indexfirst[0] === 0);
+        $this->assertTrue($res->length[0] === strlen($str));
+
+        $str = '((((((((((sdf))))))+((((((1))))))))))';
+        $res = $matcher->match($str);
+        $this->assertTrue($res->full);
+        $this->assertTrue($res->indexfirst[0] === 0);
+        $this->assertTrue($res->length[0] === strlen($str));
+    }
 }

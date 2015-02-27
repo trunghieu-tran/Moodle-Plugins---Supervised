@@ -739,4 +739,12 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
         $end = end($this->stack);
         $end->write_tag_values($transition, $strpos, $matchlen, $this->matcher);
     }
+
+    public function recursive_calls_sequence() {
+        $result = '';
+        foreach ($this->stack as $stackitem) {
+            $result .= $stackitem->subexpr;
+        }
+        return $result;
+    }
 }
