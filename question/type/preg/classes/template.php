@@ -93,9 +93,11 @@ class template {
                 'word' => new template('word', '\w+', '', array('en' => 'word', 'ru' => 'слово')),
                 'integer' => new template('integer', '[+-]?\d+', '', array('en' => 'integer', 'ru' => 'целое число')),
                 'parens_req' => new template('parens_req', '(   \(    (?:(?-1)|$$1)   \)  )', 'x', array('en' => '$$1 in parens', 'ru' => '$$1 в скобках'), 1),
-                'parens_opt' => new template('parens_opt', '$$1|(?###parens_req<)$$1(?###>)', '', array('en' => '$$1 in parens or not', 'ru' => '$$1 в скобках или без'), 1),
+                'parens_opt' => new template('parens_opt', '$$1|(?###parens_req<)$$1(?###>)', '', array('en' => '$$1 in optional parens', 'ru' => '$$1 в скобках или без'), 1),
                 'brackets_req' => new template('brackets_req', '(   \[   (?:(?-1)|$$1)   \]   )', 'x', array('en' => '$$1 in brackets', 'ru' => '$$1 в квадратных скобках'), 1),
-                'brackets_opt' => new template('brackets_opt', '$$1|(?###brackets_req<)$$1(?###>)', '', array('en' => '$$1 in brackets or not', 'ru' => '$$1 в квадратных скобках или без'), 1),
+                'brackets_opt' => new template('brackets_opt', '$$1|(?###brackets_req<)$$1(?###>)', '', array('en' => '$$1 in optional brackets', 'ru' => '$$1 в квадратных скобках или без'), 1),
+                'custom_parens_req' => new template('custom_parens_req', '(   $$1    (?:(?-1)|$$2)   $$3  )', 'x', array('en' => '$$2 in custom parens', 'ru' => '$$1 в особых скобках'), 3),
+                'custom_parens_opt' => new template('custom_parens_opt', '$$2|(?###custom_parens_req<)$$1(?###,)$$2(?###,)$$3(?###>)', 'x', array('en' => '$$2 in optional custom parens', 'ru' => '$$1 в особых скобках или без'), 3),
             );
         }
         return template::$templates;

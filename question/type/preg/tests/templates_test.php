@@ -28,6 +28,8 @@ qtype_preg\template::set_available_templates(array(
     'parens_req' => new qtype_preg\template('parens_req', '(   \(    (?:(?-1)|$$1)   \)  )', 'x', array('en' => '$$1 in parens', 'ru' => '$$1 в скобках'), 1),
     'parens_opt' => new qtype_preg\template('parens_opt', '$$1|(?###parens_req<)$$1(?###>)', '', array('en' => '$$1 in parens or not', 'ru' => '$$1 в скобках или без'), 1),
     'brackets_req' => new qtype_preg\template('brackets_req', '(   \[   (?:(?-1)|$$1)   \]   )', 'x', array('en' => '$$1 in brackets', 'ru' => '$$1 в квадратных скобках'), 1),
+    'custom_parens_req' => new qtype_preg\template('custom_parens_req', '(   $$1    (?:(?-1)|$$2)   $$3  )', 'x', array('en' => '$$2 in custom parens', 'ru' => '$$1 в особых скобках'), 3),
+    'custom_parens_opt' => new qtype_preg\template('custom_parens_opt', '$$2|(?###custom_parens_req<)$$1(?###,)$$2(?###,)$$3(?###>)', 'x', array('en' => '$$2 in optional custom parens', 'ru' => '$$1 в особых скобках или без'), 3),
     'word_in_parens' => new qtype_preg\template('word_in_parens', '(?###parens_req<)(?###word)(?###>)', '', array('en' => 'word in parens', 'ru' => 'слово в скобках')),
     'word_in_parens_in_brackets' => new qtype_preg\template('word_in_parens_in_brackets', '(?###brackets_req<)(?###parens_req<)(?###word)(?###>)(?###>)', '', array('en' => 'word in parens in brackets', 'ru' => 'слово в квадратных и обычных скобках')),
 ));
@@ -317,6 +319,23 @@ class qtype_preg_templates_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($res->full);
         $this->assertTrue($res->indexfirst[0] === 1);
         $this->assertTrue($res->length[0] === 9);
+
+        $matcher = new qtype_preg_fa_matcher('(?###custom_parens_opt<)<(?###,)(?###word)(?###,)>(?###>)');
+
+        $res = $matcher->match('word');
+        $this->assertTrue($res->full);
+        $this->assertTrue($res->indexfirst[0] === 0);
+        $this->assertTrue($res->length[0] === 4);
+
+        $res = $matcher->match('<word>');
+        $this->assertTrue($res->full);
+        $this->assertTrue($res->indexfirst[0] === 0);
+        $this->assertTrue($res->length[0] === 6);
+
+        $res = $matcher->match('<<<<word>>>>');
+        $this->assertTrue($res->full);
+        $this->assertTrue($res->indexfirst[0] === 0);
+        $this->assertTrue($res->length[0] === 12);
     }
 
     public function test_template_errors() {
@@ -397,7 +416,7 @@ class qtype_preg_templates_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($res->indexfirst[0] === 0);
         $this->assertTrue($res->length[0] === strlen($str));
 
-        $str = '((((((((((sdf))))))+((((((1))))))))))';
+        $str = '(((((((sdf))))))+((((((1)))))))';
         $res = $matcher->match($str);
         $this->assertTrue($res->full);
         $this->assertTrue($res->indexfirst[0] === 0);
