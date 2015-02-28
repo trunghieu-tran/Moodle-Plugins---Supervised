@@ -563,12 +563,33 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
         //echo $this->subpatts_to_string();
         //echo "vs\n";
         //echo $other->subpatts_to_string();
+
         // Check for full match.
         if ($this->is_full() && !$other->is_full()) {
             //echo "wins 1\n";
             return true;
         } else if (!$this->is_full() && $other->is_full()) {
             //echo "wins 2\n";
+            return false;
+        }
+
+        // Choose the leftmost match
+        // Indices for the whole regex can differ when assertions merging is turned on.
+        $this_index = isset($this->stack[0]->matches[$this->matcher->get_ast_root()->subpattern])
+                    ? $this->stack[0]->matches[$this->matcher->get_ast_root()->subpattern][0][0]
+                    : qtype_preg_matching_results::NO_MATCH_FOUND;
+        $other_index = isset($other->stack[0]->matches[$this->matcher->get_ast_root()->subpattern])
+                     ? $other->stack[0]->matches[$this->matcher->get_ast_root()->subpattern][0][0]
+                     : qtype_preg_matching_results::NO_MATCH_FOUND;
+
+        if ($this_index !== qtype_preg_matching_results::NO_MATCH_FOUND && $other_index === qtype_preg_matching_results::NO_MATCH_FOUND) {
+            return true;
+        } else if ($other_index !== qtype_preg_matching_results::NO_MATCH_FOUND && $this_index === qtype_preg_matching_results::NO_MATCH_FOUND) {
+            return false;
+        }
+        if ($this_index !== qtype_preg_matching_results::NO_MATCH_FOUND && $this_index < $other_index) {
+            return true;
+        } else if ($other_index !== qtype_preg_matching_results::NO_MATCH_FOUND && $other_index < $this_index) {
             return false;
         }
 
