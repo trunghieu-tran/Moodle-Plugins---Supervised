@@ -2735,7 +2735,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
-                        'length'=>array(0=>64),
+                        'length'=>array(0=>68),
                         'ext_index_first'=>array(0=>0),
                         'ext_length'=>array(0=>14),
                         'left'=>array(9),

@@ -933,13 +933,11 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 }
                 $left = $tmp->str->length() - $prefixlen;
                 // Choose the best one by:
-                // 1) minimizing length of the generated extension
-                // 2) minimizing abs(extension->length - match->length)
-                if ($match->extendedmatch === null) {
-                    $match->extendedmatch = $tmp;
-                    $match->left = $left;
-                } else if (($match->left > $left) ||
-                           ($match->left == $left && abs($match->extendedmatch->length - $match->length) > abs($tmp->length - $backtrack->length))) {
+                // 1) minimizing 'left' of the generated extension
+                // 2) maximizing length of the generated extension so it's as much to the original length as possible
+                if (($match->extendedmatch === null) ||
+                    ($match->left > $left) ||
+                    ($match->left === $left && $match->extendedmatch->length < $tmp->length)) {
                     $match->extendedmatch = $tmp;
                     $match->left = $left;
                 }
