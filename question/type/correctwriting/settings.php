@@ -37,4 +37,13 @@ if($ADMIN->fulltree) {
 
     $settings->add(new admin_setting_configtext('qtype_correctwriting_maxorderscount', get_string('maxorderscountlabel', 'qtype_correctwriting'),
                     get_string('maxorderscount', 'qtype_correctwriting'), 5000, PARAM_INT));
+    $settings->add(new admin_setting_configtextarea(
+        'qtype_correctwriting_special_tokens_list',
+        get_string('lexicalanalyzerlistsettingname', 'qtype_correctwriting'),
+        get_string('lexicalanalyzerlistsettingdescription', 'qtype_correctwriting'),
+        "",
+        PARAM_RAW,
+        60,
+        20
+    ));
 }

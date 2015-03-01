@@ -67,8 +67,9 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
      * Passed responsestring could be null, than object used just to find errors in the answers, token count etc...
      */
     protected function analyze() {
-        if ($this->question->are_lexeme_sequences_equal($this->basestringpair)) {
-            parent::bypass();
+        if ($this->question->are_lexeme_sequences_equal($this->basestringpair)) {		
+            $this->bypass();
+            $this->resultstringpairs[0]->assert_that_strings_are_equal();
             return;
         }
 
@@ -78,7 +79,6 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
         // 1. Compute self code - Mamontov
         // 1.1. Replace result with fixed strings
         $this->resultstringpairs = block_formal_langs_string_pair::best_string_pairs(
-            $this->question->get_used_language(),
             $this->basestringpair->correctstring(),
             $this->basestringpair->comparedstring(),
             $this->question->lexicalerrorthreshold,
@@ -86,26 +86,48 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
             'qtype_correctwriting_string_pair'
         );
 
+
+        /** @var qtype_correctwriting_string_pair $pair */
         /** @var qtype_correctwriting_string_pair $pair */
         foreach($this->resultstringpairs as $pair) {
-            $pair->tokenmappings[get_class($this)] = $pair->pairs_between_corrected_compared();
+            //$pair->tokenmappings[get_class($this)] = $pair->pairs_between_corrected_compared();
             $pair->analyzersequence[] = get_class($this);
-            // TODO: Biryukova: create own lexical_errors here and append it to pair, via
-            // append_mistakes
-            $pair->append_mistakes($lexicalmistakes);
+            if($pair->matches()==null){
+                $pair->setcorrectedstring($pair->comparedstring());
+                return;
+            }
+            $setmatches = $pair->matches()->matchedpairs;
+            $lexmistakes=array();
+            foreach ($setmatches as $onematch) {
+                if ($onematch->mistakeweight > 0) {
+                    $lexmistake = new qtype_correctwriting_lexical_mistake($onematch);
+                    //$lexmistake->mistakemsg = $onematch->message($this->basestringpair->correctstring(), $this->basestringpair->comparedstring());
+                    $lexmistake->weight = $onematch->mistakeweight;
+                    $lexmistake->answermistaken = $onematch->correcttokens;
+                    $lexmistake->responsemistaken = $onematch->comparedtokens;
+                    $lexmistakes[] = $lexmistake;
+                }
+            }
+            $pair->append_mistakes($lexmistakes);
         }
     }
 
 
     protected function bypass() {
-        parent::bypass();
         // You must create mistakes of skipped lexemes and additional lexemes
         // Also, you need to create matched 1:1 by simply comparing lexemes of two sequences
         // with ::is_same
-        $pairs = $this->result_pairs();
-        $string = $pairs[0];
+        $this->resultstringpairs = block_formal_langs_string_pair::best_string_pairs_for_bypass(
+            $this->basestringpair->correctstring(),
+            $this->basestringpair->comparedstring(),
+            $this->question->lexicalerrorthreshold,
+            $this->question->token_comparing_options(),
+            'qtype_correctwriting_string_pair'
+        );
+
         /** @var qtype_correctwriting_string_pair $string */
-        $string->set_mistakes($this->convert_lexer_errors_to_mistakes());
+        $this->resultstringpairs[0]->set_mistakes($this->convert_lexer_errors_to_mistakes());
+
     }
 
     /**
@@ -190,10 +212,7 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
 
     // Form and DB related functions.
     public function float_form_fields() {
-        return array(array('name' => 'lexicalerrorthreshold', 'default' => 0.33, 'advanced' => true, 'required' => false, 'min' => 0, 'max' => 1), //Lexical error threshold field
-                     array('name' => 'lexicalerrorweight','default' => 0.05, 'advanced' => true, 'required' => false, 'min' => 0, 'max' => 1),      //Lexical error weight field
-                     array('name' => 'absentmistakeweight', 'default' => 0.1, 'advanced' => true, 'min' => 0, 'max' => 1, 'required' => true),  //Absent token mistake weight field
-                     array('name' =>'addedmistakeweight', 'default' => 0.1, 'advanced' => true, 'min' => 0, 'max' => 1, 'required' => true),    //Extra token mistake weight field
+        return array(array('name' => 'lexicalerrorweight','default' => 0.05, 'advanced' => true, 'required' => false, 'min' => 0, 'max' => 1),      //Lexical error weight field
                     );
     }
 }
