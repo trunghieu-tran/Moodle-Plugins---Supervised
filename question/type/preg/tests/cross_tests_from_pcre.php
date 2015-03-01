@@ -5387,7 +5387,8 @@ class qtype_preg_cross_tests_from_pcre {
 
         return array('regex'=>'$b',
                      'modifiers'=>'i',
-                     'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
+                     'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_432() {
