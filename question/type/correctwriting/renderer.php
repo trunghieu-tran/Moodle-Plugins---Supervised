@@ -98,7 +98,7 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
                         $msg .= '.';
                     }
                     //Render hint buttons and/or hints.
-                    if (is_a($behaviour, 'behaviour_with_hints'))
+                    if (is_a($behaviour, 'qtype_poasquestion\\behaviour_with_hints'))
                     {
                         /** @var behaviour_with_hints $behaviour */
                         /** @var qbehaviour_adaptivehints_renderer|qbehaviour_adaptivehintsnopenalties_renderer|qbehaviour_interactivehints_renderer $behaviourrenderer */
@@ -126,7 +126,7 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
             }
         }
         //Render non-mistake hints if requested.
-        if (is_a($behaviour, 'behaviour_with_hints')) {
+        if (is_a($behaviour, 'qtype_poasquestion\\behaviour_with_hints')) {
             /** @var behaviour_with_hints $behaviour */
             $hints = $behaviour->adjust_hints($hints);
             foreach ($hints as $hintkey) {
@@ -151,7 +151,8 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
        if ($results!=null) {
            if (count($results->mistakes()) != 0) {
                $mistakecodeddata = $question->create_image_information($results);
-               $url  = $CFG->wwwroot . '/question/type/correctwriting/mistakesimage.php?data=' . urlencode($mistakecodeddata);
+               $grouping = intval($question->issyntaxanalyzerenabled);
+               $url  = $CFG->wwwroot . '/question/type/correctwriting/mistakesimage.php?data=' . urlencode($mistakecodeddata) . '&group=' . $grouping ;
                $imagesrc = html_writer::empty_tag('image', array('src' => $url));
                $resulttext = $imagesrc . $resulttext;
            }

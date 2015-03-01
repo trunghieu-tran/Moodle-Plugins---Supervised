@@ -45,6 +45,8 @@ define('FRAME_THICKNESS', 1);
 define('ABSENT_FRAME_PADDING', 2);
 // Additional length for big strkethrough  inner lines
 define('BIG_STRIKETHROUGH_ADDITIONAL_LENGTH', 2);
+// Padding for move items
+define('MOVE_GROUP_PADDING', 2);
 /**
  * This style of require_once is used intentionally, due to non-availability of Moodle here
  */
@@ -241,7 +243,7 @@ class qtype_correctwriting_table_cell
     * @return bool result
     */
    public function is_response_length_bigger($length) {
-       return textlib::strlen($this->response->text()) > $length;
+       return core_text::strlen($this->response->text()) > $length;
    }
    /** Returns a total size of cell
        @return array of coordinates as array(width, height)
@@ -570,8 +572,8 @@ class qtype_correctwriting_table
     */
    public function get_connections_by_response_index($responseindex) {
         //Get current cell
-        $cell = $this->table[$this->responsetable[$responseindex]];
-        return $this->get_connections_from_cell($cell);
+       $cell = $this->table[$this->responsetable[$responseindex]];
+       return $this->get_connections_from_cell($cell);
    }
    /** Returns a connection point for lexeme in student answer
      @param int $answerindex index of lexeme in answer
@@ -678,39 +680,199 @@ class qtype_correctwriting_arrow_builder {
        $this->table = $table;
    }
 
+    public function merge_rects($rects) {
+        $x = 10000000000000;
+        $y = 10000000000000;
+        $maxx = 0;
+        $maxy = 0;
+        foreach($rects as $rect) {
+            $x = min($x, $rect->x);
+            $y = min($y, $rect->y);
+            $maxx = max($maxx, $rect->x + $rect->width);
+            $maxy = max($maxy, $rect->y + $rect->height);
+        }
+        $r = new stdClass();
+        $r->x = $x;
+        $r->y = $y;
+        $r->width = $maxx - $x;
+        $r->height = $maxy - $y;
+        return $r;
+    }
+
    /** Draws an arrows  for mistakes
        @param resource $im image
        @param array $palette associative array of colors
      */
    public function paint(&$im, $palette) {
+       global $_REQUEST;
+
+       $groupmovements = false;
+       if (array_key_exists('group', $_REQUEST)) {
+           $groupmovements = intval($_REQUEST['group']) > 0;
+       }
+
        // Set thickness
        imagesetthickness($im, LINE_WIDTH);
        // Draw absent lexemes arrows
        if (count($this->table->mistakes()->get_absent_lexeme_indexes()) != 0) {
-           foreach($this->table->mistakes()->get_absent_lexeme_indexes() as $index) {
-               $rect = $this->table->get_rect_by_answer_index($index);
-               $this->draw_rectangle($im, $palette['red'], $rect);
+           if ($groupmovements) {
+               $groups = array();
+               $indexes = $this->table->mistakes()->get_absent_lexeme_indexes();
+               foreach($indexes as $index) {
+                    if (count($groups) == 0) {
+                        $groups[] = array( $index );
+                    } else {
+                        $lastgroup = $groups[count($groups) - 1];
+                        $lastindex = $lastgroup[count($lastgroup) - 1];
+                        if ($index == $lastindex + 1) {
+                            $groups[count($groups) - 1][] = $index;
+                        } else {
+                            $groups[] = array( $index );
+                        }
+                    }
+               }
+
+               foreach($groups as $group) {
+                   $rects = array();
+                   foreach($group as $index) {
+                       $rect = $this->table->get_rect_by_answer_index($index);
+                       $rects[] = $rect;
+                   }
+                   $rect = $this->merge_rects($rects);
+                   $this->draw_rectangle($im, $palette['red'], $rect);
+               }
+
+           } else {
+               foreach($this->table->mistakes()->get_absent_lexeme_indexes() as $index) {
+                   $rect = $this->table->get_rect_by_answer_index($index);
+                   $this->draw_rectangle($im, $palette['red'], $rect);
+               }
            }
        }
        imagesetthickness($im, STRIKETHROUGH_LINE_WIDTH);
        // Draw added lexemes arrows
        if (count($this->table->mistakes()->get_added_lexeme_indexes()) != 0 ) {
-           foreach($this->table->mistakes()->get_added_lexeme_indexes() as $index) {
-               $rect = $this->table->get_rect_by_response_index($index);
-               if ($this->table->is_response_text_bigger_than($index, 1)) {
-                   $this->draw_big_strikethrough($im, $palette['red'], $rect);
-               } else {
-                   $this->draw_strikethrough($im, $palette['red'], $rect);
+           if ($groupmovements) {
+               $groups = array();
+               $indexes = $this->table->mistakes()->get_added_lexeme_indexes();
+               foreach($indexes as $index) {
+                   if (count($groups) == 0) {
+                       $groups[] = array( $index );
+                   } else {
+                       $lastgroup = $groups[count($groups) - 1];
+                       $lastindex = $lastgroup[count($lastgroup) - 1];
+                       if ($index == $lastindex + 1) {
+                           $groups[count($groups) - 1][] = $index;
+                       } else {
+                           $groups[] = array( $index );
+                       }
+                   }
+               }
+
+               foreach($groups as $group) {
+                   if (count($group) == 1) {
+                       // Perform common root if group consists of one token
+                       $index = $group[0];
+                       $rect = $this->table->get_rect_by_response_index($index);
+                       if ($this->table->is_response_text_bigger_than($index, 1)) {
+                           $this->draw_big_strikethrough($im, $palette['red'], $rect);
+                       } else {
+                           $this->draw_strikethrough($im, $palette['red'], $rect);
+                       }
+                   } else {
+                       $rects = array();
+                       foreach($group as $index) {
+                           $rect = $this->table->get_rect_by_response_index($index);
+                           $rects[] = $rect;
+                       }
+                       $rect = $this->merge_rects($rects);
+                       $miny = $rect->y + $rect->height / 2;
+                       $maxy = $miny + 2 * BIG_STRIKETHROUGH_ADDITIONAL_LENGTH;
+                       $miny -= 2 * BIG_STRIKETHROUGH_ADDITIONAL_LENGTH;
+                       imageline($im, $rect->x, $miny, $rect->x + $rect->width, $maxy, $palette['red']);
+                       imageline($im, $rect->x, $maxy, $rect->x + $rect->width, $miny, $palette['red']);
+                   }
+               }
+           } else {
+               foreach($this->table->mistakes()->get_added_lexeme_indexes() as $index) {
+                   $rect = $this->table->get_rect_by_response_index($index);
+                   if ($this->table->is_response_text_bigger_than($index, 1)) {
+                       $this->draw_big_strikethrough($im, $palette['red'], $rect);
+                   } else {
+                       $this->draw_strikethrough($im, $palette['red'], $rect);
+                   }
                }
            }
        }
        imagesetthickness($im, LINE_WIDTH);
        // Draw moved lexemes arrows
        if (count($this->table->mistakes()->get_moves()) != 0) {
-           foreach($this->table->mistakes()->get_moves() as $entry) {
-               $p1 = $this->table->get_connections_by_answer_index($entry->answer)->answer;
-               $p2 = $this->table->get_connections_by_response_index($entry->response)->response;
-               $this->draw_arrow($im, $palette['red'], $p2, $p1, false);
+           if ($groupmovements) {
+               $moves = $this->table->mistakes()->get_moves();
+               $groups = array();
+               foreach($moves as $entry) {
+                   if (count($groups) == 0) {
+                       $groups[] = array( $entry );
+                   } else {
+                       $lastgroup = $groups[count($groups) - 1];
+                       $lastentry = $lastgroup[count($lastgroup) - 1];
+                       if ($entry->answer == $lastentry->answer + 1 && $entry->response == $lastentry->response + 1) {
+                           $groups[count($groups) - 1][] = $entry;
+                       } else {
+                           $groups[] = array( $entry );
+                       }
+                   }
+               }
+
+               foreach($groups as $group) {
+                    if (count($group) == 1) {
+                        $p1 = $this->table->get_connections_by_answer_index($group[0]->answer)->answer;
+                        $p2 = $this->table->get_connections_by_response_index($group[0]->response)->response;
+                        $this->draw_arrow($im, $palette['red'], $p2, $p1, false);
+                    }   else {
+                        $answerrects = array();
+                        $responserects = array();
+                        foreach($group as $entry) {
+                            $responserects[] = $this->table->get_rect_by_response_index($entry->response);
+                            $answerrects[] =  $this->table->get_rect_by_answer_index($entry->answer);
+                        }
+
+                        $answerrect = $this->merge_rects($answerrects);
+                        $responserect = $this->merge_rects($responserects);
+
+                        $connectionpointresponse = array();
+                        $connectionpointresponse[0] = $responserect->x + $responserect->width / 2;
+                        $connectionpointresponse[1] = $responserect->y + $responserect->height + MOVE_GROUP_PADDING; // 2 is a slight padding
+
+
+                        $connectionpointanswer = array();
+                        $connectionpointanswer[0] = $answerrect->x + $answerrect->width / 2;
+                        $connectionpointanswer[1] = $answerrect->y - MOVE_GROUP_PADDING; // 2 is a slight padding
+
+                        $this->draw_arrow($im, $palette['red'], $connectionpointresponse, $connectionpointanswer, false);
+
+                        $y = $answerrect->y - MOVE_GROUP_PADDING / 2;
+                        imageline($im, $answerrect->x - MOVE_GROUP_PADDING, $y, $answerrect->x + $answerrect->width + MOVE_GROUP_PADDING,  $y,  $palette['red']);
+                        $x = $answerrect->x - MOVE_GROUP_PADDING;
+                        imageline($im, $x, $y - MOVE_GROUP_PADDING / 2, $x,  $y + MOVE_GROUP_PADDING,  $palette['red']);
+                        $x = $answerrect->x + $answerrect->width + MOVE_GROUP_PADDING;
+                        imageline($im, $x, $y - MOVE_GROUP_PADDING / 2, $x,  $y + MOVE_GROUP_PADDING,  $palette['red']);
+
+                        $y = $responserect->y + $responserect->height + MOVE_GROUP_PADDING / 2;
+                        $miny = $responserect->y + $responserect->height - MOVE_GROUP_PADDING;
+                        $minx = $responserect->x - MOVE_GROUP_PADDING;
+                        $maxx = $responserect->x + $responserect->width + MOVE_GROUP_PADDING;
+                        imageline($im, $minx, $y, $maxx,  $y,  $palette['red']);
+                        imageline($im, $minx, $y, $minx,  $miny,  $palette['red']);
+                        imageline($im, $maxx, $y, $maxx,  $miny,  $palette['red']);
+                    }
+               }
+           } else {
+               foreach($this->table->mistakes()->get_moves() as $entry) {
+                   $p1 = $this->table->get_connections_by_answer_index($entry->answer)->answer;
+                   $p2 = $this->table->get_connections_by_response_index($entry->response)->response;
+                   $this->draw_arrow($im, $palette['red'], $p2, $p1, false);
+               }
            }
        }
        // Draw LCS
@@ -896,6 +1058,7 @@ if (strlen($_GET['data']) != 0) {
    // Decode passed parameter and split it to sections
    $data = base64_decode($_GET['data']);
    $sections = explode(';;;',$data);
+
 
    // If amount of section is six, we can build image
    if (count($sections) == 6 ) {
