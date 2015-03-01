@@ -2017,17 +2017,8 @@ class qtype_preg_cross_tests_from_preg_merging {
                         'next'=>'\n',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 
-        $test3 = array( 'str'=>"ac",
-                        'is_match'=>true,
-                        'full'=>false,
-                        'index_first'=>array(0=>0, 1=>1),
-                        'length'=>array(0=>2, 1=>1),
-                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
-
-
         return array('regex'=>'(?m)a(\n|c)(^b)',
-                     'tests'=>array($test1, $test2, $test3));
+                     'tests'=>array($test1, $test2));
     }
 
     function data_for_test_assertions_tags_3() {
@@ -2187,16 +2178,8 @@ class qtype_preg_cross_tests_from_preg_merging {
                         'next'=>'\\n',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 
-        $test3 = array( 'str'=>"ab",
-                        'is_match'=>true,
-                        'full'=>false,
-                        'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>1,1=>1),
-                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
-
         return array('regex'=>'(?m)(\n|a)^b',
-                     'tests'=>array($test1, $test2, $test3));
+                     'tests'=>array($test1, $test2));
     }
 
 
