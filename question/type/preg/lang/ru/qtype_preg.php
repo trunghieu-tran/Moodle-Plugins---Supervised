@@ -268,6 +268,8 @@ $string['description_template_parens_req'] = 'текст в круглых ск�
 $string['description_template_parens_opt'] = 'текст в круглых скобках или без';
 $string['description_template_brackets_req'] = 'текст в квадратных скобках';
 $string['description_template_brackets_opt'] = 'тект в квадратных скобках или без';
+$string['description_template_custom_parens_req'] = 'текст в в особых скобках';
+$string['description_template_custom_parens_opt'] = 'тект в особых скобках или без';
 // TYPE_LEAF_CONTROL
 $string['description_accept_leaf_control'] = 'спровоцировать удачное совпадение';
 $string['description_fail_leaf_control'] = 'спровоцировать неудачу';

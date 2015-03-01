@@ -268,6 +268,8 @@ $string['description_template_parens_req'] = 'text in round parentheses';
 $string['description_template_parens_opt'] = 'text in round parentheses or without';
 $string['description_template_brackets_req'] = 'text in square brackets';
 $string['description_template_brackets_opt'] = 'text in square brackets or without';
+$string['description_template_custom_parens_req'] = 'text in optional custom brackets';
+$string['description_template_custom_parens_opt'] = 'text in optional custom brackets or without';
 // TYPE_LEAF_CONTROL
 $string['description_accept_leaf_control'] = 'force successful subpattern match';
 $string['description_fail_leaf_control'] = 'force fail';
