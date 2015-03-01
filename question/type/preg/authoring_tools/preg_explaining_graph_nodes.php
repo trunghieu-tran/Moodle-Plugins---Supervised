@@ -210,8 +210,6 @@ class qtype_preg_explaining_graph_leaf_charset extends qtype_preg_explaining_gra
         // If first element is empty then delete it.
         if ($result[0] == '') {
             array_shift($result);
-        } else {
-            $result[0] = qtype_preg_authoring_tool::string_to_html($result[0]);
         }
 
         return $result;
@@ -861,7 +859,7 @@ class qtype_preg_explaining_graph_node_template extends qtype_preg_explaining_gr
 
         $templatename = $this->pregnode->name;
         $template = qtype_preg\template::available_templates()[$templatename];
-        $label .= '\n""' . $template->get_description() . '"';
+        $label .= '\n"' . str_replace('$$1', 'this', $template->get_description()) . '"';
 
         $template = new qtype_preg_explaining_graph_tool_subgraph(
             $label,
