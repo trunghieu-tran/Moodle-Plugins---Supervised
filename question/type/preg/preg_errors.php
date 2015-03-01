@@ -59,6 +59,11 @@ class qtype_preg_error {
      * @param preservemsg bool if true, message contains HTML code and should not be treated by htmlspecialchars function. PHP preg matcher use it to show links to PCRE documentation.
      */
     public function __construct($errormsg, $regex, $position, $preservemsg = false) {
+
+        if ($position === null) {
+            $position = new qtype_preg_position(0, core_text::strlen($regex) - 1, -1, -1, -1, -1);  // TODO
+        }
+
         $errormsg = $this->uppercase_first_letter($errormsg);
         if (!$preservemsg) {
             $errormsg = htmlspecialchars($errormsg);
@@ -108,7 +113,7 @@ class qtype_preg_modifier_error extends qtype_preg_error {
 
         $errormsg = get_string('unsupportedmodifier', 'qtype_preg', $a);
 
-        parent::__construct($errormsg);
+        parent::__construct($errormsg, '', null);
     }
 }
 
@@ -117,10 +122,6 @@ class qtype_preg_too_complex_error extends qtype_preg_error {
 
     public function __construct($regex, $matcher, $position = null) {
         global $CFG;
-
-        if ($position === null) {
-            $position = new qtype_preg_position(0, core_text::strlen($regex) - 1, -1, -1, -1, -1);  // TODO
-        }
 
         $a = new stdClass;
         $a->linefirst = $position->linefirst;
@@ -139,12 +140,6 @@ class qtype_preg_too_complex_error extends qtype_preg_error {
 class qtype_preg_empty_fa_error extends qtype_preg_error {
 
     public function __construct($regex, $position = null) {
-        global $CFG;
-
-        if ($position === null) {
-            $position = new qtype_preg_position(0, core_text::strlen($regex) - 1, -1, -1, -1, -1);  // TODO
-        }
-
         $errormsg = get_string('empty_fa', 'qtype_preg');
 
         parent::__construct($errormsg, $regex, $position);

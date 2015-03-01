@@ -138,6 +138,9 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     // Regex handling options set from the outside.
     protected $options = null;
 
+    // All modifiers occured in the regex.
+    protected $allmodifiers = array();
+
     // Positions skipped because preserveallnodes option was set to false.
     protected $skipped_positions = array();
 
@@ -319,6 +322,10 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
         return $this->skipped_positions;
     }
 
+    public function get_all_modifiers() {
+        return $this->allmodifiers;
+    }
+
     public function get_error_nodes() {
         return $this->errors;
     }
@@ -382,6 +389,13 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
         $stackitem = end($this->opt_stack);
         $stackitem->options->unset_modifier($unset);
         $stackitem->options->set_modifier($set);
+
+        foreach (qtype_preg_handling_options::get_all_modifiers() as $mod) {
+            if ($set & $mod && !in_array($mod, $this->allmodifiers)) {
+                $this->allmodifiers[] = $mod;
+            }
+        }
+
         return null;
     }
 

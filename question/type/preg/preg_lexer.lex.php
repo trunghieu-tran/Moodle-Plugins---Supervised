@@ -62,6 +62,8 @@ class qtype_preg_lexer extends JLexBase  {
 
     // Regex handling options set from the outside.
     protected $options = null;
+    // All modifiers occured in the regex.
+    protected $allmodifiers = array();
     // Positions skipped because preserveallnodes option was set to false.
     protected $skipped_positions = array();
     // Array of lexical errors found.
@@ -210,6 +212,9 @@ class qtype_preg_lexer extends JLexBase  {
     public function get_skipped_positions() {
         return $this->skipped_positions;
     }
+    public function get_all_modifiers() {
+        return $this->allmodifiers;
+    }
     public function get_error_nodes() {
         return $this->errors;
     }
@@ -262,6 +267,11 @@ class qtype_preg_lexer extends JLexBase  {
         $stackitem = end($this->opt_stack);
         $stackitem->options->unset_modifier($unset);
         $stackitem->options->set_modifier($set);
+        foreach (qtype_preg_handling_options::get_all_modifiers() as $mod) {
+            if ($set & $mod && !in_array($mod, $this->allmodifiers)) {
+                $this->allmodifiers[] = $mod;
+            }
+        }
         return null;
     }
     /**
