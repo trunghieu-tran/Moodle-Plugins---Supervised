@@ -5185,6 +5185,25 @@ class qtype_preg_cross_tests_from_preg {
                      'tests'=>array($test1, $test2));
     }
 
+    function data_for_test_recursion_4() {
+        $test1 = array( 'str'=>'b',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0,2=>1),
+                        'length'=>array(0=>1,1=>1,2=>0),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        $test2 = array( 'str'=>'bbbbbbbb',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0,2=>8),
+                        'length'=>array(0=>8,1=>8,2=>0),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        return array('regex'=>'^(b(?1)?)(b*)$',
+                     'tests'=>array($test1, $test2));
+    }
+
     function data_for_test_cond_subexpr_subexpr_generation() {
         $test1 = array( 'str'=>'',
                         'is_match'=>false,
