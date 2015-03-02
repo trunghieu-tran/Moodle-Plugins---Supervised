@@ -434,6 +434,7 @@ class qtype_preg_templates_test extends PHPUnit_Framework_TestCase {
         $options->set_modifier(qtype_preg_handling_options::MODIFIER_EXTENDED);
         $matcher = new qtype_preg_fa_matcher('^' . $regex . '$', $options);
 
+        // Full matches
         $strings = array('a+b', '(a+b)', '((a+b))', '((((a))+((((b))))))');
         foreach ($strings as $str) {
             $res = $matcher->match($str);
@@ -441,6 +442,22 @@ class qtype_preg_templates_test extends PHPUnit_Framework_TestCase {
             $this->assertTrue($res->indexfirst[0] === 0);
             $this->assertTrue($res->length[0] === strlen($str));
         }
+
+        // Partial matches
+        $res = $matcher->match('(a+b');
+        $this->assertFalse($res->full);
+        $this->assertTrue($res->indexfirst[0] === 0);
+        $this->assertTrue($res->length[0] === 4);
+
+        $res = $matcher->match('a+b)');
+        $this->assertFalse($res->full);
+        $this->assertTrue($res->indexfirst[0] === 0);
+        $this->assertTrue($res->length[0] === 3);
+
+        $res = $matcher->match('(a)+(b');
+        $this->assertFalse($res->full);
+        $this->assertTrue($res->indexfirst[0] === 0);
+        $this->assertTrue($res->length[0] === 6);
     }
 
     public function test_template_realworld_3() {   // a+b+c
@@ -478,6 +495,7 @@ class qtype_preg_templates_test extends PHPUnit_Framework_TestCase {
         $options->set_modifier(qtype_preg_handling_options::MODIFIER_EXTENDED);
         $matcher = new qtype_preg_fa_matcher('^' . $regex . '$', $options);
 
+        // Full matches
         $strings = array('a+b+c', '(a+(b)+c)', '((a+b+c))', '(((a))+(b)+(c))', '((((a))+((b)))+((c)))', '((a)+(b+c))');
         foreach ($strings as $str) {
             $res = $matcher->match($str);
@@ -485,6 +503,22 @@ class qtype_preg_templates_test extends PHPUnit_Framework_TestCase {
             $this->assertTrue($res->indexfirst[0] === 0);
             $this->assertTrue($res->length[0] === strlen($str));
         }
+
+        // Partial matches
+        $res = $matcher->match('((a+b+c)');
+        $this->assertFalse($res->full);
+        $this->assertTrue($res->indexfirst[0] === 0);
+        $this->assertTrue($res->length[0] === 8);
+
+        $res = $matcher->match('(a+b+c))');
+        $this->assertFalse($res->full);
+        $this->assertTrue($res->indexfirst[0] === 0);
+        $this->assertTrue($res->length[0] === 7);
+
+        /*$res = $matcher->match('(((a)+b)');
+        $this->assertFalse($res->full);
+        $this->assertTrue($res->indexfirst[0] === 0);
+        $this->assertTrue($res->length[0] === 8);*/
     }
 
     public function test_template_realworld_4() {   // a*b+c*d
@@ -506,6 +540,7 @@ class qtype_preg_templates_test extends PHPUnit_Framework_TestCase {
         $options->set_modifier(qtype_preg_handling_options::MODIFIER_EXTENDED);
         $matcher = new qtype_preg_fa_matcher('^' . $regex . '$', $options);
 
+        // Full matches
         $strings = array('a*b+c*d', '((a*b+c*d))', '((a)*((b)))+(((c)*(((d)))))');
         foreach ($strings as $str) {
             $res = $matcher->match($str);
