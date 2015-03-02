@@ -422,4 +422,96 @@ class qtype_preg_templates_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($res->indexfirst[0] === 0);
         $this->assertTrue($res->length[0] === strlen($str));
     }
+
+    public function test_template_realworld_2() {   // a+b
+        $regex = '
+        (?###parens_opt<)
+            (?###parens_opt<)a(?###>)
+            \+
+            (?###parens_opt<)b(?###>)
+        (?###>)';
+        $options = new qtype_preg_matching_options();
+        $options->set_modifier(qtype_preg_handling_options::MODIFIER_EXTENDED);
+        $matcher = new qtype_preg_fa_matcher('^' . $regex . '$', $options);
+
+        $strings = array('a+b', '(a+b)', '((a+b))', '((((a))+((((b))))))');
+        foreach ($strings as $str) {
+            $res = $matcher->match($str);
+            $this->assertTrue($res->full);
+            $this->assertTrue($res->indexfirst[0] === 0);
+            $this->assertTrue($res->length[0] === strlen($str));
+        }
+    }
+
+    public function test_template_realworld_3() {   // a+b+c
+        $regex = '
+        (?###parens_opt<)
+
+            (?|
+
+            # optional group a+b
+
+                (?###parens_opt<)
+                    (?###parens_opt<)a(?###>)
+                    \+
+                    (?###parens_opt<)b(?###>)
+                (?###>)
+                \+
+                (?###parens_opt<)c(?###>)
+
+            |
+
+            # optional group b+c
+
+                (?###parens_opt<)a(?###>)
+                \+
+                (?###parens_opt<)
+                    (?###parens_opt<)b(?###>)
+                    \+
+                    (?###parens_opt<)c(?###>)
+                (?###>)
+
+            )
+
+        (?###>)';
+        $options = new qtype_preg_matching_options();
+        $options->set_modifier(qtype_preg_handling_options::MODIFIER_EXTENDED);
+        $matcher = new qtype_preg_fa_matcher('^' . $regex . '$', $options);
+
+        $strings = array('a+b+c', '(a+(b)+c)', '((a+b+c))', '(((a))+(b)+(c))', '((((a))+((b)))+((c)))', '((a)+(b+c))');
+        foreach ($strings as $str) {
+            $res = $matcher->match($str);
+            $this->assertTrue($res->full);
+            $this->assertTrue($res->indexfirst[0] === 0);
+            $this->assertTrue($res->length[0] === strlen($str));
+        }
+    }
+
+    public function test_template_realworld_4() {   // a*b+c*d
+        $regex = '
+        (?###parens_opt<)
+            (?###parens_opt<)
+                (?###parens_opt<)a(?###>)
+                \*
+                (?###parens_opt<)b(?###>)
+            (?###>)
+            \+
+            (?###parens_opt<)
+                (?###parens_opt<)c(?###>)
+                \*
+                (?###parens_opt<)d(?###>)
+            (?###>)
+        (?###>)';
+        $options = new qtype_preg_matching_options();
+        $options->set_modifier(qtype_preg_handling_options::MODIFIER_EXTENDED);
+        $matcher = new qtype_preg_fa_matcher('^' . $regex . '$', $options);
+
+        $strings = array('a*b+c*d', '((a*b+c*d))', '((a)*((b)))+(((c)*(((d)))))');
+        foreach ($strings as $str) {
+            $res = $matcher->match($str);
+            $this->assertTrue($res->full);
+            $this->assertTrue($res->indexfirst[0] === 0);
+            $this->assertTrue($res->length[0] === strlen($str));
+        }
+    }
 }
