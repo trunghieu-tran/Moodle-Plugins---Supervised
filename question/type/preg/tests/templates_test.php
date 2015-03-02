@@ -460,9 +460,10 @@ class qtype_preg_templates_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($res->length[0] === 6);
     }
 
-    public function test_template_realworld_3() {   // a+b+c
+    public function test_template_realworld_3() {   // sin(a+b+c)
         $regex = '
-        (?###parens_opt<)
+        sin\s*
+        (?###parens_req<)
 
             (?|
 
@@ -496,7 +497,7 @@ class qtype_preg_templates_test extends PHPUnit_Framework_TestCase {
         $matcher = new qtype_preg_fa_matcher('^' . $regex . '$', $options);
 
         // Full matches
-        $strings = array('a+b+c', '(a+(b)+c)', '((a+b+c))', '(((a))+(b)+(c))', '((((a))+((b)))+((c)))', '((a)+(b+c))');
+        $strings = array('sin (a+b+c)', 'sin(a+(b)+c)', 'sin((a+b+c))', 'sin (((a))+(b)+(c))', 'sin((((a))+((b)))+((c)))', 'sin ((a)+(b+c))');
         foreach ($strings as $str) {
             $res = $matcher->match($str);
             $this->assertTrue($res->full);
@@ -505,20 +506,20 @@ class qtype_preg_templates_test extends PHPUnit_Framework_TestCase {
         }
 
         // Partial matches
-        $res = $matcher->match('((a+b+c)');
+        $res = $matcher->match('sin((a+b+c)');
         $this->assertFalse($res->full);
         $this->assertTrue($res->indexfirst[0] === 0);
-        $this->assertTrue($res->length[0] === 8);
+        $this->assertTrue($res->length[0] === 11);
 
-        $res = $matcher->match('(a+b+c))');
+        $res = $matcher->match('sin(a+b+c))');
         $this->assertFalse($res->full);
         $this->assertTrue($res->indexfirst[0] === 0);
-        $this->assertTrue($res->length[0] === 7);
+        $this->assertTrue($res->length[0] === 10);
 
-        /*$res = $matcher->match('(((a)+b)');
+        /*$res = $matcher->match('sin(((a)+b)');
         $this->assertFalse($res->full);
         $this->assertTrue($res->indexfirst[0] === 0);
-        $this->assertTrue($res->length[0] === 8);*/
+        $this->assertTrue($res->length[0] === 11);*/
     }
 
     public function test_template_realworld_4() {   // a*b+c*d
