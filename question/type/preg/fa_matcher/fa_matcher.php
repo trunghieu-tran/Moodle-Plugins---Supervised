@@ -582,6 +582,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
      */
     protected function match_brute_force($str, $startpos) {
         global $CFG;
+        $maxrecursionlevel = $str->length() + 1;
         $maxstatescount = isset($CFG->qtype_preg_fa_simulation_state_limit)
                         ? $CFG->qtype_preg_fa_simulation_state_limit
                         : 1000;
@@ -619,7 +620,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                     //$char = core_text::substr($str, $curpos, 1);
                     //echo "level $recursionlevel: trying $transition at pos $curpos (char '$char')\n";
 
-                    if ($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL) {
+                    if ($transition->pregleaf->type === qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL && $recursionlevel < $maxrecursionlevel) {
                         // Handle a recursive transition
                         $newstate = $this->match_recursive_transition_begin($curstate, $transition, $str, $curpos, $length, $full);
                         if ($full) {
@@ -631,7 +632,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                                 $reached[] = $newnewstate;
                             }
                         }
-                    } else {
+                    } else if ($transition->pregleaf->type !== qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL) {
                         // Handle a non-recursive transition transition
                         $newstate = $this->match_regular_transition($curstate, $transition, $str, $curpos, $length, $full);
 
@@ -727,6 +728,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
      */
     protected function match_fast($str, $startpos) {
         global $CFG;
+        $maxrecursionlevel = $str->length() + 1;
         $maxstatescount = isset($CFG->qtype_preg_fa_simulation_state_limit)
                         ? $CFG->qtype_preg_fa_simulation_state_limit
                         : 1000;
@@ -796,7 +798,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                     //$char = core_text::substr($str, $curpos, 1);
                     //echo "level $recursionlevel: trying $transition at pos $curpos (char '$char')\n";
 
-                    if ($transition->pregleaf->type == qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL) {
+                    if ($transition->pregleaf->type === qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL && $recursionlevel < $maxrecursionlevel) {
                         // Handle a recursive transition
                         $newstate = $this->match_recursive_transition_begin($curstate, $transition, $str, $curpos, $length, $full);
                         if ($full) {
@@ -812,7 +814,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                                 }
                             }
                         }
-                    } else {
+                    } else if ($transition->pregleaf->type !== qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL) {
                         // Handle a non-recursive transition transition
                         $newstate = $this->match_regular_transition($curstate, $transition, $str, $curpos, $length, $full);
 
