@@ -156,7 +156,7 @@ abstract class qtype_preg_fa_node {
         $tagsets = array();
         $oppositetransitions = array();
         $intersection = null;
-        $wasmerged = false;
+        $transitionadded = false;
         $flag = new qtype_preg_charset_flag();
         $flag->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string("\n"));
         $charset = new qtype_preg_leaf_charset();
@@ -222,7 +222,7 @@ abstract class qtype_preg_fa_node {
                         $tran->from = $del->from;
                         $tran->redirect_merged_transitions();
                         $automaton->add_transition($tran);
-                        $wasmerged = true;
+                        $transitionadded = true;
                     }
                 }
             } else {
@@ -237,14 +237,14 @@ abstract class qtype_preg_fa_node {
                         $tran->to = $del->to;
                         $tran->redirect_merged_transitions();
                         $automaton->add_transition($tran);
-                        $wasmerged = true;
+                        $transitionadded = true;
                     }
                 }
             }
             if (!($del->is_end_anchor() && in_array($del->to, $endstates)) && !($transition->from == $transition->to && ($transition->is_unmerged_assert() || $transition->is_eps()))) {
                 $automaton->remove_transition($del);
             }
-            $stackitem['broken'] = !$wasmerged;
+            $stackitem['broken'] = !$transitionadded;
             return true;
         }
         return false;
@@ -367,8 +367,6 @@ abstract class qtype_preg_fa_node {
                             $resultout->redirect_merged_transitions();
                             $automaton->add_transition(clone $clone);
                             $automaton->add_transition(clone $resultout);
-                        } else {
-                            $stack_item['broken'] = true;
                         }
                     }
                 }
@@ -601,7 +599,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
             $automaton->redirect_transitions($cur['end'], $result['start']);
             $borderstate = $result['start'];
 
-            $result = array('start' => $cur['start'], 'end' => $result['end'], 'broken' => $cur['broken']);
+            $result = array('start' => $cur['start'], 'end' => $result['end'], 'broken' => $cur['broken'] || $result['broken']);
             $start = $cur['start'];
             $end = $result['end'];
             $incoming = $automaton->get_adjacent_transitions($end, false);
