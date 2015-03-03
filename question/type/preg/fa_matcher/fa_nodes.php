@@ -48,8 +48,8 @@ abstract class qtype_preg_fa_node {
     /**
      * Creates an automaton corresponding to this node.
      * @param automaton - a reference to the automaton being built.
-     * @param stack - a stack of arrays in the form of array('start' => $ref1, 'end' => $ref2),
-     *                start and end states of parts of the resulting automaton.
+     * @param stack - a stack of arrays in the form of array('start' => $ref1, 'end' => $ref2, 'broken' => bool),
+     *                start and end states of parts of the resulting automaton + flag if the automaton broken after assertions merging.
      * @param transform - if true, perform transformations such as assertion merging
      */
     abstract protected function create_automaton_inner(&$automaton, &$stack, $transform);
@@ -474,7 +474,7 @@ class qtype_preg_fa_leaf extends qtype_preg_fa_node {
         // Add a corresponding transition between them.
         $automaton->add_transition(new qtype_preg_fa_transition($start, $this->pregnode, $end));
 
-        $stack[] = array('start' => $start, 'end' => $end);
+        $stack[] = array('start' => $start, 'end' => $end, 'broken' => false);
     }
 }
 
