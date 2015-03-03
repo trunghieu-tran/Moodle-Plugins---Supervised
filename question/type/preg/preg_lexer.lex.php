@@ -7351,6 +7351,7 @@ array(
             if (!array_key_exists($name, $available)) {
                 $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_TEMPLATE, $name, $node);
                 $error->position = $position;
+                $node->errors = array($error);
             }
             $result = new JLexToken(qtype_preg_parser::TEMPLATEOPENBRACK, $node);
         } else if (core_text::substr($this->comment, 0, 2) === '##') {
@@ -7362,6 +7363,7 @@ array(
             if (!array_key_exists($name, $available)) {
                 $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_TEMPLATE, $name, $node);
                 $error->position = $position;
+                $node->errors = array($error);
             }
             $result = new JLexToken(qtype_preg_parser::TEMPLATEPARSELEAF, $node);
         }
