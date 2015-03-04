@@ -641,7 +641,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
 	     }
         } else {
             // TODO: generic mistakes handling
-            $result = textlib::strlen($this->value) - textlib::strlen($this->value) * $threshold;
+            $result = core_text::strlen($this->value) - core_text::strlen($this->value) * $threshold;
             $str = '';
             $possiblepairs = array();
             for ($k=0; $k < count($other); $k++) {
