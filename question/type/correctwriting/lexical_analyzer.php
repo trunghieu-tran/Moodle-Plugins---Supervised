@@ -99,13 +99,14 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
             $setmatches = $pair->matches()->matchedpairs;
             $lexmistakes=array();
             foreach ($setmatches as $onematch) {
+                /** @var block_formal_langs_matched_tokens_pair $onematch */
                 if ($onematch->mistakeweight > 0) {
                     $lexmistake = new qtype_correctwriting_lexical_mistake($onematch);
-                    //$lexmistake->mistakemsg = $onematch->message($this->basestringpair->correctstring(), $this->basestringpair->comparedstring());
-                    $lexmistake->weight = $onematch->mistakeweight;
+                    $lexmistake->stringpair = $pair;
                     $lexmistake->answermistaken = $onematch->correcttokens;
                     $lexmistake->responsemistaken = $onematch->comparedtokens;
-                    $lexmistake->stringpair = $pair;
+                    $lexmistake->mistakemsg = $onematch->message($this->basestringpair->correctstring(), $this->basestringpair->comparedstring());
+                    $lexmistake->weight = $onematch->mistakeweight;
                     $lexmistakes[] = $lexmistake;
                 }
             }
