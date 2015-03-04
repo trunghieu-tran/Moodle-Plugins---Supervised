@@ -36,14 +36,14 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     protected $pregleaf;
 %}
 %%
-<YYINITIAL> "digraph" {return $this->createToken();}
+<YYINITIAL> "digraph" {return $this->createToken(qtype_preg_dot_parser::DIGRAPH);}
 <YYINITIAL> {IDENT} {return $this->createToken(qtype_preg_dot_parser::NAME);}
 <YYINITIAL> "{" {
                     $this->startstates = array();
                     $this->yybegin(self::STARTSTATES);
                 }
 
-<YYINITIAL> "}" {return $this->createToken(qtype_preg_dot_parser::CLOSE);}
+<YYINITIAL> "}" {return $this->createToken(qtype_preg_dot_parser::CLOSEBODY);}
 <YYINITIAL> "color" {return $this->createToken(qtype_preg_dot_parser::COLOR);}
 <YYINITIAL> "violet" {return $this->createToken(qtype_preg_dot_parser::VIOLET);}
 <YYINITIAL> "red" {return $this->createToken(qtype_preg_dot_parser::RED);}
