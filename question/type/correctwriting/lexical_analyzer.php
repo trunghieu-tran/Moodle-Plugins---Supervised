@@ -105,6 +105,7 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
                     $lexmistake->weight = $onematch->mistakeweight;
                     $lexmistake->answermistaken = $onematch->correcttokens;
                     $lexmistake->responsemistaken = $onematch->comparedtokens;
+                    $lexmistake->stringpair = $pair;
                     $lexmistakes[] = $lexmistake;
                 }
             }
