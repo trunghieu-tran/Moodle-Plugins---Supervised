@@ -54,7 +54,7 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
      * and values, are indexes from correct string
      * @var array
      */
-    protected $enumcorrectcorrect = array();
+    protected $enumcorrecttocorrect = array();
 
     /**
      * A mistake set for arrays
@@ -76,7 +76,7 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
      * @return int resulting index
      */
     public function map_from_correct_string_to_enum_correct_string($index) {
-        return $this->map($index, $this->enumcorrectcorrect, true, $index);
+        return $this->map($index, $this->enumcorrecttocorrect, true, $index);
     }
 
     /**
@@ -85,7 +85,7 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
      * @return int
      */
     public function map_from_enum_correct_string_to_correct_string($index) {
-        return $this->map($index, $this->enumcorrectcorrect, false, $index);
+        return $this->map($index, $this->enumcorrecttocorrect, false, $index);
     }
 
 
@@ -94,7 +94,7 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
      * @return arrray|null
      */
     public function enum_correct_to_correct() {
-        return $this->enumcorrectcorrect;
+        return $this->enumcorrecttocorrect;
     }
 
     /**
@@ -102,7 +102,7 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
      * @param array $matches
      */
     public function set_enum_correct_to_correct($matches) {
-        $this->enumcorrectcorrect = $matches;
+        $this->enumcorrecttocorrect = $matches;
     }
 
     /**
