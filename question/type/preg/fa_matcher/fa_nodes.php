@@ -470,8 +470,6 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
     }
 
     protected static function intersect($borderstate, $automaton, &$stackitem, $del = true) {
-        $charset = null;
-        $charsetuncapturering = null;
         $uncapturing = array();
         $hasintersect = false;
         $changed = array();
@@ -483,9 +481,6 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
             //printf($tran->get_label_for_dot($tran->from, $tran->to));
             if (!$tran->consumeschars) {
                 $uncapturing[] = clone $tran;
-                if ($tran->pregleaf->type == qtype_preg_node::TYPE_LEAF_CHARSET ) {
-                    $charsetuncapturering = $tran;
-                }
             }
         }
         //printf($automaton->fa_to_dot());
@@ -493,9 +488,6 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
         if (count($uncapturing) != 0) {
             foreach ($incoming as $intran) {
                 if ($intran->consumeschars) {
-                    if ($intran->pregleaf->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
-                        $charset = $intran;
-                    }
                     foreach ($uncapturing as $tran) {
                         $resulttran = $intran->intersect($tran);
                         if ($resulttran != NULL) {
@@ -519,11 +511,6 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                     }
                 }
             }
-            if (!$hasintersect && $charset != null && $charsetuncapturering != null) {
-                $unreachable = new qtype_preg_fa_transition($charset->from, $charset->pregleaf->intersect($charsetuncapturering->pregleaf), $charsetuncapturering->to);
-                $unreachable->loopsback = $charset->loopsback || $charsetuncapturering->loopsback;
-                $automaton->add_transition($unreachable);
-            }
             if (!$hasintersect) {
                 $stackitem['broken'] = true;
             }
@@ -538,9 +525,6 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
             //printf($tran->get_label_for_dot($tran->from, $tran->to));
             if (!$tran->consumeschars) {
                 $uncapturing[] = clone $tran;
-                if ($tran->pregleaf->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
-                    $charsetuncapturering = $tran;
-                }
             }
         }
         //printf($automaton->fa_to_dot());
@@ -548,9 +532,6 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
             foreach ($uncapturing as $tran) {
                 foreach ($outgoing as $outtran) {
                     if ($outtran->consumeschars) {
-                        if ($outtran->pregleaf->type == qtype_preg_node::TYPE_LEAF_CHARSET) {
-                            $charset = $outtran;
-                        }
                         $resulttran = $tran->intersect($outtran);
                         if ($resulttran != NULL) {
                             $hasintersect = true;
@@ -572,11 +553,6 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                         $automaton->remove_transition($outtran);
                     }
                 }
-            }
-            if (!$hasintersect && $charset != null && $charsetuncapturering != null) {
-                $unreachable = new qtype_preg_fa_transition($charsetuncapturering->from, $charset->pregleaf->intersect($charsetuncapturering->pregleaf), $charset->to);
-                $unreachable->loopsback = $charset->loopsback || $charsetuncapturering->loopsback;
-                $automaton->add_transition($unreachable);
             }
             if (!$hasintersect) {
                 $stackitem['broken'] = true;
