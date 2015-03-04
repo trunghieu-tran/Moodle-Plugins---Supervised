@@ -472,14 +472,14 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      */
     static public function damerau_levenshtein($str1, $str2, block_formal_langs_comparing_options $options) {
         if ($options->usecase == false) {
-            $str1 = textlib::strtolower($str1);
-            $str2 = textlib::strtolower($str2);
+            $str1 = core_text::strtolower($str1);
+            $str2 = core_text::strtolower($str2);
         }
         if ($str1 == $str2) {
             return 0;// words identical
         }
-        $lenstr1 = textlib::strlen($str1);
-        $lenstr2 = textlib::strlen($str2);
+        $lenstr1 = core_text::strlen($str1);
+        $lenstr2 = core_text::strlen($str2);
         // zero length of words
         if ($lenstr1 == 0) {
             return $lenstr2;
@@ -527,8 +527,8 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      */
     static public function redaction($str1, $str2) {
         // lenght of tokens
-        $lenstr1 = textlib::strlen($str1);
-        $lenstr2 = textlib::strlen($str2);
+        $lenstr1 = core_text::strlen($str1);
+        $lenstr2 = core_text::strlen($str2);
         // matrix operation and cost
         for ($i=0; $i < $lenstr1+1; $i++) {
             for ($j=0; $j < $lenstr2+1; $j++) {
