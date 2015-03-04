@@ -848,7 +848,11 @@ class block_formal_langs_matched_tokens_pair {
         $j = 0;
         foreach ($this->comparedtokens as $index) {
             $name = 'compared'.$j;
-            $a->$name = $comparedstring->node_description($index);
+            /** @var block_formal_langs_token_base $token */
+            $token = $comparedstring->stream->tokens[$j];
+            $a->$name = $token->value()->string();
+            // Mamontov: Since when do we have descriptions in compared string?
+            //$a->$name = $comparedstring->node_description($index);
             $j++;
         }
 
