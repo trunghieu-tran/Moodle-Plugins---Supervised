@@ -695,7 +695,7 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
         }
 
         $modified = $transform
-                  ? self::intersect($body['end'], $automaton, $stack_item, false)
+                  ? self::intersect($body['end'], $automaton, $body, false)
                   : false;
 
         foreach ($prevtrans as $transition) {
@@ -760,10 +760,11 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
 
                 }
 
+                $broken = $cur['broken'];
                 $modified = $transform
                           ? self::intersect($cur['end'], $automaton, $cur, false)
                           : false;
-
+                $cur['broken'] = $broken && $cur['broken'];
                 $prevtrans = $automaton->get_adjacent_transitions($cur['end'], false);
                 foreach ($prevtrans as $transition) {
                     $transition->set_transition_type();
