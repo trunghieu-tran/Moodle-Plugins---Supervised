@@ -52,6 +52,73 @@ abstract class qtype_correctwriting_sequence_mistake extends qtype_correctwritin
         return $this->lcs;
     }
 
+    /**
+     * Fetches a response descriptions as quoted text.
+     * Returns empty string if no response mistakes available
+     * @return string
+     */
+    protected function response_description() {
+        $result = '';
+        if (count($this->responsemistaken) == 0) {
+            return $result;
+        }
+
+        $indexes = array();
+        foreach($this->responsemistaken as $index) {
+            $realindexes = $this->stringpair->map_from_corrected_string_to_compared_string($index);
+            if (count($indexes) == 0) {
+                $indexes = $realindexes;
+            } else {
+                $indexes = array_merge($indexes, $realindexes);
+            }
+        }
+
+        if (count($indexes)) {
+            sort($indexes);
+            $strings = array();
+            foreach($indexes as $index) {
+                /** @var block_formal_langs_token_base $token */
+                $token = $this->stringpair->comparedstring()->stream->tokens[$index];
+                $string = $token->value();
+                if (is_object($string)) {
+                    /** @var qtype_poasquestion\string $string */
+                    $string = $string->string();
+                }
+                $strings[]=$string;
+            }
+            $result = implode(' ', $strings);
+            $result = get_string('quote', 'block_formal_langs', $result);
+        }
+        return $result;
+    }
+
+    /**
+     * Returns an description for node as answer
+     * @return string answer description
+     */
+    protected function answer_description() {
+        $a = '';
+        /** @var qtype_correctwriting_string_pair $stringpair */
+        $stringpair = $this->stringpair;
+        $realanswerindex = $stringpair->map_from_enum_correct_string_to_correct_string($this->answermistaken[0]);
+        if ($stringpair->correctstring()->has_description($realanswerindex)) {
+            $a = $stringpair->correctstring()->node_description($realanswerindex);
+        } else {
+            $a = $this->response_description();
+            if (core_text::strlen($a) == 0) {
+                $tokens = $this->stringpair->correctstring()->stream->tokens;
+                /** @var block_formal_langs_token_base $token */
+                $token = $tokens[$realanswerindex];
+                $a = $token->value();
+                if (is_object($a)) {
+                    /** @var qtype_poasquestion\string $a */
+                    $a = $a->string();
+                }
+                $a = get_string('quote', 'block_formal_langs', $a);
+            }
+        }
+        return $a;
+    }
 }
 
 
@@ -69,7 +136,9 @@ class qtype_correctwriting_lexeme_moved_mistake extends qtype_correctwriting_seq
         $this->languagename = $language->name();
 
         $this->stringpair = $stringpair;
-        $this->position = $this->stringpair->correctedstring()->stream->tokens[$responseindex]->position();
+        $indexes = $this->stringpair->map_from_corrected_string_to_compared_string($responseindex);
+        $index = min($indexes);
+        $this->position = $this->stringpair->comparedstring()->stream->tokens[$index]->position();
         $this->mistakemsg = null;
         // Fill answer data.
         $this->answermistaken = array();
@@ -85,7 +154,7 @@ class qtype_correctwriting_lexeme_moved_mistake extends qtype_correctwriting_seq
     public function get_mistake_message() {
         if ($this->mistakemsg === null) {
             // Create a mistake message.
-            $a = $this->token_description($this->answermistaken[0], true, true);
+            $a = $this->answer_description();
             $this->mistakemsg = get_string('movedmistakemessage', 'qtype_correctwriting', $a);
         }
         return parent::get_mistake_message();
@@ -115,7 +184,9 @@ class qtype_correctwriting_lexeme_added_mistake extends qtype_correctwriting_seq
     public function __construct($language, $stringpair, $responseindex, $options) {
         $this->languagename = $language->name();
         $this->stringpair = $stringpair;
-        $this->position = $this->stringpair->correctedstring()->stream->tokens[$responseindex]->position();
+        $indexes = $this->stringpair->map_from_corrected_string_to_compared_string($responseindex);
+        $index = min($indexes);
+        $this->position = $this->stringpair->comparedstring()->stream->tokens[$index]->position();
         // Fill answer data.
         $this->answermistaken = array();
         // Fill response data.
@@ -135,14 +206,11 @@ class qtype_correctwriting_lexeme_added_mistake extends qtype_correctwriting_seq
         }
 
         // Create a mistake message.
-        $data = $responsemistaken->value();
-        if (!is_string($data)) {
-            $data = $data->string();
-        }
+        $a = $this->response_description();
         if ($exists) {
-            $this->mistakemsg = get_string('addedmistakemessage', 'qtype_correctwriting', $data);
+            $this->mistakemsg = get_string('addedmistakemessage', 'qtype_correctwriting', $a);
         } else {
-            $this->mistakemsg = get_string('addedmistakemessage_notexist', 'qtype_correctwriting', $data);
+            $this->mistakemsg = get_string('addedmistakemessage_notexist', 'qtype_correctwriting', $a);
         }
     }
 
@@ -157,7 +225,7 @@ class qtype_correctwriting_lexeme_absent_mistake extends qtype_correctwriting_se
     /**
      * Constructs a new error, filling it with constant message.
      * @param object $language      a language object
-     * @param block_formal_langs_string_pair  $stringpair  a string pair with information about strings
+     * @param qtype_correctwriting_string_pair  $stringpair  a string pair with information about strings
      * @param int    $answerindex   index of answer token
      */
     public function __construct($language, $stringpair, $answerindex) {
@@ -165,7 +233,9 @@ class qtype_correctwriting_lexeme_absent_mistake extends qtype_correctwriting_se
 
         $this->stringpair = $stringpair;
 
-        $this->position = $this->stringpair->correctstring()->stream->tokens[$answerindex]->position();
+        $realanswerindex = $this->stringpair->map_from_enum_correct_string_to_correct_string($answerindex);
+
+        $this->position = $this->stringpair->correctstring()->stream->tokens[$realanswerindex]->position();
         // Fill answer data.
         $this->answermistaken=array();
         $this->answermistaken[] = $answerindex;
@@ -181,7 +251,7 @@ class qtype_correctwriting_lexeme_absent_mistake extends qtype_correctwriting_se
     public function get_mistake_message() {
         if ($this->mistakemsg == null) {
             // Create a mistake message.
-            $a = $this->token_description($this->answermistaken[0]);
+            $a = $this->answer_description();
             $this->mistakemsg = get_string('absentmistakemessage', 'qtype_correctwriting', $a);
         }
         return parent::get_mistake_message();
