@@ -267,7 +267,7 @@ abstract class qtype_preg_fa_node {
     }
 
 
-    public static function get_wordbreaks_transitions($negative, $isinto) {
+    public static function get_wordbreaks_transitions($pregleaf, $isinto) {
         $result = array();
         // Create transitions which can replace \b and \B.
         // Create \w.
@@ -275,46 +275,48 @@ abstract class qtype_preg_fa_node {
         $flagw->set_data(qtype_preg_charset_flag::TYPE_FLAG, qtype_preg_charset_flag::SLASH_W);
         $charsetw = new qtype_preg_leaf_charset();
         $charsetw->flags = array(array($flagw));
-        $charsetw->userinscription = array(new qtype_preg_userinscription("\w", qtype_preg_charset_flag::SLASH_W));
+        $charsetw->set_user_info($pregleaf->position, array(new qtype_preg_userinscription("\w", qtype_preg_charset_flag::SLASH_W)));
         $tranw = new qtype_preg_fa_transition(0, $charsetw, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST, false);
         // Create \W.
         $flagbigw = clone $flagw;
         $flagbigw->negative = true;
         $charsetbigw = new qtype_preg_leaf_charset();
         $charsetbigw->flags = array(array($flagbigw));
-        $charsetbigw->userinscription = array(new qtype_preg_userinscription("\W", qtype_preg_charset_flag::SLASH_W));
+        $charsetbigw->set_user_info($pregleaf->position, array(new qtype_preg_userinscription("\W", qtype_preg_charset_flag::SLASH_W)));
         $tranbigw = new qtype_preg_fa_transition(0, $charsetbigw, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST, false);
         // Create ^.
         $assertcircumflex = new qtype_preg_leaf_assert_circumflex();
+        $assertcircumflex->set_user_info($pregleaf->position);
         $transitioncircumflex = new qtype_preg_fa_transition(0, $assertcircumflex, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST, false);
         // Create $.
         $assertdollar = new qtype_preg_leaf_assert_dollar();
+        $assertdollar->set_user_info($pregleaf->position);
         $transitiondollar = new qtype_preg_fa_transition(0, $assertdollar, 1, qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST, false);
 
-        // Incoming transitions.
         if ($isinto) {
+            // Incoming transitions.
             $result[] = $tranw;
             $result[] = $tranbigw;
             $result[] = $transitioncircumflex;
-            // Case \b.
-            if (!$negative) {
-                $result[] = $tranw;
-            } else {
+            if ($pregleaf->negative) {
                 // Case \B.
                 $result[] = $tranbigw;
+            } else {
+                // Case \b.
+                $result[] = $tranw;
             }
         } else {
             // Outcoming transitions.
-            // Case \b.
-            if (!$negative) {
-                $result[] = $tranbigw;
-                $result[] = $tranw;
-                $result[] = clone $tranw;
-            } else {
+            if ($pregleaf->negative) {
                 // Case \B.
                 $result[] = $tranw;
                 $result[] = $tranbigw;
                 $result[] = clone $tranbigw;
+            } else {
+                // Case \b.
+                $result[] = $tranbigw;
+                $result[] = $tranw;
+                $result[] = clone $tranw;
             }
             $result[] = $transitiondollar;
         }
@@ -350,8 +352,8 @@ abstract class qtype_preg_fa_node {
             $stack_item['start'] = $state;
         }
 
-        $wordbreakinto = self::get_wordbreaks_transitions($tran->pregleaf->negative, true);
-        $wordbreakout = self::get_wordbreaks_transitions($tran->pregleaf->negative, false);
+        $wordbreakinto = self::get_wordbreaks_transitions($tran->pregleaf, true);
+        $wordbreakout = self::get_wordbreaks_transitions($tran->pregleaf, false);
         foreach ($wordbreakinto as $wordbreak) {
             $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             $epstran = new qtype_preg_fa_transition($wordbreak->from, $epsleaf, $wordbreak->to);

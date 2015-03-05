@@ -1001,7 +1001,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                     }
                 }
             }
-
         }
 
         // Because a partial match could be found in a recursive call, remove all
@@ -1076,8 +1075,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             $result->remove_unreachable_states();
         }
 
-        if (empty($result->adjacencymatrix)) {
-            throw new qtype_preg_empty_fa_exception('');
+        if ($body['breakpos'] !== null || empty($result->adjacencymatrix)) {
+            throw new qtype_preg_empty_fa_exception('', $body['breakpos']);
         }
 
         /*global $CFG;
@@ -1133,7 +1132,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             $this->errors[] = new qtype_preg_too_complex_error($regex, $this);
             return;
         } catch (qtype_preg_empty_fa_exception $e) {
-            $this->errors[] = new qtype_preg_empty_fa_error($regex);
+            $this->errors[] = new qtype_preg_empty_fa_error($regex, $e->a);
             return;
         }
 
