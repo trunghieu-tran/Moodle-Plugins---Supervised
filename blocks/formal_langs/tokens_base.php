@@ -836,24 +836,53 @@ class block_formal_langs_matched_tokens_pair {
             return '';
         }
 
+        // Create stringified corrected tokens
+        $strings = array();
+        $comparedmessage = '';
+        foreach ($this->comparedtokens as $index) {
+            /** @var block_formal_langs_token_base $token */
+            $token = $comparedstring->stream->tokens[$index];
+            /** @var qtype_poasquestion\string $string */
+            $string = $token->value();
+            $strings[] =$string->string();
+        }
+        if (count($strings)) {
+            $comparedmessage = implode(' ', $strings);
+            $comparedmessage = get_string('quote', 'block_formal_langs', $comparedmessage);
+        }
+
         $a = new stdClass();
         $a->mistakeweight = $this->mistakeweight;
-        $i = 0;
-        foreach ($this->correcttokens as $index) {
-            $name = 'correct'.$i;
-            $a->$name = $correctstring->node_description($index);
-            $i++;
-        }
-        $a->compared = array();
-        $j = 0;
-        foreach ($this->comparedtokens as $index) {
-            $name = 'compared'.$j;
-            /** @var block_formal_langs_token_base $token */
-            $token = $comparedstring->stream->tokens[$j];
-            $a->$name = $token->value()->string();
-            // Mamontov: Since when do we have descriptions in compared string?
-            //$a->$name = $comparedstring->node_description($index);
-            $j++;
+
+        if ($this->type != self::TYPE_MISSING_SEPARATOR) { // Handle typo
+            $i = 0;
+            foreach ($this->correcttokens as $index) {
+                $name = 'correct'.$i;
+                if ($correctstring->has_description($index)) {
+                    $a->$name = $correctstring->node_description($index);
+                } else {
+                    $a->$name = $comparedmessage;
+                }
+                $i++;
+            }
+        } else {
+            // Test if every correct token has a description
+            $hasdescriptions = true;
+            foreach ($this->correcttokens as $index) {
+                $hasdescriptions = $hasdescriptions && $correctstring->has_description($index);
+            }
+            if ($hasdescriptions) {
+                $i = 0;
+                foreach ($this->correcttokens as $index) {
+                    $name = 'correct'.$i;
+                    $a->$name = $correctstring->node_description($index);
+                    $i++;
+                }
+            } else {
+                // We should use another message to hint student
+                $this->messageid = 'missingseparatornodescriptionmsg';
+                $a->compared = $comparedmessage;
+            }
         }
 
         return get_string($this->messageid, 'block_formal_langs', $a);
@@ -2277,7 +2306,11 @@ class block_formal_langs_string_pair {
             if($this->correctstring()->has_description($nodenumber)) {
                 return $this->correctstring()->node_description($nodenumber, false, true);
             } else {
-                $value = $this->comparedstring()->stream->tokens[$index]->value();
+                $tokens = $this->comparedstring()->stream->tokens;
+                $value = '';
+                if (array_key_exists($index, $tokens)) {
+                    $value = $tokens[$index]->value();
+                }
                 return get_string('quote', 'block_formal_langs', $value);
             }
         }

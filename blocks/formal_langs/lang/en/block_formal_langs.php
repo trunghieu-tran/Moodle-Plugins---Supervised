@@ -72,6 +72,7 @@ $string['lang_simple_english_help'] = 'English Language with support for words, 
 $string['lexical_error_message'] = 'Cannot match input {$a->symbol} near {$a->line}:{$a->position} ';
 $string['lexeme'] = 'lexeme';
 $string['missingseparatormsg'] = 'there is no separator between {$a->correct0} and {$a->correct1}';
+$string['missingseparatornodescriptionmsg'] = 'there is missing separator in {$a->compared}';
 $string['part'] = 'part';
 $string['pluginname'] = 'Formal languages block';
 $string['quote'] = '"{$a}"';
