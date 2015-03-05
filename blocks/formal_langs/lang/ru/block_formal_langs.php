@@ -72,6 +72,7 @@ $string['language_editing_submit_edit'] = 'Изменить язык и прод
 $string['language_editing_submit_save_as_new'] = 'Сохранить язык как новый';
 $string['lexeme'] = 'лексема';
 $string['missingseparatormsg'] = '{$a->correct0} и {$a->correct1} возможно записаны без разделителя';
+$string['missingseparatornodescriptionmsg'] = 'Возможно пропущен разделитель в {$a->compared}';
 $string['part'] = 'часть';
 $string['pluginname'] = 'Блок формальных языков';
 $string['quoteat'] = '"{$a->value}" начинающееся с позиции {$a->line}:{$a->column}';
