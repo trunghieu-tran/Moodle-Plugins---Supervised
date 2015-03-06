@@ -729,3 +729,4 @@ $string['explain_begin'] = 'begin';
 $string['explain_end'] = 'end';
 $string['explain_true'] = 'true';
 $string['explain_false'] = 'false';
+$string['explain_this'] = 'this';
