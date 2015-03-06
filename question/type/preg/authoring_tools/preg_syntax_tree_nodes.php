@@ -442,7 +442,8 @@ class qtype_preg_syntax_tree_leaf_options extends qtype_preg_syntax_tree_leaf {
 class qtype_preg_syntax_tree_leaf_template extends qtype_preg_syntax_tree_leaf {
 
     public function tooltip() {
-        if ($this->pregnode->name != '') {
+        $available = qtype_preg\template::available_templates();
+        if ($this->pregnode->name != '' && array_key_exists($this->pregnode->name, $available)) {
             return get_string('leaf_template', 'qtype_preg') . '&#10;' . get_string('description_template_' . $this->pregnode->name, 'qtype_preg');
         }
 
@@ -535,7 +536,8 @@ class qtype_preg_syntax_tree_node_template extends qtype_preg_syntax_tree_operat
     }
 
     public function tooltip() {
-        if ($this->pregnode->name != '') {
+        $available = qtype_preg\template::available_templates();
+        if ($this->pregnode->name != '' && array_key_exists($this->pregnode->name, $available)) {
             return get_string('node_template', 'qtype_preg') . '&#10;' . get_string('description_template_' . $this->pregnode->name, 'qtype_preg');
         }
 
