@@ -629,13 +629,15 @@ M.preg_authoring_tools_script = (function ($) {
     },
 
     get_current_x : function(e, img, hnd) {
-        return e.pageX - $(window).prop('scrollX') - document.getElementById(img).getBoundingClientRect().left
+        var x = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
+        return e.pageX - x - document.getElementById(img).getBoundingClientRect().left
             - (document.getElementById(hnd).getBoundingClientRect().left - document.getElementById(img).getBoundingClientRect().left)
             + $('#' + hnd).prop('scrollLeft');
     },
 
     get_current_y : function(e, img, hnd) {
-        return e.pageY - $(window).prop('scrollY') - document.getElementById(img).getBoundingClientRect().top
+        var y = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+        return e.pageY - y - document.getElementById(img).getBoundingClientRect().top
             - (document.getElementById(hnd).getBoundingClientRect().top - document.getElementById(img).getBoundingClientRect().top)
             + $('#' + hnd).prop('scrollTop');
     },
