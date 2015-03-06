@@ -1070,7 +1070,7 @@ class qtype_preg_fa {
                 }
             }
         }
-        $result = "digraph {\n    rankdir=LR;\n    " . $start . $end . $transitions . "\n}";
+        $result = "digraph {\n    rankdir=LR;\n    " . $start . $end . $transitions . "}";
         if ($type != null) {
             $result = qtype_preg_regex_handler::execute_dot($result, $type, $filename);
         }
