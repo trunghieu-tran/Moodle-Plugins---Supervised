@@ -220,6 +220,10 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
 
 abstract class qtype_preg_dotbased_authoring_tool extends qtype_preg_authoring_tool {
 
+    public function __construct($regex = null, $options = null) {
+        parent::__construct($regex, $options);
+    }
+
     // Overloaded for some exceptions handling.
     public function generate_json() {
         try {

@@ -15,9 +15,6 @@ class qtype_preg_syntax_tree_tool extends qtype_preg_dotbased_authoring_tool {
 
     public function __construct($regex = null, $options = null) {
         parent::__construct($regex, $options);
-        if($options->treeisfold != null) {
-            $this->options->treeisfold = $options->treeisfold;
-        }
     }
 
     /**

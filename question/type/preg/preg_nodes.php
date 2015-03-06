@@ -73,6 +73,18 @@ class qtype_preg_position {
                                        $this->linefirst, $this->linelast,
                                        $this->colfirst, $this->collast + $count);
     }
+
+    public function left() {
+        return new qtype_preg_position($this->indfirst, $this->indfirst,
+                                       $this->linefirst, $this->linefirst,
+                                       $this->colfirst, $this->colfirst);
+    }
+
+    public function right() {
+        return new qtype_preg_position($this->indlast, $this->indlast,
+                                       $this->linelast, $this->linelast,
+                                       $this->collast, $this->collast);
+    }
 }
 
 /**
