@@ -304,8 +304,7 @@ class qtype_preg_explaining_graph_leaf_assert extends qtype_preg_explaining_grap
 class qtype_preg_explaining_graph_leaf_backref extends qtype_preg_explaining_graph_leaf {
 
     public function get_value() {
-        $postfix = $this->pregnode->isrecursive ? '_recursive' : '';
-        return array(get_string($this->pregnode->lang_key(true).$postfix, 'qtype_preg', $this->pregnode->number));
+        return array(get_string($this->pregnode->lang_key(true), 'qtype_preg', $this->pregnode->number));
     }
 
     public function get_color() {
