@@ -153,7 +153,7 @@ abstract class qtype_preg_fa_node {
      *
      * @param del - uncapturing transition for deleting.
      */
-    static public function go_round_transitions($automaton, $del, &$stackitem, $back = null) {
+    static public function merge_transitions($automaton, $del, &$stackitem, $back = null) {
         $clonetransitions = array();
         $tagsets = array();
         $oppositetransitions = array();
@@ -435,7 +435,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
             foreach ($incoming as $transition) {
                 $transition->set_transition_type();
                 if ($transition->is_eps()) {
-                    qtype_preg_fa_node::go_round_transitions($automaton, $transition, $stack_item);
+                    qtype_preg_fa_node::merge_transitions($automaton, $transition, $stack_item);
                 }
             }
         }
@@ -445,7 +445,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
         $incoming = $automaton->get_adjacent_transitions($borderstate, false);
         foreach ($incoming as $transition) {
             if ($transition->is_eps() && $transition->from != $stack_item['start']) {
-                qtype_preg_fa_node::go_round_transitions($automaton, $transition, $stack_item, true);
+                qtype_preg_fa_node::merge_transitions($automaton, $transition, $stack_item, true);
             }
         }
     }
@@ -478,7 +478,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
         foreach ($incoming as $transition) {
             $transition->set_transition_type();
             if ($transition->is_eps() || $transition->is_unmerged_assert()) {
-                qtype_preg_fa_node::go_round_transitions($automaton, $transition, $stack_item);
+                qtype_preg_fa_node::merge_transitions($automaton, $transition, $stack_item);
             }
 
         }
@@ -486,7 +486,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
         foreach ($outgoing as $transition) {
             $transition->set_transition_type();
             if ($transition->is_eps() || $transition->is_unmerged_assert()) {
-                qtype_preg_fa_node::go_round_transitions($automaton, $transition, $stack_item);
+                qtype_preg_fa_node::merge_transitions($automaton, $transition, $stack_item);
             }
 
         }
@@ -714,7 +714,7 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
             $automaton->add_transition($newtransition);
             $redirectedtransitions[] = $transition;
             if ($transform && ($newtransition->is_eps() || $newtransition->is_unmerged_assert())) {
-                qtype_preg_fa_node::go_round_transitions($automaton, $newtransition, $body);
+                qtype_preg_fa_node::merge_transitions($automaton, $newtransition, $body);
             }
         }
 
@@ -725,7 +725,7 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
         foreach ($prevtrans as $transition) {
             $transition->set_transition_type();
             if ($transform && ($transition->is_eps() || $transition->is_unmerged_assert())) {
-                qtype_preg_fa_node::go_round_transitions($automaton, $transition,  $body);
+                qtype_preg_fa_node::merge_transitions($automaton, $transition,  $body);
             }
         }
 
@@ -776,7 +776,7 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
                         qtype_preg_fa_node::merge_wordbreaks($newtransition, $automaton, $cur, false);
                     }
                     if ($transform && ($newtransition->is_eps() || $newtransition->is_unmerged_assert())) {
-                        qtype_preg_fa_node::go_round_transitions($automaton, $newtransition, $cur);
+                        qtype_preg_fa_node::merge_transitions($automaton, $newtransition, $cur);
                     }
                 }
 
@@ -790,7 +790,7 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
                         qtype_preg_fa_node::merge_wordbreaks($newtransition, $automaton, $cur, false);
                     }
                     if ($transform && ($transition->is_eps() || $transition->is_unmerged_assert())) {
-                        qtype_preg_fa_node::go_round_transitions($automaton, $transition, $cur);
+                        qtype_preg_fa_node::merge_transitions($automaton, $transition, $cur);
                     }
                 }
 
@@ -877,7 +877,7 @@ class qtype_preg_fa_node_finite_quant extends qtype_preg_fa_node_quant {
             $automaton->add_transition($transition);
             $transition->set_transition_type();
             if ($transform && ($transition->is_eps() || $transition->is_unmerged_assert())) {
-                qtype_preg_fa_node::go_round_transitions($automaton, $transition, $cur);
+                qtype_preg_fa_node::merge_transitions($automaton, $transition, $cur);
             }
             $quantified[] = $cur;
         }
