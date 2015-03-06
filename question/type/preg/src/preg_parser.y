@@ -103,7 +103,9 @@
 
         // Add an eps leaf if there's only positive branch.
         if (count($node->operands) - $shift == 1) {
-            $node->operands[] = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+            $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+            $epsleaf->set_user_info($node->position->right()->add_chars_right(-1));
+            $node->operands[] = $epsleaf;
         }
     }
 
