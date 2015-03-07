@@ -842,6 +842,7 @@ class qtype_preg_explaining_graph_node_template extends qtype_preg_explaining_gr
         $left = $this->operands[0]->create_graph();
         $template->assume_subgraph($left);
         $template->entries[] = end($left->entries);
+        $template->exits[] = end($left->exits);
 
         $n = count($this->operands);
         for ($i = 1; $i < $n; ++$i) {
