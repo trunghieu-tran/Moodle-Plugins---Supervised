@@ -305,6 +305,7 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
     }
 
     public function test_get_matcher() {
+        global $CFG;
         // Test case insensitivity.
         $testquestion = clone $this->testquestion;
         $matcher = $testquestion->get_matcher($testquestion->engine, $testquestion->answers[100]->answer, true, $testquestion->get_modifiers(false));
@@ -329,6 +330,7 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
 
         // Regular expression that can not match due to start/end string assertions.
         // In that case get_matcher should return fa_matcher even if PHP matcher can match expression.
+        $CFG->qtype_preg_assertfailmode = 1; // Fail mode merge on.
         $matcher = $testquestion->get_matcher('fa_matcher', 'a^b', false, 0, null, 'native', false);
         $errors = $matcher->get_errors();
         $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
