@@ -293,13 +293,18 @@ class qtype_preg_question extends question_graded_automatically
             $matcher = new $engineclass($regex, $matchingoptions);
 
             if ($matcher->errors_exist() && !$hintpossible && $engine != 'php_preg_matcher') {
-                // Custom engine can't handle regex and hints not needed, let's try preg_match instead.
-                $engine = 'php_preg_matcher';
-                require_once($CFG->dirroot . '/question/type/preg/'.$engine.'/'.$engine.'.php');
-                $engineclass = 'qtype_preg_'.$engine;
-                $newmatcher = new $engineclass($regex, $matchingoptions);
-                if (!$newmatcher->errors_exist()) {// We still prefer to show error messages from custom engine, since they are much more detailed.
-                    $matcher = $newmatcher;
+                // There is one exception - regex that can not match due to empty FA.
+                // PCRE does not look for this problem, FA matcher is.
+                $errors = $matcher->get_errors();
+                if (count($errors) > 1 || !is_a($errors[0], 'qtype_preg_empty_fa_error')) {
+                    // Custom engine can't handle regex and hints not needed, let's try preg_match instead.
+                    $engine = 'php_preg_matcher';
+                    require_once($CFG->dirroot . '/question/type/preg/'.$engine.'/'.$engine.'.php');
+                    $engineclass = 'qtype_preg_'.$engine;
+                    $newmatcher = new $engineclass($regex, $matchingoptions);
+                    if (!$newmatcher->errors_exist()) {// We still prefer to show error messages from custom engine, since they are much more detailed.
+                        $matcher = $newmatcher;
+                    }
                 }
             }
 
