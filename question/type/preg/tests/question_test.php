@@ -326,6 +326,14 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
         // Test space inside square brackets.
         $matchresults = $matcher->match('Do cats eatbats?');
         $this->assertFalse($matchresults->full);
+
+        // Regular expression that can not match due to start/end string assertions.
+        // In that case get_matcher should return fa_matcher even if PHP matcher can match expression.
+        $matcher = $testquestion->get_matcher('fa_matcher', 'a^b', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(1, count($errors));
+        $this->assertTrue(is_a($errors[0], 'qtype_preg_empty_fa_error'));
     }
 
     public function test_insert_subexpressions() {
@@ -423,4 +431,5 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
          '(z|y(x))(w)'
          '(?P<name>value)nonvalue|(?P<noname>wrongvalue)'*/
     }
+
 }
