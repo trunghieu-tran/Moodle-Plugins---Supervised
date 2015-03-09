@@ -231,7 +231,8 @@ abstract class qtype_preg_fa_node {
                     }
                 }
 
-                if ($intersection !== null || !$del->is_end_anchor() || $tran->is_unmerged_assert() || $tran->is_eps()) {
+                if ($del->pregleaf->subtype !== qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z &&
+                    ($intersection !== null || !$del->is_end_anchor() || $tran->is_unmerged_assert() || $tran->is_eps())) {
                     $tran->from = $del->from;
                     $tran->redirect_merged_transitions();
                     $automaton->add_transition($tran);
@@ -248,7 +249,8 @@ abstract class qtype_preg_fa_node {
                         $tran->pregleaf = $intersection->pregleaf;
                     }
                 }
-                if ($intersection !== null || !$del->is_start_anchor() || $tran->is_unmerged_assert() || $tran->is_eps()) {
+                if ($del->pregleaf->subtype !== qtype_preg_leaf_assert::SUBTYPE_ESC_A &&
+                    ($intersection !== null || !$del->is_start_anchor() || $tran->is_unmerged_assert() || $tran->is_eps())) {
                     $tran->to = $del->to;
                     $tran->redirect_merged_transitions();
                     $automaton->add_transition($tran);
