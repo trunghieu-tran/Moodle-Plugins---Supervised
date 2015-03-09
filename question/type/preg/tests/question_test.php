@@ -385,8 +385,8 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
         $this->assertEquals(1, count($errors));
         $this->assertTrue(is_a($errors[0], 'qtype_preg_empty_fa_error'));
-        $this->assertEquals(10, $errors[0]->position->indfirst);
-        $this->assertEquals(14, $errors[0]->position->indlast);
+        $this->assertEquals(14, $errors[0]->position->indfirst);
+        $this->assertEquals(18, $errors[0]->position->indlast);
 
         $matcher = $testquestion->get_matcher('fa_matcher', '(?m)a$[a-z]b[a-z]^c', false, 0, null, 'native', false);
         $errors = $matcher->get_errors();
