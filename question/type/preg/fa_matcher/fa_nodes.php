@@ -169,7 +169,7 @@ abstract class qtype_preg_fa_node {
         $endstates = array($stackitem['end']);
 
         // Cycled last states.
-        if (in_array($del->to, $endstates) && $del->is_eps() || !$del->consumeschars) {
+        if ((in_array($del->to, $endstates) && $del->is_eps()) || !$del->consumeschars) {
             return false;
         }
 
@@ -652,7 +652,9 @@ class qtype_preg_fa_node_alt extends qtype_preg_fa_operator {
                 // Merge start and end states.
                 $automaton->redirect_transitions($cur['start'], $result['start']);
                 $automaton->redirect_transitions($cur['end'], $result['end']);
-                $result['breakpos'] = null;
+                if ($cur['breakpos'] === null) {
+                    $result['breakpos'] = null;
+                }
             }
         }
 
