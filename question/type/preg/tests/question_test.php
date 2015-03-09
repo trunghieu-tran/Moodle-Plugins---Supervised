@@ -411,7 +411,7 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
         $this->assertEquals(0, count($errors));
 
-        $matcher = $testquestion->get_matcher('fa_matcher', 'b$(cd|\n)', false, 0, null, 'native', false);
+        $matcher = $testquestion->get_matcher('fa_matcher', '(?m)b$(cd|\n)', false, 0, null, 'native', false);
         $errors = $matcher->get_errors();
         $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
         $this->assertEquals(0, count($errors));
@@ -434,7 +434,7 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals(1, $errors[0]->position->indfirst);
         $this->assertEquals(1, $errors[0]->position->indlast);
 
-        $matcher = $testquestion->get_matcher('fa_matcher', '(b$)+\n', false, 0, null, 'native', false);
+        $matcher = $testquestion->get_matcher('fa_matcher', '(?m)(b$)+\n', false, 0, null, 'native', false);
         $errors = $matcher->get_errors();
         $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
         $this->assertEquals(0, count($errors));
