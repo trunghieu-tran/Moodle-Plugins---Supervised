@@ -471,6 +471,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
 
         $incoming = $automaton->get_adjacent_transitions($borderstate, false);
         $outgoing = $automaton->get_adjacent_transitions($borderstate, true);
+        $breakpos = $stack_item['breakpos'];
         foreach ($outgoing as $transition) {
             if (!$transition->consumeschars) {
                 self::merge_before_intersection($automaton, $stack_item, $borderstate);
@@ -491,7 +492,9 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
             }
 
         }
-
+        if ($breakpos !== null) {
+            $stack_item['breakpos'] = $breakpos;
+        }
         self::intersect($borderstate, $automaton, $stack_item);
     }
 
@@ -536,7 +539,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                     }
                 }
             }
-            if (!$hasintersect) {
+            if (!$hasintersect && $breakpos !== null) {
                 $stackitem['breakpos'] = $breakpos;
             }
             return $changed;
@@ -579,7 +582,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                     }
                 }
             }
-            if (!$hasintersect) {
+            if (!$hasintersect && $breakpos !== null) {
                 $stackitem['breakpos'] = $breakpos;
             }
             return $changed;
@@ -601,6 +604,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
             if ($breakpos === null) {
                 $breakpos = $cur['breakpos'];
             }
+
             $result = array('start' => $cur['start'], 'end' => $result['end'], 'breakpos' => $breakpos);
             $incoming = $automaton->get_adjacent_transitions($result['end'], false);
             foreach ($incoming as $tran) {
@@ -778,6 +782,7 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
                     }
                     if ($transform && ($newtransition->is_eps() || $newtransition->is_unmerged_assert())) {
                         qtype_preg_fa_node::merge_transitions($automaton, $newtransition, $cur);
+
                     }
                 }
 
@@ -792,6 +797,9 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
                     }
                     if ($transform && ($transition->is_eps() || $transition->is_unmerged_assert())) {
                         qtype_preg_fa_node::merge_transitions($automaton, $transition, $cur);
+                        if ($transition->is_end_anchor()) {
+                            $cur['breakpos'] = null;
+                        }
                     }
                 }
 
