@@ -682,10 +682,10 @@ class qtype_preg_cross_tests_from_preg {
 
     function data_for_test_assertions_simple_7() {
         $test1 = array('str'=>'bc',
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>1),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'ext_index_first'=>array(0=>0),
                        'ext_length'=>array(0=>1),
                        'left'=>array(1),
