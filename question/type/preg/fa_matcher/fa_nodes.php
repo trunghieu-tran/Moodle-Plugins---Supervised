@@ -169,7 +169,7 @@ abstract class qtype_preg_fa_node {
         $endstates = array($stackitem['end']);
 
         // Cycled last states.
-        if (in_array($del->to, $endstates) || !$del->consumeschars) {
+        if (in_array($del->to, $endstates) && $del->is_eps() || !$del->consumeschars) {
             return false;
         }
 
@@ -224,13 +224,14 @@ abstract class qtype_preg_fa_node {
         $breakpos = null;
         if (!$back) {
             foreach ($clonetransitions as &$tran) {
-                if ($del->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_DOLLAR && !$tran->is_unmerged_assert()) {
+                if ($del->is_end_anchor() && !$tran->is_unmerged_assert() && !$tran->is_eps()) {
                     $intersection = $tran->intersect($righttran);
                     if ($intersection !== null) {
                         $tran->pregleaf = $intersection->pregleaf;
                     }
                 }
-                if ($intersection !== null || $del->pregleaf->subtype != qtype_preg_leaf_assert::SUBTYPE_DOLLAR || $tran->is_unmerged_assert()) {
+
+                if ($intersection !== null || !$del->is_end_anchor() || $tran->is_unmerged_assert() || $tran->is_eps()) {
                     $tran->from = $del->from;
                     $tran->redirect_merged_transitions();
                     $automaton->add_transition($tran);
@@ -241,13 +242,13 @@ abstract class qtype_preg_fa_node {
             }
         } else {
             foreach ($clonetransitions as &$tran) {
-                if ($del->pregleaf->subtype == qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX && !$tran->is_unmerged_assert()) {
+                if ($del->is_start_anchor() && !$tran->is_unmerged_assert() && !$tran->is_eps()) {
                     $intersection = $tran->intersect($righttran);
                     if ($intersection !== null) {
                         $tran->pregleaf = $intersection->pregleaf;
                     }
                 }
-                if ($intersection !== null || $del->pregleaf->subtype != qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX || $tran->is_unmerged_assert()) {
+                if ($intersection !== null || !$del->is_start_anchor() || $tran->is_unmerged_assert() || $tran->is_eps()) {
                     $tran->to = $del->to;
                     $tran->redirect_merged_transitions();
                     $automaton->add_transition($tran);
@@ -651,9 +652,7 @@ class qtype_preg_fa_node_alt extends qtype_preg_fa_operator {
                 // Merge start and end states.
                 $automaton->redirect_transitions($cur['start'], $result['start']);
                 $automaton->redirect_transitions($cur['end'], $result['end']);
-                if ($cur['breakpos'] === null) {
-                    $result['breakpos'] = null;
-                }
+                $result['breakpos'] = null;
             }
         }
 
