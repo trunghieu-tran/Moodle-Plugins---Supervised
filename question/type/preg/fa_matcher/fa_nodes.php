@@ -256,7 +256,6 @@ abstract class qtype_preg_fa_node {
                     $automaton->add_transition($tran);
                     $transitionadded = true;
                 } else if ($breakpos === null && $tran->pregleaf->position !== null) {
-                    //var_dump($tran->pregleaf);
                     $breakpos = $tran->pregleaf->position->compose($del->pregleaf->position);
                 }
             }
