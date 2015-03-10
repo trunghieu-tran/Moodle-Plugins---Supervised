@@ -329,8 +329,14 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
             array('(?###word)', 'word', 'tbd'),
             array('(?###integer)', 'integer', 'tbd'),
             array('(?###parens_req<)a(?###>)', '$$1 in parens', 'tbd'),
-            array('(?###parens_opt<)a(?###>)', '$$1 in parens or not', 'tbd'),
+            array('(?###parens_opt<)a(?###>)', '$$1 in optional parens', 'tbd')
         );
+    }
+
+    public function test_template_errors() {
+        $handler = new qtype_preg_description_tool('(?###wtf)');
+        $root = $handler->get_ast_root();
+        $whatever = $handler->description('%content','%content');
     }
 
     //------------------------------------------------------------------
