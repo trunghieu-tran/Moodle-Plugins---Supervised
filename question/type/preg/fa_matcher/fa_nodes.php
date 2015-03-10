@@ -237,7 +237,7 @@ abstract class qtype_preg_fa_node {
                     $tran->redirect_merged_transitions();
                     $automaton->add_transition($tran);
                     $transitionadded = true;
-                } else if ($breakpos === null) {
+                } else if ($breakpos === null && $tran->pregleaf->position !== null) {
                     $breakpos = $del->pregleaf->position->compose($tran->pregleaf->position);
                 }
             }
@@ -530,7 +530,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                             $automaton->add_transition($resulttran);
                             $changed[] = $resulttran->to;
                         } else if ($del) {
-                            if ($breakpos === null) {
+                            if ($breakpos === null && $intran->pregleaf->position !== null) {
                                 $breakpos = $intran->pregleaf->position->compose($tran->pregleaf->position);
                             }
                             $automaton->remove_transition($tran);
@@ -573,7 +573,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                             $automaton->add_transition($resulttran);
                             $changed[] = $resulttran->from;
                         } else if ($del) {
-                            if ($breakpos === null) {
+                            if ($breakpos === null && $tran->pregleaf->position !== null) {
                                 $breakpos = $tran->pregleaf->position->compose($outtran->pregleaf->position);
                             }
                             $automaton->remove_transition($tran);
