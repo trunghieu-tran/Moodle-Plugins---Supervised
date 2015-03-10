@@ -361,7 +361,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
     public function pattern($node_parent = null, $form = null) {
         $characters = array();
         // check errors
-        if (count($this->pregnode->errors) > 0) {
+        if (!empty($this->pregnode->errors)) {
             return $this->pregnode->errors[0]->error_string();
         }
 
@@ -877,7 +877,7 @@ class qtype_preg_description_node_template extends qtype_preg_description_operat
      */
     public function pattern($node_parent = null, $form = null) {
         if (!empty($this->pregnode->errors)) {
-            return '';
+            return $this->pregnode->errors[0]->error_string();
         }
         return $this->template->get_description();
     }
@@ -900,7 +900,7 @@ class qtype_preg_description_leaf_template extends qtype_preg_description_leaf {
      */
     public function pattern($node_parent = null, $form = null) {
         if (!empty($this->pregnode->errors)) {
-            return '';
+            return $this->pregnode->errors[0]->error_string();
         }
         return $this->template->get_description();
     }
