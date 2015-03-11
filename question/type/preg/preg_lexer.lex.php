@@ -7294,6 +7294,11 @@ array(
 							break;
 						case 93:
 							{          /* (?(DEFINE)...             Conditional subexpression - define subpattern for reference */
+    $text = $this->yytext();
+    // Special case: (?(DEFINE with existing subpattern named "DEFINE"
+    if ($text == '(?(DEFINE)' && array_key_exists('DEFINE', $this->subexpr_name_to_number_map)) {
+        return $this->form_numeric_or_named_cond_subexpr($text, null, 'DEFINE', ')');
+    }
     return $this->form_define_cond_subexpr($this->yytext());
 }
 						case -94:
@@ -8119,6 +8124,11 @@ array(
 							break;
 						case 167:
 							{          /* (?(DEFINE)...             Conditional subexpression - define subpattern for reference */
+    $text = $this->yytext();
+    // Special case: (?(DEFINE with existing subpattern named "DEFINE"
+    if ($text == '(?(DEFINE)' && array_key_exists('DEFINE', $this->subexpr_name_to_number_map)) {
+        return $this->form_numeric_or_named_cond_subexpr($text, null, 'DEFINE', ')');
+    }
     return $this->form_define_cond_subexpr($this->yytext());
 }
 						case -167:

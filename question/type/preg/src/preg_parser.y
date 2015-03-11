@@ -164,18 +164,19 @@
 
         if ($exprnode->type == qtype_preg_node::TYPE_NODE_ALT) {
             $node->operands = $exprnode->operands;
-            $limit = $node->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE ? 1 : 2;
-            if (count($exprnode->operands) > $limit) {
+            if ($node->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE || count($exprnode->operands) > 2) {
                 // Error: only one or two top-level alternations allowed in a conditional subexpression.
                 $node->errors[] = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_TOO_MUCH_ALTER, null, $position, array(), array($exprnode));
             }
         } else {
-            $node->operands[0] = $exprnode;
+            $node->operands = array($exprnode);
         }
+
+        $ui = implode('|', array_fill(0, count($node->operands), '...')) . ')';
 
         $this->add_cond_subexpr_negative_branch($node);
 
-        $node->set_user_info($position, array(new qtype_preg_userinscription($node->userinscription[0] . '...|...)')));
+        $node->set_user_info($position, array(new qtype_preg_userinscription($node->userinscription[0] . $ui)));
         return $node;
     }
 

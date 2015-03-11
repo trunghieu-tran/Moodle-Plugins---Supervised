@@ -1469,6 +1469,11 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
 
 
 <YYINITIAL> "(?(DEFINE"")"? {          /* (?(DEFINE)...             Conditional subexpression - define subpattern for reference */
+    $text = $this->yytext();
+    // Special case: (?(DEFINE with existing subpattern named "DEFINE"
+    if ($text == '(?(DEFINE)' && array_key_exists('DEFINE', $this->subexpr_name_to_number_map)) {
+        return $this->form_numeric_or_named_cond_subexpr($text, null, 'DEFINE', ')');
+    }
     return $this->form_define_cond_subexpr($this->yytext());
 }
 <YYINITIAL> "(?(?=" {                  /* (?(assert)...             Conditional subexpression - positive look ahead assertion */
