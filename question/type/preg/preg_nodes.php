@@ -1312,6 +1312,8 @@ abstract class qtype_preg_leaf_assert extends qtype_preg_leaf {
     const SUBTYPE_SUBEXPR = 'subexpr_leaf_assert';
     /** Assertion used by conditional subexpressions */
     const SUBTYPE_RECURSION = 'recursion_leaf_assert';
+    /** Assertion that always true or false */
+    const SUBTYPE_TRUEFALSE = 'truefalse_leaf_assert';
 
     public function __construct($negative = false) {
         $this->type = qtype_preg_node::TYPE_LEAF_ASSERT;
@@ -1613,6 +1615,37 @@ class qtype_preg_leaf_assert_recursion extends qtype_preg_leaf_assert {
         return parent::is_equal($node, $numberoffset)
             /*$this->name==$node->name */
             && (($this->number!==null)?($this->number - $numberoffset):null) === $node->number;
+    }
+}
+
+/**
+ * Assertion that always true or false. Used to implement DEFINE conditional subexpressions.
+ */
+class qtype_preg_leaf_assert_truefalse extends qtype_preg_leaf_assert {
+
+    public function __construct($negative) {
+        parent::__construct($negative);
+        $this->subtype = self::SUBTYPE_TRUEFALSE;
+    }
+
+    public function match($str, $pos, &$length, $matcherstateobj = null) {
+        $length = 0;
+        return !$this->negative;
+    }
+
+    public function next_character($originalstr, $newstr, $pos, $length = 0, $matcherstateobj = null) {
+        $ok = !$this->negative;
+        return $ok ? array(self::NEXT_CHAR_OK, new qtype_poasquestion\string(''))
+                   : array(self::NEXT_CHAR_CANNOT_GENERATE, null);
+    }
+
+    public function tohr() {
+        return $this->negative ? '(false)'
+                               : '(true)';
+    }
+
+    public function is_equal($node, $numberoffset) {
+        return parent::is_equal($node, $numberoffset);
     }
 }
 
