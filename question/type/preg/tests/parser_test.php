@@ -222,14 +222,19 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[2]->operands[0]->flags[0][0]->data->string() === 'c');
         $this->assertTrue($root->operands[2]->operands[1]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[2]->operands[1]->flags[0][0]->data->string() === 'd');
-        $handler = $this->run_handler('(?(DEFINE)a|b)');
+        $handler = $this->run_handler('(?(DEFINE)a)');
         $root = $handler->get_ast_root();
         $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
-        $this->assertTrue($root->userinscription[0]->data === '(?(DEFINE)...|...)');
+        $this->assertTrue($root->userinscription[0]->data === '(?(DEFINE)...)');
         $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
         $this->assertTrue($root->operands[0]->userinscription[0]->data === 'a');
-        $this->assertTrue($root->operands[1]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
-        $this->assertTrue($root->operands[1]->userinscription[0]->data === 'b');
+        $this->assertTrue($root->operands[1]->type === qtype_preg_node::TYPE_LEAF_META);
+        $handler = $this->run_handler('(?<DEFINE>a)(?(DEFINE)a|b)');
+        $root = $handler->get_ast_root();
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_CONCAT);
+        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_NODE_SUBEXPR);
+        $this->assertTrue($root->operands[1]->type === qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
+        $this->assertTrue($root->operands[1]->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR);
     }
     function test_parser_easy_regex() {
         $handler = $this->run_handler('a|b');
@@ -910,6 +915,7 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $errors = $handler->get_error_nodes();
         $root = $handler->get_ast_root();
         $this->assertTrue($root->type == qtype_preg_node::TYPE_NODE_COND_SUBEXPR);
+        $this->assertTrue($root->userinscription[0]->data === '(?(DEFINE)...|...)');
         $this->assertTrue(count($errors) === 1);
         $this->assertTrue($root->errors[0]->type === qtype_preg_node::TYPE_NODE_ERROR);
         $this->assertTrue($root->errors[0]->subtype === qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_TOO_MUCH_ALTER);
