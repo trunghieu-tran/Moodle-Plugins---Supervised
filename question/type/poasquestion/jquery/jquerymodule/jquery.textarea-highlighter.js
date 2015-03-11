@@ -525,6 +525,49 @@ var marexandre;
     _this.$element.trigger('textarea.highlighter.highlight');
   };
 
+  TextareaHighlighter.prototype.highlightRange = function(start, end) {
+    var _this = this;
+    var text = _this.$element.val();
+    var settings = _this.settings;
+    var overMaxText = '';
+    var notOverMaxText = '';
+
+    start = Math.min(start, settings.maxlength);
+    end = Math.max(end, settings.maxlength);
+
+    // check for max length
+    if (0 < settings.maxlength) {
+      if (settings.maxlength < text.length) {
+        // get text that was over max length
+        overMaxText = text.slice(settings.maxlength, settings.maxlength + text.length - 1);
+        // escape HTML
+        overMaxText = helper.escapeHTML(overMaxText);
+        // wrap matched text with <span> tags
+        overMaxText = helper.getTextInSpan(settings.maxlengthWarning, overMaxText);
+      }
+
+      _this.updateCharLimitElement(text);
+      // set text that wasn't over max length
+      notOverMaxText = text.slice(0, settings.maxlength);
+    }
+    else {
+      notOverMaxText = text;
+    }
+
+    // Break into 3 pieces
+    var tmp = helper.escapeHTML(notOverMaxText.substring(0, start)) +
+              _this.getHighlightedContent(helper.escapeHTML(notOverMaxText.substring(start, end + 1))) +
+              helper.escapeHTML(notOverMaxText.substring(end + 1, notOverMaxText.length));
+
+    // Escape HTML content
+    //notOverMaxText = helper.escapeHTML(notOverMaxText);
+    //notOverMaxText = _this.getHighlightedContent(notOverMaxText);
+
+    _this.$backgroundDiv.html( tmp + overMaxText );
+    _this.updateHeight();
+    _this.$element.trigger('textarea.highlighter.highlight');
+  };
+
   TextareaHighlighter.prototype.getHighlightedContent = function(text) {
     var _this = this;
     var list = _this.settings.matches;

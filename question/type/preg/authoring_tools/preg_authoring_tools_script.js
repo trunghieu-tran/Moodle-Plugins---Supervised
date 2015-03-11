@@ -81,17 +81,16 @@ M.preg_authoring_tools_script = (function ($) {
         var options = {
 
             onfirstpresscallback : function () {
-                var content_url = self.www_root + '/question/type/preg/authoring_tools/preg_authoring.php';
-                var scripts = [
-                    self.www_root+'/question/type/poasquestion/interface.js',
-                    self.www_root+'/question/type/poasquestion/jquery.elastic.1.6.11.js',
-                    self.www_root+'/question/type/poasquestion/jquery.mousewheel.js',
-                    self.www_root+'/question/type/poasquestion/jquery.panzoom.js',
-                    self.www_root+'/question/type/poasquestion/jquery.textarea-highlighter.js',
-                    self.www_root+'/question/type/poasquestion/jquery-textrange.js'
-                ];
+                $.ajax({
+                    url: self.www_root + '/question/type/preg/authoring_tools/preg_authoring.php',
+                    type: "GET",
+                    dataType: "text"
+                }).done(function (responseText, textStatus, jqXHR) {
+                    var tmpM = M;
+                    $(self.textbutton_widget.dialog).html($.parseHTML(responseText, document, false));
+                    M = $.extend(M, tmpM);
 
-                self.textbutton_widget.loadDialogContent(content_url, scripts, function () {
+
 
                     // init moodle form js
                     if (M.form && M.form.shortforms) {
@@ -118,7 +117,7 @@ M.preg_authoring_tools_script = (function ($) {
                     $('#fgroup_id_charset_process_radioset input').change(self.rbtn_changed);
 
                     // Add handlers for the regex textarea.
-                    self.regex_input = $('#id_regex_text').textareaHighlighter({rows: 2});
+                    self.regex_input = $('#id_regex_text');//.textareaHighlighter({rows: 2});
 
                     //remove left margin
                     $(self.textbutton_widget.dialog).find('#region-main').css('margin-left',0);
@@ -516,7 +515,7 @@ M.preg_authoring_tools_script = (function ($) {
         if ( (indfirstorig!==indfirst || indlastorig!==indlast) && indfirst<=indfirstorig && indlast>=indlastorig) {
             self.regex_input.textareaHighlighter('highlight2areas', indfirst, indlast, 'yellow', indfirstorig, indlastorig, 'orange');
         } else {
-            self.regex_input.textareaHighlighter('highlight', indfirst, indlast, 'orange');
+            self.regex_input.textareaHighlighter('highlightRange', indfirst, indlast, 'orange');
         }
         $(window).scrollTop(scroll); // TODO - what is is? O_0 This is madness!!!
     },

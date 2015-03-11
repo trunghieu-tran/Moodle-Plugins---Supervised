@@ -73,7 +73,8 @@ class qtype_poasquestion_text_and_button extends MoodleQuickForm_textarea {
         $PAGE->requires->string_for_js('close', 'editor');
 
         // dependencies
-        $PAGE->requires->js('/question/type/poasquestion/jquery.elastic.1.6.11.js');
+        //$PAGE->requires->js('/question/type/poasquestion/jquery.elastic.1.6.11.js');
+        $PAGE->requires->jquery_plugin('poasquestion-jquerymodule', 'qtype_poasquestion');
 
         if (!self::$_poasquestion_text_and_button_included) {
             $jsargs = array(
