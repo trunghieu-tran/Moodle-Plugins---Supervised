@@ -128,6 +128,11 @@ M.preg_authoring_tools_script = (function ($) {
                     // Hide the non-working "displayas".
                     $('#fgroup_id_charset_process_radioset').hide();
 
+                    $('.ui-resizable-handle.ui-resizable-s').css('bottom', '12px');
+                    $('.ui-resizable-handle.ui-resizable-e').css('right', '12px');
+                    $('.ui-resizable-handle.ui-resizable-se.ui-icon.ui-icon-gripsmall-diagonal-se').css('bottom', '17px');
+                    $('.ui-resizable-handle.ui-resizable-se.ui-icon.ui-icon-gripsmall-diagonal-se').css('right', '17px');
+
                     // resize magic (alter for html-voodoo-bug-positioning-development)
                     $( window ).resize(self.resize_handler);
                     self.resize_handler();
