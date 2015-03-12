@@ -7649,30 +7649,30 @@ class qtype_preg_cross_tests_from_pcre {
 
     function data_for_test_761() {
         $test4 = array( 'str'=>'** Failers',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>0,2=>6),
-                        'length'=>array(0=>8,2=>2),
-                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
-                        'next'=>'',
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'left'=>array(7),
+                        'next'=>'\d',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test5 = array( 'str'=>'10.6',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0,2=>6),
-                        'length'=>array(0=>8,2=>2),
-                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
-                        'next'=>'',
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>4),
+                        'left'=>array(4),
+                        'next'=>'\.',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test6 = array( 'str'=>'455.3.4.5',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0,2=>6),
-                        'length'=>array(0=>8,2=>2),
-                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
-                        'next'=>'',
+                        'index_first'=>array(0=>4),
+                        'length'=>array(0=>5),
+                        'left'=>array(2),
+                        'next'=>'\.',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'(?(DEFINE)(?<byte>2[0-4]\d|25[0-5]|1\d\d|[1-9]?\d))\b(?&byte)(\.(?&byte)){3}',
@@ -7681,30 +7681,30 @@ class qtype_preg_cross_tests_from_pcre {
 
     function data_for_test_762() {
         $test4 = array( 'str'=>'** Failers',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>0,1=>6),
-                        'length'=>array(0=>8,1=>2),
-                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
-                        'next'=>'',
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'left'=>array(7),
+                        'next'=>'\d',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test5 = array( 'str'=>'10.6',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0,1=>6),
-                        'length'=>array(0=>8,1=>2),
-                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
-                        'next'=>'',
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>4),
+                        'left'=>array(4),
+                        'next'=>'\.',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test6 = array( 'str'=>'455.3.4.5',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0,1=>6),
-                        'length'=>array(0=>8,1=>2),
-                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
-                        'next'=>'',
+                        'index_first'=>array(0=>4),
+                        'length'=>array(0=>5),
+                        'left'=>array(2),
+                        'next'=>'\.',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'\b(?&byte)(\.(?&byte)){3}(?(DEFINE)(?<byte>2[0-4]\d|25[0-5]|1\d\d|[1-9]?\d))',
