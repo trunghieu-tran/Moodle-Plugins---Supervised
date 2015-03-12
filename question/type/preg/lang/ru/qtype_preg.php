@@ -361,8 +361,8 @@ $string['description_charset'] = 'один из следующих символ�
 $string['description_charset_neg'] = 'любой из символов кроме следующих: {$a->characters};';
 $string['description_charset_neg_one'] = 'не {$a->characters}';
 $string['description_charset_range'] = 'любой символ {$a}';
-$string['description_char'] = '<span style="color:blue">{$a->char}</span>';
-$string['description_char_16value'] = 'символ с кодом 0x{$a->code}    {$a->char}';
+$string['description_char'] = '<span class="text-info" class=\'font-family:"Courier New", Courier, monospace;\'>{$a->char}</span>';
+$string['description_char_16value'] = 'символ с кодом 0x{$a->code}';
 //$string['description_charset_one'] = '{$a->characters}';
 // non-printing characters
 $string['description_char0'] = 'ноль-символ(NUL)';

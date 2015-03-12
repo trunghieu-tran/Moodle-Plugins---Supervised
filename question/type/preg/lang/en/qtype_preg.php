@@ -361,8 +361,8 @@ $string['description_charset'] = 'one of the following characters: {$a->characte
 $string['description_charset_neg'] = 'any character except the following: {$a->characters};';
 $string['description_charset_neg_one'] = 'not {$a->characters}';
 $string['description_charset_range'] = 'any character {$a}';
-$string['description_char'] = '<span style="color:blue">{$a->char}</span>';
-$string['description_char_16value'] = 'character with code 0x{$a->code}    {$a->char}';
+$string['description_char'] = '<span class="text-info" class=\'font-family:"Courier New", Courier, monospace;\'>{$a->char}</span>';
+$string['description_char_16value'] = 'character with code 0x{$a->code}';
 //$string['description_charset_one'] = '{$a->characters}';
 // non-printing characters
 $string['description_char0'] = 'null character(NUL)';
