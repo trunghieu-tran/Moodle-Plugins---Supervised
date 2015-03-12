@@ -196,6 +196,7 @@ class qtype_preg_fa_stack_item {
                 continue;
             }
             $this->subexpr_to_subpatt[$tag->number] = $tag;
+            //echo "subexpr {$tag->number} is subpatt {$tag->subpattern}\n";
             if ($tag->name !== null && !array_key_exists($tag->name, $this->subexpr_to_subpatt)) {  // Don't overwrite existing string keys
                 $this->subexpr_to_subpatt[$tag->name] = $tag;
             }

@@ -24,7 +24,7 @@ class qtype_preg_cross_tests_from_preg_merging {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
                         'left'=>array(2),
-                        'next'=>'!');    // Can't generate a character.
+                        'next'=>'!');
 
         return array('regex'=>'^abc[a-z.?!]\b[a-zA-Z]',
                      'tests'=>array($test1, $test2),
