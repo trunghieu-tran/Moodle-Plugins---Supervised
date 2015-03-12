@@ -963,6 +963,10 @@ class qtype_preg_fa_node_cond_subexpr extends qtype_preg_fa_operator {
                 $assertpos = new qtype_preg_leaf_assert_recursion(false, $node->number, $node->name);
                 $assertneg = new qtype_preg_leaf_assert_recursion(true, $node->number, $node->name);
                 break;
+            case qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE:
+                $assertpos = new qtype_preg_leaf_assert_truefalse(true);   // Positive branch should fail
+                $assertneg = new qtype_preg_leaf_assert_truefalse(false);
+                break;
             default:
                 // WTF?
                 $assertpos = null;
@@ -991,7 +995,8 @@ class qtype_preg_fa_node_cond_subexpr extends qtype_preg_fa_operator {
 
     public function accept() {
         if ($this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR &&
-            $this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION) {
+            $this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION &&
+            $this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE) {
             return get_string($this->pregnode->subtype, 'qtype_preg');
         }
         return true;
