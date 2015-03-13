@@ -526,61 +526,83 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * @return str redaction distance
      */
     static public function redaction($str1, $str2) {
-        // lenght of tokens
-        $lenstr1 = core_text::strlen($str1);
-        $lenstr2 = core_text::strlen($str2);
-        // matrix operation and cost
-        for ($i=0; $i < $lenstr1+1; $i++) {
-            for ($j=0; $j < $lenstr2+1; $j++) {
-                $d[$i][$j] = 0;
-                $m[$i][$j] = 'i';
+        $cache = array();
+        $dameraulevensteinrecursive = function($a, $i, $b, $j,&$cache) use(&$dameraulevensteinrecursive) {
+            /** @var Closure $dameraulevensteinrecursive */
+            $ki = min($i, $j);
+
+            $cacheindex = $i . " . "  . $j;
+            if (array_key_exists($cacheindex, $cache)) {
+                return $cache[$cacheindex];
             }
-        }
-        for ($i = 0; $i <= $lenstr1; $i++) {
-            $d[$i][0] = $i;
-            $p[$i][0] = 'd';
-        }
-        for ($i = 0; $i <= $lenstr2; $i++) {
-            $d[0][$i] = $i;
-            $p[0][$i] = 'i';
-        }
-        //operation from strings
-        for ($i = 1; $i <= $lenstr1; $i++) {
-            for ($j = 1; $j <= $lenstr2; $j++) {
-                $cost = ($str1[$i - 1] != $str2[$j - 1]) ? 1 : 0;
-                if ($d[$i][$j - 1] < $d[$i - 1][$j] && $d[$i][$j - 1] < $d[$i - 1][$j - 1] + $cost) {
-                    // insertion
-                    $d[$i][$j] = $d[$i][$j - 1] + 1;
-                    $p[$i][$j] = 'i';
-                } else if ($d[$i - 1][$j] < $d[$i - 1][$j - 1] + $cost) {
-                    // deletion
-                    $d[$i][$j] = $d[$i - 1][$j] + 1;
-                    $p[$i][$j] = 'd';
-                } else {
-                    // replacement or not operation
-                    $d[$i][$j] = $d[$i - 1][$j - 1] + $cost;
-                    $p[$i][$j] = ($cost == 1) ? 'r' : 'm';
+            if ($ki == -1) {
+                $cache[$cacheindex] = array(max($i, $j), "");
+                return array(max($i, $j), "");
+            }
+            $results = array();
+            $ok = false;
+
+            $calltransform = function($deci, $decj, $adddist, $prependop) use($a, $i, $b, $j, &$cache, $dameraulevensteinrecursive) {
+                list($dist, $op) = $dameraulevensteinrecursive($a, $i - $deci, $b, $j - $decj, $cache);
+                $dist += $adddist;
+                $op =  $op . $prependop;
+                return array($dist, $op);
+            };
+            $repop = function() use($a, $i, $b, $j) {
+                $bj = core_text::substr($b, $j, 1);
+                $ai = core_text::substr($a, $i, 1);
+
+                $op = 'r';
+                $add = 1;
+                if ($ai == $bj) {
+                    $add = 0;
+                    $op = 'm';
+                }
+                return array($add, $op);
+            };
+            if ($i > 0 && $j > 0) {
+                $ami = core_text::substr($a, $i - 1, 1);
+                $bj = core_text::substr($b, $j, 1);
+
+                $ai = core_text::substr($a, $i, 1);
+                $bmj = core_text::substr($b, $j - 1, 1);
+
+                if ($ami == $bj && $ai == $bmj) {
+                    $results[] = $calltransform(1, 0, 1, 'd');
+                    $results[] = $calltransform(0, 1, 1, 'i');
+
+                    list($add, $op) = $repop();
+                    $results[] = $calltransform(1, 1, $add, $op);
+                    $results[] = $calltransform(2, 2, 1, 't');
+
+                    $ok = true;
                 }
             }
-        }
-        // recovery orders
-        $route = '';
-        $i = $lenstr1;
-        $j = $lenstr2;
-        do {
-            $c = $p[$i][$j];
-            $route = $route.($c);
-            if ($c == 'r' || $c == 'm') {
-                $i --;
-                $j --;
-            } else if ($c == 'd') {
-                $i --;
-            } else if ($c == 'i') {
-                $j --;
+
+            if (!$ok)
+            {
+                $results[] = $calltransform(1, 0, 1, 'd');
+                $results[] = $calltransform(0, 1, 1, 'i');
+
+                list($add, $op) = $repop();
+                $results[] = $calltransform(1, 1, $add, $op);
             }
-        } while (($i != 0) || ($j != 0));
-        $redact = strrev($route);
-        return $redact;
+            //echo "<scan $i $j>\n";
+            $result = array_shift($results);
+            foreach($results as $test) {
+                //var_dump($test);
+                if ($test[0] < $result[0]) {
+                    $result = $test;
+                }
+            }
+            $cache[$cacheindex] = $result;
+            //echo "</scan>\n";
+            return $result;
+        };
+        $result =  $dameraulevensteinrecursive($str1, core_text::strlen($str1) - 1, $str2, core_text::strlen($str2) - 1, $cache);
+        // Index fix
+        $result[0] += 1;
+        return $result[1];
     }
      /* Calculates possible pair
      *
@@ -619,7 +641,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * $answertokens or $responsetokens field inside (it is filling from outside)
      */
     public function look_for_matches($other, $threshold, $iscorrect, block_formal_langs_comparing_options $options, $bypass) {      
-	if ($bypass == true) {
+	    if ($bypass == true) {
             $possiblepairs = array();
             if($options->usecase == true){
                 for ($k=0; $k < count($other); $k++) {
@@ -629,16 +651,16 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
                     }
                 }
             } else {
-		//если usecase false
-		for ($k=0; $k < count($other); $k++) {
-		$str1 = strtolower($other[$k]->value);
-		$str2 = strtolower($this->value);
+		        //если usecase false
+		        for ($k=0; $k < count($other); $k++) {
+                    $str1 = strtolower($other[$k]->value);
+                    $str2 = strtolower($this->value);
                     if($str1 == $str2) {
                         $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), 0, false, '');
                         $possiblepairs[] = $pair;
                     }
                 }
-	     }
+	        }
         } else {
             // TODO: generic mistakes handling
             $result = core_text::strlen($this->value) - core_text::strlen($this->value) * $threshold;
@@ -657,7 +679,13 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
                             $pair = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($k), $dist, false, '');
                         }
                         ////////////////////////////////////////////////////////////////
-                        $pair->operations=$this->redaction($this->value, $other[$k]->value);
+                        $thisvalue = $this->value;
+                        $otherkvalue = $other[$k]->value;
+                        if ($options->usecase == false) {
+                            $thisvalue = core_text::strtolower($thisvalue);
+                            $otherkvalue = core_text::strtolower($otherkvalue);
+                        }
+                        $pair->operations=$this->redaction($thisvalue, $otherkvalue);
                         ////////////////////////////////////////////////////////////////
                         $possiblepairs[] = $pair;
                         /*
