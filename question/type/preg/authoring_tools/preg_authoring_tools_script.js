@@ -83,11 +83,12 @@ M.preg_authoring_tools_script = (function ($) {
             onfirstpresscallback : function () {
                 var content_url = self.www_root + '/question/type/preg/authoring_tools/preg_authoring.php';
                 var scripts = [
-                    self.www_root+'/question/type/poasquestion/jquery.panzoom.js',
-                    self.www_root+'/question/type/poasquestion/jquery-textrange.js',
                     self.www_root+'/question/type/poasquestion/interface.js',
+                    self.www_root+'/question/type/poasquestion/jquery.elastic.1.6.11.js',
                     self.www_root+'/question/type/poasquestion/jquery.mousewheel.js',
-                    self.www_root+'/question/type/poasquestion/textareaHighlighter.js'
+                    self.www_root+'/question/type/poasquestion/jquery.panzoom.js',
+                    self.www_root+'/question/type/poasquestion/jquery.textarea-highlighter.js',
+                    self.www_root+'/question/type/poasquestion/jquery-textrange.js'
                 ];
 
                 self.textbutton_widget.loadDialogContent(content_url, scripts, function () {
@@ -127,11 +128,6 @@ M.preg_authoring_tools_script = (function ($) {
 
                     // Hide the non-working "displayas".
                     $('#fgroup_id_charset_process_radioset').hide();
-
-                    $('.ui-resizable-handle.ui-resizable-s').css('bottom', '12px');
-                    $('.ui-resizable-handle.ui-resizable-e').css('right', '12px');
-                    $('.ui-resizable-handle.ui-resizable-se.ui-icon.ui-icon-gripsmall-diagonal-se').css('bottom', '17px');
-                    $('.ui-resizable-handle.ui-resizable-se.ui-icon.ui-icon-gripsmall-diagonal-se').css('right', '17px');
 
                     // resize magic (alter for html-voodoo-bug-positioning-development)
                     $( window ).resize(self.resize_handler);
