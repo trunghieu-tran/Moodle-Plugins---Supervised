@@ -66,7 +66,7 @@ class  qtype_correctwriting_sequence_analyzer extends qtype_correctwriting_abstr
     }
 
     protected function analyze() {
-        $answertokens = $this->basestringpair->correctstring()->stream;
+        $answertokens = $this->basestringpair->enum_correct_string()->stream;
         $responsetokens = $this->basestringpair->correctedstring()->stream;
         $options = $this->question->token_comparing_options();
         $alllcs = qtype_correctwriting_sequence_analyzer::lcs($answertokens, $responsetokens, $options);
