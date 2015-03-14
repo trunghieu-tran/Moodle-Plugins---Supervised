@@ -39,9 +39,9 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
 <YYINITIAL> "digraph" {return $this->createToken(qtype_preg_dot_parser::DIGRAPH);}
 <YYINITIAL> {IDENT} {return $this->createToken(qtype_preg_dot_parser::NAME);}
 <YYINITIAL> "{" {
-                    $this->startstates = array();
-                    $this->yybegin(self::STARTSTATES);
-                }
+					$this->startstates = array();
+					$this->yybegin(self::STARTSTATES);
+				}
 
 <YYINITIAL> "}" {return $this->createToken(qtype_preg_dot_parser::CLOSEBODY);}
 <YYINITIAL> "color" {return $this->createToken(qtype_preg_dot_parser::COLOR);}
@@ -51,6 +51,7 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
 <YYINITIAL> "style" {return $this->createToken(qtype_preg_dot_parser::STYLE);}
 <YYINITIAL> "dotted" {return $this->createToken(qtype_preg_dot_parser::DOTTED);}
 <YYINITIAL> "," {return $this->createToken(qtype_preg_dot_parser::COMMA);}
+<YYINITIAL> "=" {return $this->createToken(qtype_preg_dot_parser::EQUALS);}
 
 <YYINITIAL> "["({WHITESPACE})*"label"({WHITESPACE})*"="({WHITESPACE})*"<"{$this->yybegin(self::TRANSITION);}
 <TRANSITION> "<B>" {return $this->createToken(qtype_preg_dot_parser::MAINSTART);}
@@ -60,7 +61,10 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
                         $this->yybegin(self::OPENTAGS);
                     }
 
-<OPENTAGS> {NUMBER}"," {$this->opentags[] = $this->yytext();}
+<OPENTAGS> {NUMBER}"," {
+                            $str = $this->yytext();
+                            $this->opentags[] = substr($str, 0, -1);
+                        }
 <OPENTAGS> " " {
                     $this->yybegin(self::PREGLEAF);
                     return $this->createToken(qtype_preg_dot_parser::OPEN, $this->opentags);
@@ -79,8 +83,11 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
                     $this->pregleaf = $lexer->nextToken()->value;
                 }
 
-<CLOSETAGS> {NUMBER}"," {$this->closetags[] = $this->yytext();}
-<CLOSETAGS> \n {
+<CLOSETAGS> {NUMBER}"," {
+                            $str = $this->yytext();
+                            $this->closetags[] = substr($str, 0, -1);
+                        }
+<CLOSETAGS> "<BR/>" {
                     $this->yybegin(self::TRANSITION);
                     return $this->createToken(qtype_preg_dot_parser::CLOSE, $this->closetags);
                 }
@@ -94,18 +101,27 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
       return $this->createToken();
 }
 
-<STARTSTATES> {FASTATE}";" {$this->startstates[] = $this->yytext();}
+<STARTSTATES> {FASTATE}";" {
+                                $str = $this->yytext();
+                                $this->startstates[] = substr($str, 0, -1);
+                            }
 <STARTSTATES> \n {
                     $this->endstates = array();
                     $this->yybegin(self::ENDSTATES);
                     return $this->createToken(qtype_preg_dot_parser::START, $this->startstates);
                 }
 
-<ENDSTATES> {FASTATE}";" {$this->endstates[] = $this->yytext();}
+<ENDSTATES> {FASTATE}";" {
+                            $str = $this->yytext();
+                            $this->endstates[] = substr($str, 0, -1);
+                        }
 <ENDSTATES> \n {
                     $this->yybegin(self::YYINITIAL);
                     return $this->createToken(qtype_preg_dot_parser::END, $this->endstates);
                 }
 
-<YYINITIAL> {FASTATE}"->"{FASTATE} {return $this->createToken(qtype_preg_dot_parser::TRANSITIONSTATES, array($this->yytext()));}
+<YYINITIAL> {FASTATE}"->"{FASTATE} {
+                                        $str = $this->yytext();
+                                        return $this->createToken(qtype_preg_dot_parser::TRANSITIONSTATES, explode("->", $str));
+                                    }
 <YYINITIAL> .           { /* ignore bad characters */ }
