@@ -1051,8 +1051,8 @@ class qtype_preg_fa {
             // Add start states.
             foreach ($this->get_states() as $id) {
                 $realnumber = $usestateids
-                            ? $id
-                            : $this->statenumbers[$id];
+                            ? $this->statenumbers[$id]
+                            : $id;
                 $tmp = '"' . $realnumber . '"';
                 if (in_array($id, $this->start_states())) {
                     $start .= "{$tmp}[shape=rarrow];\n";
@@ -1064,7 +1064,7 @@ class qtype_preg_fa {
                 foreach ($outgoing as $transition) {
                     $from = $transition->from;
                     $to = $transition->to;
-                    if (!$usestateids) {
+                    if ($usestateids) {
                         $from = $this->statenumbers[$from];
                         $to = $this->statenumbers[$to];
                     }
