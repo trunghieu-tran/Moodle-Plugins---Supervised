@@ -1321,17 +1321,18 @@ abstract class qtype_preg_leaf_assert extends qtype_preg_leaf {
     }
 
     public function is_start_anchor() {
-        return ($this->subtype == self::SUBTYPE_CIRCUMFLEX || $this->subtype == self::SUBTYPE_ESC_A ||
-                $this->subtype == self::SUBTYPE_ESC_G);
+        return $this->subtype === self::SUBTYPE_CIRCUMFLEX || $this->subtype === self::SUBTYPE_ESC_A || $this->subtype === self::SUBTYPE_ESC_G;
     }
 
     public function is_end_anchor() {
-        return ($this->subtype == self::SUBTYPE_DOLLAR || $this->subtype == self::SUBTYPE_CAPITAL_ESC_Z ||
-                $this->subtype == self::SUBTYPE_SMALL_ESC_Z);
+        return $this->subtype === self::SUBTYPE_DOLLAR || $this->subtype === self::SUBTYPE_CAPITAL_ESC_Z || $this->subtype === self::SUBTYPE_SMALL_ESC_Z;
     }
 
-    public function is_conditional_assert() {
-        return ($this->subtype == self::SUBTYPE_SUBEXPR || $this->subtype == self::SUBTYPE_RECURSION);
+    /**
+     * By an artificial assert we imply one that can not be written by user.
+     */
+    public function is_artificial_assert() {
+        return $this->subtype === self::SUBTYPE_SUBEXPR || $this->subtype === self::SUBTYPE_RECURSION || $this->subtype === self::SUBTYPE_TRUEFALSE;
     }
 
     public function consumes($matcherstateobj = null) {
