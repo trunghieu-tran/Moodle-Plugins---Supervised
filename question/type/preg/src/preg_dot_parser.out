@@ -1,0 +1,316 @@
+State 0:
+          start ::= * DIGRAPH automaton_body CLOSEBODY
+
+                       DIGRAPH shift  11
+                         start accept
+
+State 1:
+          transition_stmt ::= TRANSITIONSTATES transition_merged_list main_transition * transition_merged_list
+      (5) transition_stmt ::= TRANSITIONSTATES transition_merged_list main_transition *
+          transition_stmt ::= TRANSITIONSTATES transition_merged_list main_transition * transition_merged_list transition_params
+          transition_stmt ::= TRANSITIONSTATES transition_merged_list main_transition * transition_params
+          transition_merged_list ::= * merged_transition
+          transition_merged_list ::= * merged_transition transition_merged_list
+          transition_params ::= * transition_params_type
+          transition_params ::= * transition_params_type COMMA STYLE EQUALS DOTTED
+          transition_params_type ::= * COLOR EQUALS VIOLET
+          transition_params_type ::= * COLOR EQUALS BLUE
+          transition_params_type ::= * COLOR EQUALS RED
+          merged_transition ::= * transition_desc
+          transition_desc ::= * OPEN LEAF CLOSE
+
+                         COLOR shift  17
+                          OPEN shift  16
+        transition_merged_list shift  8
+             transition_params shift  33
+             merged_transition shift  4
+        transition_params_type shift  19
+               transition_desc shift  29
+                     {default} reduce 5
+
+State 2:
+          transition_stmt ::= TRANSITIONSTATES main_transition * transition_merged_list
+      (7) transition_stmt ::= TRANSITIONSTATES main_transition *
+          transition_stmt ::= TRANSITIONSTATES main_transition * transition_merged_list transition_params
+          transition_stmt ::= TRANSITIONSTATES main_transition * transition_params
+          transition_merged_list ::= * merged_transition
+          transition_merged_list ::= * merged_transition transition_merged_list
+          transition_params ::= * transition_params_type
+          transition_params ::= * transition_params_type COMMA STYLE EQUALS DOTTED
+          transition_params_type ::= * COLOR EQUALS VIOLET
+          transition_params_type ::= * COLOR EQUALS BLUE
+          transition_params_type ::= * COLOR EQUALS RED
+          merged_transition ::= * transition_desc
+          transition_desc ::= * OPEN LEAF CLOSE
+
+                         COLOR shift  17
+                          OPEN shift  16
+        transition_merged_list shift  7
+             transition_params shift  28
+             merged_transition shift  4
+        transition_params_type shift  19
+               transition_desc shift  29
+                     {default} reduce 7
+
+State 3:
+          transition_stmt ::= TRANSITIONSTATES * transition_merged_list main_transition transition_merged_list
+          transition_stmt ::= TRANSITIONSTATES * transition_merged_list main_transition
+          transition_stmt ::= TRANSITIONSTATES * main_transition transition_merged_list
+          transition_stmt ::= TRANSITIONSTATES * main_transition
+          transition_stmt ::= TRANSITIONSTATES * transition_merged_list main_transition transition_merged_list transition_params
+          transition_stmt ::= TRANSITIONSTATES * transition_merged_list main_transition transition_params
+          transition_stmt ::= TRANSITIONSTATES * main_transition transition_merged_list transition_params
+          transition_stmt ::= TRANSITIONSTATES * main_transition transition_params
+          transition_merged_list ::= * merged_transition
+          transition_merged_list ::= * merged_transition transition_merged_list
+          merged_transition ::= * transition_desc
+          main_transition ::= * MAINSTART transition_desc MAINEND
+          transition_desc ::= * OPEN LEAF CLOSE
+
+                     MAINSTART shift  10
+                          OPEN shift  16
+        transition_merged_list shift  9
+               main_transition shift  2
+             merged_transition shift  4
+               transition_desc shift  29
+
+State 4:
+          transition_merged_list ::= * merged_transition
+     (12) transition_merged_list ::= merged_transition *
+          transition_merged_list ::= * merged_transition transition_merged_list
+          transition_merged_list ::= merged_transition * transition_merged_list
+          merged_transition ::= * transition_desc
+          transition_desc ::= * OPEN LEAF CLOSE
+
+                          OPEN shift  16
+        transition_merged_list shift  34
+             merged_transition shift  4
+               transition_desc shift  29
+                     {default} reduce 12
+
+State 5:
+          transitions_list ::= * transition_stmt
+      (2) transitions_list ::= transition_stmt *
+          transitions_list ::= * transition_stmt transitions_list
+          transitions_list ::= transition_stmt * transitions_list
+          transition_stmt ::= * TRANSITIONSTATES transition_merged_list main_transition transition_merged_list
+          transition_stmt ::= * TRANSITIONSTATES transition_merged_list main_transition
+          transition_stmt ::= * TRANSITIONSTATES main_transition transition_merged_list
+          transition_stmt ::= * TRANSITIONSTATES main_transition
+          transition_stmt ::= * TRANSITIONSTATES transition_merged_list main_transition transition_merged_list transition_params
+          transition_stmt ::= * TRANSITIONSTATES transition_merged_list main_transition transition_params
+          transition_stmt ::= * TRANSITIONSTATES main_transition transition_merged_list transition_params
+          transition_stmt ::= * TRANSITIONSTATES main_transition transition_params
+
+              TRANSITIONSTATES shift  3
+              transitions_list shift  37
+               transition_stmt shift  5
+                     {default} reduce 2
+
+State 6:
+          automaton_body ::= START END * transitions_list
+          transitions_list ::= * transition_stmt
+          transitions_list ::= * transition_stmt transitions_list
+          transition_stmt ::= * TRANSITIONSTATES transition_merged_list main_transition transition_merged_list
+          transition_stmt ::= * TRANSITIONSTATES transition_merged_list main_transition
+          transition_stmt ::= * TRANSITIONSTATES main_transition transition_merged_list
+          transition_stmt ::= * TRANSITIONSTATES main_transition
+          transition_stmt ::= * TRANSITIONSTATES transition_merged_list main_transition transition_merged_list transition_params
+          transition_stmt ::= * TRANSITIONSTATES transition_merged_list main_transition transition_params
+          transition_stmt ::= * TRANSITIONSTATES main_transition transition_merged_list transition_params
+          transition_stmt ::= * TRANSITIONSTATES main_transition transition_params
+
+              TRANSITIONSTATES shift  3
+              transitions_list shift  24
+               transition_stmt shift  5
+
+State 7:
+      (6) transition_stmt ::= TRANSITIONSTATES main_transition transition_merged_list *
+          transition_stmt ::= TRANSITIONSTATES main_transition transition_merged_list * transition_params
+          transition_params ::= * transition_params_type
+          transition_params ::= * transition_params_type COMMA STYLE EQUALS DOTTED
+          transition_params_type ::= * COLOR EQUALS VIOLET
+          transition_params_type ::= * COLOR EQUALS BLUE
+          transition_params_type ::= * COLOR EQUALS RED
+
+                         COLOR shift  17
+             transition_params shift  26
+        transition_params_type shift  19
+                     {default} reduce 6
+
+State 8:
+      (4) transition_stmt ::= TRANSITIONSTATES transition_merged_list main_transition transition_merged_list *
+          transition_stmt ::= TRANSITIONSTATES transition_merged_list main_transition transition_merged_list * transition_params
+          transition_params ::= * transition_params_type
+          transition_params ::= * transition_params_type COMMA STYLE EQUALS DOTTED
+          transition_params_type ::= * COLOR EQUALS VIOLET
+          transition_params_type ::= * COLOR EQUALS BLUE
+          transition_params_type ::= * COLOR EQUALS RED
+
+                         COLOR shift  17
+             transition_params shift  35
+        transition_params_type shift  19
+                     {default} reduce 4
+
+State 9:
+          transition_stmt ::= TRANSITIONSTATES transition_merged_list * main_transition transition_merged_list
+          transition_stmt ::= TRANSITIONSTATES transition_merged_list * main_transition
+          transition_stmt ::= TRANSITIONSTATES transition_merged_list * main_transition transition_merged_list transition_params
+          transition_stmt ::= TRANSITIONSTATES transition_merged_list * main_transition transition_params
+          main_transition ::= * MAINSTART transition_desc MAINEND
+
+                     MAINSTART shift  10
+               main_transition shift  1
+
+State 10:
+          main_transition ::= MAINSTART * transition_desc MAINEND
+          transition_desc ::= * OPEN LEAF CLOSE
+
+                          OPEN shift  16
+               transition_desc shift  14
+
+State 11:
+          start ::= DIGRAPH * automaton_body CLOSEBODY
+          automaton_body ::= * START END transitions_list
+
+                         START shift  18
+                automaton_body shift  20
+
+State 12:
+          transition_params_type ::= COLOR EQUALS * VIOLET
+          transition_params_type ::= COLOR EQUALS * BLUE
+          transition_params_type ::= COLOR EQUALS * RED
+
+                        VIOLET shift  32
+                          BLUE shift  31
+                           RED shift  30
+
+State 13:
+          transition_desc ::= OPEN LEAF * CLOSE
+
+                         CLOSE shift  27
+
+State 14:
+          main_transition ::= MAINSTART transition_desc * MAINEND
+
+                       MAINEND shift  23
+
+State 15:
+          transition_params ::= transition_params_type COMMA STYLE EQUALS * DOTTED
+
+                        DOTTED shift  36
+
+State 16:
+          transition_desc ::= OPEN * LEAF CLOSE
+
+                          LEAF shift  13
+
+State 17:
+          transition_params_type ::= COLOR * EQUALS VIOLET
+          transition_params_type ::= COLOR * EQUALS BLUE
+          transition_params_type ::= COLOR * EQUALS RED
+
+                        EQUALS shift  12
+
+State 18:
+          automaton_body ::= START * END transitions_list
+
+                           END shift  6
+
+State 19:
+     (14) transition_params ::= transition_params_type *
+          transition_params ::= transition_params_type * COMMA STYLE EQUALS DOTTED
+
+                         COMMA shift  22
+                     {default} reduce 14
+
+State 20:
+          start ::= DIGRAPH automaton_body * CLOSEBODY
+
+                     CLOSEBODY shift  25
+
+State 21:
+          transition_params ::= transition_params_type COMMA STYLE * EQUALS DOTTED
+
+                        EQUALS shift  15
+
+State 22:
+          transition_params ::= transition_params_type COMMA * STYLE EQUALS DOTTED
+
+                         STYLE shift  21
+
+State 23:
+     (20) main_transition ::= MAINSTART transition_desc MAINEND *
+
+                     {default} reduce 20
+
+State 24:
+      (1) automaton_body ::= START END transitions_list *
+
+                     {default} reduce 1
+
+State 25:
+      (0) start ::= DIGRAPH automaton_body CLOSEBODY *
+
+                     {default} reduce 0
+
+State 26:
+     (10) transition_stmt ::= TRANSITIONSTATES main_transition transition_merged_list transition_params *
+
+                     {default} reduce 10
+
+State 27:
+     (21) transition_desc ::= OPEN LEAF CLOSE *
+
+                     {default} reduce 21
+
+State 28:
+     (11) transition_stmt ::= TRANSITIONSTATES main_transition transition_params *
+
+                     {default} reduce 11
+
+State 29:
+     (19) merged_transition ::= transition_desc *
+
+                     {default} reduce 19
+
+State 30:
+     (18) transition_params_type ::= COLOR EQUALS RED *
+
+                     {default} reduce 18
+
+State 31:
+     (17) transition_params_type ::= COLOR EQUALS BLUE *
+
+                     {default} reduce 17
+
+State 32:
+     (16) transition_params_type ::= COLOR EQUALS VIOLET *
+
+                     {default} reduce 16
+
+State 33:
+      (9) transition_stmt ::= TRANSITIONSTATES transition_merged_list main_transition transition_params *
+
+                     {default} reduce 9
+
+State 34:
+     (13) transition_merged_list ::= merged_transition transition_merged_list *
+
+                     {default} reduce 13
+
+State 35:
+      (8) transition_stmt ::= TRANSITIONSTATES transition_merged_list main_transition transition_merged_list transition_params *
+
+                     {default} reduce 8
+
+State 36:
+     (15) transition_params ::= transition_params_type COMMA STYLE EQUALS DOTTED *
+
+                     {default} reduce 15
+
+State 37:
+      (3) transitions_list ::= transition_stmt transitions_list *
+
+                     {default} reduce 3
+
