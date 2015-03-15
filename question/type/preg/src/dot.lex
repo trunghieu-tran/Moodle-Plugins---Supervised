@@ -9,6 +9,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 %function nextToken
 %line
 %char
+%unicode
 %state STARTSTATES
 %state ENDSTATES
 %state TRANSITION
@@ -34,94 +35,126 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     protected $opentags;
     protected $closetags;
     protected $pregleaf;
+    protected $fromstate;
+    protected $chars;
+    private function createToken($type, $value = null) {
+        return new JLexToken($type, $value);
+    }
 %}
 %%
 <YYINITIAL> "digraph" {return $this->createToken(qtype_preg_dot_parser::DIGRAPH);}
-<YYINITIAL> {IDENT} {return $this->createToken(qtype_preg_dot_parser::NAME);}
-<YYINITIAL> "{" {
+<YYINITIAL> "{"[\n] {
 					$this->startstates = array();
 					$this->yybegin(self::STARTSTATES);
 				}
 
 <YYINITIAL> "}" {return $this->createToken(qtype_preg_dot_parser::CLOSEBODY);}
-<YYINITIAL> "color" {return $this->createToken(qtype_preg_dot_parser::COLOR);}
-<YYINITIAL> "violet" {return $this->createToken(qtype_preg_dot_parser::VIOLET);}
-<YYINITIAL> "red" {return $this->createToken(qtype_preg_dot_parser::RED);}
-<YYINITIAL> "blue" {return $this->createToken(qtype_preg_dot_parser::BLUE);}
-<YYINITIAL> "style" {return $this->createToken(qtype_preg_dot_parser::STYLE);}
-<YYINITIAL> "dotted" {return $this->createToken(qtype_preg_dot_parser::DOTTED);}
-<YYINITIAL> "," {return $this->createToken(qtype_preg_dot_parser::COMMA);}
-<YYINITIAL> "=" {return $this->createToken(qtype_preg_dot_parser::EQUALS);}
 
-<YYINITIAL> "["({WHITESPACE})*"label"({WHITESPACE})*"="({WHITESPACE})*"<"{$this->yybegin(self::TRANSITION);}
+
+<YYINITIAL> "["({WHITESPACE})*"label"({WHITESPACE})*"="({WHITESPACE})*"<" {$this->yybegin(self::TRANSITION);}
+<TRANSITION> (">")?({WHITESPACE})*","({WHITESPACE})*"color" {return $this->createToken(qtype_preg_dot_parser::COLOR);}
+<TRANSITION> "violet" {return $this->createToken(qtype_preg_dot_parser::VIOLET);}
+<TRANSITION> "red" {return $this->createToken(qtype_preg_dot_parser::RED);}
+<TRANSITION> "blue" {return $this->createToken(qtype_preg_dot_parser::BLUE);}
+<TRANSITION> "style" {return $this->createToken(qtype_preg_dot_parser::STYLE);}
+<TRANSITION> "dotted" {return $this->createToken(qtype_preg_dot_parser::DOTTED);}
+<TRANSITION> "," {return $this->createToken(qtype_preg_dot_parser::COMMA);}
+<TRANSITION> "=" {return $this->createToken(qtype_preg_dot_parser::EQUALS);}
 <TRANSITION> "<B>" {return $this->createToken(qtype_preg_dot_parser::MAINSTART);}
-<TRANSITION> "</B>" {return $this->createToken(qtype_preg_dot_parser::MAINEND);}
+<TRANSITION> "/B>" {return $this->createToken(qtype_preg_dot_parser::MAINEND);}
+<TRANSITION> "<BR/>" {}
+<TRANSITION> ">];" {$this->yybegin(self::YYINITIAL);}
+<TRANSITION> "];" {$this->yybegin(self::YYINITIAL);}
+<TRANSITION> {WHITESPACE} {}
 <TRANSITION> "o:" {
                         $this->opentags = array();
                         $this->yybegin(self::OPENTAGS);
                     }
 
 <OPENTAGS> {NUMBER}"," {
-                            $str = $this->yytext();
-                            $this->opentags[] = substr($str, 0, -1);
+                            $this->opentags[] = (int)$this->yytext();
                         }
 <OPENTAGS> " " {
                     $this->yybegin(self::PREGLEAF);
+                    $this->chars = "";
                     return $this->createToken(qtype_preg_dot_parser::OPEN, $this->opentags);
                 }
 
+<OPENTAGS> "," {}
 <PREGLEAF> " c:" {
-                    $this->yybegin(self::CLOSETAGS);
-                    return $this->createToken(qtype_preg_dot_parser::LEAF, $this->pregleaf);
-                }
-
-<PREGLEAF> (.)+ {
-                    $chars = $this->yytext();
-                    StringStreamController::createRef('regex', $chars);
+                    StringStreamController::createRef('regex', $this->chars);
                     $pseudofile = fopen('string://regex', 'r');
                     $lexer = new qtype_preg_lexer($pseudofile);
                     $this->pregleaf = $lexer->nextToken()->value;
+                    if ($this->chars == "$") {
+                        $this->pregleaf = new qtype_preg_leaf_assert_dollar();
+                    }
+                    if ($this->chars == "^") {
+                        $this->pregleaf = new qtype_preg_leaf_assert_circumflex();
+                    }
+                    if ($this->chars == "ε") {
+                        $this->pregleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+                    }
+                    $this->closetags = array();
+                    $this->yybegin(self::CLOSETAGS);
+                    return $this->createToken(qtype_preg_dot_parser::LEAF, $this->pregleaf);
+}
+<PREGLEAF> . {
+                    $this->chars .= $this->yytext();
+
                 }
 
 <CLOSETAGS> {NUMBER}"," {
-                            $str = $this->yytext();
-                            $this->closetags[] = substr($str, 0, -1);
+                            $this->closetags[] = (int)$this->yytext();
                         }
+
+<CLOSETAGS> "," {}
+
 <CLOSETAGS> "<BR/>" {
                     $this->yybegin(self::TRANSITION);
                     return $this->createToken(qtype_preg_dot_parser::CLOSE, $this->closetags);
                 }
 
 <CLOSETAGS> ">" {
-                    $this->yybegin(self::YYINITIAL);
+                    $this->yybegin(self::TRANSITION);
                     return $this->createToken(qtype_preg_dot_parser::CLOSE, $this->closetags);
                 }
 
-<YYINITIAL> {NUMBER} {
-      return $this->createToken();
-}
+<CLOSETAGS> "<" {
+                    $this->yybegin(self::TRANSITION);
+                    return $this->createToken(qtype_preg_dot_parser::CLOSE, $this->closetags);
+                }
 
 <STARTSTATES> {FASTATE}";" {
-                                $str = $this->yytext();
-                                $this->startstates[] = substr($str, 0, -1);
+                                $this->startstates[] = $this->yytext();
                             }
-<STARTSTATES> \n {
+<STARTSTATES> [\n] {
                     $this->endstates = array();
                     $this->yybegin(self::ENDSTATES);
                     return $this->createToken(qtype_preg_dot_parser::START, $this->startstates);
                 }
 
+<STARTSTATES> {WHITESPACE}|";" {}
+
 <ENDSTATES> {FASTATE}";" {
-                            $str = $this->yytext();
-                            $this->endstates[] = substr($str, 0, -1);
+                            $this->endstates[] = $this->yytext();
                         }
-<ENDSTATES> \n {
+<ENDSTATES> [\n] {
+                    $this->fromstate = null;
                     $this->yybegin(self::YYINITIAL);
                     return $this->createToken(qtype_preg_dot_parser::END, $this->endstates);
                 }
 
-<YYINITIAL> {FASTATE}"->"{FASTATE} {
-                                        $str = $this->yytext();
-                                        return $this->createToken(qtype_preg_dot_parser::TRANSITIONSTATES, explode("->", $str));
+<ENDSTATES> {WHITESPACE}|";" {}
+
+<YYINITIAL> ({FASTATE}"->"{FASTATE}) {
+                                        if ($this->fromstate === null) {
+                                            $this->fromstate = $this->yytext();
+                                        } else {
+                                            $fromstate = $this->fromstate;
+                                            $this->fromstate = null;
+                                            return $this->createToken(qtype_preg_dot_parser::TRANSITIONSTATES, array($fromstate, $this->yytext()));
+                                        }
+
                                     }
-<YYINITIAL> .           { /* ignore bad characters */ }
+<YYINITIAL> "->"|[\n]|{WHITESPACE} {}
