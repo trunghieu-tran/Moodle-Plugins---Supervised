@@ -294,4 +294,35 @@ class qtype_correctwriting_test_mistake_descriptions extends PHPUnit_Framework_T
         $this->assertTrue(in_array('"23" misplaced', $mistakes), var_export($mistakes, true));
         $this->assertTrue(in_array('"odd" should not be in response', $mistakes), var_export($mistakes, true));
     }
+
+    public function test_typo_and_missing_separator() {
+        $allmistakes = $this->get_mistakes_for_case(
+            'int separator ;',
+            'intseparadir ;',
+            array(
+                0 => 'type',
+            )
+        );
+
+        $mistakes = $this->find_mistakes('lexical', $allmistakes);
+        $this->assertTrue($mistakes == array('there may be a typo in "intseparadir"'), var_export($mistakes, true));
+        $mistakes = $this->find_mistakes('sequence', $allmistakes);
+        $this->assertTrue($mistakes == array('type is missing'), var_export($mistakes, true));
+    }
+
+    public function test_typo_and_extra_separator() {
+        $allmistakes = $this->get_mistakes_for_case(
+            'int separator ;',
+            'int separa dir ;',
+            array(
+                0 => 'type',
+            )
+        );
+
+        $mistakes = $this->find_mistakes('lexical', $allmistakes);
+        $this->assertTrue($mistakes == array('there may be a typo in "separa"'), var_export($mistakes, true));
+        $mistakes = $this->find_mistakes('sequence', $allmistakes);
+        $this->assertTrue($mistakes == array('"dir" should not be in response'), var_export($mistakes, true));
+
+    }
 }
