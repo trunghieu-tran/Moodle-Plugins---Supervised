@@ -951,6 +951,10 @@ class qtype_preg_fa {
         return $result;
     }
 
+    public function has_transition($from, $to) {
+        return array_key_exists($to, $this->adjacencymatrix[$from]) && !empty($this->adjacencymatrix[$from][$to]);
+    }
+
     /**
      * Return outtransitions of state with id $state.
      *
