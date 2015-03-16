@@ -38,7 +38,7 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
     protected $operations;
 
     /** Constructs new non-fixed lexeme label with specified text
-    @param string $text text of lexeme
+     *  @param string $text text of lexeme
      */
     public function __construct($text) {
         $bbox = qtype_correctwriting_get_text_bounding_box($text);
@@ -119,7 +119,7 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
      * @param $lexeme a lexeme data
      */
     public function append_extra_separator_lexeme($lexeme) {
-        $this->text = $this->text . ' ' . $lexeme;
+        $this->text = $this->text . '_' . $lexeme;
         $this->operations[] = 'extra_separator';
         for($i = 0; $i < core_text::strlen($lexeme); ++$i) {
             $this->operations[] = 'normal';
@@ -166,6 +166,14 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
                 $height = max(2 * TINY_SPACE + $metrics['height'], $height);
                 $baselineoffset = max($baselineoffset, TINY_SPACE + $metrics['height']);
                 $width += MISSING_SEPARATOR_WIDTH;
+            }
+
+            if ($pair[1] == 'insert') {
+                $bbox = qtype_correctwriting_get_text_bounding_box($pair[0]);
+                $width = 4 * TINY_SPACE + $bbox->width;
+                $tmpheight = $metrics['height'] / 2 + $bbox->height;
+                $height = max($tmpheight, $height);
+                $baselineoffset = max($baselineoffset, $tmpheight - $metrics['height']);
             }
 
             if (in_array($pair[1], $specialrenderings) == false) {
