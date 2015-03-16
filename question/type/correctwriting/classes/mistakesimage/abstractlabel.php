@@ -39,6 +39,11 @@ class qtype_correctwriting_abstract_label {
      * @var stdClass|null bounding rectangle
      */
     protected $rectangle = null;
+    /**
+     * Computes offset for base line of text
+     * @var int
+     */
+    protected $baselineoffset = 0;
 
     /**
      * Returns a rectangle for data
@@ -54,7 +59,7 @@ class qtype_correctwriting_abstract_label {
         return $this->connection;
     }
     /** Returns a requested size of label for drawing
-    @return array of two coordinates width and height as array(width,height)
+     *  @return array of two coordinates width and height as array(width,height)
      */
     public function get_size() {
         return $this->labelsize;

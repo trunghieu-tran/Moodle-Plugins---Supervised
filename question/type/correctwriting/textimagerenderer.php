@@ -74,6 +74,26 @@ function qtype_correctwriting_get_text_bounding_box($text)  {
 }
 
 /**
+ * Returns kerning for two strings
+ * @param string $a first string
+ * @param string $b second string
+ * @return int kerning
+ */
+function qtype_correctwriting_compute_kerning($a, $b) {
+    $awidth = qtype_correctwriting_get_text_bounding_box($a);
+    $awidth = $awidth->width;
+
+    $bwidth = qtype_correctwriting_get_text_bounding_box($b);
+    $bwidth = $bwidth->width;
+
+    $fullwidth = qtype_correctwriting_get_text_bounding_box($a . $b);
+    $fullwidth = $fullwidth->width;
+
+    $kerning = $fullwidth - $awidth - $bwidth;
+    return $kerning;
+}
+
+/**
  * Renders text on image
  * @param resource $im image
  * @param int $x left corner coordinate of image
