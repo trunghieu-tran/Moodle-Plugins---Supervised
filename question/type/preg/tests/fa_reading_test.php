@@ -32,7 +32,6 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
     0->6[label = <<B>o:3,2,1, a c:3,</B><BR/>o:4, ε c:(0,6)>, color = red, penwidth = 2];
     0->5[label = <<B>o:3,2,1, a c:3,</B><BR/>o:4, ε c:(0,5)>, color = red, penwidth = 2];
     0->2[label = <<B>o:3,2,1, a c:3,</B>>, color = violet, penwidth = 2];
-
 }';
 
         $automata = qtype_preg_fa::read_fa($dotdescription);
@@ -62,7 +61,6 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
     1->4[label = <<B>o: [01] c:</B>>, color = violet, penwidth = 2];
     1->2[label = <<B>o: [abc] c:</B>>, color = violet, penwidth = 2];
     0->1[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
-
 }';
 
         $automata = qtype_preg_fa::read_fa($dotdescription);
@@ -92,7 +90,6 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
     3->4[label = <<B>o: [y] c:</B>>, color = violet, penwidth = 2];
     2->4[label = <<B>o: [a-f] c:</B>>, color = violet, penwidth = 2];
     1->2[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
-
 }';
 
         $automata = qtype_preg_fa::read_fa($dotdescription);
@@ -122,7 +119,6 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
     2->3[label = <<B>o: [\\\\[\\\\]] c:</B>>, color = violet, penwidth = 2];
     1->2[label = <<B>o: [\\\\$\\\\Z] c:</B>>, color = violet, penwidth = 2];
     0->1[label = <<B>o: [\\\\\\\\\\\\-] c:</B>>, color = violet, penwidth = 2];
-
 }';
 
         $automata = qtype_preg_fa::read_fa($dotdescription);
@@ -154,7 +150,6 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
     3->4[label = <<B>o: y c:</B>>, color = violet, penwidth = 2];
     2->4[label = <<B>o: [a-f] c:</B>>, color = violet, penwidth = 2];
     1->2[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
-
 }';
 
         $automata = qtype_preg_fa::read_fa($dotdescription);
@@ -178,7 +173,6 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
     2->3[label = <<B>o: [abc-hl-x] c:</B>>, color = violet, penwidth = 2];
     1->2[label = <<B>o: [a-jxy] c:</B>>, color = violet, penwidth = 2];
     0->1[label = <<B>o: [a-kn-z] c:</B>>, color = violet, penwidth = 2];
-
 }';
 
         $automata = qtype_preg_fa::read_fa($dotdescription);
@@ -206,7 +200,6 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
     0->3[label = <o: \\\\z c:(0,3)<BR/><B>o: [xy] c:</B><BR/>o: \\\\A c:(0,3)>, color = violet, penwidth = 2, style = dotted];
     0->1[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
     2->3[label = <<B>o: [a-z] c:</B><BR/>o: ^ c:(2,3)>, color = violet, penwidth = 2];
-
 }';
 
         $automata = qtype_preg_fa::read_fa($dotdescription);
@@ -230,7 +223,6 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
     ""2,1""->"",2""[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
     ""1,0""->""2,1""[label = <<B>o: [0-9] c:</B>>, color = red, penwidth = 2];
     ""0,""->""1,0""[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
-
 }';
 
         $automata = qtype_preg_fa::read_fa($dotdescription);
@@ -256,7 +248,6 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
     1->3[label = <<B>o: ε c:</B>>, color = violet, penwidth = 2];
     0->1[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
     0->2[label = <<B>o: ε c:</B>>, color = violet, penwidth = 2];
-
 }';
 
         $automata = qtype_preg_fa::read_fa($dotdescription);
@@ -281,7 +272,6 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
     1->3[label = <<B>o: [.] c:</B>>, color = violet, penwidth = 2];
     0->1[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
     0->2[label = <<B>o: . c:</B>>, color = violet, penwidth = 2];
-
 }';
 
         $automata = qtype_preg_fa::read_fa($dotdescription);
