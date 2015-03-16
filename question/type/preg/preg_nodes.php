@@ -944,7 +944,8 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         } else {
             $position = new qtype_preg_position();
         }
-        $result->set_user_info($position, array_merge($this->userinscription, $other->userinscription));
+        $result->set_user_info($position, array(array(0 => $this->userinscription, 1 => $other->userinscription)));
+
         return $result;
     }
 
