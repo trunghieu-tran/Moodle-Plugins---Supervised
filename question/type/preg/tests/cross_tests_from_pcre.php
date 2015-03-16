@@ -1112,7 +1112,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>17),
                         'length'=>array(0=>15),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -1121,7 +1121,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>17),
                         'length'=>array(0=>15),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -1329,7 +1329,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>17),
                         'length'=>array(0=>15),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -1338,7 +1338,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>17),
                         'length'=>array(0=>15),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -2737,7 +2737,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>64),
                         'ext_index_first'=>array(0=>0),
-                        'ext_length'=>array(0=>14),
+                        'ext_length'=>array(0=>68),
                         'left'=>array(9),
                         'next'=>'o',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
@@ -5387,7 +5387,8 @@ class qtype_preg_cross_tests_from_pcre {
 
         return array('regex'=>'$b',
                      'modifiers'=>'i',
-                     'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6));
+                     'tests'=>array($test1, $test2, $test3, $test4, $test5, $test6),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_432() {
@@ -6563,7 +6564,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>34),
                         'length'=>array(0=>35,1=>0),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -6572,7 +6573,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>34),
                         'length'=>array(0=>35,1=>0),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -6581,7 +6582,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>34),
                         'length'=>array(0=>35,1=>0),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -6590,7 +6591,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>34),
                         'length'=>array(0=>35,1=>0),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -6599,7 +6600,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>34),
                         'length'=>array(0=>35,1=>0),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -6608,7 +6609,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>34),
                         'length'=>array(0=>35,1=>0),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -6617,7 +6618,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>34),
                         'length'=>array(0=>35,1=>0),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -6626,7 +6627,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>34),
                         'length'=>array(0=>35,1=>0),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -6635,7 +6636,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>34),
                         'length'=>array(0=>35,1=>0),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -7648,30 +7649,30 @@ class qtype_preg_cross_tests_from_pcre {
 
     function data_for_test_761() {
         $test4 = array( 'str'=>'** Failers',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>0,2=>6),
-                        'length'=>array(0=>8,2=>2),
-                        'left'=>array(),
-                        'next'=>'',
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'left'=>array(7),
+                        'next'=>'\d',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test5 = array( 'str'=>'10.6',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0,2=>6),
-                        'length'=>array(0=>8,2=>2),
-                        'left'=>array(),
-                        'next'=>'',
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>4),
+                        'left'=>array(4),
+                        'next'=>'\.',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test6 = array( 'str'=>'455.3.4.5',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0,2=>6),
-                        'length'=>array(0=>8,2=>2),
-                        'left'=>array(),
-                        'next'=>'',
+                        'index_first'=>array(0=>4),
+                        'length'=>array(0=>5),
+                        'left'=>array(2),
+                        'next'=>'\.',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'(?(DEFINE)(?<byte>2[0-4]\d|25[0-5]|1\d\d|[1-9]?\d))\b(?&byte)(\.(?&byte)){3}',
@@ -7680,30 +7681,30 @@ class qtype_preg_cross_tests_from_pcre {
 
     function data_for_test_762() {
         $test4 = array( 'str'=>'** Failers',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>0,1=>6),
-                        'length'=>array(0=>8,1=>2),
-                        'left'=>array(),
-                        'next'=>'',
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'left'=>array(7),
+                        'next'=>'\d',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test5 = array( 'str'=>'10.6',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0,1=>6),
-                        'length'=>array(0=>8,1=>2),
-                        'left'=>array(),
-                        'next'=>'',
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>4),
+                        'left'=>array(4),
+                        'next'=>'\.',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         $test6 = array( 'str'=>'455.3.4.5',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0,1=>6),
-                        'length'=>array(0=>8,1=>2),
-                        'left'=>array(),
-                        'next'=>'',
+                        'index_first'=>array(0=>4),
+                        'length'=>array(0=>5),
+                        'left'=>array(2),
+                        'next'=>'\.',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
         return array('regex'=>'\b(?&byte)(\.(?&byte)){3}(?(DEFINE)(?<byte>2[0-4]\d|25[0-5]|1\d\d|[1-9]?\d))',
@@ -7925,7 +7926,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -7939,7 +7940,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -7953,7 +7954,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -7967,7 +7968,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -7981,7 +7982,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -7995,7 +7996,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>5,1=>5),
                         'length'=>array(0=>3,1=>3),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8009,7 +8010,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0,2=>1,3=>3),
                         'length'=>array(0=>4,1=>3,2=>1,3=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8018,7 +8019,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0,2=>1,3=>3),
                         'length'=>array(0=>4,1=>3,2=>1,3=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8218,7 +8219,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>1),
                         'length'=>array(0=>2,1=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8227,7 +8228,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>1),
                         'length'=>array(0=>2,1=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8241,7 +8242,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>1),
                         'length'=>array(0=>2,1=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8250,7 +8251,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>1),
                         'length'=>array(0=>2,1=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8259,7 +8260,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>1),
                         'length'=>array(0=>2,1=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8268,7 +8269,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>1),
                         'length'=>array(0=>2,1=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8282,7 +8283,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>1),
                         'length'=>array(0=>2,1=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8291,7 +8292,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>1),
                         'length'=>array(0=>2,1=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8300,7 +8301,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>1),
                         'length'=>array(0=>2,1=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8314,7 +8315,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>1),
                         'length'=>array(0=>0),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8323,7 +8324,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>1),
                         'length'=>array(0=>0),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8337,7 +8338,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>3),
                         'length'=>array(0=>0),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8346,7 +8347,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>3),
                         'length'=>array(0=>0),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8363,7 +8364,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8377,7 +8378,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8386,7 +8387,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8395,7 +8396,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8410,7 +8411,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0,MK=>-1),
                         'length'=>array(0=>1,1=>1,MK=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8419,7 +8420,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0,MK=>-1),
                         'length'=>array(0=>1,1=>1,MK=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8436,7 +8437,7 @@ however, we need the complication for Perl. */
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0,2=>1,3=>2),
                         'length'=>array(0=>3,1=>1,2=>1,3=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8445,7 +8446,7 @@ however, we need the complication for Perl. */
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0,2=>1,3=>2),
                         'length'=>array(0=>3,1=>1,2=>1,3=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8459,7 +8460,7 @@ however, we need the complication for Perl. */
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0),
                         'length'=>array(0=>4,1=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8474,7 +8475,7 @@ however, we need the complication for Perl. */
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8488,7 +8489,7 @@ however, we need the complication for Perl. */
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8502,7 +8503,7 @@ however, we need the complication for Perl. */
                         'full'=>false,
                         'index_first'=>array(0=>1),
                         'length'=>array(0=>2),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8516,7 +8517,7 @@ however, we need the complication for Perl. */
                         'full'=>false,
                         'index_first'=>array(0=>1),
                         'length'=>array(0=>2),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8847,7 +8848,7 @@ however, we need the complication for Perl. */
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8862,7 +8863,7 @@ however, we need the complication for Perl. */
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>1,2=>1),
                         'length'=>array(0=>4,1=>2,2=>2),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8877,7 +8878,7 @@ however, we need the complication for Perl. */
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8892,7 +8893,7 @@ however, we need the complication for Perl. */
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>4),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8907,7 +8908,7 @@ however, we need the complication for Perl. */
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8922,7 +8923,7 @@ however, we need the complication for Perl. */
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>4),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8937,7 +8938,7 @@ however, we need the complication for Perl. */
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8952,7 +8953,7 @@ however, we need the complication for Perl. */
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>1,2=>1),
                         'length'=>array(0=>4,1=>2,2=>2),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8967,7 +8968,7 @@ however, we need the complication for Perl. */
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8982,7 +8983,7 @@ however, we need the complication for Perl. */
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>4),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -8998,7 +8999,7 @@ however, we need the complication for Perl. */
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9012,7 +9013,7 @@ however, we need the complication for Perl. */
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>2),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9026,7 +9027,7 @@ however, we need the complication for Perl. */
                         'full'=>false,
                         'index_first'=>array(0=>3,1=>1),
                         'length'=>array(0=>1,1=>2),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9035,7 +9036,7 @@ however, we need the complication for Perl. */
                         'full'=>false,
                         'index_first'=>array(0=>3,1=>1),
                         'length'=>array(0=>1,1=>2),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9053,7 +9054,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>0,MK=>-1),
                         'length'=>array(0=>3,MK=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9062,7 +9063,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>0,MK=>-1),
                         'length'=>array(0=>3,MK=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9071,7 +9072,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>0,MK=>-1),
                         'length'=>array(0=>3,MK=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9080,7 +9081,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>0,MK=>-1),
                         'length'=>array(0=>3,MK=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9089,7 +9090,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>0,MK=>-1),
                         'length'=>array(0=>3,MK=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9104,7 +9105,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0,MK=>-1),
                         'length'=>array(0=>2,1=>2,MK=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9113,7 +9114,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0,MK=>-1),
                         'length'=>array(0=>2,1=>2,MK=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9122,7 +9123,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0,MK=>-1),
                         'length'=>array(0=>2,1=>2,MK=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9137,7 +9138,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0,MK=>-1),
                         'length'=>array(0=>2,1=>2,MK=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9146,7 +9147,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0,MK=>-1),
                         'length'=>array(0=>2,1=>2,MK=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9155,7 +9156,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>0,1=>0,MK=>-1),
                         'length'=>array(0=>2,1=>2,MK=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9170,7 +9171,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>2),
                         'length'=>array(0=>2),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9179,7 +9180,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>2),
                         'length'=>array(0=>2),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9188,7 +9189,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>2),
                         'length'=>array(0=>2),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9203,7 +9204,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>0,MK=>-1),
                         'length'=>array(0=>3,MK=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9212,7 +9213,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>0,MK=>-1),
                         'length'=>array(0=>3,MK=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9227,7 +9228,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>0,MK=>-1),
                         'length'=>array(0=>3,MK=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9236,7 +9237,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>0,MK=>-1),
                         'length'=>array(0=>3,MK=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9251,7 +9252,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>0,MK=>-1),
                         'length'=>array(0=>3,MK=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9260,7 +9261,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>0,MK=>-1),
                         'length'=>array(0=>3,MK=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9275,7 +9276,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>0,MK=>-1),
                         'length'=>array(0=>3,MK=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9284,7 +9285,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>0,MK=>-1),
                         'length'=>array(0=>3,MK=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9299,7 +9300,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>0,MK=>-1),
                         'length'=>array(0=>3,MK=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9308,7 +9309,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>0,MK=>-1),
                         'length'=>array(0=>3,MK=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9323,7 +9324,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>0,MK=>-1),
                         'length'=>array(0=>3,MK=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9332,7 +9333,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>0,MK=>-1),
                         'length'=>array(0=>3,MK=>1),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9361,7 +9362,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>1),
                         'length'=>array(0=>2),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9406,7 +9407,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9415,7 +9416,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9430,7 +9431,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9439,7 +9440,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9454,7 +9455,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>6),
                         'length'=>array(0=>3),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9463,7 +9464,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>6),
                         'length'=>array(0=>3),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9478,7 +9479,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>5),
                         'length'=>array(0=>0),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 
@@ -9487,7 +9488,7 @@ more complicated. */
                         'full'=>false,
                         'index_first'=>array(0=>5),
                         'length'=>array(0=>0),
-                        'left'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>'',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE));
 

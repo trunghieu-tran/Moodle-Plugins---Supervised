@@ -28,6 +28,8 @@ qtype_preg\template::set_available_templates(array(
     'parens_req' => new qtype_preg\template('parens_req', '(   \(    (?:(?-1)|$$1)   \)  )', 'x', array('en' => '$$1 in parens', 'ru' => '$$1 в скобках'), 1),
     'parens_opt' => new qtype_preg\template('parens_opt', '$$1|(?###parens_req<)$$1(?###>)', '', array('en' => '$$1 in parens or not', 'ru' => '$$1 в скобках или без'), 1),
     'brackets_req' => new qtype_preg\template('brackets_req', '(   \[   (?:(?-1)|$$1)   \]   )', 'x', array('en' => '$$1 in brackets', 'ru' => '$$1 в квадратных скобках'), 1),
+    'custom_parens_req' => new qtype_preg\template('custom_parens_req', '(   $$1    (?:(?-1)|$$2)   $$3  )', 'x', array('en' => '$$2 in custom parens', 'ru' => '$$1 в особых скобках'), 3),
+    'custom_parens_opt' => new qtype_preg\template('custom_parens_opt', '$$2|(?###custom_parens_req<)$$1(?###,)$$2(?###,)$$3(?###>)', 'x', array('en' => '$$2 in optional custom parens', 'ru' => '$$1 в особых скобках или без'), 3),
     'word_in_parens' => new qtype_preg\template('word_in_parens', '(?###parens_req<)(?###word)(?###>)', '', array('en' => 'word in parens', 'ru' => 'слово в скобках')),
     'word_in_parens_in_brackets' => new qtype_preg\template('word_in_parens_in_brackets', '(?###brackets_req<)(?###parens_req<)(?###word)(?###>)(?###>)', '', array('en' => 'word in parens in brackets', 'ru' => 'слово в квадратных и обычных скобках')),
 ));
@@ -317,6 +319,23 @@ class qtype_preg_templates_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($res->full);
         $this->assertTrue($res->indexfirst[0] === 1);
         $this->assertTrue($res->length[0] === 9);
+
+        $matcher = new qtype_preg_fa_matcher('(?###custom_parens_opt<)<(?###,)(?###word)(?###,)>(?###>)');
+
+        $res = $matcher->match('word');
+        $this->assertTrue($res->full);
+        $this->assertTrue($res->indexfirst[0] === 0);
+        $this->assertTrue($res->length[0] === 4);
+
+        $res = $matcher->match('<word>');
+        $this->assertTrue($res->full);
+        $this->assertTrue($res->indexfirst[0] === 0);
+        $this->assertTrue($res->length[0] === 6);
+
+        $res = $matcher->match('<<<<word>>>>');
+        $this->assertTrue($res->full);
+        $this->assertTrue($res->indexfirst[0] === 0);
+        $this->assertTrue($res->length[0] === 12);
     }
 
     public function test_template_errors() {
@@ -397,10 +416,138 @@ class qtype_preg_templates_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($res->indexfirst[0] === 0);
         $this->assertTrue($res->length[0] === strlen($str));
 
-        $str = '((((((((((sdf))))))+((((((1))))))))))';
+        $str = '(((((((sdf))))))+((((((1)))))))';
         $res = $matcher->match($str);
         $this->assertTrue($res->full);
         $this->assertTrue($res->indexfirst[0] === 0);
         $this->assertTrue($res->length[0] === strlen($str));
+    }
+
+    public function test_template_realworld_2() {   // a+b
+        $regex = '
+        (?###parens_opt<)
+            (?###parens_opt<)a(?###>)
+            \+
+            (?###parens_opt<)b(?###>)
+        (?###>)';
+        $options = new qtype_preg_matching_options();
+        $options->set_modifier(qtype_preg_handling_options::MODIFIER_EXTENDED);
+        $matcher = new qtype_preg_fa_matcher('^' . $regex . '$', $options);
+
+        // Full matches
+        $strings = array('a+b', '(a+b)', '((a+b))', '((((a))+((((b))))))');
+        foreach ($strings as $str) {
+            $res = $matcher->match($str);
+            $this->assertTrue($res->full);
+            $this->assertTrue($res->indexfirst[0] === 0);
+            $this->assertTrue($res->length[0] === strlen($str));
+        }
+
+        // Partial matches
+        $res = $matcher->match('(a+b');
+        $this->assertFalse($res->full);
+        $this->assertTrue($res->indexfirst[0] === 0);
+        $this->assertTrue($res->length[0] === 4);
+
+        $res = $matcher->match('a+b)');
+        $this->assertFalse($res->full);
+        $this->assertTrue($res->indexfirst[0] === 0);
+        $this->assertTrue($res->length[0] === 3);
+
+        $res = $matcher->match('(a)+(b');
+        $this->assertFalse($res->full);
+        $this->assertTrue($res->indexfirst[0] === 0);
+        $this->assertTrue($res->length[0] === 6);
+    }
+
+    public function test_template_realworld_3() {   // sin(a+b+c)
+        $regex = '
+        sin\s*
+        (?###parens_req<)
+
+            (?|
+
+            # optional group a+b
+
+                (?###parens_opt<)
+                    (?###parens_opt<)a(?###>)
+                    \+
+                    (?###parens_opt<)b(?###>)
+                (?###>)
+                \+
+                (?###parens_opt<)c(?###>)
+
+            |
+
+            # optional group b+c
+
+                (?###parens_opt<)a(?###>)
+                \+
+                (?###parens_opt<)
+                    (?###parens_opt<)b(?###>)
+                    \+
+                    (?###parens_opt<)c(?###>)
+                (?###>)
+
+            )
+
+        (?###>)';
+        $options = new qtype_preg_matching_options();
+        $options->set_modifier(qtype_preg_handling_options::MODIFIER_EXTENDED);
+        $matcher = new qtype_preg_fa_matcher('^' . $regex . '$', $options);
+
+        // Full matches
+        $strings = array('sin (a+b+c)', 'sin(a+(b)+c)', 'sin((a+b+c))', 'sin (((a))+(b)+(c))', 'sin((((a))+((b)))+((c)))', 'sin ((a)+(b+c))');
+        foreach ($strings as $str) {
+            $res = $matcher->match($str);
+            $this->assertTrue($res->full);
+            $this->assertTrue($res->indexfirst[0] === 0);
+            $this->assertTrue($res->length[0] === strlen($str));
+        }
+
+        // Partial matches
+        $res = $matcher->match('sin((a+b+c)');
+        $this->assertFalse($res->full);
+        $this->assertTrue($res->indexfirst[0] === 0);
+        $this->assertTrue($res->length[0] === 11);
+
+        $res = $matcher->match('sin(a+b+c))');
+        $this->assertFalse($res->full);
+        $this->assertTrue($res->indexfirst[0] === 0);
+        $this->assertTrue($res->length[0] === 10);
+
+        /*$res = $matcher->match('sin(((a)+b)');
+        $this->assertFalse($res->full);
+        $this->assertTrue($res->indexfirst[0] === 0);
+        $this->assertTrue($res->length[0] === 11);*/
+    }
+
+    public function test_template_realworld_4() {   // a*b+c*d
+        $regex = '
+        (?###parens_opt<)
+            (?###parens_opt<)
+                (?###parens_opt<)a(?###>)
+                \*
+                (?###parens_opt<)b(?###>)
+            (?###>)
+            \+
+            (?###parens_opt<)
+                (?###parens_opt<)c(?###>)
+                \*
+                (?###parens_opt<)d(?###>)
+            (?###>)
+        (?###>)';
+        $options = new qtype_preg_matching_options();
+        $options->set_modifier(qtype_preg_handling_options::MODIFIER_EXTENDED);
+        $matcher = new qtype_preg_fa_matcher('^' . $regex . '$', $options);
+
+        // Full matches
+        $strings = array('a*b+c*d', '((a*b+c*d))', '((a)*((b)))+(((c)*(((d)))))');
+        foreach ($strings as $str) {
+            $res = $matcher->match($str);
+            $this->assertTrue($res->full);
+            $this->assertTrue($res->indexfirst[0] === 0);
+            $this->assertTrue($res->length[0] === strlen($str));
+        }
     }
 }

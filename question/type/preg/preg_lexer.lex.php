@@ -62,6 +62,8 @@ class qtype_preg_lexer extends JLexBase  {
 
     // Regex handling options set from the outside.
     protected $options = null;
+    // All modifiers occured in the regex.
+    protected $allmodifiers = array();
     // Positions skipped because preserveallnodes option was set to false.
     protected $skipped_positions = array();
     // Array of lexical errors found.
@@ -210,6 +212,9 @@ class qtype_preg_lexer extends JLexBase  {
     public function get_skipped_positions() {
         return $this->skipped_positions;
     }
+    public function get_all_modifiers() {
+        return $this->allmodifiers;
+    }
     public function get_error_nodes() {
         return $this->errors;
     }
@@ -262,6 +267,11 @@ class qtype_preg_lexer extends JLexBase  {
         $stackitem = end($this->opt_stack);
         $stackitem->options->unset_modifier($unset);
         $stackitem->options->set_modifier($set);
+        foreach (qtype_preg_handling_options::get_all_modifiers() as $mod) {
+            if ($set & $mod && !in_array($mod, $this->allmodifiers)) {
+                $this->allmodifiers[] = $mod;
+            }
+        }
         return null;
     }
     /**
@@ -7284,6 +7294,11 @@ array(
 							break;
 						case 93:
 							{          /* (?(DEFINE)...             Conditional subexpression - define subpattern for reference */
+    $text = $this->yytext();
+    // Special case: (?(DEFINE with existing subpattern named "DEFINE"
+    if ($text == '(?(DEFINE)' && array_key_exists('DEFINE', $this->subexpr_name_to_number_map)) {
+        return $this->form_numeric_or_named_cond_subexpr($text, null, 'DEFINE', ')');
+    }
     return $this->form_define_cond_subexpr($this->yytext());
 }
 						case -94:
@@ -7341,6 +7356,7 @@ array(
             if (!array_key_exists($name, $available)) {
                 $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_TEMPLATE, $name, $node);
                 $error->position = $position;
+                $node->errors = array($error);
             }
             $result = new JLexToken(qtype_preg_parser::TEMPLATEOPENBRACK, $node);
         } else if (core_text::substr($this->comment, 0, 2) === '##') {
@@ -7352,6 +7368,7 @@ array(
             if (!array_key_exists($name, $available)) {
                 $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_TEMPLATE, $name, $node);
                 $error->position = $position;
+                $node->errors = array($error);
             }
             $result = new JLexToken(qtype_preg_parser::TEMPLATEPARSELEAF, $node);
         }
@@ -8107,6 +8124,11 @@ array(
 							break;
 						case 167:
 							{          /* (?(DEFINE)...             Conditional subexpression - define subpattern for reference */
+    $text = $this->yytext();
+    // Special case: (?(DEFINE with existing subpattern named "DEFINE"
+    if ($text == '(?(DEFINE)' && array_key_exists('DEFINE', $this->subexpr_name_to_number_map)) {
+        return $this->form_numeric_or_named_cond_subexpr($text, null, 'DEFINE', ')');
+    }
     return $this->form_define_cond_subexpr($this->yytext());
 }
 						case -167:

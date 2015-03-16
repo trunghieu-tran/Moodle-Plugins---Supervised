@@ -210,8 +210,6 @@ class qtype_preg_explaining_graph_leaf_charset extends qtype_preg_explaining_gra
         // If first element is empty then delete it.
         if ($result[0] == '') {
             array_shift($result);
-        } else {
-            $result[0] = qtype_preg_authoring_tool::string_to_html($result[0]);
         }
 
         return $result;
@@ -306,8 +304,7 @@ class qtype_preg_explaining_graph_leaf_assert extends qtype_preg_explaining_grap
 class qtype_preg_explaining_graph_leaf_backref extends qtype_preg_explaining_graph_leaf {
 
     public function get_value() {
-        $postfix = $this->pregnode->isrecursive ? '_recursive' : '';
-        return array(get_string($this->pregnode->lang_key(true).$postfix, 'qtype_preg', $this->pregnode->number));
+        return array(get_string($this->pregnode->lang_key(true), 'qtype_preg', $this->pregnode->number));
     }
 
     public function get_color() {
@@ -828,40 +825,11 @@ class qtype_preg_explaining_graph_node_template extends qtype_preg_explaining_gr
      * @param qtype_preg_explaining_graph_tool_subgraph $graph Current explainning graph.
      */
     protected function process_operator($graph) {
-        if ($this->pregnode->operands[0]->type != qtype_preg_node::TYPE_LEAF_META) {
-            if ($this->pregnode->operands[0]->type == qtype_preg_node::TYPE_LEAF_OPTIONS) {
-                $operand = new qtype_preg_explaining_graph_tool_subgraph('');
-                $operand->style = 'solid';
-
-                $operand->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $operand, -1);
-                $operand->entries[] = end($operand->nodes);
-                $operand->exits[] = end($operand->nodes);
-            } else {
-                $operand = $this->operands[0]->create_graph();
-            }
-        } else {
-            $operand = new qtype_preg_explaining_graph_tool_subgraph('');
-            $operand->style = 'solid';
-            if ($this->operands[0]->is_selected()) {
-                $operand->subgraphs[] = new qtype_preg_explaining_graph_tool_subgraph('');
-                $operand->subgraphs[0]->style = 'solid';
-                $operand->subgraphs[0]->color = 'darkgreen';
-                $operand->subgraphs[0]->isselection = true;
-                $operand->subgraphs[0]->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $operand->subgraphs[0], -1);
-                $operand->entries[] = end($operand->subgraphs[0]->nodes);
-                $operand->exits[] = end($operand->subgraphs[0]->nodes);
-            } else {
-                $operand->nodes[] = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $operand, -1);
-                $operand->entries[] = end($operand->nodes);
-                $operand->exits[] = end($operand->nodes);
-            }
-        }
-
         $label = get_string('description_node_template', 'qtype_preg');
 
         $templatename = $this->pregnode->name;
         $template = qtype_preg\template::available_templates()[$templatename];
-        $label .= '\n""' . $template->get_description() . '"';
+        $label .= '\n"' . preg_replace('/\$\$\d+/i', get_string('explain_this', 'qtype_preg') , $template->get_description()) . '"';
 
         $template = new qtype_preg_explaining_graph_tool_subgraph(
             $label,
@@ -870,10 +838,29 @@ class qtype_preg_explaining_graph_node_template extends qtype_preg_explaining_gr
         $template->tooltip = "template";
         $template->style = ($this->pregnode->userinscription[0]->data != '(?i:...)') ? 'solid' : 'filled';
         $template->color = ($this->pregnode->userinscription[0]->data != '(?i:...)') ? 'black' : 'lightgrey';
-        $template->assume_subgraph($operand);
+
+        $left = $this->operands[0]->create_graph();
+        $template->assume_subgraph($left);
+        $template->entries[] = end($left->entries);
+        $template->exits[] = end($left->exits);
+
+        $n = count($this->operands);
+        for ($i = 1; $i < $n; ++$i) {
+            $right = $this->operands[$i]->create_graph();
+            $template->assume_subgraph($right);
+            $template->links[] = new qtype_preg_explaining_graph_tool_link('', $left->exits[0], $right->entries[0], $template);
+            $template->links[count($template->links)-1]->id = $this->pregnode->id;
+            $template->links[count($template->links)-1]->tooltip = 'concatenation';
+
+            if ($i != $n-1) {
+                $left = $right;
+            } else {
+                $template->exits[] = end($right->exits);
+            }
+        }
 
         $graph->subgraphs[] = $template;
-        $graph->entries[] = end($operand->entries);
-        $graph->exits[] = end($operand->exits);
+        $graph->entries[] = end($template->entries);
+        $graph->exits[] = end($template->exits);
     }
 }

@@ -629,17 +629,26 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
                 if ($result->worse_than($tmp)) {
                     $result = $tmp;
                 }
-                if ($result->best()) {
+                // the actual match starting position is $result->indexfirst[0].
+                // $result->indexfirst[0] can differ from $i if assertions merging is turned on.
+                // assertions merging can lead to non-consuming transitions in the beginning or in the end of the finite automaton,
+                // those transitions shift the actual matching position.
+                // to ensure the leftmost-longest match, we should stop matching when $result->indexfirst[0] equals
+                // current position of the loop and the match is 'best'.
+                if ($result->indexfirst[0] <= $i && $result->best()) {
                     break;
                 }
             }
         } else {// Match from all indexes.
             $rightborder = $str->length();
             // Starting positions loop.
-            for ($i = 0; $i <= $rightborder && !$result->best(); $i++) {
+            for ($i = 0; $i <= $rightborder; $i++) {
                 $tmp = $this->match_from_pos($str, $i);
                 if ($result->worse_than($tmp)) {
                     $result = $tmp;
+                }
+                if ($result->indexfirst[0] <= $i && $result->best()) {
+                    break;
                 }
             }
         }
