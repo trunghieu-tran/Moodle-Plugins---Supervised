@@ -47,4 +47,6 @@ define('ABSENT_FRAME_PADDING', 2);
 define('BIG_STRIKETHROUGH_ADDITIONAL_LENGTH', 2);
 // Padding for move items
 define('MOVE_GROUP_PADDING', 2);
+// A missing separator width
+define('MISSING_SEPARATOR_WIDTH', 4);
 
