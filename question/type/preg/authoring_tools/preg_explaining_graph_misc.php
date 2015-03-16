@@ -602,7 +602,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
             $instr .= "arrowhead=\"" . $iter->style . "\", ";
             $instr .= "color=\"" . $iter->color . "\", ";
             if ($iter->id !== -1) $instr .= "tooltip=\"" . $iter->tooltip . "\", ";
-            $instr .= "]\n";
+            $instr .= "];\n";
         }
 
         $instr .= "}\n";
@@ -665,7 +665,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
         $instr .= 'style=' . $gr->style . ';';
         $instr .= 'color=' . $gr->color . ';';
         $instr .= 'bgcolor=' . $gr->bgcolor . ';';
-        $instr .= 'label="' . $gr->label . '";';
+        $instr .= 'label="' . qtype_preg_authoring_tool::string_to_html($gr->label) . '";';
         $instr .= 'id="graphid_' . $gr->id . '";';
         $instr .= 'tooltip="' . $gr->tooltip . '";';
         $instr .= $gr->edge;

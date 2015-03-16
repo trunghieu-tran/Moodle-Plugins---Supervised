@@ -361,7 +361,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
     public function pattern($node_parent = null, $form = null) {
         $characters = array();
         // check errors
-        if (count($this->pregnode->errors) > 0) {
+        if (!empty($this->pregnode->errors)) {
             return $this->pregnode->errors[0]->error_string();
         }
 
@@ -863,9 +863,10 @@ class qtype_preg_description_node_template extends qtype_preg_description_operat
      */
     public function __construct($node, $matcher) {
         parent::__construct($node, $matcher);
-        $templatename = $this->pregnode->name;
-        $this->template = qtype_preg\template::available_templates()[$templatename];
-        $this->regex = $matcher->from_preg_node($this->template->regex); // TODO - options
+        if (empty($this->pregnode->errors)) {
+            $this->template = qtype_preg\template::available_templates()[$this->pregnode->name];
+            $this->regex = $matcher->from_preg_node($this->template->regex); // TODO - options
+        }
         /*foreach ($this->pregnode->operands as $operand) {
             array_push($this->operands, $matcher->from_preg_node($operand));
         }*/
@@ -875,16 +876,20 @@ class qtype_preg_description_node_template extends qtype_preg_description_operat
      * Override of abstract qtype_preg_description_operator::pattern()
      */
     public function pattern($node_parent = null, $form = null) {
-        return $templatedescr = $this->template->get_description();
+        if (!empty($this->pregnode->errors)) {
+            return $this->pregnode->errors[0]->error_string();
+        }
+        return $this->template->get_description();
     }
 }
 
 class qtype_preg_description_leaf_template extends qtype_preg_description_leaf {
     public function __construct($node, $matcher) {
         parent::__construct($node, $matcher);
-        $templatename = $this->pregnode->name;
-        $this->template = qtype_preg\template::available_templates()[$templatename];
-        $this->regex = $matcher->from_preg_node($this->template->regex); // TODO - options
+        if (empty($this->pregnode->errors)) {
+            $this->template = qtype_preg\template::available_templates()[$this->pregnode->name];
+            $this->regex = $matcher->from_preg_node($this->template->regex); // TODO - options
+        }
         /*foreach ($this->pregnode->operands as $operand) {
             array_push($this->operands, $matcher->from_preg_node($operand));
         }*/
@@ -894,7 +899,10 @@ class qtype_preg_description_leaf_template extends qtype_preg_description_leaf {
      * Override of abstract qtype_preg_description_operator::pattern()
      */
     public function pattern($node_parent = null, $form = null) {
-        return $templatedescr = $this->template->get_description();
+        if (!empty($this->pregnode->errors)) {
+            return $this->pregnode->errors[0]->error_string();
+        }
+        return $this->template->get_description();
     }
 }
 

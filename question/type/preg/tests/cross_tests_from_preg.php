@@ -682,10 +682,10 @@ class qtype_preg_cross_tests_from_preg {
 
     function data_for_test_assertions_simple_7() {
         $test1 = array('str'=>'bc',
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>1),
+                       'index_first'=>array(),
+                       'length'=>array(),
                        'ext_index_first'=>array(0=>0),
                        'ext_length'=>array(0=>1),
                        'left'=>array(1),
@@ -5182,6 +5182,64 @@ class qtype_preg_cross_tests_from_preg {
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
 
         return array('regex'=>'^(\[[a-z](?1)?\])$',
+                     'tests'=>array($test1, $test2));
+    }
+
+    function data_for_test_recursion_4() {
+        $test1 = array( 'str'=>'b',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0,2=>1),
+                        'length'=>array(0=>1,1=>1,2=>0),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        $test2 = array( 'str'=>'bbbbbbbb',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0,2=>8),
+                        'length'=>array(0=>8,1=>8,2=>0),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        return array('regex'=>'^(b(?1)?)(b*)$',
+                     'tests'=>array($test1, $test2));
+    }
+
+    function data_for_test_recursion_5() {
+        $test1 = array( 'str'=>'b',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0,2=>1),
+                        'length'=>array(0=>1,1=>1,2=>0),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        $test2 = array( 'str'=>'bbbbbbbb',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0,2=>8),
+                        'length'=>array(0=>8,1=>8,2=>0),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        return array('regex'=>'^(b*)(b?(?2)?)$',
+                     'tests'=>array($test1, $test2));
+    }
+
+    function data_for_test_recursion_6() {
+        $test1 = array( 'str'=>'((b))',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0,2=>1),
+                        'length'=>array(0=>5,1=>5,2=>3),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        $test2 = array( 'str'=>'((((b))))',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0),
+                        'length'=>array(0=>9,1=>9),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        return array('regex'=>'^(\((?:(?-1)|    (\((?:(?-1)|b)\))   )\))$',
+                     'modifiers'=>'x',
                      'tests'=>array($test1, $test2));
     }
 

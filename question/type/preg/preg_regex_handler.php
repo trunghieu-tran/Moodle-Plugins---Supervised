@@ -220,7 +220,7 @@ class qtype_preg_handling_options {
     public function modifiers_to_string() {
         $result = '';
         foreach (self::get_all_modifiers() as $mod) {
-            if ($this->modifiers & $mod) {
+            if ($this->is_modifier_set($mod)) {
                 $result .= self::modifier_to_char($mod);
             }
         }
@@ -291,17 +291,6 @@ class qtype_preg_regex_handler {
             $options = $notationobj->convert_options($usednotation);
         }
 
-        // Look for unsupported modifiers.
-        $allmodifiers = qtype_preg_handling_options::get_all_modifiers();
-        $supportedmodifiers = $this->get_supported_modifiers();
-        foreach ($allmodifiers as $mod) {
-            $passed = $options->is_modifier_set($mod);
-            $supported = $supportedmodifiers & $mod;
-            if ($passed && !$supported) {
-                $this->errors[] = new qtype_preg_modifier_error($this->name(), $mod);
-            }
-        }
-
         $this->regex = new qtype_poasquestion\string($regex);
         $this->options = $options;
 
@@ -338,7 +327,7 @@ class qtype_preg_regex_handler {
                qtype_preg_handling_options::MODIFIER_CASELESS |         // Any qtype_preg_matcher should support case insensitivity.
                qtype_preg_handling_options::MODIFIER_DOLLAR_ENDONLY |
                qtype_preg_handling_options::MODIFIER_DOTALL |
-               qtype_preg_handling_options::MODIFIER_DUPNAMES |
+               //qtype_preg_handling_options::MODIFIER_DUPNAMES |
                qtype_preg_handling_options::MODIFIER_EXTENDED |
                qtype_preg_handling_options::MODIFIER_MULTILINE |
                qtype_preg_handling_options::MODIFIER_UTF8;
@@ -707,6 +696,15 @@ class qtype_preg_regex_handler {
                 $this->parser->doParse(0, 0);
 
                 $this->astroot = $this->parser->get_root();
+
+                // Look for unsupported modifiers.
+                $supportedmodifiers = $this->get_supported_modifiers();
+                foreach ($this->lexer->get_all_modifiers() as $mod) {
+                    $supported = $supportedmodifiers & $mod;
+                    if (!$supported) {
+                        $this->errors[] = new qtype_preg_modifier_error($this->name(), qtype_preg_handling_options::modifier_to_char($mod));
+                    }
+                }
             }
 
             // Add necessary nodes.

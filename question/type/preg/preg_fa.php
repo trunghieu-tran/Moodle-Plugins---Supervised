@@ -226,8 +226,8 @@ class qtype_preg_fa_transition {
         return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT && $this->pregleaf->is_end_anchor()) /*&& empty($this->mergedafter))*/;
     }
 
-    public function is_conditional_assert() {
-        return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT &&  ($this->pregleaf->is_conditional_assert() && (!empty($this->mergedafter) || !empty($this->mergedbefore))));
+    public function is_artificial_assert() {
+        return ($this->pregleaf->type == qtype_preg_node::TYPE_LEAF_ASSERT &&  ($this->pregleaf->is_artificial_assert() && (!empty($this->mergedafter) || !empty($this->mergedbefore))));
     }
 
     /**
@@ -319,10 +319,10 @@ class qtype_preg_fa_transition {
         } else if ($other->pregleaf->type == qtype_preg_node::TYPE_LEAF_CHARSET || $other->pregleaf->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
             $assert = clone $other;
         } else {
-            if (count($resultbefore) != 0) {
+            if (!empty($resultbefore)) {
                 $assert = clone $resultbefore[count($resultbefore) - 1];
                 unset($resultbefore[count($resultbefore) - 1]);
-            } else if (count($resultafter) != 0) {
+            } else if (!empty($resultafter)) {
                 $assert = $resultafter[0];
                 unset($resultafter[0]);
             } else {
@@ -506,9 +506,7 @@ class qtype_preg_fa_transition {
             } else {
                 $resulttran->mergedbefore = $assert->mergedbefore;
             }
-            //$resulttran->mergedafter = $assert->mergedafter;
             $resulttran->loopsback = $this->loopsback || $other->loopsback;
-            //$this->unite_tags($other, $resulttran);
             return $resulttran;
         }
         if ($this->is_unmerged_assert() && $this->consumeschars == false && (!$other->is_eps() && !$other->is_unmerged_assert())
@@ -955,6 +953,10 @@ class qtype_preg_fa {
         return $result;
     }
 
+    public function has_transition($from, $to) {
+        return array_key_exists($to, $this->adjacencymatrix[$from]) && !empty($this->adjacencymatrix[$from][$to]);
+    }
+
     /**
      * Return outtransitions of state with id $state.
      *
@@ -1074,7 +1076,7 @@ class qtype_preg_fa {
                 }
             }
         }
-        $result = "digraph {\n    rankdir=LR;\n    " . $start . $end . $transitions . "\n}";
+        $result = "digraph {\n    rankdir=LR;\n    " . $start . $end . $transitions . "}";
         if ($type != null) {
             $result = qtype_preg_regex_handler::execute_dot($result, $type, $filename);
         }
