@@ -148,6 +148,17 @@ abstract class qtype_preg_fa_node {
         $stack[] = $body;
     }
 
+    protected static function check_connection($automaton, $fromstates, $tostates) {
+        foreach ($fromstates as $from) {
+            foreach ($tostates as $to) {
+                if ($automaton->has_transition($from, $to)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * Merging transitions without merging states.
      *
@@ -156,6 +167,8 @@ abstract class qtype_preg_fa_node {
     static public function merge_transitions($automaton, $del, &$stackitem, $back = null) {
         $clonetransitions = array();
         $tagsets = array();
+        $fromstates = array();
+        $tostates = array();
         $oppositetransitions = array();
         $intersection = null;
         $transitionadded = false;
@@ -174,16 +187,20 @@ abstract class qtype_preg_fa_node {
         }
 
         if ($back === null) {
+
             // Get transitions for merging back.
             if (($del->is_unmerged_assert() && $del->is_start_anchor()) || ($del->is_eps() && in_array($del->to, $endstates))) {
                 $transitions = $automaton->get_adjacent_transitions($del->from, false);
+                $tostates[] = $del->to;
                 $back = true;
             } else {
                 // Get transitions for merging forward.
                 $transitions = $automaton->get_adjacent_transitions($del->to, true);
+                $fromstates[] = $del->from;
                 $back = false;
             }
         } else {
+
             if ($back) {
                 $transitions = $automaton->get_adjacent_transitions($del->from, false);
             } else {
@@ -224,6 +241,7 @@ abstract class qtype_preg_fa_node {
         $breakpos = null;
         if (!$back) {
             foreach ($clonetransitions as &$tran) {
+                $tostates[] = $tran->to;
                 if ($del->is_end_anchor() && !$tran->is_unmerged_assert() && !$tran->is_eps()) {
                     $righttran->pregleaf->position = $tran->pregleaf->position;
                     $intersection = $tran->intersect($righttran);
@@ -244,6 +262,7 @@ abstract class qtype_preg_fa_node {
             }
         } else {
             foreach ($clonetransitions as &$tran) {
+                $fromstates[] = $tran->from;
                 if ($del->is_start_anchor() && !$tran->is_unmerged_assert() && !$tran->is_eps()) {
                     $righttran->pregleaf->position = $tran->pregleaf->position;
                     $intersection = $tran->intersect($righttran);
@@ -262,10 +281,14 @@ abstract class qtype_preg_fa_node {
                 }
             }
         }
+
         if (!($del->is_end_anchor() && in_array($del->to, $endstates)) && !($transition->from == $transition->to && ($transition->is_unmerged_assert() || $transition->is_eps()))) {
             $automaton->remove_transition($del);
         }
-        $stackitem['breakpos'] = $transitionadded ? null : $breakpos;
+
+        $hastransitions = self::check_connection($automaton, $fromstates, $tostates);
+        $stackitem['breakpos'] = ($transitionadded || $hastransitions) ? null : $breakpos;
+
         return true;
     }
 
@@ -476,9 +499,11 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
         $incoming = $automaton->get_adjacent_transitions($borderstate, false);
         $outgoing = $automaton->get_adjacent_transitions($borderstate, true);
         $breakpos = $stack_item['breakpos'];
+
         foreach ($outgoing as $transition) {
             if (!$transition->consumeschars) {
                 self::merge_before_intersection($automaton, $stack_item, $borderstate);
+                break;
             }
         }
         foreach ($incoming as $transition) {
@@ -505,7 +530,10 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
     protected static function intersect($borderstate, $automaton, &$stackitem, $del = true) {
         $uncapturing = array();
         $hasintersect = false;
+        $hastransitions = false;
         $changed = array();
+        $tostates = array();
+        $fromstates = array();
         // Uncapturing transitions are outgoing.
         // If one transition doesn't consume chars intersect it with other.
         $incoming = $automaton->get_adjacent_transitions($borderstate, false);
@@ -519,7 +547,11 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
             $breakpos = null;
             foreach ($incoming as $intran) {
                 if ($intran->consumeschars) {
+                    $fromstates[] = $intran->from;
                     foreach ($uncapturing as $tran) {
+                        if (count($fromstates == 1)) {
+                            $tostates[] = $tran->to;
+                        }
                         $resulttran = $intran->intersect($tran);
                         if ($resulttran !== null) {
                             $hasintersect = true;
@@ -533,6 +565,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                             $changed[] = $resulttran->to;
                         } else if ($del) {
                             if ($breakpos === null) {
+
                                 $breakpos = $intran->pregleaf->position->compose($tran->pregleaf->position);
                             }
                             $automaton->remove_transition($tran);
@@ -543,7 +576,8 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                     }
                 }
             }
-            if (!$hasintersect && $breakpos !== null) {
+            $hastransitions = qtype_preg_fa_node::check_connection($automaton, $fromstates, $tostates);
+            if (!$hasintersect && $breakpos !== null && !$hastransitions) {
                 $stackitem['breakpos'] = $breakpos;
             }
             return $changed;
@@ -561,8 +595,12 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
         if (!empty($uncapturing)) {
             $breakpos = null;
             foreach ($uncapturing as $tran) {
+                $fromstates[] = $tran->from;
                 foreach ($outgoing as $outtran) {
                     if ($outtran->consumeschars) {
+                        if (count($fromstates == 1)) {
+                            $tostates[] = $outtran->to;
+                        }
                         $resulttran = $tran->intersect($outtran);
                         if ($resulttran !== null) {
                             $hasintersect = true;
@@ -586,7 +624,8 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                     }
                 }
             }
-            if (!$hasintersect && $breakpos !== null) {
+            $hastransitions = qtype_preg_fa_node::check_connection($automaton, $fromstates, $tostates);
+            if (!$hasintersect && $breakpos !== null && !$hastransitions) {
                 $stackitem['breakpos'] = $breakpos;
             }
             return $changed;

@@ -530,6 +530,16 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(is_a($errors[0], 'qtype_preg_empty_fa_error'));
         $this->assertEquals(0, $errors[0]->position->indfirst);
         $this->assertEquals(2, $errors[0]->position->indlast);
+
+        $matcher = $testquestion->get_matcher('fa_matcher', '(?(DEFINE)(?<byte>2[0-4]\d|25[0-5]|1\d\d|[1-9]?\d))\b(?&byte)(\.(?&byte)){3}', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(0, count($errors));
+
+        $matcher = $testquestion->get_matcher('fa_matcher', 'a{0,1}(^bc)', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(0, count($errors));
     }
 
     public function test_insert_subexpressions() {
