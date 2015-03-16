@@ -321,19 +321,18 @@ class qtype_correctwriting_mistake_container
 
    /**
     *  Constructs a container, from other string
-    *  @param absentstring string with absent lexeme indexes, separated by ',,,'
-    *  @param addedstring string with added lexeme indexes, separated by ',,,'
-    *  @param movedstring string with moved lexeme indexes as pattern answer_response, separated by ',,,'
+    *  @param array absentstring with absent lexeme indexes, separated by ',,,'
+    *  @param array addedstring with added lexeme indexes, separated by ',,,'
+    *  @param array movedstring with moved lexeme indexes as pattern answer_response, separated by ',,,'
     */
    public function __construct($absentstring, $addedstring, $movedstring) {
-       $this->absentlexemes = array_diff(explode(',,,',$absentstring), array(''));
-       $this->addedlexemes = array_diff(explode(',,,',$addedstring), array(''));
-       $movedlexemes = array_diff(explode(',,,',$movedstring), array(''));
+       $this->absentlexemes = $absentstring;
+       $this->addedlexemes = $addedstring;
+       $movedlexemes = $movedstring;
        foreach($movedlexemes as $entry) {
-           $tmp = explode('_',$entry);
            $data = new stdClass();
-           $data->answer = $tmp[0];
-           $data->response = $tmp[1];
+           $data->answer = $entry[0];
+           $data->response = $entry[1];
            $this->movedlexemes[] = $data;
        }
    }
@@ -980,34 +979,63 @@ class qtype_correctwriting_image_generator
    private $table;
 
    /** Constructs a generator, scanning sections
-     @param array $sections used sections, passed to a script
+    *  @param qtype_correctwriting_string_pair $pair
+    *  @param qtype_correctwriting_question $question
     */
-   public function __construct($sections) {
+   public function __construct($pair, $question) {
        // Preprocess answers
        $answer = array();
-       $base64answers = explode(',,,',$sections[0]);
-       if (count($base64answers) != 0) {
-           foreach($base64answers as $tmpanswer) {
-               $answer[] = new qtype_correctwriting_lexeme_label(base64_decode($tmpanswer));
+       $tokens = $pair->enum_correct_string()->stream->tokens;
+       if (count($tokens) != 0) {
+           foreach($tokens as $answertoken) {
+               $value = $answertoken->value();
+               if (is_object($value)) {
+                   $value = $value->string();
+               }
+               $answer[] = new qtype_correctwriting_lexeme_label($value);
            }
        }
-       // Preprocess responses
+
+       // Preprocess response
        $response = array();
-       $base64responses = explode(',,,',$sections[1]);
-       if (count($base64responses) != 0) {
-           foreach($base64responses as $tmpresponse) {
-               $response[] = new qtype_correctwriting_lexeme_label(base64_decode($tmpresponse));
+       $tokens = $pair->comparedstring()->stream->tokens;
+       // Preprocess responses
+       if (count($tokens) != 0) {
+           foreach($tokens as $responsetoken) {
+               $value = $responsetoken->value();
+               if (is_object($value)) {
+                   $value = $value->string();
+               }
+               $response[] = new qtype_correctwriting_lexeme_label($value);
            }
        }
-       // Mark fixed lexemes
-       $fixedlexemeindexes = array_diff(explode(',,,',$sections[2]), array(''));
-       if (count($fixedlexemeindexes) != 0 ) {
-           foreach($fixedlexemeindexes as $index) {
-               $response[$index]->make_fixed();
+
+       $grouping = intval($question->issyntaxanalyzerenabled);
+
+       $absentlexemes = array();
+       $addedlexemes  = array();
+       $movedlexemes = array();
+
+       foreach($pair->mistakes() as $mistake) {
+           // If this is lexical mistake, we should mark some lexeme as fixed
+           if (count($mistake->answermistaken) == 0) {
+               foreach ($mistake->responsemistaken as $index) {
+                   $addedlexemes[] = $index;
+               }
+               // Track absent mistakes
+           }  elseif (count($mistake->responsemistaken)==0) {
+               foreach ($mistake->answermistaken as $index) {
+                   $absentlexemes[] = $index;
+               }
+           } else {
+               for($i = 0;$i < count($mistake->answermistaken);$i++) {
+                   $movedlexemes[] = array($mistake->answermistaken[$i], $mistake->responsemistaken[$i]);
+               }
            }
        }
+
        // Create a table
-       $mistakes = new qtype_correctwriting_mistake_container($sections[3], $sections[4], $sections[5]);
+       $mistakes = new qtype_correctwriting_mistake_container($absentlexemes, $addedlexemes, $movedlexemes);
        $lcs = new qtype_correctwriting_lcs_extractor(count($answer), count($response), $mistakes);
        $this->table  = new qtype_correctwriting_table($answer, $response, $lcs, $mistakes);
    }
@@ -1045,37 +1073,11 @@ class qtype_correctwriting_image_generator
        $builder = new qtype_correctwriting_arrow_builder($this->table);
        $builder->paint($im, $palette);
        // Output image
-       header('Content-type: image/png');
+       ob_start();
        imagepng($im);
+       $result = ob_get_clean();
        imagedestroy($im);
+       return $result;
    }
 
 }
-
-// Scan parameter and check, whether it's malformed
-if (strlen($_GET['data']) != 0) {
-
-   // Decode passed parameter and split it to sections
-   $data = base64_decode($_GET['data']);
-   $sections = explode(';;;',$data);
-
-
-   // If amount of section is six, we can build image
-   if (count($sections) == 6 ) {
-
-       // Create a generator, which take all staff
-       $generator = new qtype_correctwriting_image_generator($sections);
-       $generator->produce_image();
-   } else {
-
-       // TODO: Change it to more appropriate. We do not perform localization,
-       // since we can't access Moodle from here
-       echo 'Error generating image: malformed data';
-   }
-} else {
-
-       // If no data supplied, we can't build image.
-       // This output is simple response, which can be changed later
-       echo 'Error generating image: no data supplied';
-}
-?>
