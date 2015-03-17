@@ -375,6 +375,44 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($node->flags[0][0]->data == "\t");
     }
 
+    function test_node_by_regex_fragment_template_simple() {
+        $options = new qtype_preg_handling_options();
+        $options->preserveallnodes = true;
+        $handler = new qtype_preg_regex_handler("(?###word)", $options);
+        $idcounter = 1000;
+
+        $root = clone $handler->get_ast_root();
+        $node = $root->node_by_regex_fragment(0, 0, $idcounter);
+        $this->assertTrue($node === $root);
+
+        $root = clone $handler->get_ast_root();
+        $node = $root->node_by_regex_fragment(0, 9, $idcounter);
+        $this->assertTrue($node === $root);
+
+        $root = clone $handler->get_ast_root();
+        $node = $root->node_by_regex_fragment(5, 5, $idcounter);
+        $this->assertTrue($node === $root);
+    }
+
+    function test_node_by_regex_fragment_template_with_params() {
+        $options = new qtype_preg_handling_options();
+        $options->preserveallnodes = true;
+        $handler = new qtype_preg_regex_handler("(?###parens_req<)a(?###>)", $options);
+        $idcounter = 1000;
+
+        $root = clone $handler->get_ast_root();
+        $node = $root->node_by_regex_fragment(0, 0, $idcounter);
+        $this->assertTrue($node === $root);
+
+        $root = clone $handler->get_ast_root();
+        $node = $root->node_by_regex_fragment(24, 24, $idcounter);
+        $this->assertTrue($node === $root);
+
+        $root = clone $handler->get_ast_root();
+        $node = $root->node_by_regex_fragment(17, 18, $idcounter);
+        $this->assertTrue($node === $root);
+    }
+
     function test_selection_as_option() {
         $options = new qtype_preg_handling_options();
         $options->selection = new qtype_preg_position(3, 3);

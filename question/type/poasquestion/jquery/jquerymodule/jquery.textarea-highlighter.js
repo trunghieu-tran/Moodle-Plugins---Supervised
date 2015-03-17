@@ -42,59 +42,8 @@ var marexandre;
       });
     };
 
-    Helper.prototype.removeOverlapingIndeciesByPriority = function(list) {
-      list = list || [];
-      list = this.orderBy(list, 'priority');
-
-      var a = [], item, next;
-      // Remove overlap based on priority
-      for (var i = 0, imax = list.length; i < imax; i++) {
-        item = list[i];
-
-        for (var j = i + 1; j < imax; j++) {
-          next = list[j];
-          if (this.isOverlap(item, next)) {
-            if (item.priority < next.priority) {
-              a.push(i);
-              break;
-            } else if (item.priority === next.priority) {
-              if (item.end > next.end || item.start < next.start) {
-                a.push(j);
-              } else {
-                a.push(i);
-                break;
-              }
-            } else {
-              a.push(j);
-            }
-          }
-        }
-      }
-      // Remove overlapping items from the list
-      return list.slice(0).filter(function(elem, pos) {
-        if (a.indexOf(pos) !== -1) {
-          return false;
-        }
-        return true;
-      });
-    };
-
     Helper.prototype.isOverlap = function(x, y) {
       return x.start < y.end && y.start < x.end;
-    };
-
-    Helper.prototype.flattenIndeciesList = function(list) {
-      var a = [], type, obj;
-
-      for (var i = 0, imax = list.length; i < imax; i++) {
-        type = list[i].type;
-        for (var j = 0, jmax = list[i].indecies.length; j < jmax; j++) {
-          obj = list[i].indecies[j];
-          a.push({ 'start': obj.start, 'end': obj.end, 'type': type });
-        }
-      }
-
-      return a;
     };
 
     Helper.prototype.cleanupOnWordBoundary = function(text, list, useWordBoundary) {
@@ -125,6 +74,9 @@ var marexandre;
 
       for (var i = 0, imax = indecies.length; i < imax; i++) {
         o = indecies[i];
+        if (o.end < o.start) {
+          continue;
+        }
         ss = o.start;
 
         if (ss > s) {
