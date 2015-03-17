@@ -413,6 +413,24 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($node === $root);
     }
 
+    function test_node_by_regex_fragment_template_with_something() {
+        $options = new qtype_preg_handling_options();
+        $options->preserveallnodes = true;
+        $handler = new qtype_preg_regex_handler("\s*(?###parens_req<)\*\s*ptr\s*(?###>)\s*\+\s*\+\s*;", $options);
+        $idcounter = 1000;
+
+        $root = clone $handler->get_ast_root();
+        $node = $root->node_by_regex_fragment(20, 20, $idcounter);
+        $this->assertTrue($node->position->indfirst === 20);
+        $this->assertTrue($node->position->indlast === 21);
+
+        $root = clone $handler->get_ast_root();
+        $node = $root->node_by_regex_fragment(30, 30, $idcounter);
+        $this->assertTrue($node->position->indfirst === 28);
+        $this->assertTrue($node->position->indlast === 30);
+    }
+
+
     function test_selection_as_option() {
         $options = new qtype_preg_handling_options();
         $options->selection = new qtype_preg_position(3, 3);

@@ -117,8 +117,9 @@ M.preg_authoring_tools_script = (function ($) {
                     $('#fgroup_id_charset_process_radioset input').change(self.rbtn_changed);
 
                     // Add handlers for the regex textarea.
-                    self.regex_input = $('#id_regex_text');
+                    self.regex_input = $('.qtype-preg-highlighted-regex-text');//$('#id_regex_text');
                     self.regex_input.textareaHighlighter({matches: []});
+                    //self.regex_input.textareaHighlighter('debugModeOn');
 
                     //remove left margin
                     $(self.textbutton_widget.dialog).find('#region-main').css('margin-left',0);
