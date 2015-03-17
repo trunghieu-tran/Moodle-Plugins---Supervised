@@ -65,3 +65,10 @@ body#page-question-type-preg div[id^=fitem_id_][id*=feedback_] {
 .qtype-preg-orange {
     background-color: orange;
 }
+
+#id_regex_text {
+    overflow: hidden;
+    white-space: pre-wrap;
+    word-break: break-all;
+    word-wrap: break-word;
+}
