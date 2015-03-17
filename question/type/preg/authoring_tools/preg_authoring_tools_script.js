@@ -120,6 +120,7 @@ M.preg_authoring_tools_script = (function ($) {
                     self.regex_input = $('.qtype-preg-highlighted-regex-text');//$('#id_regex_text');
                     self.regex_input.textareaHighlighter({matches: []});
                     //self.regex_input.textareaHighlighter('debugModeOn');
+                    self.regex_input.bind('input propertychange', self.regex_text_changed);
 
                     //remove left margin
                     $(self.textbutton_widget.dialog).find('#region-main').css('margin-left',0);
@@ -198,7 +199,7 @@ M.preg_authoring_tools_script = (function ($) {
 
         self.data = self.regex_input.val();
         // If regex is changed
-        if(self.is_changed()) {
+        if (self.is_changed()) {
             $('input[name=\'tree_fold_node_points\']').val('');
             self.prevdata = self.data;
             self.panzooms.reset_all();
@@ -248,11 +249,16 @@ M.preg_authoring_tools_script = (function ($) {
 
     rbtn_changed : function (e) {
         e.preventDefault();
-        if(e.currentTarget.id != "id_tree_folding_mode") {
+        if (e.currentTarget.id != "id_tree_folding_mode") {
             var sel = self.get_selection();
             self.load_content(sel.indfirst, sel.indlast);
             self.panzooms.reset_tree();
         }
+    },
+
+    regex_text_changed : function (e) {
+        e.preventDefault();
+        self.regex_input.textareaHighlighter('updateMatches', []);
     },
 
     tree_node_clicked : function (e) {
@@ -262,20 +268,20 @@ M.preg_authoring_tools_script = (function ($) {
             indfirst = tmp[2],
             indlast = tmp[3];
 
-        if(self.is_tree_foldind_mode()) {
+        if (self.is_tree_foldind_mode()) {
             var points = $('input[name=\'tree_fold_node_points\']').val();
             // if new point not contained
-            if(points.indexOf(indfirst + ',' + indlast) == -1) {
+            if (points.indexOf(indfirst + ',' + indlast) == -1) {
                 // add new point
-                if(points != '') {
+                if (points != '') {
                     points += ';';
                 }
                 points += indfirst + ',' + indlast;
             } else { // if new point already contained
                 // remove this point
-                if(points.indexOf(';' + indfirst + ',' + indlast) != -1) {
+                if (points.indexOf(';' + indfirst + ',' + indlast) != -1) {
                     points = points.replace(';' + indfirst + ',' + indlast, '');
-                } else if(points.indexOf(indfirst + ',' + indlast + ';') != -1) {
+                } else if (points.indexOf(indfirst + ',' + indlast + ';') != -1) {
                     points = points.replace(indfirst + ',' + indlast + ';', '');
                 } else {
                     points = points.replace(indfirst + ',' + indlast, '');
@@ -283,7 +289,7 @@ M.preg_authoring_tools_script = (function ($) {
             }
             $('input[name=\'tree_fold_node_points\']').val(points);
 
-            if(typeof $('input[name=\'tree_selected_node_points\']').val() != 'undefined') {
+            if (typeof $('input[name=\'tree_selected_node_points\']').val() != 'undefined') {
                 var tmpcoords = $('input[name=\'tree_selected_node_points\']').val().split(',');
                 indfirst = tmpcoords[0];
                 indlast = tmpcoords[1];
@@ -303,7 +309,7 @@ M.preg_authoring_tools_script = (function ($) {
 
     tree_node_misclicked : function (e) {
         e.preventDefault(); // TODO - joining many times when panning
-        if(!self.is_tree_foldind_mode()) {
+        if (!self.is_tree_foldind_mode()) {
             $('input[name=\'tree_selected_node_points\']').val('');
             self.load_content();
             self.load_strings();
@@ -473,7 +479,7 @@ M.preg_authoring_tools_script = (function ($) {
 
             $(window).mouseup(function(e){
                 e.preventDefault();
-                if(self.CALC_COORD == true) {
+                if (self.CALC_COORD == true) {
                     self.CALC_COORD = false;
 
                     var transformattr = $('#explaining_graph').attr('transform');
@@ -522,6 +528,7 @@ M.preg_authoring_tools_script = (function ($) {
               ]
             );
         } else {*/
+            self.regex_input.textrange('set', 0, 0);
             self.regex_input.textareaHighlighter('updateMatches',
               [
                 {'type': 'qtype-preg-orange', start: indfirst, end: indlast}
@@ -537,25 +544,25 @@ M.preg_authoring_tools_script = (function ($) {
             var new_pageX = self.get_current_x(e, img, hnd);
             var new_pageY = self.get_current_y(e, img, hnd);
 
-            if(self.RECTANGLE_WIDTH < new_pageX && self.RECTANGLE_HEIGHT < new_pageY) {
+            if (self.RECTANGLE_WIDTH < new_pageX && self.RECTANGLE_HEIGHT < new_pageY) {
                 $('#' + rectangle).css({
                     width : (new_pageX - self.RECTANGLE_WIDTH)-10,
                     height : (new_pageY - self.RECTANGLE_HEIGHT)-10
                 });
-            } else if(self.RECTANGLE_WIDTH < new_pageX && self.RECTANGLE_HEIGHT > new_pageY) {
+            } else if (self.RECTANGLE_WIDTH < new_pageX && self.RECTANGLE_HEIGHT > new_pageY) {
                 $('#' + rectangle).css({
                     width : (new_pageX - self.RECTANGLE_WIDTH)-10,
                     height : (self.RECTANGLE_HEIGHT - new_pageY)-10,
                     top : new_pageY
                 });
-            } else if(self.RECTANGLE_WIDTH > new_pageX && self.RECTANGLE_HEIGHT > new_pageY) {
+            } else if (self.RECTANGLE_WIDTH > new_pageX && self.RECTANGLE_HEIGHT > new_pageY) {
                 $('#' + rectangle).css({
                     width : (self.RECTANGLE_WIDTH - new_pageX)-10,
                     height : (self.RECTANGLE_HEIGHT - new_pageY)-10,
                     top : new_pageY,
                     left : new_pageX
                 });
-            } else if(self.RECTANGLE_WIDTH > new_pageX && self.RECTANGLE_HEIGHT < new_pageY) {
+            } else if (self.RECTANGLE_WIDTH > new_pageX && self.RECTANGLE_HEIGHT < new_pageY) {
                 $('#' + rectangle).css({
                     width : (self.RECTANGLE_WIDTH - new_pageX)-10,
                     height : (new_pageY - self.RECTANGLE_HEIGHT)-10,
@@ -852,10 +859,10 @@ M.preg_authoring_tools_script = (function ($) {
                     && rect_right_top_x > nodeCoords[j].x
                     && rect_left_bot_y + 2*(document.getElementById("graph_hnd").getBoundingClientRect().top - document.getElementById("graph_img").getBoundingClientRect().top) > nodeCoords[j].y
                     && rect_right_top_y + 2*(document.getElementById("graph_hnd").getBoundingClientRect().top - document.getElementById("graph_img").getBoundingClientRect().top) < nodeCoords[j].y) {
-                    if(parseInt(nodeId[2]) < parseInt(indfirst)) {
+                    if (parseInt(nodeId[2]) < parseInt(indfirst)) {
                         indfirst = nodeId[2];
                     }
-                    if(parseInt(nodeId[3]) > parseInt(indlast)) {
+                    if (parseInt(nodeId[3]) > parseInt(indlast)) {
                         indlast = nodeId[3];
                     }
                 }
@@ -968,7 +975,7 @@ M.preg_authoring_tools_script = (function ($) {
             indfirst = selection.start,
             indlast = selection.end - 1;*/
             indfirst = indlast = -2;
-        if(typeof $('input[name=\'tree_selected_node_points\']').val() != 'undefined') {
+        if (typeof $('input[name=\'tree_selected_node_points\']').val() != 'undefined') {
             var tmpcoords = $('input[name=\'tree_selected_node_points\']').val().split(',');
             indfirst = tmpcoords[0];
             indlast = tmpcoords[1];
