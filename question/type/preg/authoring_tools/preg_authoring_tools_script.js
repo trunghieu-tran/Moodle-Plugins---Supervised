@@ -117,7 +117,8 @@ M.preg_authoring_tools_script = (function ($) {
                     $('#fgroup_id_charset_process_radioset input').change(self.rbtn_changed);
 
                     // Add handlers for the regex textarea.
-                    self.regex_input = $('#id_regex_text');//.textareaHighlighter({rows: 2});
+                    self.regex_input = $('#id_regex_text');
+                    self.regex_input.textareaHighlighter({matches: []});
 
                     //remove left margin
                     $(self.textbutton_widget.dialog).find('#region-main').css('margin-left',0);
@@ -512,10 +513,19 @@ M.preg_authoring_tools_script = (function ($) {
         if (indlast < 0) {
             length = 0;
         }
-        if ( (indfirstorig!==indfirst || indlastorig!==indlast) && indfirst<=indfirstorig && indlast>=indlastorig) {
-            self.regex_input.textareaHighlighter('highlight2areas', indfirst, indlast, 'yellow', indfirstorig, indlastorig, 'orange');
+        if ((indfirstorig !== indfirst || indlastorig !== indlast) && indfirst <= indfirstorig && indlast >= indlastorig) {
+            self.regex_input.textareaHighlighter('updateMatches',
+              [
+                {'type': 'qtype-preg-yellow', start: indfirst, end: indlast},
+                {'type': 'qtype-preg-orange', start: indfirstorig, end: indlastorig}
+              ]
+            );
         } else {
-            self.regex_input.textareaHighlighter('highlightRange', indfirst, indlast, 'orange');
+            self.regex_input.textareaHighlighter('updateMatches',
+              [
+                {'type': 'qtype-preg-orange', start: indfirst, end: indlast}
+              ]
+            );
         }
         $(window).scrollTop(scroll); // TODO - what is is? O_0 This is madness!!!
     },

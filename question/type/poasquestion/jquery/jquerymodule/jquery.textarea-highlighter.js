@@ -227,146 +227,6 @@ var marexandre;
 })(marexandre || (marexandre = {}));
 
 var marexandre;
-(function (marexandre) {
-  'use strict';
-
-  var Trie = (function() {
-    function Trie(_list_) {
-      this.list = {
-        children: {}
-      };
-      // Initialize
-      this.addFromArray(_list_ || []);
-    }
-
-    /**
-     * addFromArray adds an givet array of strings to the trie dictionary
-     * @param  {Array} _list_ Array of string to add to the dictionary
-     */
-    Trie.prototype.addFromArray = function(_list_) {
-      var self = this;
-
-      for (var i = 0, imax = _list_.length; i < imax; i++) {
-        self.add( _list_[i] );
-      }
-    };
-
-
-    /**
-     * add adds an givet string to the trie dictionary
-     * @param  {String} _text_ String to add to the trie dictionary
-     */
-    Trie.prototype.add = function(_word_) {
-      var self = this;
-      var obj = self.list;
-
-      for (var j = 0, jmax = _word_.length; j < jmax; j++) {
-        var c = _word_[j];
-
-        if (obj.children[c] == null) {
-          obj.children[c] = {
-            children: {},
-            value: c,
-            is_end: j === jmax - 1 // Check if at the last letter
-          };
-        }
-
-        obj = obj.children[c];
-      }
-    };
-
-    /**
-     * hasWord returns an Boolean if a given string exists in the trie dictionary
-     * @param  {String} _text_ String to search for in the trie dictionary
-     * @type {Boolean}
-     */
-    Trie.prototype.hasWord = function(_text_) {
-      var self = this;
-      var children = self.list.children;
-      var flg = false;
-
-      for (var i = 0, imax = _text_.length; i < imax; i++) {
-        var c = _text_[i];
-        var exists = children.hasOwnProperty(c.toString());
-
-        if (exists) {
-          if (children[c].is_end && i === imax - 1) {
-            flg = true;
-            break;
-          }
-          children = children[c].children;
-        } else {
-          break;
-        }
-      }
-      return flg;
-    };
-
-    /**
-     * getIndecies returns an Array of indecies that matched from a give string
-     * @param  {String} _text_ String from which to get indecies
-     * @type {Array}
-     */
-    Trie.prototype.getIndecies = function(_text_) {
-      var self = this;
-      var result = [];
-      var copy = '';
-      var tmpTrie = self.list;
-      var start = -1, end = -1;
-
-      for (var i = 0, imax = _text_.length; i < imax; i++) {
-        copy = _text_.slice(i);
-
-        // TODO: Need to refactor this loop :(
-        for (var j = 0, jmax = copy.length; j < jmax; j++) {
-          var c = copy[j];
-          var exists = tmpTrie.children.hasOwnProperty(c.toString());
-
-          if (exists) {
-            tmpTrie = tmpTrie.children[c];
-            start = i;
-            // Check if next character exists in children, and if does dive deeper
-            if (copy[j + 1]) {
-              var exists2 = tmpTrie.children.hasOwnProperty(copy[j + 1].toString());
-              if (tmpTrie.is_end && !exists2) {
-                end = start + j;
-                break;
-              }
-            } else {
-              if (tmpTrie.is_end) {
-                end = start + j;
-                break;
-              }
-              break;
-            }
-          } else {
-            break;
-          }
-        }
-        // If there was a match save it.
-        if (start !== -1 && end !== -1) {
-          result.push({
-            start: start,
-            end: end + 1
-          });
-          i = end;
-        }
-        // Reset for next round
-        start = -1;
-        end = -1;
-        tmpTrie = self.list;
-      }
-
-      return result;
-    };
-
-    return Trie;
-  })();
-
-  marexandre.Trie = Trie;
-})(marexandre || (marexandre = {}));
-
-var marexandre;
 (function($, window, document, undefined) {
   'use strict';
 
@@ -387,13 +247,10 @@ var marexandre;
   };
 
   TextareaHighlighter.DEFAULTS = {
-    word_base: true,
+    //word_base: true,
     matches: [
       // {'matchClass': '', 'match': []}
     ],
-    maxlength        : -1,
-    maxlengthWarning : '',
-    maxlengthElement : null,
     isAutoExpand     : true,
     typingDelay      : 30,
     debug            : false
@@ -405,11 +262,6 @@ var marexandre;
         settings       = this.settings,
         $wrapDiv       = this.$wrapDiv,
         $backgroundDiv = this.$backgroundDiv;
-
-    // Remove duplicates from 'match'
-    for (var i = 0, imax = settings.matches.length; i < imax; i++) {
-      settings.matches[i].match = helper.getUniqueArray(settings.matches[i].match);
-    }
 
     _this.updateStyle();
 
@@ -495,134 +347,30 @@ var marexandre;
     var _this = this;
     var text = _this.$element.val();
     var settings = _this.settings;
-    var overMaxText = '';
-    var notOverMaxText = '';
-
-    // check for max length
-    if (0 < settings.maxlength) {
-      if (settings.maxlength < text.length) {
-        // get text that was over max length
-        overMaxText = text.slice(settings.maxlength, settings.maxlength + text.length - 1);
-        // escape HTML
-        overMaxText = helper.escapeHTML(overMaxText);
-        // wrap matched text with <span> tags
-        overMaxText = helper.getTextInSpan(settings.maxlengthWarning, overMaxText);
-      }
-
-      _this.updateCharLimitElement(text);
-      // set text that wasn't over max length
-      notOverMaxText = text.slice(0, settings.maxlength);
-    }
-    else {
-      notOverMaxText = text;
-    }
-    // Escape HTML content
-    notOverMaxText = helper.escapeHTML(notOverMaxText);
-    notOverMaxText = _this.getHighlightedContent(notOverMaxText);
-
-    _this.$backgroundDiv.html( notOverMaxText + overMaxText );
-    _this.updateHeight();
-    _this.$element.trigger('textarea.highlighter.highlight');
-  };
-
-  TextareaHighlighter.prototype.highlightRange = function(start, end) {
-    var _this = this;
-    var text = _this.$element.val();
-    var settings = _this.settings;
-    var overMaxText = '';
-    var notOverMaxText = '';
-
-    start = Math.min(start, settings.maxlength);
-    end = Math.max(end, settings.maxlength);
-
-    // check for max length
-    if (0 < settings.maxlength) {
-      if (settings.maxlength < text.length) {
-        // get text that was over max length
-        overMaxText = text.slice(settings.maxlength, settings.maxlength + text.length - 1);
-        // escape HTML
-        overMaxText = helper.escapeHTML(overMaxText);
-        // wrap matched text with <span> tags
-        overMaxText = helper.getTextInSpan(settings.maxlengthWarning, overMaxText);
-      }
-
-      _this.updateCharLimitElement(text);
-      // set text that wasn't over max length
-      notOverMaxText = text.slice(0, settings.maxlength);
-    }
-    else {
-      notOverMaxText = text;
-    }
-
-    // Break into 3 pieces
-    var tmp = helper.escapeHTML(notOverMaxText.substring(0, start)) +
-              _this.getHighlightedContent(helper.escapeHTML(notOverMaxText.substring(start, end + 1))) +
-              helper.escapeHTML(notOverMaxText.substring(end + 1, notOverMaxText.length));
 
     // Escape HTML content
-    //notOverMaxText = helper.escapeHTML(notOverMaxText);
-    //notOverMaxText = _this.getHighlightedContent(notOverMaxText);
+    text = helper.escapeHTML(text);
+    text = _this.getHighlightedContent(text);
 
-    _this.$backgroundDiv.html( tmp + overMaxText );
+    _this.$backgroundDiv.html(text);
     _this.updateHeight();
     _this.$element.trigger('textarea.highlighter.highlight');
   };
 
   TextareaHighlighter.prototype.getHighlightedContent = function(text) {
     var _this = this;
-    var list = _this.settings.matches;
-    var indeciesList = [];
-    var item, trieIndecies;
+    var list = JSON.parse(JSON.stringify(_this.settings.matches));
 
     for (var i = 0, imax = list.length; i < imax; i++) {
-      item = list[i];
-
-      if (!item._trie) {
-        item._trie = new marexandre.Trie();
-        // HTML escape matching words
-        for (var j = 0, jmax = item.match.length; j < jmax; j++) {
-          item._trie.add( helper.escapeHTML(item.match[j]) );
-        }
-      }
-
-      trieIndecies = item._trie.getIndecies(text);
-      trieIndecies = helper.removeOverlapingIndecies(trieIndecies);
-
-      indeciesList.push({ 'indecies': trieIndecies, 'type': item.matchClass });
+        list[i].end++;
     }
 
-    var flattened = helper.flattenIndeciesList(indeciesList);
-    flattened = helper.orderBy(flattened, 'start');
-    flattened = helper.removeOverlapingIndecies(flattened);
-    flattened = helper.cleanupOnWordBoundary(text, flattened, _this.settings.word_base);
+    list = helper.orderBy(list, 'start');
+    list = helper.removeOverlapingIndecies(list);
+    //list = helper.cleanupOnWordBoundary(text, list, _this.settings.word_base);
 
-    return helper.createHTML( helper.makeTokenized(text, flattened) );
+    return helper.createHTML(helper.makeTokenized(text, list));
   };
-
-  TextareaHighlighter.prototype.updateCharLimitElement = function(text) {
-    var _this = this;
-    var settings = _this.settings;
-    // update text max length
-    if (settings.maxlengthElement !== null) {
-      var maxSize = settings.maxlength - text.length;
-
-      if (maxSize < 0) {
-        // add max length warning class
-        if (!settings.maxlengthElement.hasClass( settings.maxlengthWarning )) {
-          settings.maxlengthElement.addClass( settings.maxlengthWarning );
-        }
-      }
-      else {
-        // remove max length warning class
-        if (settings.maxlengthElement.hasClass( settings.maxlengthWarning )) {
-          settings.maxlengthElement.removeClass( settings.maxlengthWarning );
-        }
-      }
-      // update max length
-      settings.maxlengthElement.text(maxSize);
-    }
-  };
-
 
   TextareaHighlighter.prototype.updateMatches = function(matches) {
     var _this = this;

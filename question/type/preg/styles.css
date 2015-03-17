@@ -57,3 +57,11 @@ body#page-question-type-preg div[id^=fitem_id_][id*=feedback_] {
 #qtype-preg-colored-string .partiallycorrect {
     background-color: #ffffa5;
 }
+
+.qtype-preg-yellow {
+    background-color: yellow;
+}
+
+.qtype-preg-orange {
+    background-color: orange;
+}
