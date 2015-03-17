@@ -513,20 +513,20 @@ M.preg_authoring_tools_script = (function ($) {
         if (indlast < 0) {
             length = 0;
         }
-        if ((indfirstorig !== indfirst || indlastorig !== indlast) && indfirst <= indfirstorig && indlast >= indlastorig) {
+        /*if ((indfirstorig !== indfirst || indlastorig !== indlast) && indfirst <= indfirstorig && indlast >= indlastorig) {
             self.regex_input.textareaHighlighter('updateMatches',
               [
                 {'type': 'qtype-preg-yellow', start: indfirst, end: indlast},
                 {'type': 'qtype-preg-orange', start: indfirstorig, end: indlastorig}
               ]
             );
-        } else {
+        } else {*/
             self.regex_input.textareaHighlighter('updateMatches',
               [
                 {'type': 'qtype-preg-orange', start: indfirst, end: indlast}
               ]
             );
-        }
+        //}
         $(window).scrollTop(scroll); // TODO - what is is? O_0 This is madness!!!
     },
 
