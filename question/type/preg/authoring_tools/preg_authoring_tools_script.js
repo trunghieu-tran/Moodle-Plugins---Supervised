@@ -528,7 +528,6 @@ M.preg_authoring_tools_script = (function ($) {
               ]
             );
         //}
-        $(window).scrollTop(scroll); // TODO - what is is? O_0 This is madness!!!
     },
 
 
