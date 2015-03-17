@@ -53,7 +53,7 @@ class qtype_preg_authoring_form extends moodleform {
         $mform->addElement('header', 'regex_input_header', get_string('authoring_form_edit_header', 'qtype_preg'));
         $mform->setExpanded('regex_input_header', (bool)get_user_preferences('qtype_preg_regex_input_expanded', true));
         $mform->addHelpButton('regex_input_header', 'authoring_form_edit_header', 'qtype_preg');
-        $mform->addElement('textarea', 'regex_text', get_string('authoring_form_text', 'qtype_preg'), array('rows' => 1, 'cols' => 80, 'style' => 'width: 100%'));
+        $mform->addElement('textarea', 'regex_text', get_string('authoring_form_text', 'qtype_preg'), array('rows' => 1, 'cols' => 80, 'style' => 'width: 100%', 'class'=>'qtype-preg-highlighted-regex-text'));
         $mform->setType('regex_text', PARAM_RAW);
 
         $topline = array();
