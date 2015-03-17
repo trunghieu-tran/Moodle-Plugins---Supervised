@@ -10,6 +10,9 @@
 
 //defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+global $PAGE;
+
 require_once($CFG->libdir . '/formslib.php');
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_syntax_tree_nodes.php');
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_regex_testing_tool.php');
@@ -18,6 +21,8 @@ require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explainin
 require_once($CFG->dirroot . '/question/type/preg/question.php');
 require_once($CFG->dirroot . '/question/type/preg/questiontype.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');
+
+$PAGE->requires->jquery_plugin('poasquestion-jquerymodule', 'qtype_poasquestion');
 
 class qtype_preg_authoring_form extends moodleform {
 
@@ -32,12 +37,6 @@ class qtype_preg_authoring_form extends moodleform {
     //Add elements to form
     function definition() {
         global $CFG;
-        global $PAGE;
-
-        $PAGE->requires->jquery_plugin('poasquestion-jquerymodule', 'qtype_poasquestion');
-
-        /*$PAGE->requires->css('/question/type/poasquestion/shadow.css');
-        $PAGE->requires->css('/question/type/poasquestion/rect.css');*/
 
         // Create the form.
         $qtype = new qtype_preg();
