@@ -301,7 +301,7 @@ var marexandre;
     var settings = _this.settings;
 
     // Escape HTML content
-    text = helper.escapeHTML(text);
+    //text = helper.escapeHTML(text);
     text = _this.getHighlightedContent(text);
 
     _this.$backgroundDiv.html(text);
@@ -321,7 +321,11 @@ var marexandre;
     list = helper.removeOverlapingIndecies(list);
     //list = helper.cleanupOnWordBoundary(text, list, _this.settings.word_base);
 
-    return helper.createHTML(helper.makeTokenized(text, list));
+    var tokens = helper.makeTokenized(text, list);
+    for (var i = 0, imax = tokens.length; i < imax; i++) {
+        tokens[i].value = helper.escapeHTML(tokens[i].value);
+    }
+    return helper.createHTML(tokens);
   };
 
   TextareaHighlighter.prototype.updateMatches = function(matches) {
