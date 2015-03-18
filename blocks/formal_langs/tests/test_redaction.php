@@ -31,6 +31,8 @@ class block_formal_langs_tokens_base_test extends UnitTestCase {
         $this->assert_redaction(block_formal_langs_token_base::redaction('hlelo', 'hello'),'mtmm');
         $this->assert_redaction(block_formal_langs_token_base::redaction('hello', 'hllo'),'mdmmm');
         $this->assert_redaction(block_formal_langs_token_base::redaction('hlla', 'hello'),'mimmr');
+        $this->assert_redaction(block_formal_langs_token_base::redaction('paratim', 'separator'),'iimmmmmrr');
+        $this->assert_redaction(block_formal_langs_token_base::redaction('paratim', 'rator'),'ddmmmrr');
     }
 }
 ?>
