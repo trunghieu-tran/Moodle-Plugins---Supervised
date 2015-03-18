@@ -728,7 +728,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
                             $thisvalue = core_text::strtolower($thisvalue);
                             $otherkvalue = core_text::strtolower($otherkvalue);
                         }
-                        $pair->operations=$this->redaction($thisvalue, $otherkvalue);
+                        $pair->operations=$this->redaction($otherkvalue, $thisvalue);
                         ////////////////////////////////////////////////////////////////
                         $possiblepairs[] = $pair;
                         /*
