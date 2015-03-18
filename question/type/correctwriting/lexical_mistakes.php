@@ -30,8 +30,8 @@ require_once($CFG->dirroot.'/question/type/correctwriting/response_mistakes.php'
 // A marker class to indicate errors from lexical analyzer. We need them to indicate
 // what lexemes was corrected by analyzer.
 class qtype_correctwriting_lexical_mistake extends qtype_correctwriting_response_mistake {
-    /*! A pair of tokens, linked with lexeical mistake
-        @var block_formal_langs_token_pair
+    /** A pair of tokens, linked with lexeical mistake
+     *  @var block_formal_langs_matched_tokens_pair
      */
     public $tokenpair;
     
