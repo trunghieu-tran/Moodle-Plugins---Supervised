@@ -536,7 +536,15 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
                 return $cache[$cacheindex];
             }
             if ($ki == -1) {
-                $cache[$cacheindex] = array(max($i, $j), "");
+                $ops = "";
+                if ($i != -1 || $j != -1) {
+                    if ($j > $i) {
+                        $ops = str_repeat('i', $j + 1);
+                    } else {
+                        $ops = str_repeat('d', $i + 1);
+                    }
+                }
+                $cache[$cacheindex] = array(max($i, $j), $ops);
                 return array(max($i, $j), "");
             }
             $results = array();
@@ -600,6 +608,41 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
             return $result;
         };
         $result =  $dameraulevensteinrecursive($str1, core_text::strlen($str1) - 1, $str2, core_text::strlen($str2) - 1, $cache);
+        /*
+        echo PHP_EOL;
+        echo '     ';
+        for($j = -1; $j < core_text::strlen($str2); $j++) {
+            $letter = '';
+            if ($j > -1) {
+                $letter = core_text::substr($str2, $j, 1);
+            }
+            echo str_pad($letter, 11, ' ');
+        }
+        echo PHP_EOL;
+        echo '     ';
+        for($j = -1; $j < core_text::strlen($str2); $j++) {
+            $letter = (string)$j;
+            echo str_pad($letter, 11, ' ');
+        }
+        echo PHP_EOL;
+        for($i = -1; $i < core_text::strlen($str1); $i++) {
+            $letter = ' ';
+            if ($i > - 1) {
+                $letter = core_text::substr($str1, $i, 1);
+            }
+            if ($i != -1) {
+                echo str_pad($letter . ' ' . $i . ':', 5, ' ');
+            } else {
+                echo ' -1: ';
+            }
+            for($j = -1; $j < core_text::strlen($str2); $j++) {
+                $cacheindex = $i . " . "  . $j;
+                echo str_pad($cache[$cacheindex][0] . ',' . $cache[$cacheindex][1], 11, ' ');
+            }
+
+            echo PHP_EOL;
+        }
+        */
         // Index fix
         $result[0] += 1;
         return $result[1];
