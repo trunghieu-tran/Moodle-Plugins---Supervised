@@ -36,6 +36,11 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
      * @var array
      */
     protected $operations;
+    /**
+     * Whether size is fixed
+     * @var
+     */
+    protected $sizefixed;
 
     /** Constructs new non-fixed lexeme label with specified text
      *  @param string $text text of lexeme
@@ -48,6 +53,8 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
         $this->text = $text;
         // List of operations to be filled
         $this->operations = array_fill(0, core_text::strlen($text), 'normal');
+
+        $this->sizefixed = false;
     }
 
     /**
@@ -116,7 +123,7 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
 
     /**
      * Appends lexeme with extra separator
-     * @param $lexeme a lexeme data
+     * @param string $lexeme a lexeme data
      */
     public function append_extra_separator_lexeme($lexeme) {
         $this->text = $this->text . '_' . $lexeme;
@@ -127,6 +134,19 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
     }
 
     /**
+     * Returns operations, which will be aligned on same line
+     * @return array
+     */
+    public function get_ops_for_same_line_alignment() {
+        return array(
+            'extra_separator',
+            'normal',
+            'red',
+            'strikethrough',
+            'transpose'
+        );
+    }
+    /**
      * Recomputes size of label
      */
     public function recompute_size() {
@@ -135,13 +155,7 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
         $width = 0;
         $height = 0;
         $baselineoffset = 0;
-        $sametext = array(
-            'extra_separator',
-            'normal',
-            'red',
-            'strikethrough',
-            'transpose'
-        );
+        $sametext = $this->get_ops_for_same_line_alignment();
         $specialrenderings = array(
             'transpose',
             'missing_separator',
@@ -156,24 +170,24 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
                 $fbbox = qtype_correctwriting_get_text_bounding_box($firstletter);
                 $sbbox = qtype_correctwriting_get_text_bounding_box($secondletter);
                 $radius = ($bbox->width - $fbbox->width / 2 - $sbbox->width / 2) / 2;
-                $tmpheight = $radius * 2 + $bbox->height + TINY_SPACE * 2;
+                $tmpheight = $radius * 2 + $bbox->height + TINY_SPACE * 4;
                 $width += $bbox->width;
                 $height = max($tmpheight, $height);
-                $baselineoffset = max($baselineoffset, TINY_SPACE + $bbox->height + $radius);
+                $baselineoffset = max($baselineoffset, TINY_SPACE * 2 + $radius);
             }
 
             if ($pair[1]  == 'missing_separator') {
                 $height = max(2 * TINY_SPACE + $metrics['height'], $height);
-                $baselineoffset = max($baselineoffset, TINY_SPACE + $metrics['height']);
+                $baselineoffset = max($baselineoffset, TINY_SPACE);
                 $width += MISSING_SEPARATOR_WIDTH;
             }
 
             if ($pair[1] == 'insert') {
                 $bbox = qtype_correctwriting_get_text_bounding_box($pair[0]);
-                $width = 4 * TINY_SPACE + $bbox->width;
-                $tmpheight = $metrics['height'] / 2 + $bbox->height;
+                $width += 4 * TINY_SPACE + $bbox->width;
+                $tmpheight = $metrics['height']  + $bbox->height + 2 * TINY_SPACE;
                 $height = max($tmpheight, $height);
-                $baselineoffset = max($baselineoffset, $tmpheight - $metrics['height']);
+                $baselineoffset = max($baselineoffset, $metrics['height'] - 2 * TINY_SPACE);
             }
 
             if (in_array($pair[1], $specialrenderings) == false) {
@@ -184,7 +198,7 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
 
             if ($i != count($operationspairs) - 1) {
                 if (in_array($operationspairs[$i][1], $sametext) && in_array($operationspairs[$i + 1][1], $sametext)) {
-                    $width += qtype_correctwriting_compute_kerning($operationspairs[$i][1][0], $operationspairs[$i][1][1]);
+                    $width += qtype_correctwriting_compute_kerning($operationspairs[$i][0], $operationspairs[$i + 1][0]);
                 }
             }
         }
@@ -196,15 +210,32 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
      *  @return array of two coordinates width and height as array(width,height)
      */
     public function get_size() {
-        $this->recompute_size();
+        if ($this->sizefixed == false) {
+            $this->recompute_size();
+        }
         return $this->labelsize;
+    }
+
+    /**
+     * Sets new offset for baseline
+     * @param int $offset new offset
+     */
+    public function set_baseline_offset($offset) {
+        $this->recompute_size();
+        $height = $this->labelsize[1] - $this->baselineoffset;
+        $this->connectiontopoffset = $offset - $this->baselineoffset;
+        $this->baselineoffset = $offset;
+        $this->labelsize[1] = $this->baselineoffset + $height;
+        $this->sizefixed = true;
     }
 
     /**
      * Returns baseline offset for rendering a lexeme label
      */
     public function get_baseline_offset() {
-        $this->recompute_size();
+        if ($this->sizefixed == false) {
+            $this->recompute_size();
+        }
         return $this->baselineoffset;
     }
 
@@ -219,8 +250,20 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
                 $results[] = array(core_text::substr($this->text, $i, 1), $this->operations[$i]);
             } else {
                 $lastpairindex = count($results) - 1;
-                $lastpair = $results[$lastpairindex];
+                $lastpair = &$results[$lastpairindex];
+                $concat = false;
                 if ($lastpair[1] == $this->operations[$i]) {
+                    if ($lastpair[1] == 'transpose') {
+                        if (core_text::strlen($lastpair[0]) == 1) {
+                            $concat = true;
+                        } else {
+                            $concat = false;
+                        }
+                    } else {
+                        $concat = true;
+                    }
+                }
+                if ($concat) {
                     $lastpair[0] =  $lastpair[0] . core_text::substr($this->text, $i, 1);
                 } else {
                     $results[] = array(core_text::substr($this->text, $i, 1), $this->operations[$i]);
@@ -238,6 +281,7 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
      *  @param bool  $bottom         whether point should placed on bottom part of rectangle, or top
      */
     public function paint(&$im, $palette, $currentrect, $bottom) {
+        global $metrics;
         // Set connection point
         parent::paint($im, $palette, $currentrect, $bottom);
 
@@ -247,20 +291,123 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
         // Compute a middle parameter at center
         $x = $currentrect->x + $currentrect->width/2 - $this->labelsize[0]/2;
 
-        // Debug drawing of lexeme rectangles
-        /*
-        $fx1 = $currentrect->x;
-        $fx2 = $currentrect->x + $currentrect->width;
-        $fy1 = $currentrect->y;
-        $fy2 = $currentrect->y + $currentrect->height;
-        $points = array( array($fx1, $fy1), array($fx2, $fy1),
-                         array($fx2, $fy2), array($fx1, $fy2), array($fx1, $fy1) );
-        for($i = 1; $i < count($points); $i++) {
-            imageline($im, $points[$i-1][0], $points[$i-1][1], $points[$i][0], $points[$i][1], $palette['red']);
-        }
-        */
+        $operationpairs = $this->combine_operations();
 
-        // Paint a string
-        qtype_correctwriting_render_text($im, $x, $currentrect->y, $this->text, $color);
+        $sametext = $this->get_ops_for_same_line_alignment();
+
+
+        for($i = 0; $i < count($operationpairs); $i++) {
+            $operationpair = $operationpairs[$i];
+
+            $currentcolor = ($operationpair[1] != 'red' && $operationpair[1] != 'extra_separator') ? ($palette['black']) : ($palette['red']);
+            if ($operationpair[1] != 'insert' && $operationpair[1] != 'missing_separator') {
+                qtype_correctwriting_render_text($im, $x, $currentrect->y + $this->baselineoffset, $operationpair[0], $currentcolor);
+
+                $bbox = qtype_correctwriting_get_text_bounding_box($operationpair[0]);
+
+                $nx = $x;
+                $nx += $bbox->width;
+
+                if ($i != count($operationpairs) - 1) {
+                    if (in_array($operationpairs[$i][1], $sametext) && in_array($operationpairs[$i + 1][1], $sametext)) {
+                        $nx += qtype_correctwriting_compute_kerning($operationpairs[$i][0], $operationpairs[$i + 1][0]);
+                    }
+                }
+
+                if ($operationpair[1] == 'strikethrough') {
+                    if (core_text::strlen($operationpair[0]) == 1) {
+                        $highery = $currentrect->y + $this->baselineoffset;
+                        $lowery = $currentrect->y + $this->baselineoffset + $bbox->height;
+                        imageline($im, $x - TINY_SPACE / 2, $highery, $nx + TINY_SPACE / 2, $lowery, $palette['red']);
+                        imageline($im, $x - TINY_SPACE / 2, $lowery, $nx  + TINY_SPACE / 2, $highery, $palette['red']);
+                    } else {
+                        $py = $currentrect->y + $this->baselineoffset + $bbox->height / 2;
+                        imageline($im, $x - TINY_SPACE, $py, $nx + TINY_SPACE, $py, $palette['red']);
+                    }
+                }
+
+                if ($operationpair[1] == 'transpose' && core_text::strlen($operationpair[0]) == 2) {
+                    $firstletter = core_text::substr($operationpair[0], 0, 1);
+                    $secondletter = core_text::substr($operationpair[0], 1, 1);
+                    $bbox = qtype_correctwriting_get_text_bounding_box($operationpair[0]);
+                    $fbbox = qtype_correctwriting_get_text_bounding_box($firstletter);
+                    $sbbox = qtype_correctwriting_get_text_bounding_box($secondletter);
+                    //var_dump($bbox);
+                    //var_dump($fbbox);
+                    //var_dump($sbbox);
+
+                    $radius = ($bbox->width - $sbbox->width / 2 - $fbbox->width / 2) / 2;
+                    //var_dump($radius);
+
+                    $posx = (($x + $fbbox->width / 2) + ($x + $bbox->width - $sbbox->width / 2)) / 2 ;
+
+                    $topx = $posx + $radius;
+                    //var_dump($posx);
+
+                    $highery = $currentrect->y + $this->baselineoffset - TINY_SPACE / 2;
+                    $lowery = $currentrect->y + $this->baselineoffset + $bbox->height + TINY_SPACE / 2;
+
+                    imageline($im, $topx, $highery, $topx + TINY_SPACE * 2, $highery - ARROW_LENGTH , $palette['red']);
+                    imageline($im, $topx, $highery, $topx - TINY_SPACE * 2, $highery - ARROW_LENGTH, $palette['red']);
+
+                    $bottomx = $posx - $radius;
+                    imageline($im, $bottomx, $lowery, $bottomx + TINY_SPACE * 2, $lowery + ARROW_LENGTH, $palette['red']);
+                    imageline($im, $bottomx, $lowery, $bottomx - TINY_SPACE * 2, $lowery + ARROW_LENGTH, $palette['red']);
+
+                    imagearc($im, $posx, $highery - TINY_SPACE, $radius * 2, $radius * 2, 180, 360, $palette['red']);
+                    imagearc($im, $posx - 1, $lowery + TINY_SPACE, $radius * 2, $radius * 2, 0, 180, $palette['red']);
+                }
+
+                $x = $nx;
+            }
+
+            if ($operationpair[1] == 'missing_separator') {
+                $highery = $currentrect->y + $this->baselineoffset;
+                $lowery = $currentrect->y + $this->baselineoffset + $metrics['height'];
+                imageline($im, $x, $lowery + TINY_SPACE, $x + MISSING_SEPARATOR_WIDTH / 2, $lowery + TINY_SPACE, $palette['red']);
+                imageline($im, $x + MISSING_SEPARATOR_WIDTH / 2, $highery - TINY_SPACE, $x + MISSING_SEPARATOR_WIDTH, $highery - TINY_SPACE, $palette['red']);
+                imageline($im, $x + MISSING_SEPARATOR_WIDTH / 2, $highery - TINY_SPACE, $x + MISSING_SEPARATOR_WIDTH / 2, $lowery + TINY_SPACE, $palette['red']);
+
+                $x  += MISSING_SEPARATOR_WIDTH;
+            }
+
+            if ($operationpair[1] == 'insert') {
+                if (core_text::strlen($operationpair[0]) == 1) {
+                    $bbox = qtype_correctwriting_get_text_bounding_box($operationpair[0]);
+
+                    $nx = $x;
+                    $nx += $bbox->width + 4 * TINY_SPACE;
+
+                    qtype_correctwriting_render_text($im, $x + 2 * TINY_SPACE, $currentrect->y + $this->baselineoffset - $metrics['height'] + 2 * TINY_SPACE, $operationpair[0], $palette['red']);
+                    $middle = $x + ($nx - $x) / 2;
+                    imageline($im, $middle, $currentrect->y + $this->baselineoffset + $metrics['height'] / 2, $x + TINY_SPACE, $currentrect->y + $this->baselineoffset - TINY_SPACE, $palette['red']);
+                    imageline($im, $middle, $currentrect->y + $this->baselineoffset + $metrics['height'] / 2, $nx - TINY_SPACE, $currentrect->y + $this->baselineoffset - TINY_SPACE, $palette['red']);
+
+                    $x = $nx;
+                } else {
+                    $bbox = qtype_correctwriting_get_text_bounding_box($operationpair[0]);
+
+                    $nx = $x;
+                    $nx += $bbox->width + 4 * TINY_SPACE;
+
+                    qtype_correctwriting_render_text($im, $x + 2 * TINY_SPACE, $currentrect->y + $this->baselineoffset - $metrics['height'] + 2 * TINY_SPACE, $operationpair[0], $palette['red']);
+
+                    $middle = ($x + $nx) / 2;
+                    $lowery = $currentrect->y + $this->baselineoffset + $metrics['height'] / 2;
+                    $highery = $lowery - $metrics['height'] / 2 + TINY_SPACE;
+
+                    imageline($im, $middle, $lowery, $middle - TINY_SPACE, $highery, $palette['red']);
+                    imageline($im, $middle, $lowery, $middle + TINY_SPACE, $highery, $palette['red']);
+
+                    imageline($im, $middle - TINY_SPACE, $highery, $x + TINY_SPACE, $highery, $palette['red']);
+                    imageline($im, $middle + TINY_SPACE, $highery, $nx - TINY_SPACE, $highery, $palette['red']);
+
+                    imageline($im, $x + TINY_SPACE, $highery, $x + TINY_SPACE, $highery - 2 * TINY_SPACE, $palette['red']);
+                    imageline($im, $nx - TINY_SPACE, $highery, $nx - TINY_SPACE, $highery - 2 * TINY_SPACE, $palette['red']);
+
+                    $x = $nx;
+                }
+            }
+        }
     }
 }

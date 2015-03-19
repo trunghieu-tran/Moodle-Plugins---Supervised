@@ -44,7 +44,11 @@ class qtype_correctwriting_abstract_label {
      * @var int
      */
     protected $baselineoffset = 0;
-
+    /**
+     *  A top offset for connection
+     * @var int
+     */
+    protected $connectiontopoffset = 0;
     /**
      * Returns a rectangle for data
      * @return null|stdClass
@@ -53,10 +57,34 @@ class qtype_correctwriting_abstract_label {
         return $this->rectangle;
     }
     /** Returns a connection point for drawing arrows
-    @return array  of two coordinates x and y as array(x,y)
+     * @return array  of two coordinates x and y as array(x,y)
      */
     public function get_connection_point() {
         return $this->connection;
+    }
+
+    /**
+     * Sets new offset for baseline
+     * @param $offset
+     */
+    public function set_baseline_offset($offset) {
+        $this->baselineoffset = $offset;
+    }
+
+    /**
+     * Returns base line offset
+     * @return int
+     */
+    public function get_baseline_offset() {
+        return $this->baselineoffset;
+    }
+
+    /**
+     * Returns top connection offset
+     * @return int
+     */
+    public function get_top_connection_offset() {
+        return $this->connectiontopoffset;
     }
     /** Returns a requested size of label for drawing
      *  @return array of two coordinates width and height as array(width,height)
@@ -80,11 +108,11 @@ class qtype_correctwriting_abstract_label {
         $this->rectangle = $currentrect;
     }
     /** Paints a label at specific position, specified by rectangle, also setting a connection point
-    for drawing arrows
-    @param resource $im image resource, where it should be painted
-    @param array    $palette palette of colors as associtive array. Currently with colors, can be accessed as 'black', 'red'
-    @param stdClass $currentrect rectangle, where it should be painted with fields x,y,width, height.
-    @param bool  $bottom         whether point should placed on bottom part of rectangle, or top
+     * for drawing arrows
+     * @param resource $im image resource, where it should be painted
+     * @param array    $palette palette of colors as associtive array. Currently with colors, can be accessed as 'black', 'red'
+     * @param stdClass $currentrect rectangle, where it should be painted with fields x,y,width, height.
+     * @param bool  $bottom         whether point should placed on bottom part of rectangle, or top
      */
     public function paint(&$im, $palette, $currentrect, $bottom) {
         $this->set_connection_point($currentrect, $bottom);
@@ -95,5 +123,13 @@ class qtype_correctwriting_abstract_label {
      */
     public function text() {
         return '';
+    }
+
+    /**
+     * Whether label is several lexemes, linked together
+     * @return bool
+     */
+    public function is_several_lexemes() {
+        return false;
     }
 }

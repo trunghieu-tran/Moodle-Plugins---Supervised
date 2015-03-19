@@ -26,7 +26,7 @@ require_once(dirname(__FILE__) . '/../../../config.php');
 require_once(dirname(__FILE__) . '/../../../lib/moodlelib.php');
 
 define('FONT' , dirname(__FILE__) . '/../../../lib/default.ttf');
-define('FONT_SIZE' , 10.0);
+define('FONT_SIZE' , 15.0);
 
 /**
  * Computes font metrics for specified font and size
@@ -47,6 +47,13 @@ function qtype_correctwriting_compute_font_metrics() {
     $metrics['descentheight'] = $withdescentheightheight - $withoutanythingheight;
     $metrics['baseline'] = $metrics['capheight'] + $withoutanythingheight;
     $metrics['height'] = $metrics['baseline'] + $metrics['descentheight'];
+    $metrics['widthcache'] = array();
+    $wbox = imagettfbbox(FONT_SIZE, 0, FONT, 'w');
+    $mbox = imagettfbbox(FONT_SIZE, 0, FONT, 'm');
+    $metrics['width'] = max($wbox[2] - $wbox[0], $mbox[2] - $mbox[0]);
+    $wbox = imagettfbbox(FONT_SIZE, 0, FONT, 'W');
+    $mbox = imagettfbbox(FONT_SIZE, 0, FONT, 'M');
+    $metrics['width'] = max($metrics['width'], $wbox[2] - $wbox[0], $mbox[2] - $mbox[0]);
     return $metrics;
 }
 
@@ -57,6 +64,30 @@ function qtype_correctwriting_compute_font_metrics() {
 global $metrics;
 $metrics = qtype_correctwriting_compute_font_metrics();
 
+
+function qtype_correctwriting_letter_width($text) {
+    global $metrics;
+    $narrowletters = array(
+       'i' => 1,
+       'l' => 1,
+       '!' => 1,
+       '.' => 1,
+       ',' => 1
+    );
+    if (array_key_exists($text, $narrowletters)) {
+        return qtype_correctwriting_letter_width('a');
+    } else {
+        if (array_key_exists($text, $metrics['widthcache'])) {
+            return $metrics['widthcache'][$text];
+        }
+        $im = imagecreatetruecolor(1, 1);
+        $wbox = imagettfbbox(FONT_SIZE, 0, FONT, $text);
+        $metrics['widthcache'][$text] = $wbox[2] - $wbox[0] + TINY_SPACE;
+        imagedestroy($im);
+        return $metrics['widthcache'][$text];
+    }
+}
+
 /**
  * Returns text bounding box
  * @param string $text
@@ -64,12 +95,19 @@ $metrics = qtype_correctwriting_compute_font_metrics();
  */
 function qtype_correctwriting_get_text_bounding_box($text)  {
     global $metrics;
-    $im = imagecreatetruecolor(1, 1);
-    $bbox = imagettfbbox(FONT_SIZE, 0, FONT, $text);
-    imagedestroy($im);
+    // Now, we render this font as monospace
+    // This is required to make transpose be rendered properly.
+    // Yeah, it's not very good, but how you supposed to render
+    // nice arc with radius of 1.5px and have an arrow attached
+    // to it.
     $r = new stdClass();
     $r->height = $metrics['height'];
-    $r->width = $bbox[2] - $bbox[0];
+    $r->width = 0;
+    for($i = 0; $i < core_text::strlen($text); $i++) {
+        $letter = core_text::substr($text, $i, 1);
+        $nominalletterwidth = qtype_correctwriting_letter_width($letter);
+        $r->width += $nominalletterwidth;
+    }
     return $r;
 }
 
@@ -80,17 +118,8 @@ function qtype_correctwriting_get_text_bounding_box($text)  {
  * @return int kerning
  */
 function qtype_correctwriting_compute_kerning($a, $b) {
-    $awidth = qtype_correctwriting_get_text_bounding_box($a);
-    $awidth = $awidth->width;
-
-    $bwidth = qtype_correctwriting_get_text_bounding_box($b);
-    $bwidth = $bwidth->width;
-
-    $fullwidth = qtype_correctwriting_get_text_bounding_box($a . $b);
-    $fullwidth = $fullwidth->width;
-
-    $kerning = $fullwidth - $awidth - $bwidth;
-    return $kerning;
+    // Since we switched to monospace rendering, we do not need the kerning
+    return 0;
 }
 
 /**
@@ -99,9 +128,17 @@ function qtype_correctwriting_compute_kerning($a, $b) {
  * @param int $x left corner coordinate of image
  * @param int $y top corner coordinate of image
  * @param string $text text data
- * @param resource $color color
+ * @param int $color color
  */
 function qtype_correctwriting_render_text(&$im, $x, $y, $text, $color) {
     global $metrics;
-    imagettftext($im, FONT_SIZE, 0.0, $x, $y + $metrics['baseline'], $color, FONT, $text);
+    $length = core_text::strlen($text);
+    for($i = 0; $i < $length; $i++) {
+        $letter = core_text::substr($text, $i, 1);
+        $nominalletterwidth = qtype_correctwriting_letter_width($letter);
+        $bbox = imagettfbbox(FONT_SIZE, 0, FONT, $letter);
+        $letterwidth = $bbox[2] - $bbox[0];
+        imagettftext($im, FONT_SIZE, 0.0, $x + ($nominalletterwidth - $letterwidth) / 2.0, $y + $metrics['baseline'], $color, FONT, $letter);
+        $x += $nominalletterwidth;
+    }
 }
