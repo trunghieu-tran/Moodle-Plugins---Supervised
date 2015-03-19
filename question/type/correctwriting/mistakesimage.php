@@ -471,6 +471,14 @@ class qtype_correctwriting_table
     */
    protected function create_response_cell($response, $responseindex) {
        $entry = new qtype_correctwriting_empty_label();
+       /*
+       if (array_key_exists($responseindex, $response) == false) {
+           echo "<pre>";
+           var_dump(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 5));
+           echo "</pre>";
+           die();
+       }
+       */
        $this->table[] = new qtype_correctwriting_table_cell($entry, $response[$responseindex]);
        $this->responsetable[$responseindex] = count($this->table) - 1 ;
    }
@@ -482,6 +490,22 @@ class qtype_correctwriting_table
     */
    protected function create_cell_range ($labelarray, $begin, $end , $method) {
        $i = $begin;
+       /*
+       if (is_array($begin)) {
+           echo "<pre>";
+           echo "Begin: ";
+           var_dump($begin);
+           echo "</pre>";
+       }
+       if (is_array($end)) {
+           echo "<pre>";
+           echo "End: ";
+           var_dump($end);
+           echo "</pre>";
+       }
+       echo $method . ' ';
+       echo $begin . ' ' . $end . '<br />';
+       */
        while($i < $end) {
            $this->$method($labelarray, $i);
             $i++;
@@ -1068,7 +1092,6 @@ class qtype_correctwriting_image_generator
        $addedlexemes = $this->transform_added_lexemes($addedlexemes, $comparedtocompared);
 
        $movedlexemes = $this->transform_pair_mappings($movedlexemes, $correcttocorrect, $comparedtocompared);
-
        /*
        echo "<pre>";
        var_dump($absentlexemes);
@@ -1091,12 +1114,15 @@ class qtype_correctwriting_image_generator
        var_dump($oldlcs);
        echo "</pre>";
        */
+
        $newlcs = $this->transform_lcs($oldlcs, $correcttocorrect, $comparedtocompared);
+
        /*
        echo "<pre>";
        var_dump($newlcs);
        echo "</pre>";
        */
+
        $lcs->set_lcs($newlcs);
 
        // Create a table
@@ -1208,13 +1234,18 @@ class qtype_correctwriting_image_generator
                 $changed = false;
                 for($j = 1; $j < count($sameindexes); $j++) {
                     $changed = true;
-                    unset($movedlexemes[$j]);
+                    unset($movedlexemes[$sameindexes[$j]]);
                 }
                 $value = $comparedtocompared[$lexemesfromcompared[0]];
                 for($j = 1; $j < count($lexemesfromcompared); $j++) {
                     $index = $comparedtocompared[$lexemesfromcompared[$j]];
                     assert($value == $index, $comparedtocompared[$lexemesfromcompared[$j]] . " does not match grouped value " . $index);
                 }
+                /*
+                echo "<pre>";
+                var_dump($value);
+                echo "</pre>";
+                */
                 $movedlexemes[$i][1] = $value;
                 if ($changed) {
                     $movedlexemes = array_values($movedlexemes);
