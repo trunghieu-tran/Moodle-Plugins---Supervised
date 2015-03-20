@@ -25,8 +25,10 @@
 require_once(dirname(__FILE__) . '/../../../config.php');
 require_once(dirname(__FILE__) . '/../../../lib/moodlelib.php');
 
-define('FONT' , dirname(__FILE__) . '/../../../lib/default.ttf');
-define('FONT_SIZE' , 15.0);
+//define('FONT' , dirname(__FILE__) . '/../../../lib/default.ttf');
+define('FONT' , dirname(__FILE__) . '/fonts/PTM75F.ttf');
+
+define('FONT_SIZE' , 17.0);
 
 /**
  * Computes font metrics for specified font and size
@@ -67,25 +69,14 @@ $metrics = qtype_correctwriting_compute_font_metrics();
 
 function qtype_correctwriting_letter_width($text) {
     global $metrics;
-    $narrowletters = array(
-       'i' => 1,
-       'l' => 1,
-       '!' => 1,
-       '.' => 1,
-       ',' => 1
-    );
-    if (array_key_exists($text, $narrowletters) && false) {
-        return qtype_correctwriting_letter_width('a');
-    } else {
-        if (array_key_exists($text, $metrics['widthcache'])) {
-            return $metrics['widthcache'][$text];
-        }
-        $im = imagecreatetruecolor(1, 1);
-        $wbox = imagettfbbox(FONT_SIZE, 0, FONT, $text);
-        $metrics['widthcache'][$text] = $wbox[2] - $wbox[0] + TINY_SPACE;
-        imagedestroy($im);
+    if (array_key_exists($text, $metrics['widthcache'])) {
         return $metrics['widthcache'][$text];
     }
+    $im = imagecreatetruecolor(1, 1);
+    $wbox = imagettfbbox(FONT_SIZE, 0, FONT, $text);
+    $metrics['widthcache'][$text] = $wbox[2] - $wbox[0] + TINY_SPACE;
+    imagedestroy($im);
+    return $metrics['widthcache'][$text];
 }
 
 /**

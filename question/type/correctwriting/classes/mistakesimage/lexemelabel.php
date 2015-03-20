@@ -170,10 +170,10 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
                 $fbbox = qtype_correctwriting_get_text_bounding_box($firstletter);
                 $sbbox = qtype_correctwriting_get_text_bounding_box($secondletter);
                 $radius = ($bbox->width - $fbbox->width / 2 - $sbbox->width / 2) / 2;
-                $tmpheight = $radius * 2 + $bbox->height + TINY_SPACE * 4;
+                $tmpheight = $radius * 2 + $bbox->height + ARROW_LENGTH * 2 + TINY_SPACE;
                 $width += $bbox->width;
                 $height = max($tmpheight, $height);
-                $baselineoffset = max($baselineoffset, TINY_SPACE * 2 + $radius);
+                $baselineoffset = max($baselineoffset, ARROW_LENGTH + $radius + TINY_SPACE);
             }
 
             if ($pair[1]  == 'missing_separator') {
@@ -342,20 +342,26 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
                     $posx = (($x + $fbbox->width / 2) + ($x + $bbox->width - $sbbox->width / 2)) / 2 ;
 
                     $topx = $posx + $radius;
+                    $bottomx = $posx - $radius;
                     //var_dump($posx);
 
-                    $highery = $currentrect->y + $this->baselineoffset - TINY_SPACE / 2;
-                    $lowery = $currentrect->y + $this->baselineoffset + $bbox->height + TINY_SPACE / 2;
+                    $highery = $currentrect->y + $this->baselineoffset - TINY_SPACE;
+                    $lowery = $currentrect->y + $this->baselineoffset + $bbox->height;
 
-                    imageline($im, $topx - 1, $highery, $topx + TINY_SPACE, $highery - ARROW_LENGTH / 2 , $palette['red']);
-                    imageline($im, $topx - 1, $highery, $topx - TINY_SPACE * 2, $highery - ARROW_LENGTH / 2, $palette['red']);
+                    imageline($im, $topx, $highery, $topx + TINY_SPACE, $highery - ARROW_LENGTH / 2 , $palette['red']);
+                    imageline($im, $topx, $highery, $topx - TINY_SPACE, $highery - ARROW_LENGTH / 2, $palette['red']);
 
-                    $bottomx = $posx - $radius;
+                    imageline($im, $topx, $highery, $topx, $highery - ARROW_LENGTH, $palette['red']);
+                    imageline($im, $bottomx, $highery, $bottomx, $highery - ARROW_LENGTH, $palette['red']);
+
                     imageline($im, $bottomx, $lowery, $bottomx + TINY_SPACE, $lowery + ARROW_LENGTH / 2, $palette['red']);
                     imageline($im, $bottomx, $lowery, $bottomx - TINY_SPACE, $lowery + ARROW_LENGTH / 2, $palette['red']);
 
-                    imagearc($im, $posx, $highery - TINY_SPACE, $radius * 2, $radius * 2, 180, 360, $palette['red']);
-                    imagearc($im, $posx - 1, $lowery + TINY_SPACE, $radius * 2, $radius * 2, 0, 180, $palette['red']);
+                    imageline($im, $topx, $lowery, $topx, $lowery + ARROW_LENGTH, $palette['red']);
+                    imageline($im, $bottomx, $lowery, $bottomx, $lowery + ARROW_LENGTH, $palette['red']);
+
+                    imagearc($im, $posx, $highery  - ARROW_LENGTH, $radius * 2, $radius * 2, 180, 360, $palette['red']);
+                    imagearc($im, $posx, $lowery + ARROW_LENGTH, $radius * 2, $radius * 2, 0, 180, $palette['red']);
                 }
 
                 $x = $nx;
