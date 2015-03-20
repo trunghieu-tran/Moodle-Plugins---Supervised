@@ -32,9 +32,11 @@ define('TINY_SPACE', 2);
 // Defines a width for drawing lines of moving, removing or adding
 define('LINE_WIDTH', 2);
 // A line width for strikethrought
-define('STRIKETHROUGH_LINE_WIDTH', 1);
+define('STRIKETHROUGH_LINE_WIDTH', 3);
 // A length of arrow end part
 define('ARROW_LENGTH', 5);
+// A transpose arrow length
+define('TRANSPOSE_ARROW_LENGTH', 10);
 // An arrow angle in radians
 define('ARROW_ANGLE', 0.5);
 // Define a space for frame
