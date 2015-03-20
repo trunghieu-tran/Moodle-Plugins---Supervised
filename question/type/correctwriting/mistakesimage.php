@@ -965,98 +965,7 @@ class qtype_correctwriting_image_generator
                }
            } else {
                if (is_a($mistake, 'qtype_correctwriting_lexical_mistake')) {
-                   /** @var qtype_correctwriting_lexical_mistake $lexicalmistake */
-                   $lexicalmistake = $mistake;
-                   /** @var block_formal_langs_matched_tokens_pair $match */
-                   $match = $lexicalmistake->tokenpair;
-                   if ($match->type == block_formal_langs_matched_tokens_pair::TYPE_TYPO) {
-                       $typomatch = $match;
-                       /** @var block_formal_langs_typo_pair $typomatch */
-                       $comparedindex = $match->comparedtokens[0];
-                       $correctindex = $pair->map_from_correct_string_to_enum_correct_string($match->correcttokens[0]);
-                       $ops = $typomatch->operations;
-                       $comparedpos = 0;
-                       $correctpos = 0;
-                       /** @var qtype_correctwriting_lexeme_label $correctlabel */
-                       $correctlabel = $answer[$correctindex];
-                       /** @var qtype_correctwriting_lexeme_label $comparedlabel */
-                       $comparedlabel = $response[$comparedindex];
-                       for($i = 0; $i < core_text::strlen($ops); $i++) {
-                           $op = core_text::substr($ops, $i, 1);
-                           if ($op == 'd') {
-                               $comparedlabel->set_operation($comparedpos, 'strikethrough');
-                               $comparedpos += 1;
-                           }
-
-                           if ($op == 'i') {
-                               $letter = core_text::substr($correctlabel->text(), $correctpos, 1);
-                               $comparedlabel->insert_letter($letter, $comparedpos);
-
-                               $comparedpos += 1;
-                               $correctpos += 1;
-                           }
-
-                           if ($op == 'm') {
-                               $comparedpos += 1;
-                               $correctpos += 1;
-                           }
-
-                           if ($op == 'r') {
-                               $comparedlabel->set_operation($comparedpos, 'strikethrough');
-                               $correctlabel->set_operation($correctpos, 'red');
-
-                               $comparedpos += 1;
-                               $correctpos += 1;
-                           }
-
-                           if ($op == 't') {
-                               $comparedlabel->set_operation($comparedpos, 'transpose');
-                               if ($comparedpos != core_text::strlen($comparedlabel->text()) - 1) {
-                                       $comparedlabel->set_operation($comparedpos + 1, 'transpose');
-                               }
-
-                               $comparedpos += 2;
-                               $correctpos += 2;
-                           }
-                       }
-                   }
-
-                   if ($match->type  == block_formal_langs_matched_tokens_pair::TYPE_MISSING_SEPARATOR) {
-                       $comparedindex = $match->comparedtokens[0];
-                       $correctindex1 = $pair->map_from_correct_string_to_enum_correct_string($match->correcttokens[0]);
-                       $correctindex2 = $pair->map_from_correct_string_to_enum_correct_string($match->correcttokens[1]);
-
-                       /** @var qtype_correctwriting_lexeme_label $correctlabel */
-                       $correctlabel = $answer[$correctindex1];
-
-                       $newcorrectlabel = new qtype_correctwriting_image_block(array($correctlabel, $answer[$correctindex2]));
-                       /** @var qtype_correctwriting_lexeme_label $comparedlabel */
-                       $comparedlabel = $response[$comparedindex];
-
-                       $answer[$correctindex1] = $newcorrectlabel;
-                       unset($answer[$correctindex2]);
-
-                       $correcttocorrect[$correctindex2] = $correctindex1;
-
-
-                       $comparedlabel->insert_missing_separator(core_text::strlen($correctlabel->text()));
-                   }
-
-                   if ($match->type == block_formal_langs_matched_tokens_pair::TYPE_EXTRA_SEPARATOR) {
-                       $comparedindex1 = $match->comparedtokens[0];
-                       $comparedindex2 = $match->comparedtokens[1];
-
-                       /** @var qtype_correctwriting_lexeme_label $comparedlabel1 */
-                       /** @var qtype_correctwriting_lexeme_label $comparedlabel2 */
-
-                       $comparedlabel1 = $response[$comparedindex1];
-                       $comparedlabel2 = $response[$comparedindex2];
-                       $comparedlabel1->append_extra_separator_lexeme($comparedlabel2->text());
-
-                       unset($response[$comparedindex2]);
-
-                       $comparedtocompared[$comparedindex2] = $comparedindex1;
-                   }
+                    self::handle_lexical_mistake_change($answer, $response, $mistake, $pair, $correcttocorrect, $comparedtocompared);
                }
            }
        }
@@ -1128,6 +1037,127 @@ class qtype_correctwriting_image_generator
        // Create a table
        $mistakes = new qtype_correctwriting_mistake_container($absentlexemes, $addedlexemes, $movedlexemes);
        $this->table  = new qtype_correctwriting_table($answer, $response, $lcs, $mistakes);
+   }
+
+   /**
+    * Handles, changes, emitted by lexical mistakes
+    * @param array $answer answer
+    * @param array $response response data
+    * @param qtype_correctwriting_lexical_mistake $mistake a mistake to be handled
+    * @param qtype_correctwriting_string_pair $pair a pair
+    * @param array $correcttocorrect mappings from correct tokens to a blocks of tokens
+    * @param array $comparedtocompared mappings from com[ared tokens to blocks of tokens
+    */
+   public static function handle_lexical_mistake_change(&$answer, &$response, $mistake, $pair, &$correcttocorrect, &$comparedtocompared)  {
+       /** @var qtype_correctwriting_lexical_mistake $lexicalmistake */
+       $lexicalmistake = $mistake;
+       /** @var block_formal_langs_matched_tokens_pair $match */
+       $match = $lexicalmistake->tokenpair;
+       $label = null;
+       if ($match->type == block_formal_langs_matched_tokens_pair::TYPE_TYPO) {
+           $typomatch = $match;
+           /** @var block_formal_langs_typo_pair $typomatch */
+           $comparedindex = $match->comparedtokens[0];
+           $correctindex = $pair->map_from_correct_string_to_enum_correct_string($match->correcttokens[0]);
+           $ops = $typomatch->operations;
+           $comparedpos = 0;
+           $correctpos = 0;
+           /** @var qtype_correctwriting_lexeme_label $correctlabel */
+           $correctlabel = $answer[$correctindex];
+           /** @var qtype_correctwriting_lexeme_label $comparedlabel */
+           $comparedlabel = $response[$comparedindex];
+           $label = $comparedlabel;
+           for($i = 0; $i < core_text::strlen($ops); $i++) {
+               $op = core_text::substr($ops, $i, 1);
+               if ($op == 'd' || $op == 'i' || $op == 'r') {
+                   $oldop = $op;
+                   $inserttext = '';
+                   $dorm = true;
+                   for($j = $i; $j < core_text::strlen($ops) && $dorm; $j++) {
+                       $op = core_text::substr($ops, $j, 1);
+                       if ($op == 'r') {
+                           $comparedlabel->set_operation($comparedpos, 'strikethrough');
+                           $inserttext .= core_text::substr($correctlabel->text(), $correctpos, 1);
+                           $comparedpos += 1;
+                           $correctpos += 1;
+                       } else {
+                           if ($op == 'd') {
+                               $comparedlabel->set_operation($comparedpos, 'strikethrough');
+                               $comparedpos += 1;
+                           } else {
+                               if ($op == 'i') {
+                                   $letter = core_text::substr($correctlabel->text(), $correctpos, 1);
+                                   $inserttext .= $letter;
+                                   $correctpos += 1;
+                               } else {
+                                   $dorm = false;
+                               }
+                           }
+                       }
+                   }
+
+                   for($j =  0; $j < core_text::strlen($inserttext); $j++) {
+                       $letter = core_text::substr($inserttext, $j, 1);
+                       $comparedlabel->insert_letter($letter, $comparedpos);
+                       $comparedpos += 1;
+                   }
+
+                   $op  = $oldop;
+               }
+
+               if ($op == 'm') {
+                   $comparedpos += 1;
+                   $correctpos += 1;
+               }
+
+               if ($op == 't') {
+                   $comparedlabel->set_operation($comparedpos, 'transpose');
+                   if ($comparedpos != core_text::strlen($comparedlabel->text()) - 1) {
+                       $comparedlabel->set_operation($comparedpos + 1, 'transpose');
+                   }
+
+                   $comparedpos += 2;
+                   $correctpos += 2;
+               }
+           }
+       }
+
+       if ($match->type  == block_formal_langs_matched_tokens_pair::TYPE_MISSING_SEPARATOR) {
+           $comparedindex = $match->comparedtokens[0];
+           $correctindex1 = $pair->map_from_correct_string_to_enum_correct_string($match->correcttokens[0]);
+           $correctindex2 = $pair->map_from_correct_string_to_enum_correct_string($match->correcttokens[1]);
+
+           /** @var qtype_correctwriting_lexeme_label $correctlabel */
+           $correctlabel = $answer[$correctindex1];
+
+           $newcorrectlabel = new qtype_correctwriting_image_block(array($correctlabel, $answer[$correctindex2]));
+           /** @var qtype_correctwriting_lexeme_label $comparedlabel */
+           $comparedlabel = $response[$comparedindex];
+
+           $answer[$correctindex1] = $newcorrectlabel;
+           unset($answer[$correctindex2]);
+
+           $correcttocorrect[$correctindex2] = $correctindex1;
+
+
+           $comparedlabel->insert_missing_separator(core_text::strlen($correctlabel->text()));
+       }
+
+       if ($match->type == block_formal_langs_matched_tokens_pair::TYPE_EXTRA_SEPARATOR) {
+           $comparedindex1 = $match->comparedtokens[0];
+           $comparedindex2 = $match->comparedtokens[1];
+
+           /** @var qtype_correctwriting_lexeme_label $comparedlabel1 */
+           /** @var qtype_correctwriting_lexeme_label $comparedlabel2 */
+
+           $comparedlabel1 = $response[$comparedindex1];
+           $comparedlabel2 = $response[$comparedindex2];
+           $comparedlabel1->append_extra_separator_lexeme($comparedlabel2->text());
+
+           unset($response[$comparedindex2]);
+
+           $comparedtocompared[$comparedindex2] = $comparedindex1;
+       }
    }
 
     /**
