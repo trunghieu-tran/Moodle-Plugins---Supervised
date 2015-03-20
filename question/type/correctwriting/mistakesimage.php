@@ -774,10 +774,14 @@ class qtype_correctwriting_arrow_builder {
            foreach($this->table->lcs_extractor()->lcs() as $entry) {
                $p1 = $this->table->get_connections_by_answer_index($entry->answer)->answer;
                $p2 = $this->table->get_connections_by_response_index($entry->response)->response;
+               $color = $palette['black'];
+               if (count($p1) > 2 || count($p2) > 2) {
+                   $color = $palette['red'];
+               }
                if (count($p1) == 2 && count($p2) == 2) {
                    $p2[0] = $p1[0];
                }
-               $this->draw_multi_arrow($im, $palette['black'], $p2, $p1, true);
+               $this->draw_multi_arrow($im, $color, $p2, $p1, true);
            }
        }
    }
@@ -842,10 +846,10 @@ class qtype_correctwriting_arrow_builder {
        $centery = $rect->y + $rect->height / 2;
        $hheight = $rect->height / 2 + BIG_STRIKETHROUGH_ADDITIONAL_LENGTH;
        $points = array(
-            array($centerx - $hheight, $centery - $hheight),
-            array($centerx - $hheight, $centery + $hheight),
-            array($centerx + $hheight, $centery + $hheight),
-            array($centerx + $hheight, $centery - $hheight),
+            array($rect->x, $centery - $hheight),
+            array($rect->x, $centery + $hheight),
+            array($rect->x + $rect->width, $centery + $hheight),
+            array($rect->x + $rect->width, $centery - $hheight),
        );
        for($i = 0; $i < count($points); $i++) {
            imageline($im, $centerx, $centery, $points[$i][0], $points[$i][1], $color);
