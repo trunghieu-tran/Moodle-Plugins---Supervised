@@ -347,12 +347,12 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
                     $highery = $currentrect->y + $this->baselineoffset - TINY_SPACE / 2;
                     $lowery = $currentrect->y + $this->baselineoffset + $bbox->height + TINY_SPACE / 2;
 
-                    imageline($im, $topx, $highery, $topx + TINY_SPACE * 2, $highery - ARROW_LENGTH , $palette['red']);
-                    imageline($im, $topx, $highery, $topx - TINY_SPACE * 2, $highery - ARROW_LENGTH, $palette['red']);
+                    imageline($im, $topx - 1, $highery, $topx + TINY_SPACE, $highery - ARROW_LENGTH / 2 , $palette['red']);
+                    imageline($im, $topx - 1, $highery, $topx - TINY_SPACE * 2, $highery - ARROW_LENGTH / 2, $palette['red']);
 
                     $bottomx = $posx - $radius;
-                    imageline($im, $bottomx, $lowery, $bottomx + TINY_SPACE * 2, $lowery + ARROW_LENGTH, $palette['red']);
-                    imageline($im, $bottomx, $lowery, $bottomx - TINY_SPACE * 2, $lowery + ARROW_LENGTH, $palette['red']);
+                    imageline($im, $bottomx, $lowery, $bottomx + TINY_SPACE, $lowery + ARROW_LENGTH / 2, $palette['red']);
+                    imageline($im, $bottomx, $lowery, $bottomx - TINY_SPACE, $lowery + ARROW_LENGTH / 2, $palette['red']);
 
                     imagearc($im, $posx, $highery - TINY_SPACE, $radius * 2, $radius * 2, 180, 360, $palette['red']);
                     imagearc($im, $posx - 1, $lowery + TINY_SPACE, $radius * 2, $radius * 2, 0, 180, $palette['red']);

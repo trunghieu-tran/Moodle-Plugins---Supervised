@@ -74,7 +74,7 @@ function qtype_correctwriting_letter_width($text) {
        '.' => 1,
        ',' => 1
     );
-    if (array_key_exists($text, $narrowletters)) {
+    if (array_key_exists($text, $narrowletters) && false) {
         return qtype_correctwriting_letter_width('a');
     } else {
         if (array_key_exists($text, $metrics['widthcache'])) {
