@@ -170,10 +170,10 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
                 $fbbox = qtype_correctwriting_get_text_bounding_box($firstletter);
                 $sbbox = qtype_correctwriting_get_text_bounding_box($secondletter);
                 $radius = ($bbox->width - $fbbox->width / 2 - $sbbox->width / 2) / 2;
-                $tmpheight = $radius * 2 + $bbox->height + ARROW_LENGTH * 2 + TINY_SPACE;
+                $tmpheight = $radius * 2 + $bbox->height + TRANSPOSE_ARROW_LENGTH * 2 + TINY_SPACE;
                 $width += $bbox->width;
                 $height = max($tmpheight, $height);
-                $baselineoffset = max($baselineoffset, ARROW_LENGTH + $radius + TINY_SPACE);
+                $baselineoffset = max($baselineoffset, TRANSPOSE_ARROW_LENGTH + $radius + TINY_SPACE);
             }
 
             if ($pair[1]  == 'missing_separator') {
@@ -315,6 +315,7 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
                 }
 
                 if ($operationpair[1] == 'strikethrough') {
+                    imagesetthickness($im, STRIKETHROUGH_LINE_WIDTH);
                     if (core_text::strlen($operationpair[0]) == 1) {
                         $highery = $currentrect->y + $this->baselineoffset;
                         $lowery = $currentrect->y + $this->baselineoffset + $bbox->height;
@@ -324,6 +325,7 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
                         $py = $currentrect->y + $this->baselineoffset + $bbox->height / 2;
                         imageline($im, $x - TINY_SPACE, $py, $nx + TINY_SPACE, $py, $palette['red']);
                     }
+                    imagesetthickness($im, FRAME_THICKNESS);
                 }
 
                 if ($operationpair[1] == 'transpose' && core_text::strlen($operationpair[0]) == 2) {
@@ -348,20 +350,20 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
                     $highery = $currentrect->y + $this->baselineoffset - TINY_SPACE;
                     $lowery = $currentrect->y + $this->baselineoffset + $bbox->height;
 
-                    imageline($im, $topx, $highery, $topx + TINY_SPACE, $highery - ARROW_LENGTH / 2 , $palette['red']);
-                    imageline($im, $topx, $highery, $topx - TINY_SPACE, $highery - ARROW_LENGTH / 2, $palette['red']);
+                    imageline($im, $topx, $highery, $topx + TINY_SPACE, $highery - TRANSPOSE_ARROW_LENGTH / 1.5 , $palette['red']);
+                    imageline($im, $topx, $highery, $topx - TINY_SPACE, $highery - TRANSPOSE_ARROW_LENGTH / 1.5, $palette['red']);
 
-                    imageline($im, $topx, $highery, $topx, $highery - ARROW_LENGTH, $palette['red']);
-                    imageline($im, $bottomx, $highery, $bottomx, $highery - ARROW_LENGTH, $palette['red']);
+                    imageline($im, $topx, $highery, $topx, $highery - TRANSPOSE_ARROW_LENGTH, $palette['red']);
+                    imageline($im, $bottomx, $highery, $bottomx, $highery - TRANSPOSE_ARROW_LENGTH, $palette['red']);
 
-                    imageline($im, $bottomx, $lowery, $bottomx + TINY_SPACE, $lowery + ARROW_LENGTH / 2, $palette['red']);
-                    imageline($im, $bottomx, $lowery, $bottomx - TINY_SPACE, $lowery + ARROW_LENGTH / 2, $palette['red']);
+                    imageline($im, $bottomx, $lowery, $bottomx + TINY_SPACE , $lowery + TRANSPOSE_ARROW_LENGTH / 1.5, $palette['red']);
+                    imageline($im, $bottomx, $lowery, $bottomx - TINY_SPACE , $lowery + TRANSPOSE_ARROW_LENGTH / 1.5, $palette['red']);
 
-                    imageline($im, $topx, $lowery, $topx, $lowery + ARROW_LENGTH, $palette['red']);
-                    imageline($im, $bottomx, $lowery, $bottomx, $lowery + ARROW_LENGTH, $palette['red']);
+                    imageline($im, $topx, $lowery, $topx, $lowery + TRANSPOSE_ARROW_LENGTH, $palette['red']);
+                    imageline($im, $bottomx, $lowery, $bottomx, $lowery + TRANSPOSE_ARROW_LENGTH, $palette['red']);
 
-                    imagearc($im, $posx, $highery  - ARROW_LENGTH, $radius * 2, $radius * 2, 180, 360, $palette['red']);
-                    imagearc($im, $posx, $lowery + ARROW_LENGTH, $radius * 2, $radius * 2, 0, 180, $palette['red']);
+                    imagearc($im, $posx, $highery  - TRANSPOSE_ARROW_LENGTH, $radius * 2, $radius * 2, 190, 350, $palette['red']);
+                    imagearc($im, $posx, $lowery + TRANSPOSE_ARROW_LENGTH, $radius * 2, $radius * 2, 0, 180, $palette['red']);
                 }
 
                 $x = $nx;
