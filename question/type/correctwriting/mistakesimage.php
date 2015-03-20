@@ -434,6 +434,17 @@ class qtype_correctwriting_table
        $cell = $this->table[$this->responsetable[$responseindex]];
        return $cell->get_response_rect();
    }
+
+    /**
+     * Index
+     * @param int $responseindex
+     * @return qtype_correctwriting_table_cell
+     */
+   public function get_cell_by_response_index($responseindex) {
+        /** @var qtype_correctwriting_table_cell $cell */
+        $cell = $this->table[$this->responsetable[$responseindex]];
+        return $cell;
+   }
     /** Returns a connection point for lexeme in student answer
      * @param int $responseindex of lexeme in answer
      * @param int $length supposed length of lexeme
@@ -652,6 +663,9 @@ class qtype_correctwriting_arrow_builder {
                        $index = $group[0];
                        $rect = $this->table->get_rect_by_response_index($index);
                        if ($this->table->is_response_text_bigger_than($index, 1)) {
+                           $baselineoffset = $this->table->get_cell_by_response_index($index)->response()->get_baseline_offset();
+                           $rect->y += $baselineoffset;
+                           $rect->height -= $baselineoffset;
                            $this->draw_big_strikethrough($im, $palette['red'], $rect);
                        } else {
                            $this->draw_strikethrough($im, $palette['red'], $rect);
@@ -674,6 +688,9 @@ class qtype_correctwriting_arrow_builder {
                foreach($this->table->mistakes()->get_added_lexeme_indexes() as $index) {
                    $rect = $this->table->get_rect_by_response_index($index);
                    if ($this->table->is_response_text_bigger_than($index, 1)) {
+                       $baselineoffset = $this->table->get_cell_by_response_index($index)->response()->get_baseline_offset();
+                       $rect->y += $baselineoffset;
+                       $rect->height -= $baselineoffset;
                        $this->draw_big_strikethrough($im, $palette['red'], $rect);
                    } else {
                        $this->draw_strikethrough($im, $palette['red'], $rect);
