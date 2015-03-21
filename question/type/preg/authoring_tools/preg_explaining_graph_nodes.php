@@ -829,7 +829,7 @@ class qtype_preg_explaining_graph_node_template extends qtype_preg_explaining_gr
 
         $templatename = $this->pregnode->name;
         $template = qtype_preg\template::available_templates()[$templatename];
-        $label .= '\n"' . preg_replace('/\$\$\d+/i', get_string('explain_this', 'qtype_preg') , $template->get_description()) . '"';
+        $label .= '\n"' . preg_replace('/\%\d+/i', get_string('explain_this', 'qtype_preg') , $template->get_description()) . '"';
 
         $template = new qtype_preg_explaining_graph_tool_subgraph(
             $label,
