@@ -555,4 +555,8 @@ class qtype_preg_syntax_tree_node_template extends qtype_preg_syntax_tree_operat
         }
         return 'red';
     }
+
+    public function label_for_edge($operand) {
+        return get_string('explain_parameter', 'qtype_preg');
+    }
 }
