@@ -733,3 +733,5 @@ $string['explain_end'] = 'end';
 $string['explain_true'] = 'true';
 $string['explain_false'] = 'false';
 $string['explain_this'] = 'this';
+$string['explain_unknow_template'] = 'unknow template';
+$string['explain_parameter'] = 'parameter';
