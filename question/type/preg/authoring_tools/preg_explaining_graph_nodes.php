@@ -488,6 +488,10 @@ class qtype_preg_explaining_graph_node_concat extends qtype_preg_explaining_grap
             $graph->links[count($graph->links)-1]->id = $this->pregnode->id;// . '_' .
                 //$this->operands[$i-1]->pregnode->position->indfirst . '_' . $this->operands[$i]->pregnode->position->indlast;
             $graph->links[count($graph->links)-1]->tooltip = 'concatenation';
+            if ($left->exits[0]->borderoftemplate !== null)
+                $graph->links[count($graph->links)-1]->ltail = $left->exits[0]->borderoftemplate;
+            if ($right->entries[0]->borderoftemplate !== null)
+            $graph->links[count($graph->links)-1]->lhead = $right->entries[0]->borderoftemplate;
 
             if ($i != $n-1) {
                 $left = $right;
@@ -825,42 +829,56 @@ class qtype_preg_explaining_graph_node_template extends qtype_preg_explaining_gr
      * @param qtype_preg_explaining_graph_tool_subgraph $graph Current explainning graph.
      */
     protected function process_operator($graph) {
-        $label = get_string('description_node_template', 'qtype_preg');
-
-        $templatename = $this->pregnode->name;
-        $template = qtype_preg\template::available_templates()[$templatename];
-        $label .= '\n"' . preg_replace('/\%\d+/i', get_string('explain_this', 'qtype_preg') , $template->get_description()) . '"';
+        $tooltip = get_string('node_template', 'qtype_preg');
+        $available = qtype_preg\template::available_templates();
+        if ($this->pregnode->name != '' && array_key_exists($this->pregnode->name, $available)) {
+            $label = $tooltip . '\n' . get_string('description_template_' . $this->pregnode->name, 'qtype_preg');
+        } else {
+            $label = get_string('explain_unknow_template', 'qtype_preg');
+        }
 
         $template = new qtype_preg_explaining_graph_tool_subgraph(
             $label,
             $this->pregnode->id. '_' . $this->pregnode->position->indfirst . '_' . $this->pregnode->position->indlast
         );
-        $template->tooltip = "template";
+        $template->tooltip = $tooltip;
         $template->style = ($this->pregnode->userinscription[0]->data != '(?i:...)') ? 'solid' : 'filled';
         $template->color = ($this->pregnode->userinscription[0]->data != '(?i:...)') ? 'black' : 'lightgrey';
 
-        $left = $this->operands[0]->create_graph();
-        $template->assume_subgraph($left);
+        $left = new qtype_preg_explaining_graph_tool_subgraph('');
+        $left->tooltip = get_string('explain_parameter', 'qtype_preg');
+        $inner_left = $this->operands[0]->create_graph();
+        $left->assume_subgraph($inner_left);
+        $left->entries[] = end($inner_left->entries);
+        $left->exits[] = end($inner_left->exits);
+        $template->subgraphs[] = $left;
         $template->entries[] = end($left->entries);
-        $template->exits[] = end($left->exits);
+        $right = $left;
 
         $n = count($this->operands);
         for ($i = 1; $i < $n; ++$i) {
-            $right = $this->operands[$i]->create_graph();
-            $template->assume_subgraph($right);
-            $template->links[] = new qtype_preg_explaining_graph_tool_link('', $left->exits[0], $right->entries[0], $template);
-            $template->links[count($template->links)-1]->id = $this->pregnode->id;
-            $template->links[count($template->links)-1]->tooltip = 'concatenation';
+            $right = new qtype_preg_explaining_graph_tool_subgraph('');
+            $right->tooltip = get_string('explain_parameter', 'qtype_preg');
+            $inner_right = $this->operands[$i]->create_graph();
+            $right->assume_subgraph($inner_right);
+            $right->entries[] = end($inner_right->entries);
+            $right->exits[] = end($inner_right->exits);
+            $template->subgraphs[] = $right;
+
+            $tmplink = new qtype_preg_explaining_graph_tool_link('', end($left->exits), end($right->entries), $template);
+            $tmplink->color = 'transparent';
+            $template->links[] = $tmplink;
 
             if ($i != $n-1) {
                 $left = $right;
-            } else {
-                $template->exits[] = end($right->exits);
             }
         }
+        $template->exits[] = end($right->exits);
 
         $graph->subgraphs[] = $template;
         $graph->entries[] = end($template->entries);
+        end($template->entries)->borderoftemplate = $template;
         $graph->exits[] = end($template->exits);
+        end($template->exits)->borderoftemplate = $template;
     }
 }
