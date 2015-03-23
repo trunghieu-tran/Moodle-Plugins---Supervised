@@ -732,4 +732,5 @@ $string['explain_begin'] = 'начало';
 $string['explain_end'] = 'конец';
 $string['explain_true'] = 'истина';
 $string['explain_false'] = 'ложь';
-$string['explain_this'] = 'содержимое';
+$string['explain_unknow_template'] = 'неизвестный шаблон';
+$string['explain_parameter'] = 'параметр';

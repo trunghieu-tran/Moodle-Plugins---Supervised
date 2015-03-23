@@ -130,8 +130,13 @@ class qtype_preg_explaining_graph_tool extends qtype_preg_dotbased_authoring_too
             $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $graph->nodes[0], $graph->nodes[count($graph->nodes) - 1], $graph);
         } else {
             $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $graph->nodes[count($graph->nodes) - 2], $graph->entries[count($graph->entries) - 1], $graph);
+            if ($graph->entries[count($graph->entries) - 1]->borderoftemplate !== null)
+                $graph->links[count($graph->links)-1]->lhead = $graph->entries[count($graph->entries) - 1]->borderoftemplate;
 
             $graph->links[] = new qtype_preg_explaining_graph_tool_link('', $graph->exits[count($graph->exits) - 1], $graph->nodes[count($graph->nodes) - 1], $graph);
+            if ($graph->exits[count($graph->exits) - 1]->borderoftemplate !== null)
+                $graph->links[count($graph->links)-1]->ltail = $graph->exits[count($graph->exits) - 1]->borderoftemplate;
+
             $graph->entries = array();
             $graph->exits = array();
 
