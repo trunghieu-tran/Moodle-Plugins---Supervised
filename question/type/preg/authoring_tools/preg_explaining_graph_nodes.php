@@ -848,7 +848,6 @@ class qtype_preg_explaining_graph_node_template extends qtype_preg_explaining_gr
         $template->color = ($this->pregnode->userinscription[0]->data != '(?i:...)') ? 'black' : 'lightgrey';
 
 
-
         $left = new qtype_preg_explaining_graph_tool_subgraph('');
         $left->color = 'lightgray';
         $left->tooltip = $parametersdescription === null ? get_string('explain_parameter', 'qtype_preg') :  $parametersdescription[0];
@@ -882,8 +881,8 @@ class qtype_preg_explaining_graph_node_template extends qtype_preg_explaining_gr
 
         $graph->subgraphs[] = $template;
         $graph->entries[] = end($template->entries);
-        end($template->entries)->borderoftemplate = $template;
+//        end($template->entries)->borderoftemplate = $template;
         $graph->exits[] = end($template->exits);
-        end($template->exits)->borderoftemplate = $template;
+//        end($template->exits)->borderoftemplate = $template;
     }
 }
