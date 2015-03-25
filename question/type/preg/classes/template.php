@@ -52,15 +52,19 @@ class template {
      */
     private static $templates;
 
-    /** Descriptions */
+    /** Descriptions. */
     private $descriptions;
 
-    public function __construct($name = '', $regex = '', $options = '', $descriptions = array(), $placeholderscount = 0) {
+    /** Descriptions of template parameters (if any exist). */
+    private $parametersdescriptions;
+
+    public function __construct($name = '', $regex = '', $options = '', $descriptions = array(), $placeholderscount = 0, $parametersdescriptions = array()) {
         $this->name = $name;
         $this->regex = $regex;
         $this->options = $options;
         $this->descriptions = $descriptions;
         $this->placeholderscount = $placeholderscount;
+        $this->parametersdescriptions = $parametersdescriptions;
     }
 
     private function get_options_str($positive = true) {
@@ -92,12 +96,121 @@ class template {
             template::$templates = array(
                 'word' => new template('word', '\w+', '', array('en' => 'word', 'ru' => 'слово')),
                 'integer' => new template('integer', '[+-]?\d+', '', array('en' => 'integer', 'ru' => 'целое число')),
-                'parens_req' => new template('parens_req', '(   \(    (?:(?-1)|$$1)   \)  )', 'x', array('en' => '%1 in parens', 'ru' => '%1 в скобках'), 1),
-                'parens_opt' => new template('parens_opt', '$$1|(?###parens_req<)$$1(?###>)', '', array('en' => '%1 in optional parens', 'ru' => '%1 в скобках или без'), 1),
-                'brackets_req' => new template('brackets_req', '(   \[   (?:(?-1)|$$1)   \]   )', 'x', array('en' => '%1 in brackets', 'ru' => '%1 в квадратных скобках'), 1),
-                'brackets_opt' => new template('brackets_opt', '$$1|(?###brackets_req<)$$1(?###>)', '', array('en' => '%1 in optional brackets', 'ru' => '%1 в квадратных скобках или без'), 1),
-                'custom_parens_req' => new template('custom_parens_req', '(   $$1    (?:(?-1)|$$2)   $$3  )', 'x', array('en' => '%2 in any number of evenly opened %1 and closed %3', 'ru' => '%2 в любом количестве открытых %1 и закрытых %3'), 3),
-                'custom_parens_opt' => new template('custom_parens_opt', '$$2|(?###custom_parens_req<)$$1(?###,)$$2(?###,)$$3(?###>)', 'x', array('en' => '%2 in any number of evenly opened %1 and closed %3 or without them', 'ru' => '%2 в любом количестве открытых %1 и закрытых %3'), 3),
+                'parens_req' => new template(
+                    'parens_req',
+                    '(   \(    (?:(?-1)|$$1)   \)  )',
+                    'x',
+                    array(
+                        'en' => '%1 in parens',
+                        'ru' => '%1 в скобках'
+                    ),
+                    1,
+                    array(
+                        'en' => array(
+                            'text inside brackets'
+                        ),
+                        'ru' => array(
+                            'текст внутри скобок'
+                        )
+                    )
+                ),
+                'parens_opt' => new template(
+                    'parens_opt',
+                    '$$1|(?###parens_req<)$$1(?###>)',
+                    '',
+                    array(
+                        'en' => '%1 in optional parens',
+                        'ru' => '%1 в скобках или без'
+                    ),
+                    1,
+                    array(
+                        'en' => array(
+                            'text inside brackets'
+                        ),
+                        'ru' => array(
+                            'текст внутри скобок'
+                        )
+                    )
+                ),
+                'brackets_req' => new template(
+                    'brackets_req',
+                    '(   \[   (?:(?-1)|$$1)   \]   )',
+                    'x',
+                    array(
+                        'en' => '%1 in brackets',
+                        'ru' => '%1 в квадратных скобках'
+                    ),
+                    1,
+                    array(
+                        'en' => array(
+                            'text inside brackets'
+                        ),
+                        'ru' => array(
+                            'текст внутри скобок'
+                        )
+                    )
+                ),
+                'brackets_opt' => new template(
+                    'brackets_opt',
+                    '$$1|(?###brackets_req<)$$1(?###>)',
+                    '',
+                    array(
+                        'en' => '%1 in optional brackets',
+                        'ru' => '%1 в квадратных скобках или без'
+                    ),
+                    1,
+                    array(
+                        'en' => array(
+                            'text inside brackets'
+                        ),
+                        'ru' => array(
+                            'текст внутри скобок'
+                        )
+                    )
+                ),
+                'custom_parens_req' => new template(
+                    'custom_parens_req',
+                    '(   $$1    (?:(?-1)|$$2)   $$3  )',
+                    'x',
+                    array(
+                        'en' => '%2 in any number of evenly opened %1 and closed %3',
+                        'ru' => '%2 в любом количестве открытых %1 и закрытых %3'
+                    ),
+                    3,
+                    array(
+                        'en' => array(
+                            'opening bracket',
+                            'text inside brackets',
+                            'closing bracket'
+                        ),
+                        'ru' => array(
+                            'открывающаяся скобка',
+                            'текст внутри скобок',
+                            'закрывающаяся скобка'
+                        )
+                    )
+                ),
+                'custom_parens_opt' => new template(
+                    'custom_parens_opt',
+                    '$$2|(?###custom_parens_req<)$$1(?###,)$$2(?###,)$$3(?###>)',
+                    'x',
+                    array(
+                        'en' => '%2 in any number of evenly opened %1 and closed %3 or without them',
+                        'ru' => '%2 в любом количестве открытых %1 и закрытых %3'),
+                    3,
+                    array(
+                        'en' => array(
+                            'opening bracket',
+                            'text inside brackets',
+                            'closing bracket'
+                        ),
+                        'ru' => array(
+                            'открывающаяся скобка',
+                            'текст внутри скобок',
+                            'закрывающаяся скобка'
+                        )
+                    )
+                ),
             );
         }
         return template::$templates;
@@ -156,6 +269,22 @@ class template {
             $description = reset($this->descriptions); // dont use in foreach
         }
         return $description;
+    }
+
+    public function get_parametersdescription() {
+        $parametersdescription = false;
+        $mylang = current_language();
+        $parentlang = get_parent_language($mylang);
+        if (array_key_exists($mylang, $this->parametersdescriptions)) {
+            $parametersdescription = $this->parametersdescriptions[$mylang];
+        } else if (array_key_exists($parentlang, $this->parametersdescriptions)) {
+            $parametersdescription = $this->descriptions[$parentlang];
+        } else if (array_key_exists('en', $this->parametersdescriptions)) {
+            $parametersdescription = $this->descriptions['en'];
+        } else {
+            $parametersdescription = reset($this->parametersdescriptions); // dont use in foreach
+        }
+        return $parametersdescription;
     }
 
     /**

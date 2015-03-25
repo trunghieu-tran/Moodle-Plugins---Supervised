@@ -188,24 +188,30 @@ trait qtype_preg_equality_test_provider {
 
     public function complex_provider() {
         return array(
-            // Input Output
-            // Excess recurring characters
-            // Same consecutive simple statements
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // ВНИМАНИЕ!!!!
+            // КОММЕНТАРИИ В ЭТОМ ПРОВАЙДЕРЕ СЪЕХАЛИ ПОСЛЕ ПЕРЕЕЗДА ИЗ GOOGLE DOCS
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // Вход Выход
+            // Лишние повторяющиеся символы
+            // Одинаковые подряд идущие простые утверждения
             array('^^a', '^a', true),
             array('a$$', 'a$', true),
             array('^^a$$', '^a$', true),
-            // Empty groups
             array('a(?:)', 'a', true),
             array('a(?:){3}', 'a', true),
             array('(?:(?:a))', '(?:a)', true),
-            // Empty subpatterns
             array('a()', 'a', true),
             array('a(){3}', 'a', true),
             array('((a))', '(a)', true),
-            // Cast to quantifiers: simple tests
-            // Cast quantifiers to one or more recurring characters
+            // Приведение к квантификаторам одного или нескольких повторяющихся
             array('aaa', 'a{3}', true),
             array('aaab', 'a{3}b', true),
+            // Простые утверждения, не имеющие смысла
+            // Пустые группировки
+            // Пустые подмаски
+            // Приведение к квантификаторам: простые тесты
+            // символов
             array('baaa', 'ba{3}', true),
             array('abab', '(?:ab){2}', true),
             array('ababa', '(?:ab){2}', true), //или a(?:ba){2}
@@ -252,8 +258,7 @@ trait qtype_preg_equality_test_provider {
             array('a[b]ab', '(?:ab){2}', true),
             array('ab[a]b', '(?:ab){2}', true),
             array('aba[b]', '(?:ab){2}', true),
-            // Cast quantifiers to one or several recurring characters,
-            // containing quantifiers and / or alternatives
+            // Приведение к квантификаторам одного или несколько повторяющихся
             array('[ab]a|b', '[ab]{2}', true),
             array('a|aa', 'a{1,2}', true),
             array('(a|aa)', '(a{1,2})', true),
@@ -276,9 +281,10 @@ trait qtype_preg_equality_test_provider {
             array('aa?', 'a{1,2}', true),
             array('aa+', 'a{2,}', true),
             array('aa*', 'a+', true),
-            array('символов,', 'содержащих', true),
-            // Cast to quantifiers: complex tests
-            // Quantifier? , A lot of single characters
+            array('символов,', 'содержащих', true), //
+            //квантификаторы и/или альтернативы
+            // Приведение к квантификаторам: комплексные тесты
+            // Квантификатор ? , множество одиночных символов
             array('aaa?', 'a{2,3}', true),
             array('aa?a', 'a{2,3}', true),
             array('a?aa', 'a{2,3}', true),
@@ -382,7 +388,6 @@ trait qtype_preg_equality_test_provider {
             array('(?:a?a)?(?:a?)', 'a{0,3}', true),
             array('(?:aa?)?(?:a?)', 'a{0,3}', true),
             array('(?:a?a?)?(?:a?)', 'a{0,3}', true),
-            // Quantifier? a plurality of pairs of characters
             array('abab?', 'abab?', true),
             array('aba?b', 'aba?b', true),
             array('ab?ab', 'ab?ab', true),
@@ -421,7 +426,8 @@ trait qtype_preg_equality_test_provider {
             array('aaa+', 'a{3,}', true),
             array('aa+a', 'a{3,}', true),
             array('a+aa', 'a{3,}', true),
-            // Quantifier + set of single characters
+            // Квантификатор ? множество парных символов
+            // Квантификатор множество одиночных символов
             array('a+a+a', 'a{3,}', true),
             array('aa+a+', 'a{3,}', true),
             array('a+aa+', 'a{3,}', true),
@@ -522,7 +528,6 @@ trait qtype_preg_equality_test_provider {
             array('(?:a+a)+(?:a+)', 'a{3,}', true),
             array('(?:aa+)+(?:a+)', 'a{3,}', true),
             array('(?:a+a+)+(?:a+)', 'a{3,}', true),
-            // Quantifier + set of delimiters
             array('abab+', 'abab+', true),
             array('aba+b', 'aba+b', true),
             array('ab+ab', 'ab+ab', true),
@@ -551,6 +556,7 @@ trait qtype_preg_equality_test_provider {
             array('abab(ab)+(a+b)', '(?:ab){2}(ab)+(a+b)', true),
             array('(abab)(ab)+', '((?:ab){2})(ab)+', true),
             array('(abab)(ab+)', '((?:ab){2})(ab+)', true),
+            // Квантификатор +, множество парных символов
             array('(abab)(a+b)', '((?:ab){2})(a+b)', true),
             array('(abab)(?:ab)+', '((?:ab){2})(?:ab)+', true),
             array('(abab)(?ab+)', '((?:ab){2})(?:ab+)', true),
@@ -558,7 +564,6 @@ trait qtype_preg_equality_test_provider {
             array('(?:abab)(?:ab)+', '(?:ab){3,}', true),
             array('(?:abab)(?:ab+)', '(?:ab){2}(?:ab+)', true),
             array('(?:abab)(?:a+b)', '(?:ab){2}(?:a+b)', true),
-            // Quantifier * set of single characters
             array('aaa*', 'a{2,}', true),
             array('aa*a', 'a{2,}', true),
             array('a*aa', 'a{2,}', true),
@@ -594,6 +599,7 @@ trait qtype_preg_equality_test_provider {
             array('aa*(a)*', 'a+(a)*', true),
             array('a*a(a)*', 'a+(a)*', true),
             array('a*a*(a)*', 'a*(a)*', true),
+            // Квантификатор * множество одиночных символов
             array('aa(a*)', 'a{2}(a*)', true),
             array('aa*(a*)', 'a+(a*)', true),
             array('a*a(a*)', 'a+(a*)', true),
@@ -662,7 +668,6 @@ trait qtype_preg_equality_test_provider {
             array('(?:a*a)*(?:a*)', 'a*', true),
             array('(?:aa*)*(?:a*)', 'a*', true),
             array('(?:a*a*)*(?:a*)', 'a*', true),
-            // Quantifier *, the set of paired characters
             array('abab*', 'abab*', true),
             array('aba*b', 'aba*b', true),
             array('ab*ab', 'ab*ab', true),
@@ -680,6 +685,7 @@ trait qtype_preg_equality_test_provider {
             array('abab(?:a*b)(?:ab)*', '(?:ab){2}(?:a*b)(?:ab)*', true),
             array('abab(?:ab)*(?:ab*)', '(?:ab){2,}(?:ab*)', true),
             array('abab(?:ab)*(?:a*b)', '(?:ab){2,}(?:a*b)', true),
+            // Квантификатор *, множество парных символов
             array('abab(ab)*', '(?:ab){2}(ab)*', true),
             array('abab(ab)*(ab)*', '(?:ab){2}(ab)*(ab)*', true),
             array('abab(ab*)(ab*)', '(?:ab){2}(ab*)(ab*)', true),
@@ -698,7 +704,6 @@ trait qtype_preg_equality_test_provider {
             array('(?:abab)(?:ab)*', '(?:ab){2,}', true),
             array('(?:abab)(?:ab*)', '(?:ab){2}(?:ab*)', true),
             array('(?:abab)(?:a*b)', '(?:ab){2}(?:a*b)', true),
-            // Simple tests on combinations of quantifiers
             array('(?:a?)?', 'a?', true),
             array('(?:a?)+', 'a*', true),
             array('(?:a?)*', 'a*', true),
@@ -723,8 +728,8 @@ trait qtype_preg_equality_test_provider {
             array('(a?){1,2}', '(a){0,2}', true),
             array('(a+){1,2}', '(a)+', true),
             array('(a*){1,2}', '(a*)', true),
-            // Integration tests on a combination of quantifiers:
-            // Match a single character within the group with a single character to the left
+            // Простые тесты на сочетания квантификаторов
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
             array('a(?:a?)?', 'aa?', true), // или a{1,2}
             array('a(?:a?)+', 'a+', true),
             array('a(?:a?)*', 'a+', true),
@@ -734,8 +739,7 @@ trait qtype_preg_equality_test_provider {
             array('a(?:a*)?', 'a+', true),
             array('a(?:a*)+', 'a+', true),
             array('a(?:a*)*', 'a+', true),
-            // Integration tests on a combination of quantifiers:
-            // Match a single character inside a subpattern with a single character to the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
             array('a(a?)?', 'a(a?)?', true),
             array('a(a?)+', 'a(a?)+', true),
             array('a(a?)*', 'a(a?)*', true),
@@ -745,8 +749,7 @@ trait qtype_preg_equality_test_provider {
             array('a(a*)?', 'a(a*)', true),
             array('a(a*)+', 'a(a*)', true),
             array('a(a*)*', 'a(a*)', true),
-            // Integration tests on a combination of quantifiers:
-            // single match character within the group with a single character to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
             array('(?:a?)?a', 'a{1,2}', true),
             array('(?:a?)+a', 'a+', true),
             array('(?:a?)*a', 'a+', true),
@@ -756,8 +759,7 @@ trait qtype_preg_equality_test_provider {
             array('(?:a*)?a', 'a+', true),
             array('(?:a*)+a', 'a+', true),
             array('(?:a*)*a', 'a+', true),
-            // Integration tests on a combination of quantifiers:
-            // single match character inside a subpattern with a single character to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
             array('(a?)?a', '(a?)?a', true),
             array('(a?)+a', '(a?)+a', true),
             array('(a?)*a', '(a?)*a', true),
@@ -765,31 +767,36 @@ trait qtype_preg_equality_test_provider {
             array('(a+)+a', '(a+)+a', true),
             array('(a+)*a', '(a+)*a', true),
             array('(a*)?a', '(a*)a', true),
+            // Комплексные тесты на сочетания квантификаторов
+            // символа внутри группировки с одиночным символом слева
+            // символа внутри подмаски с одиночным символом слева
+            // символа внутри группировки с одиночным символом справа
+            // символа внутри подмаски с одиночным символом справа
             array('(a*)+a', '(a*)a', true),
             array('(a*)*a', '(a*)a', true),
-            // Integration tests on a combination of quantifiers:
-            // single match character within the group with a single character to the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
             array('a(?:a?){1,2}', 'a{1,3}', true),
             array('a(?:a+){1,2}', 'a{2,}', true),
             array('a(?:a*){1,2}', 'a+', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character inside a subpattern with a single character to the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
             array('a(a?){1,2}', 'a(a?){1,2}', true),
             array('a(a+){1,2}', 'a(a+)', true),
             array('a(a*){1,2}', 'a(a*)', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character within the group with a single character to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
             array('(?:a?){1,2}a', 'a{1,3}', true),
             array('(?:a+){1,2}a', 'a{2,}', true),
             array('(?:a*){1,2}a', 'a+', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character inside a subpattern with a single character to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
             array('(a?){1,2}a', '(a?){1,2}a', true),
             array('(a+){1,2}a', '(a+)a', true),
             array('(a*){1,2}a', '(a*)a', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character within the group with the leftmost character of the
-            // A sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри группировки с одиночным символом слева
+            // символа внутри подмаски с одиночным символом слева
+            // символа внутри группировки с одиночным символом справа
+            // символа внутри подмаски с одиночным символом справа
+            // символа внутри группировки с крайним левым символом из
+            // последовательности символов слева
             array('ab(?:a?)?', 'aba?', true),
             array('ab(?:a?)+', 'aba*', true),
             array('ab(?:a?)*', 'aba*', true),
@@ -799,21 +806,21 @@ trait qtype_preg_equality_test_provider {
             array('ab(?:a*)?', 'aba*', true),
             array('ab(?:a*)+', 'aba*', true),
             array('ab(?:a*)*', 'aba*', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character inside a subpattern with the leftmost Character in the sequence
-            // Characters left
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри подмаски с крайним левым символом из последовательности
             array('ab(a?)?', 'ab(a?)?', true),
             array('ab(a?)+', 'ab(a?)+', true),
             array('ab(a?)*', 'ab(a?)*', true),
             array('ab(a+)?', 'ab(a*)', true),
             array('ab(a+)+', 'ab(a+)+', true),
             array('ab(a+)*', 'ab(a+)*', true),
+            // символов слева
             array('ab(a*)?', 'ab(a*)', true),
             array('ab(a*)+', 'ab(a*)', true),
             array('ab(a*)*', 'ab(a*)', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character within the group with the leftmost character of the
-            // A sequence of characters from the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри группировки с крайним левым символом из
+            // последовательности символов справа
             array('(?:a?)?ab', 'a{0,2}b', true),
             array('(?:a?)+ab', 'a+b', true),
             array('(?:a?)*ab', 'a+b', true),
@@ -823,9 +830,8 @@ trait qtype_preg_equality_test_provider {
             array('(?:a*)?ab', 'a+b', true),
             array('(?:a*)+ab', 'a+b', true),
             array('(?:a*)*ab', 'a+b', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character inside a subpattern with the leftmost character in the sequence
-            // Characters to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри подмаски с крайним левым символом из последовательности
             array('(a?)?ab', '(a?)?ab', true),
             array('(a?)+ab', '(a?)+ab', true),
             array('(a?)*ab', '(a?)*ab', true),
@@ -835,33 +841,32 @@ trait qtype_preg_equality_test_provider {
             array('(a*)?ab', '(a*)ab', true),
             array('(a*)+ab', '(a*)ab', true),
             array('(a*)*ab', '(a*)ab', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character within the group with the leftmost character of the
-            // A sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символов справа
+            // символа внутри группировки с крайним левым символом из
+            // последовательности символов слева
             array('ab(?:a?){1,2}', 'aba{0,2}', true),
             array('ab(?:a+){1,2}', 'aba+', true),
             array('ab(?:a*){1,2}', 'aba*', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character inside a subpattern with the leftmost character in the sequence
-            // Characters left
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри подмаски с крайним левым символом из последовательности
             array('ab(a?){1,2}', 'ab(a?){1,2}', true),
             array('ab(a+){1,2}', 'ab(a+){1,2}', true),
             array('ab(a*){1,2}', 'ab(a*)', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character within the group with the leftmost character of the
-            // A sequence of characters from the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символов слева
+            // символа внутри группировки с крайним левым символом из
+            // последовательности символов справа
             array('(?:a?){1,2}ab', 'a{1,3}b', true),
             array('(?:a+){1,2}ab', 'a+b', true),
             array('(?:a*){1,2}ab', 'a+b', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character inside a subpattern with the leftmost character in the sequence
-            // Characters to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри подмаски с крайним левым символом из последовательности
             array('(a?){1,2}ab', '(a?){1,2}ab', true),
             array('(a+){1,2}ab', '(a+){1,2}ab', true),
             array('(a*){1,2}ab', '(a*)ab', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters within the group with
-            // Character on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри группировки с
             array('a(?:ab?)?', 'a(?:ab?)?', true),
             array('a(?:ab?)+', 'a(?:ab?)+', true),
             array('a(?:ab?)*', 'a(?:ab?)*', true),
@@ -871,9 +876,8 @@ trait qtype_preg_equality_test_provider {
             array('a(?:ab*)?', 'a(?:ab*)?', true),
             array('a(?:ab*)+', 'a(?:ab*)+', true),
             array('a(?:ab*)*', 'a(?:ab*)*', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters inside a subpattern with
-            // Character on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри подмаски с
             array('a(ab?)?', 'a(ab?)?', true),
             array('a(ab?)+', 'a(ab?)+', true),
             array('a(ab?)*', 'a(ab?)*', true),
@@ -883,9 +887,8 @@ trait qtype_preg_equality_test_provider {
             array('a(ab*)?', 'a(ab*)?', true),
             array('a(ab*)+', 'a(ab*)+', true),
             array('a(ab*)*', 'a(ab*)*', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters within the group with
-            // Character to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри группировки с
             array('(?:ab?)?a', '(?:ab?)?a', true),
             array('(?:ab?)+a', '(?:ab?)+a', true),
             array('(?:ab?)*a', '(?:ab?)*a', true),
@@ -894,10 +897,13 @@ trait qtype_preg_equality_test_provider {
             array('(?:ab+)*a', '(?:ab+)*a', true),
             array('(?:ab*)?a', '(?:ab*)?a', true),
             array('(?:ab*)+a', '(?:ab*)+a', true),
+            // символов справа
+            // символом слева
+            // символом слева
+            // символом справа
             array('(?:ab*)*a', '(?:ab*)*a', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters inside a subpattern with
-            // Character to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри подмаски с
             array('(ab?)?a', '(ab?)?a', true),
             array('(ab?)+a', '(ab?)+a', true),
             array('(ab?)*a', '(ab?)*a', true),
@@ -907,45 +913,45 @@ trait qtype_preg_equality_test_provider {
             array('(ab*)?a', '(ab*)?a', true),
             array('(ab*)+a', '(ab*)+a', true),
             array('(ab*)*a', '(ab*)*a', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters within the group with
-            // Character on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри группировки с
             array('a(?:ab?){1,2}', 'a(?:ab?){1,2}', true),
             array('a(?:ab+){1,2}', 'a(?:ab+){1,2}', true),
             array('a(?:ab*){1,2}', 'a(?:ab*)', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters inside a subpattern with
-            // Character on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри подмаски с
             array('a(ab?){1,2}', 'a(ab?){1,2}', true),
             array('a(ab+){1,2}', 'a(ab+){1,2}', true),
             array('a(ab*){1,2}', 'a(ab*){1,2}', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters within the group with
-            // Character to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри группировки с
             array('(?:ab?){1,2}a', '(?:ab?){1,2}a', true),
             array('(?:ab+){1,2}a', '(?:ab+){1,2}a', true),
             array('(?:ab*){1,2}a', '(?:ab*){1,2}a', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters inside a subpattern with
-            // Character to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри подмаски с
             array('(ab?){1,2}a', '(ab?){1,2}a', true),
             array('(ab+){1,2}a', '(ab+){1,2}a', true),
             array('(ab*){1,2}a', '(ab*)a', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters within the group with
-            // Leftmost character of a sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри группировки с
+            // крайним левым символом из последовательности символов слева
             array('ab(?:ab?)?', 'ab(?:ab?)?', true),
             array('ab(?:ab?)+', 'ab(?:ab?)+', true),
             array('ab(?:ab?)*', 'ab(?:ab?)*', true),
+            // символом справа
+            // символом слева
+            // символом слева
+            // символом справа
+            // символом слева
             array('ab(?:ab+)?', 'ab(?:ab+)?', true),
             array('ab(?:ab+)+', 'ab(?:ab+)+', true),
             array('ab(?:ab+)*', 'ab(?:ab+)*', true),
             array('ab(?:ab*)?', 'ab(?:ab*)?', true),
             array('ab(?:ab*)+', 'ab(?:ab*)+', true),
             array('ab(?:ab*)*', 'ab(?:ab*)*', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters inside a subpattern with extreme
-            // Leftmost character in the sequence of characters left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри подмаски с крайним
             array('ab(ab?)?', 'ab(ab?)?', true),
             array('ab(ab?)+', 'ab(ab?)+', true),
             array('ab(ab?)*', 'ab(ab?)*', true),
@@ -955,9 +961,9 @@ trait qtype_preg_equality_test_provider {
             array('ab(ab*)?', 'ab(ab*)?', true),
             array('ab(ab*)+', 'ab(ab*)+', true),
             array('ab(ab*)*', 'ab(ab*)*', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters within the group with
-            // Leftmost character of a sequence of characters to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри группировки с
+            // крайним левым символом из последовательности символов справа
             array('(?:ab?)?ab', '(?:ab?)?ab', true),
             array('(?:ab?)+ab', '(?:ab?)+ab', true),
             array('(?:ab?)*ab', '(?:ab?)*ab', true),
@@ -967,9 +973,8 @@ trait qtype_preg_equality_test_provider {
             array('(?:ab*)?ab', '(?:ab*)?ab', true),
             array('(?:ab*)+ab', '(?:ab*)+ab', true),
             array('(?:ab*)*ab', '(?:ab*)*ab', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters inside a subpattern with extreme
-            // Leftmost character of a sequence of characters from the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри подмаски с крайним
             array('(ab?)?ab', '(ab?)?ab', true),
             array('(ab?)+ab', '(ab?)+ab', true),
             array('(ab?)*ab', '(ab?)*ab', true),
@@ -979,33 +984,35 @@ trait qtype_preg_equality_test_provider {
             array('(ab*)?ab', '(ab*)?ab', true),
             array('(ab*)+ab', '(ab*)+ab', true),
             array('(ab*)*ab', '(ab*)*ab', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters within the group with
-            // Leftmost character of a sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левым символом из последовательности символов слева
+            // левым символом из последовательности символов справа
+            // левого символа из последовательности символов внутри группировки с
+            // крайним левым символом из последовательности символов слева
             array('ab(?:ab?){1,2}', 'ab(?:ab?){1,2}', true),
             array('ab(?:ab+){1,2}', 'ab(?:ab+){1,2}', true),
             array('ab(?:ab*){1,2}', 'ab(?:ab*){1,2}', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters inside a subpattern with extreme
-            // Leftmost character in the sequence of characters left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри подмаски с крайним
             array('ab(ab?){1,2}', 'ab(ab?){1,2}', true),
             array('ab(ab+){1,2}', 'ab(ab+){1,2}', true),
             array('ab(ab*){1,2}', 'ab(ab*){1,2}', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters within the group with
-            // Leftmost character of a sequence of characters to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри группировки с
+            // крайним левым символом из последовательности символов справа
             array('(?:ab?){1,2}ab', '(?:ab?){1,2}ab', true),
             array('(?:ab+){1,2}ab', '(?:ab+){1,2}ab', true),
             array('(?:ab*){1,2}ab', '(?:ab*){1,2}ab', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters inside a subpattern with extreme
-            // Leftmost character of a sequence of characters from the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри подмаски с крайним
             array('(ab?){1,2}ab', '(ab?){1,2}ab', true),
             array('(ab+){1,2}ab', '(ab+){1,2}ab', true),
             array('(ab*){1,2}ab', '(ab*){1,2}ab', true),
-            // Integration tests on a combination of quantifiersв: single match
-            // Character within the group with the leftmost character of the
-            // A sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // левым символом из последовательности символов слева
+            // левым символом из последовательности символов справа
+            // символа внутри группировки с крайним левым символом из
+            // последовательности символов слева
             array('ab(?:a?)?', 'aba?', true),
             array('ab(?:a?)+', 'aba*', true),
             array('ab(?:a?)*', 'aba*', true),
@@ -1015,9 +1022,9 @@ trait qtype_preg_equality_test_provider {
             array('ab(?:a*)?', 'aba*', true),
             array('ab(?:a*)+', 'aba*', true),
             array('ab(?:a*)*', 'aba*', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character within the group with the leftmost character of the
-            // A sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри группировки с крайним левым символом из
+            // последовательности символов слева
             array('ab(a?)?', 'ab(a?)?', true),
             array('ab(a?)+', 'ab(a?)+', true),
             array('ab(a?)*', 'ab(a?)*', true),
@@ -1027,9 +1034,9 @@ trait qtype_preg_equality_test_provider {
             array('ab(a*)?', 'ab(a*)?', true),
             array('ab(a*)+', 'ab(a*)+', true),
             array('ab(a*)*', 'ab(a*)*', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character inside a subpattern with the rightmost characters of the
-            // A sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри подмаски с крайним правым символом из
+            // последовательности символов слева
             array('ba(?:a?)?', 'ba{1,2}', true),
             array('ba(?:a?)+', 'ba+', true),
             array('ba(?:a?)*', 'ba+', true),
@@ -1039,9 +1046,9 @@ trait qtype_preg_equality_test_provider {
             array('ba(?:a*)?', 'ba+', true),
             array('ba(?:a*)+', 'ba+', true),
             array('ba(?:a*)*', 'ba+', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character inside a subpattern with the rightmost characters of the
-            // A sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри подмаски с крайним правым символом из
+            // последовательности символов слева
             array('ba(a?)?', 'ba(a?)?', true),
             array('ba(a?)+', 'ba(a?)+', true),
             array('ba(a?)*', 'ba(a?)*', true),
@@ -1051,9 +1058,9 @@ trait qtype_preg_equality_test_provider {
             array('ba(a*)?', 'ba(a*)?', true),
             array('ba(a*)+', 'ba(a*)+', true),
             array('ba(a*)*', 'ba(a*)*', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character within the group with the rightmost characters of
-            // A sequence of characters from the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри группировки с крайним правым символом из
+            // последовательности символов справа
             array('(?:a?)?ba', 'a?ba', true),
             array('(?:a?)+ba', 'a*ba', true),
             array('(?:a?)*ba', 'a*ba', true),
@@ -1062,9 +1069,9 @@ trait qtype_preg_equality_test_provider {
             array('(?:a+)*ba', 'a*ba', true),
             array('(?:a*)?ba', 'a*ba', true),
             array('(?:a*)+ba', 'a*ba', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character within the group with the rightmost characters of
-            // A sequence of characters from the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри группировки с крайним правым символом из
+            // последовательности символов справа
             array('(a?)?ba', '(a?)?ba', true),
             array('(a?)+ba', '(a?)+ba', true),
             array('(a?)*ba', '(a?)*ba', true),
@@ -1075,33 +1082,32 @@ trait qtype_preg_equality_test_provider {
             array('(a*)+ba', '(a*)+ba', true),
             array('(a*)*ba', '(a*)*ba', true),
             array('(a*)*ba', '(a*)*ba', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character within the group with the leftmost character of the
-            // A sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри группировки с крайним левым символом из
+            // последовательности символов слева
             array('ba(?:a?){1,2}', 'ba{1,3}', true),
             array('ba(?:a+){1,2}', 'ba{2,}', true),
             array('ba(?:a*){1,2}', 'ba+', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character inside a subpattern with the rightmost characters of the
-            // A sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри подмаски с крайним правым символом из
+            // последовательности символов слева
             array('ba(a?){1,2}', 'ba(a?){1,2}', true),
             array('ba(a+){1,2}', 'ba(a+){1,2}', true),
             array('ba(a*){1,2}', 'ba(a*){1,2}', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character within the group with the rightmost characters of
-            // A sequence of characters from the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри группировки с крайним правым символом из
+            // последовательности символов справа
             array('(?:a?){1,2}ba', 'a{0,2}ba', true),
             array('(?:a+){1,2}ba', 'a+ba', true),
             array('(?:a*){1,2}ba', 'a*ba', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character inside a subpattern with the rightmost characters of the
-            // A sequence of characters from the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри подмаски с крайним правым символом из
+            // последовательности символов справа
             array('(a?){1,2}ba', '(a?){1,2}ba', true),
             array('(a+){1,2}ba', '(a+){1,2}ba', true),
             array('(a*){1,2}ba', '(a*){1,2}ba', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Right character sequence of characters within the group with
-            // Character on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри группировки с
             array('a(?:ba?)?', 'a(?:ba?)?', true),
             array('a(?:ba?)+', 'a(?:ba?)+', true),
             array('a(?:ba?)*', 'a(?:ba?)*', true),
@@ -1109,11 +1115,11 @@ trait qtype_preg_equality_test_provider {
             array('a(?:ba+)+', 'a(?:ba+)+', true),
             array('a(?:ba+)*', 'a(?:ba+)*', true),
             array('a(?:ba*)?', 'a(?:ba*)?', true),
+            // символом слева
             array('a(?:ba*)+', 'a(?:ba*)+', true),
             array('a(?:ba*)*', 'a(?:ba*)*', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Rightmost character of the character sequences inside a subpattern with
-            // Character on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри подмаски с
             array('a(ba?)?', 'a(ba?)?', true),
             array('a(ba?)+', 'a(ba?)+', true),
             array('a(ba?)*', 'a(ba?)*', true),
@@ -1123,9 +1129,8 @@ trait qtype_preg_equality_test_provider {
             array('a(ba*)?', 'a(ba*)?', true),
             array('a(ba*)+', 'a(ba*)+', true),
             array('a(ba*)*', 'a(ba*)*', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Right character sequence of characters within the group with
-            // Character to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри группировки с
             array('(?:ba?)?a', '(?:ba?)?a', true),
             array('(?:ba?)+a', '(?:ba?)+a', true),
             array('(?:ba?)*a', '(?:ba?)*a', true),
@@ -1135,9 +1140,8 @@ trait qtype_preg_equality_test_provider {
             array('(?:ba*)?a', '(?:ba*)?a', true),
             array('(?:ba*)+a', '(?:ba*)+a', true),
             array('(?:ba*)*a', '(?:ba*)*a', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Rightmost character of the character sequences inside a subpattern with
-            // Character to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри подмаски с
             array('(ba?)?a', '(ba?)?a', true),
             array('(ba?)+a', '(ba?)+a', true),
             array('(ba?)*a', '(ba?)*a', true),
@@ -1147,33 +1151,33 @@ trait qtype_preg_equality_test_provider {
             array('(ba*)?a', '(ba*)?a', true),
             array('(ba*)+a', '(ba*)+a', true),
             array('(ba*)*a', '(ba*)*a', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Right character sequence of characters within the group with
-            // Character on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри группировки с
             array('a(?:ba?){1,2}', 'a(?:ba?){1,2}', true),
             array('a(?:ba+){1,2}', 'a(?:ba+){1,2}', true),
+            // символом слева
+            // символом справа
+            // символом справа
+            // символом слева
             array('a(?:ba*){1,2}', 'a(?:ba*){1,2}', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Rightmost character of the character sequences inside a subpattern with
-            // Character on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри подмаски с
             array('a(ba?){1,2}', 'a(ba?){1,2}', true),
             array('a(ba+){1,2}', 'a(ba+){1,2}', true),
             array('a(ba*){1,2}', 'a(ba*){1,2}', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Right character sequence of characters within the group with
-            // Character to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри группировки с
             array('(?:ba?){1,2}a', '(?:ba?){1,2}a', true),
             array('(?:ba+){1,2}a', '(?:ba+){1,2}a', true),
             array('(?:ba*){1,2}a', '(?:ba*){1,2}a', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Rightmost character of the character sequences inside a subpattern with
-            // Character on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри подмаски с
             array('(ba?){1,2}a', '(ba?){1,2}a', true),
             array('(ba+){1,2}a', '(ba+){1,2}a', true),
             array('(ba*){1,2}a', '(ba*){1,2}a', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters within the group with
-            // The rightmost characters of a sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри группировки с
+            // крайним правым символом из последовательности символов слева
             array('ba(?:ab?)?', 'ba(?:ab?)?', true),
             array('ba(?:ab?)+', 'ba(?:ab?)+', true),
             array('ba(?:ab?)*', 'ba(?:ab?)*', true),
@@ -1183,9 +1187,9 @@ trait qtype_preg_equality_test_provider {
             array('ba(?:ab*)?', 'ba(?:ab*)?', true),
             array('ba(?:ab*)+', 'ba(?:ab*)+', true),
             array('ba(?:ab*)*', 'ba(?:ab*)*', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Right character sequence of characters within the group with
-            // Leftmost character of a sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри группировки с
+            // крайним левым символом из последовательности символов слева
             array('ab(?:ba?)?', 'ab(?:ba?)?', true),
             array('ab(?:ba?)+', 'ab(?:ba?)+', true),
             array('ab(?:ba?)*', 'ab(?:ba?)*', true),
@@ -1195,9 +1199,11 @@ trait qtype_preg_equality_test_provider {
             array('ab(?:ba*)?', 'ab(?:ba*)?', true),
             array('ab(?:ba*)+', 'ab(?:ba*)+', true),
             array('ab(?:ba*)*', 'ab(?:ba*)*', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters inside a subpattern with extreme
-            // Right character from a sequence of characters on the left
+            // символом слева
+            // символом справа
+            // символом слева
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри подмаски с крайним
             array('ba(ab?)?', 'ba(ab?)?', true),
             array('ba(ab?)+', 'ba(ab?)+', true),
             array('ba(ab?)*', 'ba(ab?)*', true),
@@ -1207,9 +1213,9 @@ trait qtype_preg_equality_test_provider {
             array('ba(ab*)?', 'ba(ab*)?', true),
             array('ba(ab*)+', 'ba(ab*)+', true),
             array('ba(ab*)*', 'ba(ab*)*', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Rightmost character of the character sequences inside a subpattern with
-            // Leftmost character of a sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри подмаски с
+            // крайним левым символом из последовательности символов слева
             array('ab(ba?)?', 'ab(ba?)?', true),
             array('ab(ba?)+', 'ab(ba?)+', true),
             array('ab(ba?)*', 'ab(ba?)*', true),
@@ -1219,9 +1225,9 @@ trait qtype_preg_equality_test_provider {
             array('ab(ba*)?', 'ab(ba*)?', true),
             array('ab(ba*)+', 'ab(ba*)+', true),
             array('ab(ba*)*', 'ab(ba*)*', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters within the group with
-            // The rightmost characters of a sequence of characters to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри группировки с
+            // крайним правым символом из последовательности символов справа
             array('(?:ab?)?ba', '(?:ab?)?ba', true),
             array('(?:ab?)+ba', '(?:ab?)+ba', true),
             array('(?:ab?)*ba', '(?:ab?)*ba', true),
@@ -1231,21 +1237,21 @@ trait qtype_preg_equality_test_provider {
             array('(?:ab*)?ba', '(?:ab*)?ba', true),
             array('(?:ab*)+ba', '(?:ab*)+ba', true),
             array('(?:ab*)*ba', '(?:ab*)*ba', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Right character sequence of characters within the group with
-            // Leftmost character of a sequence of characters to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри группировки с
+            // крайним левым символом из последовательности символов справа
             array('(?:ba?)?ab', '(?:ba?)?ab', true),
             array('(?:ba?)+ab', '(?:ba?)+ab', true),
             array('(?:ba?)*ab', '(?:ba?)*ab', true),
             array('(?:ba+)?ab', '(?:ba+)?ab', true),
+            // правым символом из последовательности символов слева
             array('(?:ba+)+ab', '(?:ba+)+ab', true),
             array('(?:ba+)*ab', '(?:ba+)*ab', true),
             array('(?:ba*)?ab', '(?:ba*)?ab', true),
             array('(?:ba*)+ab', '(?:ba*)+ab', true),
             array('(?:ba*)*ab', '(?:ba*)*ab', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters inside a subpattern with extreme
-            // Right character from a sequence of characters from the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри подмаски с крайним
             array('(ab?)?ba', '(ab?)?ba', true),
             array('(ab?)+ba', '(ab?)+ba', true),
             array('(ab?)*ba', '(ab?)*ba', true),
@@ -1255,9 +1261,9 @@ trait qtype_preg_equality_test_provider {
             array('(ab*)?ba', '(ab*)?ba', true),
             array('(ab*)+ba', '(ab*)+ba', true),
             array('(ab*)*ba', '(ab*)*ba', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Rightmost character of the character sequences inside a subpattern with
-            // Leftmost character of a sequence of characters to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри подмаски с
+            // крайним левым символом из последовательности символов справа
             array('(ba?)?ab', '(ba?)?ab', true),
             array('(ba?)+ab', '(ba?)+ab', true),
             array('(ba?)*ab', '(ba?)*ab', true),
@@ -1267,55 +1273,55 @@ trait qtype_preg_equality_test_provider {
             array('(ba*)?ab', '(ba*)?ab', true),
             array('(ba*)+ab', '(ba*)+ab', true),
             array('(ba*)*ab', '(ba*)*ab', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters within the group with
-            // The rightmost characters of a sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри группировки с
+            // крайним правым символом из последовательности символов слева
             array('ba(?:ab?){1,2}', 'ba(?:ab?){1,2}', true),
             array('ba(?:ab+){1,2}', 'ba(?:ab+){1,2}', true),
             array('ba(?:ab*){1,2}', 'ba(?:ab*){1,2}', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Right character sequence of characters within the group with
-            // Leftmost character of a sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри группировки с
+            // крайним левым символом из последовательности символов слева
             array('ab(?:ba?){1,2}', 'ab(?:ba?){1,2}', true),
             array('ab(?:ba+){1,2}', 'ab(?:ba+){1,2}', true),
             array('ab(?:ba*){1,2}', 'ab(?:ba*){1,2}', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters inside a subpattern with extreme
-            // Right character from a sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри подмаски с крайним
+            // правым символом из последовательности символов справа
+            // правым символом из последовательности символов слева
             array('ba(ab?){1,2}', 'ba(ab?){1,2}', true),
             array('ba(ab+){1,2}', 'ba(ab+){1,2}', true),
             array('ba(ab*){1,2}', 'ba(ab*){1,2}', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Rightmost character of the character sequences inside a subpattern with
-            // Leftmost character of a sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри подмаски с
+            // крайним левым символом из последовательности символов слева
             array('ab(ba?){1,2}', 'ab(ba?){1,2}', true),
             array('ab(ba+){1,2}', 'ab(ba+){1,2}', true),
             array('ab(ba*){1,2}', 'ab(ba*){1,2}', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters within the group with
-            // The rightmost characters of a sequence of characters to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри группировки с
+            // крайним правым символом из последовательности символов справа
             array('(?:ab?){1,2}ba', '(?:ab?){1,2}ba', true),
             array('(?:ab+){1,2}ba', '(?:ab+){1,2}ba', true),
             array('(?:ab*){1,2}ba', '(?:ab*){1,2}ba', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Right character sequence of characters within the group with
-            // Leftmost character of a sequence of characters to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри группировки с
+            // крайним левым символом из последовательности символов справа
             array('(?:ba?){1,2}ab', '(?:ba?){1,2}ab', true),
             array('(?:ba+){1,2}ab', '(?:ba+){1,2}ab', true),
             array('(?:ba*){1,2}ab', '(?:ba*){1,2}ab', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters inside a subpattern with extreme
-            // Right character from a sequence of characters from the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри подмаски с крайним
             array('(ab?){1,2}ba', '(ab?){1,2}ba', true),
             array('(ab+){1,2}ba', '(ab+){1,2}ba', true),
             array('(ab*){1,2}ba', '(ab*){1,2}ba', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Rightmost character of the character sequences inside a subpattern with
-            // Leftmost character of a sequence of characters to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри подмаски с
+            // крайним левым символом из последовательности символов справа
             array('(ba?){1,2}ab', '(ba?){1,2}ab', true),
             array('(ba+){1,2}ab', '(ba+){1,2}ab', true),
             array('(ba*){1,2}ab', '(ba*){1,2}ab', true),
-            // Integration tests on a combination of quantifiers: It does not help
+            // Комплексные тесты на сочетания квантификаторов: не упрощаются
             array('a(?:cb?)?', 'a(?:cb?)?', true),
             array('a(?:cb?)+', 'a(?:cb?)+', true),
             array('a(?:cb?)*', 'a(?:cb?)*', true),
@@ -1324,6 +1330,7 @@ trait qtype_preg_equality_test_provider {
             array('a(?:cb+)*', 'a(?:cb+)*', true),
             array('a(?:cb*)?', 'a(?:cb*)?', true),
             array('a(?:cb*)+', 'a(?:cb*)+', true),
+            // правым символом из последовательности символов справа
             array('a(?:cb*)*', 'a(?:cb*)*', true),
             array('a(cb?)?', 'a(cb?)?', true),
             array('a(cb?)+', 'a(cb?)+', true),
@@ -1412,401 +1419,402 @@ trait qtype_preg_equality_test_provider {
             array('(cb?){1,2}ab', '(cb?){1,2}ab', true),
             array('(cb+){1,2}ab', '(cb+){1,2}ab', true),
             array('(cb*){1,2}ab', '(cb*){1,2}ab', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character within the group with a single character to the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
             array('a(?:a)?', 'aa?', true), // или a{1,2}
             array('a(?:a)+', 'a{2,}', true),
             array('a(?:a)*', 'a+', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character inside a subpattern with a single character to the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
             array('a(a)?', 'a(a)?', true),
             array('a(a)+', 'a(a)+', true),
             array('a(a)*', 'a(a)*', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character within the group with a single character to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
             array('(?:a)?a', 'a{1,2}', true),
             array('(?:a)+a', 'a+', true),
             array('(?:a)*a', 'a+', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character inside a subpattern with a single character to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
             array('(a)?a', '(a)?a', true),
             array('(a)+a', '(a)+a', true),
             array('(a)*a', '(a)*a', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character within the group with a single character to the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
             array('a(?:a){1,2}', 'a{1,3}', true),
             array('a(?:a){3,4}', 'aa{3,4}', true),
             array('a(?:a)?{3,4}', 'aa?{3,4}', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character inside a subpattern with a single character to the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
             array('a(a){1,2}', 'a(a){1,2}', true),
             array('a(a){3,4}', 'a(a){3,4}', true),
             array('a(a)?{3,4}', 'a(a)?{3,4}', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character within the group with a single character to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
             array('(?:a){1,2}a', 'a{1,3}', true),
             array('(?:a){3,4}a', '(?:a){3,4}a', true),
             array('(?:a)?{3,4}a', '(?:a)?{3,4}a', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character inside a subpattern with a single character to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
             array('(a){1,2}a', '(a){1,2}a', true),
             array('(a){3,4}a', '(a){3,4}a', true),
             array('(a)?{3,4}a', '(a)?{3,4}a', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character within the group with the leftmost character of the
-            // A sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри группировки с одиночным символом слева
+            // символа внутри подмаски с одиночным символом слева
+            // символа внутри группировки с одиночным символом справа
+            // символа внутри подмаски с одиночным символом справа
+            // символа внутри группировки с одиночным символом слева
+            // символа внутри подмаски с одиночным символом слева
+            // символа внутри группировки с одиночным символом справа
+            // символа внутри подмаски с одиночным символом справа
+            // символа внутри группировки с крайним левым символом из
+            // последовательности символов слева
             array('ab(?:a)?', 'aba?', true),
             array('ab(?:a)+', 'aba+', true),
             array('ab(?:a)*', 'aba*', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character inside a subpattern with the leftmost character in the sequence
-            // Characters left
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри подмаски с крайним левым символом из последовательности
             array('ab(a)?', 'ab(a)?', true),
             array('ab(a)+', 'ab(a)+', true),
             array('ab(a)*', 'ab(a)*', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character within the group with the leftmost character of the
-            // A sequence of characters from the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символов слева
+            // символа внутри группировки с крайним левым символом из
+            // последовательности символов справа
             array('(?:a)?ab', 'a{0,2}b', true),
             array('(?:a)+ab', 'a{2,}b', true),
             array('(?:a)*ab', 'a+b', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character inside a subpattern with the leftmost character in the sequence
-            // Characters to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри подмаски с крайним левым символом из последовательности
             array('(a)?ab', '(a)?ab', true),
             array('(a)+ab', '(a)+ab', true),
             array('(a)*ab', '(a)*ab', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character within the group with the leftmost character of the
-            // A sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символов справа
+            // символа внутри группировки с крайним левым символом из
+            // последовательности символов слева
             array('ab(?:a){1,2}', 'aba{1,2}', true),
             array('ab(?:a){3,4}', 'aba{3,4}', true),
             array('ab(?:a)?{3,4}', 'aba?{3,4}', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character inside a subpattern with the leftmost character in the sequence
-            // Characters left
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри подмаски с крайним левым символом из последовательности
             array('ab(a){1,2}', 'ab(a){1,2}', true),
             array('ab(a){3,4}', 'ab(a){3,4}', true),
             array('ab(a)?{3,4}', 'ab(a)?{3,4}', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character within the group with the leftmost character of the
-            // A sequence of characters from the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символов слева
+            // символа внутри группировки с крайним левым символом из
+            // последовательности символов справа
             array('(?:a){1,2}ab', 'a{1,3}b', true),
             array('(?:a){3,4}ab', 'a{4,5}b', true),
             array('(?:a)?{3,4}ab', 'a?{3,4}ab', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character inside a subpattern with the leftmost character in the sequence
-            // Characters to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри подмаски с крайним левым символом из последовательности
+            // символов справа
             array('(a){1,2}ab', '(a){1,2}ab', true),
             array('(a){3,4}ab', '(a){3,4}ab', true),
             array('(a)?{3,4}ab', '(a)?{3,4}ab', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters within the group with
-            // Character on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри группировки с
             array('a(?:ab)?', 'a(?:ab)?', true),
             array('a(?:ab)+', 'a(?:ab)+', true),
             array('a(?:ab)*', 'a(?:ab)*', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters inside a subpattern with
-            // Character on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри подмаски с
             array('a(ab)?', 'a(ab?)?', true),
             array('a(ab)+', 'a(ab?)+', true),
             array('a(ab)*', 'a(ab?)*', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters within the group with
-            // Character to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри группировки с
             array('(?:ab)?a', '(?:ab)?a', true),
             array('(?:ab)+a', '(?:ab)+a', true),
             array('(?:ab)*a', '(?:ab)*a', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters inside a subpattern with
-            // Character to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри подмаски с
             array('(ab)?a', '(ab)?a', true),
             array('(ab)+a', '(ab)+a', true),
             array('(ab)*a', '(ab)*a', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters within the group with
-            // Character on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри группировки с
             array('a(?:ab){1,2}', 'a(?:ab){1,2}', true),
             array('a(?:ab){3,4}', 'a(?:ab){3,4}', true),
             array('a(?:ab)?{3,4}', 'a(?:ab)?{3,4}', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters inside a subpattern with
-            // Character on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри подмаски с
             array('a(ab){1,2}', 'a(ab){1,2}', true),
             array('a(ab){3,4}', 'a(ab){3,4}', true),
             array('a(ab)?{3,4}', 'a(ab)?{3,4}', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters within the group with
-            // Character to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри группировки с
             array('(?:ab){1,2}a', '(?:ab){1,2}a', true),
+            // символом слева
+            // символом слева
+            // символом справа
+            // символом справа
+            // символом слева
+            // символом слева
+            // символом справа
             array('(?:ab){3,4}a', '(?:ab){3,4}a', true),
             array('(?:ab)?{3,4}a', '(?:ab)?{3,4}a', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters inside a subpattern with the character
-            // on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри подмаски с имволом
             array('(ab){1,2}a', '(ab){1,2}a', true),
             array('(ab){3,4}a', '(ab){3,4}a', true),
             array('(ab)?{3,4}a', '(ab)?(3,4)a', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters within the group with
-            // Leftmost character of a sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри группировки с
+            // крайним левым символом из последовательности символов слева
             array('ab(?:ab)?', '(?:ab){1,2}', true),
             array('ab(?:ab)+', '(?:ab){2,}', true),
             array('ab(?:ab)*', '(?:ab)+', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters inside a subpattern with extreme
-            // Leftmost character in the sequence of characters left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри подмаски с крайним
             array('ab(ab)?', 'ab(ab?)?', true),
             array('ab(ab)+', 'ab(ab?)+', true),
             array('ab(ab)*', 'ab(ab?)*', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters within the group with
-            // Leftmost character of a sequence of characters to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри группировки с
+            // крайним левым символом из последовательности символов справа
             array('(?:ab)?ab', '(?:ab){1,2}', true),
             array('(?:ab)+ab', '(?:ab?){2,}', true),
             array('(?:ab)*ab', '(?:ab?)+', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters inside a subpattern with extreme
-            // Leftmost character of a sequence of characters from the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри подмаски с крайним
             array('(ab)?ab', '(ab)?ab', true),
             array('(ab)+ab', '(ab)+ab', true),
             array('(ab)*ab', '(ab)*ab', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters within the group with
-            // Leftmost character of a sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри группировки с
+            // крайним левым символом из последовательности символов слева
             array('ab(?:ab){1,2}', '(?:ab){2,3}', true),
             array('ab(?:ab){3,4}', '(?:ab+){4,5}', true),
             array('ab(?:ab)?{3,4}', 'ab(?:ab)?{1,2}', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters inside a subpattern with extreme
-            // Leftmost character in the sequence of characters left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри подмаски с крайним
             array('ab(ab){1,2}', 'ab(ab){1,2}', true),
             array('ab(ab){3,4}', 'ab(ab){3,4}', true),
+            // слева
+            // левым символом из последовательности символов слева
+            // левым символом из последовательности символов справа
+            // левым символом из последовательности символов слева
             array('ab(ab)?{3,4}', 'ab(ab)?{3,4}', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters within the group with
-            // Leftmost character of a sequence of characters to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри группировки с
+            // крайним левым символом из последовательности символов справа
             array('(?:ab){1,2}ab', '(?:ab){1,2}ab', true),
             array('(?:ab){3,4}ab', '(?:ab){4,5}', true),
             array('(?:ab)?{3,4}ab', '(?:ab)?{3,4}ab', true),
-            // Integration tests on a combination of quantifiers: совпадение крайнего
-            // Leftmost character of a sequence of characters inside a subpattern with extreme
-            // Leftmost character of a sequence of characters from the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри подмаски с крайним
             array('(ab){1,2}ab', '(ab){1,2}ab', true),
             array('(ab){3,4}ab', '(ab){3,4}ab', true),
             array('(ab)?{3,4}ab', '(ab)?{3,4}ab', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character within the group with the leftmost character of the
-            // A sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // левым символом из последовательности символов справа
+            // символа внутри группировки с крайним левым символом из
+            // последовательности символов слева
             array('ab(?:a)?', 'aba?', true),
             array('ab(?:a)+', 'aba+', true),
             array('ab(?:a)*', 'aba*', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character within the group with the leftmost character of the
-            // A sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри группировки с крайним левым символом из
+            // последовательности символов слева
             array('ab(a)?', 'ab(a)?', true),
             array('ab(a)+', 'ab(a)+', true),
             array('ab(a)*', 'ab(a)*', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character inside a subpattern with the rightmost characters of the
-            // A sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри подмаски с крайним правым символом из
+            // последовательности символов слева
             array('ba(?:a)?', 'ba{1,2}', true),
             array('ba(?:a)+', 'ba{2,}', true),
             array('ba(?:a)*', 'ba+', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character inside a subpattern with the rightmost characters of the
-            // A sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри подмаски с крайним правым символом из
+            // последовательности символов слева
             array('ba(a)?', 'ba(a)?', true),
             array('ba(a)+', 'ba(a)+', true),
             array('ba(a)*', 'ba(a)*', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character within the group with the rightmost characters of
-            // A sequence of characters from the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри группировки с крайним правым символом из
+            // последовательности символов справа
             array('(?:a)?ba', 'a?ba', true),
             array('(?:a)+ba', 'a+ba', true),
             array('(?:a)*ba', 'a*ba', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character within the group with the rightmost characters of
-            // A sequence of characters from the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри группировки с крайним правым символом из
+            // последовательности символов справа
             array('(a)?ba', '(a)?ba', true),
             array('(a)+ba', '(a)+ba', true),
             array('(a)*ba', '(a)*ba', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character within the group with the leftmost character of the
-            // A sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри группировки с крайним левым символом из
+            // последовательности символов слева
             array('ba(?:a){1,2}', 'ba{1,3}', true),
             array('ba(?:a){3,4}', 'baa{3,4}', true),
             array('ba(?:a)?{3,4}', 'ba(?:a)?{3,4}', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character inside a subpattern with the rightmost characters of the
-            // A sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри подмаски с крайним правым символом из
+            // последовательности символов слева
             array('ba(a){1,2}', 'ba(a){1,2}', true),
             array('ba(a){3,4}', 'ba(a){3,4}', true),
             array('ba(a)?{3,4}', 'ba(a)?{3,4}', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character within the group with the rightmost characters of
-            // A sequence of characters from the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри группировки с крайним правым символом из
+            // последовательности символов справа
             array('(?:a){1,2}ba', 'a{1,2}ba', true),
             array('(?:a){3,4}ba', 'a{3,4}ba', true),
             array('(?:a)?{3,4}ba', 'a?{3,4}ba', true),
-            // Integration tests on a combination of quantifiers: single match
-            // Character inside a subpattern with the rightmost characters of the
-            // A sequence of characters from the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение одиночного
+            // символа внутри подмаски с крайним правым символом из
+            // последовательности символов справа
             array('(a){1,2}ba', '(a){1,2}ba', true),
             array('(a){3,4}ba', '(a){3,4}ba', true),
             array('(a)?{3,4}ba', '(a)?{3,4}ba', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Right character sequence of characters within the group with
-            // Character on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри группировки с
             array('a(?:ba)?', 'a(?:ba)?', true),
             array('a(?:ba)+', 'a(?:ba)+', true),
             array('a(?:ba)*', 'a(?:ba)*', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Right character sequence of characters within the subpattern with
-            // Character on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри группировки с
             array('a(ba)?', 'a(ba)?', true),
             array('a(ba)+', 'a(ba?)+', true),
             array('a(ba)*', 'a(ba?)*', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Rightmost character of the character sequences inside a subpattern with
-            // Character on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // символом слева
+            // символом слева
+            // правого символа из последовательности символов внутри подмаски с
             array('a(ba)?', 'a(ba)?', true),
             array('a(ba)+', 'a(ba)+', true),
             array('a(ba)*', 'a(ba)*', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Right character sequence of characters within the group with
-            // Character to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри группировки с
             array('(?:ba)?a', '(?:ba)?a', true),
             array('(?:ba)+a', '(?:ba)+a', true),
             array('(?:ba)*a', '(?:ba)*a', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Rightmost character of the character sequences inside a subpattern with
-            // Character to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри подмаски с
             array('(ba)?a', '(ba)?a', true),
             array('(ba)+a', '(ba)+a', true),
             array('(ba)*a', '(ba)*a', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Right character sequence of characters within the group with
-            // Character on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри группировки с
             array('a(?:ba){1,2}', 'a(?:ba){1,2}', true),
             array('a(?:ba){3,4}', 'a(?:ba){1,2}', true),
             array('a(?:ba)?{3,4}', 'a(?:ba){1,2}', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Rightmost character of the character sequences inside a subpattern with
-            // Character on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри подмаски с
             array('a(ba){1,2}', 'a(ba){1,2}', true),
             array('a(ba){3,4}', 'a(ba){3,4}', true),
             array('a(ba)?{3,4}', 'a(ba)?{3,4}', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Right character sequence of characters within the group with
-            // Character to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри группировки с
             array('(?:ba){1,2}a', '(?:ba){1,2}a', true),
             array('(?:ba){3,4}a', '(?:ba){3,4}a', true),
             array('(?:ba)?{3,4}a', '(?:ba)?{3,4}a', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Rightmost character of the character sequences inside a subpattern with
-            // Character on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри подмаски с
             array('(ba){1,2}a', '(ba){1,2}a', true),
             array('(ba){3,4}a', '(ba){3,4}a', true),
             array('(ba){3,4}a', '(ba){3,4}a', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters within the group with
-            // Rightmost characters of a sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри группировки с
+            // крайним правым символом из последовательности символов слева
+            // символом слева
+            // символом справа
+            // символом справа
+            // символом слева
+            // символом слева
+            // символом справа
+            // символом слева
             array('ba(?:ab)?', 'ba(?:ab)?', true),
             array('ba(?:ab)+', 'ba(?:ab)+', true),
             array('ba(?:ab)*', 'ba(?:ab)*', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Right character sequence of characters within the group with
-            // Leftmost character of a sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри группировки с
+            // крайним левым символом из последовательности символов слева
             array('ab(?:ba)?', 'ab(?:ba)?', true),
             array('ab(?:ba)+', 'ab(?:ba)+', true),
             array('ab(?:ba)*', 'ab(?:ba)*', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters inside a subpattern with extreme
-            // Right character from a sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри подмаски с крайним
             array('ba(ab)?', 'ba(ab)?', true),
             array('ba(ab)+', 'ba(ab)+', true),
             array('ba(ab)*', 'ba(ab)*', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Rightmost character of the character sequences inside a subpattern with
-            // Leftmost character of a sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри подмаски с
+            // крайним левым символом из последовательности символов слева
             array('ab(ba)?', 'ab(ba)?', true),
             array('ab(ba)+', 'ab(ba)+', true),
             array('ab(ba)*', 'ab(ba)*', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters within the group with
-            // Rightmost characters of a sequence of characters to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри группировки с
+            // крайним правым символом из последовательности символов справа
             array('(?:ab)?ba', '(?:ab)?ba', true),
             array('(?:ab)+ba', '(?:ab)+ba', true),
             array('(?:ab)*ba', '(?:ab)*ba', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Right character sequence of characters within the group with
-            // Leftmost character of a sequence of characters to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри группировки с
+            // крайним левым символом из последовательности символов справа
             array('(?:ba)?ab', '(?:ba)?ab', true),
             array('(?:ba)+ab', '(?:ba)+ab', true),
             array('(?:ba)*ab', '(?:ba)*ab', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters inside a subpattern with extreme
-            // Right character from a sequence of characters from the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри подмаски с крайним
             array('(ab)?ba', '(ab)?ba', true),
             array('(ab)+ba', '(ab)+ba', true),
             array('(ab)*ba', '(ab)*ba', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Rightmost character of the character sequences inside a subpattern with
-            // Leftmost character of a sequence of characters to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри подмаски с
+            // крайним левым символом из последовательности символов справа
             array('(ba)?ab', '(ba)?ab', true),
+            // правым символом из последовательности символов слева
+            // правым символом из последовательности символов справа
+
             array('(ba)+ab', '(ba)+ab', true),
             array('(ba)*ab', '(ba)*ab', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters within the group with
-            // Rightmost characters of a sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри группировки с
+            // крайним правым символом из последовательности символов слева
             array('ba(?:ab){1,2}', 'ba(?:ab){1,2}', true),
             array('ba(?:ab){3,4}', 'ba(?:ab){3,4}', true),
             array('ba(?:ab)?{3,4}', 'ba(?:ab)?{3,4}', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Right character sequence of characters within the group with
-            // Leftmost character of a sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри группировки с
+            // крайним левым символом из последовательности символов слева
             array('ab(?:ba){1,2}', 'ab(?:ba){1,2}', true),
             array('ab(?:ba){3,4}', 'ab(?:ba){3,4}', true),
             array('ab(?:ba)?{3,4}', 'ab(?:ba)?{3,4}', true),
-            // Integration tests on a combination of quantifiersв: match extreme
-            // Leftmost character of a sequence of characters inside a subpattern with extreme
-            // Right character from a sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри подмаски с крайним
             array('ba(ab){1,2}', 'ba(ab){1,2}', true),
             array('ba(ab){3,4}', 'ba(ab){3,4}', true),
             array('ba(ab)?{3,4}', 'ba(ab)?{3,4}', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Rightmost character of the character sequences inside a subpattern with
-            // Leftmost character of a sequence of characters on the left
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри подмаски с
+            // крайним левым символом из последовательности символов слева
             array('ab(ba){1,2}', 'ab(ba){1,2}', true),
             array('ab(ba){3,4}', 'ab(ba){3,4}', true),
             array('ab(ba)?{3,4}', 'ab(ba)?{3,4}', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters within the group with
-            // The rightmost characters of a sequence of characters to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри группировки с
+            // крайним правым символом из последовательности символов справа
             array('(?:ab){1,2}ba', '(?:ab?){1,2}ba', true),
             array('(?:ab){3,4}ba', '(?:ab+){3,4}ba', true),
             array('(?:ab)?{3,4}ba', '(?:ab*)?{3,4}ba', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Right character sequence of characters within the group with
-            // Leftmost character of a sequence of characters to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри группировки с
+            // крайним левым символом из последовательности символов справа
             array('(?:ba){1,2}ab', '(?:ba){1,2}ab', true),
             array('(?:ba){3,4}ab', '(?:ba){1,2}ab', true),
             array('(?:ba)?{3,4}ab', '(?:ba){1,2}ab', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Leftmost character of a sequence of characters inside a subpattern with extreme
-            // Right character from a sequence of characters from the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // левого символа из последовательности символов внутри подмаски с крайним
             array('(ab){1,2}ba', '(ab){1,2}ba', true),
             array('(ab){3,4}ba', '(ab){3,4}ba', true),
+            // правым символом из последовательности символов слева
+            // правым символом из последовательности символов справа
             array('(ab)?{3,4}ba', '(ab)?{3,4}ba', true),
-            // Integration tests on a combination of quantifiers: match extreme
-            // Rightmost character of the character sequences inside a subpattern with
-            // Leftmost character of a sequence of characters to the right
+            // Комплексные тесты на сочетания квантификаторов: совпадение крайнего
+            // правого символа из последовательности символов внутри подмаски с
+            // крайним левым символом из последовательности символов справа
             array('(ba){1,2}ab', '(ba){1,2}ab', true),
             array('(ba){3,4}ab', '(ba){3,4}ab', true),
             array('(ba)?{3,4}ab', '(ba)?{3,4}ab', true),
-            // Integration tests on a combination of quantifiers: three or more quantifiers
+            // Комплексные тесты на сочетания квантификаторов: три и более
             array('(?:(?:a*)?)?', 'a*', true),
             array('(?:(?:a*)?)+', 'a*', true),
             array('(?:(?:a*)?)*', 'a*', true),
@@ -1841,6 +1849,7 @@ trait qtype_preg_equality_test_provider {
             array('(?:(?:aa*)+)+', 'a+', true),
             array('(?:(?:aa*)+)*', 'a*', true),
             array('(?:(?:aa*)*)?', 'a*', true),
+            // квантификаторов
             array('(?:(?:aa*)*)+', 'a*', true),
             array('(?:(?:aa*)*)*', 'a*', true),
             array('(?:(?:aa+)?)?', 'a*', true),
@@ -1883,7 +1892,7 @@ trait qtype_preg_equality_test_provider {
             array('ab*|a', 'ab*', true),
             array('a?b|a', 'a?b?', true),
             array('a+b|a', 'a+b?', true),
-            // Conversion alternatives
+            // Преобразование альтернатив
             array('a*b|a', 'a+b?', true),
             array('(?:ab|a)?', '(?:a|ab|)', true),
             array('(?:ab|a)+', '(?ab)+|a+', true),
@@ -1900,7 +1909,8 @@ trait qtype_preg_equality_test_provider {
             array('a|aaaa?', 'a|a{3,4}', true),
             array('a|(?:ab)', '(?:ab?)', true),
             array('a|(?:aab)', 'a(?:ab)?', true),
-            // Alternative with emptiness
+            // Альтернатива
+            // Альтернатива с пустотой
             array('a?|', 'a?', true),
             array('a*|', 'a*', true),
             array('a+|', 'a*', true),
@@ -1914,7 +1924,6 @@ trait qtype_preg_equality_test_provider {
             array('a{1,}|', 'a*', true),
             array('a{0,1}|', 'a?', true),
             array('a{0,3}|', 'a{0,3}', true),
-            // Cast to character classes
             array('a|b', '[ab]', true),
             array('a|b|', '[ab]?', true),
             array('a|c|b|d', '[a-d]', true),
@@ -1926,6 +1935,7 @@ trait qtype_preg_equality_test_provider {
             array('a|b|c|[x-z]*', '[a-c]|[x-z]*', true),
             array('\s|a', '[\sa]', true),
             array('\S|a', '[\Sa]', true),
+            // Приведение к символьным классам
             array('\w|a', '[\wa]', true),
             array('\W|a', '[\Wa]', true),
             array('\d|a', '[\da]', true),
@@ -1937,14 +1947,13 @@ trait qtype_preg_equality_test_provider {
             array('a|b+', 'a|b+', true),
             array('a|b*', 'a|b*', true),
             array('(?:a|b)?', '(?:[ab])?', true),
-            // Equivalent replacement
             array('[0-9]', '\d', true),
             array('[^0-9]', '\D', true),
             array('[ \f\n\r\t\v]', '\s', true),
             array('[^ \f\n\r\t\v]', '\S', true),
             array('[[:word:]]', '\w', true),
             array('[^[:word:]]', '\W', true)
-
+            // Эквивалентная замена
         );
     }
 }

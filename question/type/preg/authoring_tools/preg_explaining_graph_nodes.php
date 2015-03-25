@@ -831,8 +831,10 @@ class qtype_preg_explaining_graph_node_template extends qtype_preg_explaining_gr
     protected function process_operator($graph) {
         $tooltip = get_string('node_template', 'qtype_preg');
         $available = qtype_preg\template::available_templates();
+        $parametersdescription = null;
         if ($this->pregnode->name != '' && array_key_exists($this->pregnode->name, $available)) {
             $label = $tooltip . '\n' . get_string('description_template_' . $this->pregnode->name, 'qtype_preg');
+            $parametersdescription = $available[$this->pregnode->name]->get_parametersdescription();
         } else {
             $label = get_string('explain_unknow_template', 'qtype_preg');
         }
@@ -845,8 +847,11 @@ class qtype_preg_explaining_graph_node_template extends qtype_preg_explaining_gr
         $template->style = ($this->pregnode->userinscription[0]->data != '(?i:...)') ? 'solid' : 'filled';
         $template->color = ($this->pregnode->userinscription[0]->data != '(?i:...)') ? 'black' : 'lightgrey';
 
+
+
         $left = new qtype_preg_explaining_graph_tool_subgraph('');
-        $left->tooltip = get_string('explain_parameter', 'qtype_preg');
+        $left->color = 'lightgray';
+        $left->tooltip = $parametersdescription === null ? get_string('explain_parameter', 'qtype_preg') :  $parametersdescription[0];
         $inner_left = $this->operands[0]->create_graph();
         $left->assume_subgraph($inner_left);
         $left->entries[] = end($inner_left->entries);
@@ -858,7 +863,8 @@ class qtype_preg_explaining_graph_node_template extends qtype_preg_explaining_gr
         $n = count($this->operands);
         for ($i = 1; $i < $n; ++$i) {
             $right = new qtype_preg_explaining_graph_tool_subgraph('');
-            $right->tooltip = get_string('explain_parameter', 'qtype_preg');
+            $right->color = 'lightgray';
+            $right->tooltip = $parametersdescription === null ? get_string('explain_parameter', 'qtype_preg') :  $parametersdescription[$i];
             $inner_right = $this->operands[$i]->create_graph();
             $right->assume_subgraph($inner_right);
             $right->entries[] = end($inner_right->entries);
@@ -866,7 +872,6 @@ class qtype_preg_explaining_graph_node_template extends qtype_preg_explaining_gr
             $template->subgraphs[] = $right;
 
             $tmplink = new qtype_preg_explaining_graph_tool_link('', end($left->exits), end($right->entries), $template);
-            $tmplink->color = 'transparent';
             $template->links[] = $tmplink;
 
             if ($i != $n-1) {
