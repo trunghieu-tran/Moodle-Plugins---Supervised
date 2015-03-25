@@ -20,7 +20,7 @@
  *
  * @package    qtype_preg
  * @copyright  2012 Oleg Sychev, Volgograd State Technical University
- * @author     Oleg Sychev <oasychev@gmail.com>
+ * @author     Oleg Sychev <oasychev@gmail.com>, Valeriy Streltsov, Elena Lepilkina
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -57,11 +57,11 @@ class qtype_preg_fa_transition {
     /** Transition from intersection part. */
     const ORIGIN_TRANSITION_INTER = 0x04;
 
-    /** @var object of qtype_preg_fa_state class - a state which transition starts from. */
+    /** @var int - state which transition starts from. */
     public $from;
     /** @var object of qtype_preg_leaf class - condition for this transition. */
     public $pregleaf;
-    /** @var object of qtype_preg_fa_state class - state which transition leads to. */
+    /** @var int - state which transition leads to. */
     public $to;
     /** @var greediness of this transition. */
     public $greediness;
