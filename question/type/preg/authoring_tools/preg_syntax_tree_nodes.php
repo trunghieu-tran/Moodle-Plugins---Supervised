@@ -451,7 +451,11 @@ class qtype_preg_syntax_tree_leaf_template extends qtype_preg_syntax_tree_leaf {
     }
 
     public function shape_color() {
-        return 'blue';
+        $available = qtype_preg\template::available_templates();
+        if ($this->pregnode->name != '' && array_key_exists($this->pregnode->name, $available)) {
+            return 'blue';
+        }
+        return 'red';
     }
 }
 
@@ -545,6 +549,14 @@ class qtype_preg_syntax_tree_node_template extends qtype_preg_syntax_tree_operat
     }
 
     public function shape_color() {
-        return 'blue';
+        $available = qtype_preg\template::available_templates();
+        if ($this->pregnode->name != '' && array_key_exists($this->pregnode->name, $available)) {
+            return 'blue';
+        }
+        return 'red';
+    }
+
+    public function label_for_edge($operand) {
+        return get_string('explain_parameter', 'qtype_preg');
     }
 }
