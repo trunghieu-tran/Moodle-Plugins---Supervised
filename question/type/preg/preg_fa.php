@@ -2004,7 +2004,7 @@ class qtype_preg_fa {
         $clones = array();
         $oldfront[] = $start;
         // Work with each state.
-        while (count($oldfront) != 0) {
+        while (!empty($oldfront)) {
             foreach ($oldfront as $curstate) {
                 // Get states from first and second automata.
                 $secondnumbers = $anotherfa->get_state_numbers();
@@ -2092,7 +2092,7 @@ class qtype_preg_fa {
             // Add new start states.
             $state = $result->get_inter_state(0, 0);
             $state = array_search($state, $resnumbers);
-            if ($state !== false) {
+            if ($state) {
                 $result->add_start_state($state);
             } else {
                 foreach ($possibleend as $start) {
@@ -2103,7 +2103,7 @@ class qtype_preg_fa {
         // Get cycle if it's nessessary.
         $newfront = array();
         $resultnumbers = $result->get_state_numbers();
-        if ($withcycle == true) {
+        if ($withcycle) {
             foreach ($possibleend as $state) {
                 $aregone = array();
                 $isfind = false;
@@ -2113,7 +2113,7 @@ class qtype_preg_fa {
                 $oldfront = $result->get_connected_states($state, !$direction);
                 $secondnumberscount = $result->get_second_numbers_count($anotherfa, $state);
                 // Analysis states of automata serching interecsting state.
-                while (count($oldfront) != 0 && !$isfind) {
+                while (!empty($oldfront) && !$isfind) {
                     foreach ($oldfront as $curstate) {
                         $aregone[] = $curstate;
                         $curnumberscount = $result->get_second_numbers_count($anotherfa, $curstate);
