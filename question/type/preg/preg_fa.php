@@ -127,6 +127,10 @@ class qtype_preg_fa_transition {
         }
     }
 
+    public function equal($other) {
+        return $this->from == $other->from && $this->to == $other->to && $this->pregleaf == $other->pregleaf;
+    }
+
     /**
      * Generates a character considering merged transitions that affect the resulting char (^ \A $ \Z \z)
      */
@@ -1443,7 +1447,7 @@ class qtype_preg_fa {
     public function copy_transitions($stateswere, $statefromsource, $workstate, $memoryfront, $source, $direction) {
         // Get origin of source automata.
         $states = $source->get_states();
-        if (count($states) != 0) {
+        if (!empty($states)) {
             $keys = array_keys($states);
             $transitions = $source->get_adjacent_transitions($states[$keys[0]], true);
             $keys = array_keys($transitions);
@@ -1481,7 +1485,18 @@ class qtype_preg_fa {
                             $transition = new qtype_preg_fa_transition($workstate, $tran->pregleaf, $memstate, $tran->origin, $tran->consumeschars);
                         }
                         $transition->set_transition_type();
-                        $this->add_transition($transition);
+                        $hassametransition = false;
+                        if ($this->has_transition($transition->from, $transition->to)) {
+                            $innertransitions = $this->adjacencymatrix[$transition->from][$transition->to];
+                            foreach ($innertransitions as $inner) {
+                                if ($transition->equal($inner)) {
+                                    $hassametransition = true;
+                                }
+                            }
+                        }
+                        if (!$hassametransition) {
+                            $this->add_transition($transition);
+                        }
                     }
                 }
             }
@@ -1505,7 +1520,18 @@ class qtype_preg_fa {
                         $transition = new qtype_preg_fa_transition($workstate, $tran->pregleaf, $state, $tran->origin, $tran->consumeschars);
                     }
                     $transition->set_transition_type();
-                    $this->add_transition($transition);
+                    $hassametransition = false;
+                        if ($this->has_transition($transition->from, $transition->to)) {
+                            $innertransitions = $this->adjacencymatrix[$transition->from][$transition->to];
+                            foreach ($innertransitions as $inner) {
+                                if ($transition->equal($inner)) {
+                                    $hassametransition = true;
+                                }
+                            }
+                        }
+                        if (!$hassametransition) {
+                            $this->add_transition($transition);
+                        }
                 }
             }
         }
@@ -1527,7 +1553,7 @@ class qtype_preg_fa {
         $newmemoryfront = array();
         // Getting origin of automata.
         $states = $source->get_states();
-        if (count($states) != 0) {
+        if (!empty($states)) {
             $keys = array_keys($states);
             $transitions = $source->get_adjacent_transitions($states[$keys[0]], true);
             $keys = array_keys($transitions);
@@ -1539,11 +1565,8 @@ class qtype_preg_fa {
         $this->remove_all_end_states();
 
         // Coping.
-        while (count ($oldfront) != 0) {
+        while (!empty($oldfront)) {
             foreach ($oldfront as $curstate) {
-                if (count($stateswere) == 0) {
-                            $stateswere = array();
-                }
                 if (!$source->is_copied_state($curstate)) {
                     // Modify states.
                     $changedstate = $source->statenumbers[$curstate];
@@ -1552,12 +1575,11 @@ class qtype_preg_fa {
                     $source->set_copied_state($curstate);
                     $isfind = false;
                     // Search among states which were in automata.
-                    if (count($stateswere) != 0) {
-                        if (in_array($changedstate, $stateswere)) {
-                            $isfind = true;
-                            $workstate = array_search($changedstate, $stateswere);
-                        }
+                    if (in_array($changedstate, $stateswere)) {
+                        $isfind = true;
+                        $workstate = array_search($changedstate, $stateswere);
                     }
+
                     // Hasn't such state.
                     if (!$isfind) {
                         $this->add_state($changedstate);
