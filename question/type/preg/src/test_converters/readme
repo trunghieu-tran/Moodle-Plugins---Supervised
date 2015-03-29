@@ -1,0 +1,9 @@
+Download the pcre library, replace pcretest with this one and build like this:
+
+export LIBS=-licuuc
+./configure --enable-utf --enable-unicode-properties
+make
+
+then you can run ./pcretest testdata/testinput1 cross_tests_from_pcre_testinput1.php
+
+this modified version forces utf8 mode so some of tests (with incorrect utf8 bytes) are lost
