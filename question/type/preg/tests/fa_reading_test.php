@@ -218,11 +218,11 @@ class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
                     }';
         $expectedresult = 'digraph {
     rankdir=LR;
-    ""0,""[shape=rarrow];
-"",2""[shape=doublecircle];
-    ""2,1""->"",2""[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
-    ""1,0""->""2,1""[label = <<B>o: [0-9] c:</B>>, color = red, penwidth = 2];
-    ""0,""->""1,0""[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+    "0,"[shape=rarrow];
+",2"[shape=doublecircle];
+    "2,1"->",2"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
+    "1,0"->"2,1"[label = <<B>o: [0-9] c:</B>>, color = red, penwidth = 2];
+    "0,"->"1,0"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
 }';
 
         $automata = qtype_preg_fa::read_fa($dotdescription);

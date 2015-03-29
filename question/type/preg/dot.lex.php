@@ -3891,11 +3891,11 @@ array(
 						case 4:
 							{
                                         if ($this->fromstate === null) {
-                                            $this->fromstate = $this->yytext();
+                                            $this->fromstate = trim($this->yytext(), '"');
                                         } else {
                                             $fromstate = $this->fromstate;
                                             $this->fromstate = null;
-                                            return $this->createToken(qtype_preg_dot_parser::TRANSITIONSTATES, array($fromstate, $this->yytext()));
+                                            return $this->createToken(qtype_preg_dot_parser::TRANSITIONSTATES, array($fromstate, trim($this->yytext(), '"')));
                                         }
                                     }
 						case -5:
@@ -3929,7 +3929,7 @@ array(
 							break;
 						case 10:
 							{
-                                $this->startstates[] = $this->yytext();
+                                $this->startstates[] = trim($this->yytext(), '"');
                             }
 						case -11:
 							break;
@@ -3947,7 +3947,7 @@ array(
 							break;
 						case 13:
 							{
-                            $this->endstates[] = $this->yytext();
+                            $this->endstates[] = trim($this->yytext(), '"');
                         }
 						case -14:
 							break;
@@ -4093,24 +4093,24 @@ array(
 						case 40:
 							{
                                         if ($this->fromstate === null) {
-                                            $this->fromstate = $this->yytext();
+                                            $this->fromstate = trim($this->yytext(), '"');
                                         } else {
                                             $fromstate = $this->fromstate;
                                             $this->fromstate = null;
-                                            return $this->createToken(qtype_preg_dot_parser::TRANSITIONSTATES, array($fromstate, $this->yytext()));
+                                            return $this->createToken(qtype_preg_dot_parser::TRANSITIONSTATES, array($fromstate, trim($this->yytext(), '"')));
                                         }
                                     }
 						case -40:
 							break;
 						case 41:
 							{
-                                $this->startstates[] = $this->yytext();
+                                $this->startstates[] = trim($this->yytext(), '"');
                             }
 						case -41:
 							break;
 						case 42:
 							{
-                            $this->endstates[] = $this->yytext();
+                            $this->endstates[] = trim($this->yytext(), '"');
                         }
 						case -42:
 							break;
@@ -4123,11 +4123,11 @@ array(
 						case 45:
 							{
                                         if ($this->fromstate === null) {
-                                            $this->fromstate = $this->yytext();
+                                            $this->fromstate = trim($this->yytext(), '"');
                                         } else {
                                             $fromstate = $this->fromstate;
                                             $this->fromstate = null;
-                                            return $this->createToken(qtype_preg_dot_parser::TRANSITIONSTATES, array($fromstate, $this->yytext()));
+                                            return $this->createToken(qtype_preg_dot_parser::TRANSITIONSTATES, array($fromstate, trim($this->yytext(), '"')));
                                         }
                                     }
 						case -44:

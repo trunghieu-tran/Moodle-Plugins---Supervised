@@ -126,7 +126,7 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
                 }
 
 <STARTSTATES> {FASTATE}";" {
-                                $this->startstates[] = $this->yytext();
+                                $this->startstates[] = trim($this->yytext(), '"');
                             }
 <STARTSTATES> [\n] {
                     $this->endstates = array();
@@ -137,7 +137,7 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
 <STARTSTATES> {WHITESPACE}|";" {}
 
 <ENDSTATES> {FASTATE}";" {
-                            $this->endstates[] = $this->yytext();
+                            $this->endstates[] = trim($this->yytext(), '"');
                         }
 <ENDSTATES> [\n] {
                     $this->fromstate = null;
@@ -149,11 +149,11 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
 
 <YYINITIAL> ({FASTATE}"->"{FASTATE}) {
                                         if ($this->fromstate === null) {
-                                            $this->fromstate = $this->yytext();
+                                            $this->fromstate = trim($this->yytext(), '"');
                                         } else {
                                             $fromstate = $this->fromstate;
                                             $this->fromstate = null;
-                                            return $this->createToken(qtype_preg_dot_parser::TRANSITIONSTATES, array($fromstate, $this->yytext()));
+                                            return $this->createToken(qtype_preg_dot_parser::TRANSITIONSTATES, array($fromstate, trim($this->yytext(), '"')));
                                         }
 
                                     }
