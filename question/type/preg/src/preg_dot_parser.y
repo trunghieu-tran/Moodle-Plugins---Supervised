@@ -29,7 +29,11 @@
 
 start ::= DIGRAPH automaton_body CLOSEBODY.
 
-automaton_body ::= START(A) END(B) transitions_list. {
+automaton_body ::= start_end_states_description.
+automaton_body ::= start_end_states_description transitions_list.
+
+
+start_end_states_description ::= START(A) END(B). {
     foreach (A as $start) {
         $this->automaton->add_start_state($this->automaton->add_state($start));
     }
@@ -37,6 +41,7 @@ automaton_body ::= START(A) END(B) transitions_list. {
         $this->automaton->add_end_state($this->automaton->add_state($end));
     }
 }
+
 transitions_list ::= transition_stmt(A).{
 	$fromid = $this->automaton->add_state(A->from);
 	$toid = $this->automaton->add_state(A->to);
