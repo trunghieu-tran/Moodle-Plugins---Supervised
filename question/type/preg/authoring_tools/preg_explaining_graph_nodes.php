@@ -859,6 +859,7 @@ class qtype_preg_explaining_graph_node_template extends qtype_preg_explaining_gr
             $right = $inner_left;
         } else {
             $left->assume_subgraph($inner_left);
+            $left->label = $left->tooltip;
             $left->entries[] = end($inner_left->entries);
             $left->exits[] = end($inner_left->exits);
             $template->subgraphs[] = $left;
@@ -872,6 +873,7 @@ class qtype_preg_explaining_graph_node_template extends qtype_preg_explaining_gr
             $right->tooltip = $parametersdescription === null ? get_string('explain_parameter', 'qtype_preg') :  $parametersdescription[$i];
             $inner_right = $this->operands[$i]->create_graph();
             $right->assume_subgraph($inner_right);
+            $right->label = $right->tooltip;
             $right->entries[] = end($inner_right->entries);
             $right->exits[] = end($inner_right->exits);
             $template->subgraphs[] = $right;
