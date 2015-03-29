@@ -126,7 +126,8 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
                 }
 
 <STARTSTATES> {FASTATE}";" {
-                                $this->startstates[] = trim($this->yytext(), '"');
+                                $state = trim($this->yytext(), ';');
+                                $this->startstates[] = trim($state, '"');
                             }
 <STARTSTATES> [\n] {
                     $this->endstates = array();
@@ -137,7 +138,8 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
 <STARTSTATES> {WHITESPACE}|";" {}
 
 <ENDSTATES> {FASTATE}";" {
-                            $this->endstates[] = trim($this->yytext(), '"');
+                            $state = trim($this->yytext(), ';');
+                            $this->endstates[] = trim($state, '"');
                         }
 <ENDSTATES> [\n] {
                     $this->fromstate = null;

@@ -3929,7 +3929,8 @@ array(
 							break;
 						case 10:
 							{
-                                $this->startstates[] = trim($this->yytext(), '"');
+                                $state = trim($this->yytext(), ';');
+                                $this->startstates[] = trim($state, '"');
                             }
 						case -11:
 							break;
@@ -3947,7 +3948,8 @@ array(
 							break;
 						case 13:
 							{
-                            $this->endstates[] = trim($this->yytext(), '"');
+                            $state = trim($this->yytext(), ';');
+                            $this->endstates[] = trim($state, '"');
                         }
 						case -14:
 							break;
@@ -4104,13 +4106,15 @@ array(
 							break;
 						case 41:
 							{
-                                $this->startstates[] = trim($this->yytext(), '"');
+                                $state = trim($this->yytext(), ';');
+                                $this->startstates[] = trim($state, '"');
                             }
 						case -41:
 							break;
 						case 42:
 							{
-                            $this->endstates[] = trim($this->yytext(), '"');
+                            $state = trim($this->yytext(), ';');
+                            $this->endstates[] = trim($state, '"');
                         }
 						case -42:
 							break;

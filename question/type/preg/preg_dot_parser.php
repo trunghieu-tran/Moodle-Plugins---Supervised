@@ -157,9 +157,9 @@ class qtype_preg_dot_parser#line 108 "../preg_dot_parser.php"
     const OPEN                           = 16;
     const LEAF                           = 17;
     const CLOSE                          = 18;
-    const YY_NO_ACTION = 62;
-    const YY_ACCEPT_ACTION = 61;
-    const YY_ERROR_ACTION = 60;
+    const YY_NO_ACTION = 65;
+    const YY_ACCEPT_ACTION = 64;
+    const YY_ERROR_ACTION = 63;
 
 /* Next are that tables used to determine what action to take based on the
 ** current state and lookahead token.  These tables are used to implement
@@ -211,35 +211,35 @@ class qtype_preg_dot_parser#line 108 "../preg_dot_parser.php"
 **                          shifting non-terminals after a reduce.
 **  self::$yy_default       Default action for each state.
 */
-    const YY_SZ_ACTTAB = 57;
+    const YY_SZ_ACTTAB = 53;
 static public $yy_action = array(
- /*     0 */     7,   17,   28,    4,   19,   29,    8,   16,   33,    4,
- /*    10 */    19,   29,    9,    2,   13,    4,   34,   29,   36,    4,
- /*    20 */    23,   29,   32,   31,   30,   24,    5,   26,   27,   19,
- /*    30 */    35,   10,   19,   16,   37,    5,   12,   21,   25,   11,
- /*    40 */    15,    6,   20,   18,   17,   22,    3,   61,    1,   16,
- /*    50 */    54,   14,   54,   54,   54,   54,   10,
+ /*     0 */     8,   18,   24,    4,   16,   35,    5,   13,   37,    4,
+ /*    10 */    16,   35,   10,    2,   11,    4,   13,   35,   30,   33,
+ /*    20 */    34,   29,   36,    6,    4,   22,   35,   15,    9,   23,
+ /*    30 */    38,   28,   26,    6,   19,   25,   32,   27,   31,   16,
+ /*    40 */    16,    7,   12,   21,   20,   17,   14,   11,    3,   18,
+ /*    50 */    64,    1,   13,
     );
     static public $yy_lookahead = array(
- /*     0 */    24,   10,   26,   27,   28,   29,   24,   16,   26,   27,
- /*    10 */    28,   29,   24,   25,   17,   27,   24,   29,    9,   27,
- /*    20 */    15,   29,   11,   12,   13,   22,   23,   26,   18,   28,
- /*    30 */    26,   14,   28,   16,   22,   23,    8,    7,    2,    1,
- /*    40 */     8,    4,   21,    3,   10,    6,    5,   20,   25,   16,
- /*    50 */    30,   29,   30,   30,   30,   30,   14,
+ /*     0 */    25,   10,   27,   28,   29,   30,   25,   16,   27,   28,
+ /*    10 */    29,   30,   25,   26,   14,   28,   16,   30,   11,   12,
+ /*    20 */    13,   25,   23,   24,   28,   17,   30,   21,   22,   15,
+ /*    30 */    18,    2,   23,   24,    6,    4,    9,   27,   27,   29,
+ /*    40 */    29,    1,    8,    8,    7,    3,   30,   14,    5,   10,
+ /*    50 */    20,   26,   16,
 );
     const YY_SHIFT_USE_DFLT = -10;
     const YY_SHIFT_MAX = 22;
     static public $yy_shift_ofst = array(
- /*     0 */    38,   -9,   -9,   17,   33,   41,   41,   34,   34,   42,
- /*    10 */    33,   40,   11,   10,    5,    9,   -3,   28,   37,   39,
- /*    20 */    36,   32,   30,
+ /*     0 */    40,   -9,   -9,    0,   36,   39,   43,   42,   39,   43,
+ /*    10 */    33,   36,    7,    8,   14,   29,   28,   31,   34,   37,
+ /*    20 */    35,   27,   12,
 );
-    const YY_REDUCE_USE_DFLT = -25;
+    const YY_REDUCE_USE_DFLT = -26;
     const YY_REDUCE_MAX = 11;
     static public $yy_reduce_ofst = array(
- /*     0 */    27,  -18,  -24,  -12,   -8,   12,    3,    1,    4,   23,
- /*    10 */    22,   21,
+ /*     0 */    30,  -19,  -25,  -13,   -4,   11,   -1,    6,   10,    9,
+ /*    10 */    25,   16,
 );
     static public $yyExpectedTokens = array(
         /* 0 */ array(1, ),
@@ -247,24 +247,24 @@ static public $yy_action = array(
         /* 2 */ array(10, 16, ),
         /* 3 */ array(14, 16, ),
         /* 4 */ array(16, ),
-        /* 5 */ array(5, ),
+        /* 5 */ array(10, ),
         /* 6 */ array(5, ),
-        /* 7 */ array(10, ),
+        /* 7 */ array(3, ),
         /* 8 */ array(10, ),
-        /* 9 */ array(14, ),
-        /* 10 */ array(16, ),
-        /* 11 */ array(3, ),
+        /* 9 */ array(5, ),
+        /* 10 */ array(14, ),
+        /* 11 */ array(16, ),
         /* 12 */ array(11, 12, 13, ),
-        /* 13 */ array(18, ),
+        /* 13 */ array(17, ),
         /* 14 */ array(15, ),
-        /* 15 */ array(9, ),
-        /* 16 */ array(17, ),
-        /* 17 */ array(8, ),
-        /* 18 */ array(4, ),
-        /* 19 */ array(6, ),
-        /* 20 */ array(2, ),
-        /* 21 */ array(8, ),
-        /* 22 */ array(7, ),
+        /* 15 */ array(2, ),
+        /* 16 */ array(6, ),
+        /* 17 */ array(4, ),
+        /* 18 */ array(8, ),
+        /* 19 */ array(7, ),
+        /* 20 */ array(8, ),
+        /* 21 */ array(9, ),
+        /* 22 */ array(18, ),
         /* 23 */ array(),
         /* 24 */ array(),
         /* 25 */ array(),
@@ -280,12 +280,13 @@ static public $yy_action = array(
         /* 35 */ array(),
         /* 36 */ array(),
         /* 37 */ array(),
+        /* 38 */ array(),
 );
     static public $yy_default = array(
- /*     0 */    60,   43,   45,   60,   50,   40,   60,   44,   42,   60,
- /*    10 */    60,   60,   60,   60,   60,   60,   60,   60,   60,   52,
- /*    20 */    60,   60,   60,   58,   39,   38,   48,   59,   49,   57,
- /*    30 */    56,   55,   54,   47,   51,   46,   53,   41,
+ /*     0 */    63,   46,   48,   63,   53,   45,   43,   63,   47,   40,
+ /*    10 */    63,   63,   63,   63,   63,   63,   55,   63,   63,   63,
+ /*    20 */    63,   63,   63,   61,   52,   42,   41,   51,   39,   54,
+ /*    30 */    57,   49,   56,   58,   59,   60,   44,   50,   62,
 );
 /* The next thing included is series of defines which control
 ** various aspects of the generated parser.
@@ -302,11 +303,11 @@ static public $yy_action = array(
 **    self::YYERRORSYMBOL is the code number of the error symbol.  If not
 **                        defined, then do no error processing.
 */
-    const YYNOCODE = 31;
+    const YYNOCODE = 32;
     const YYSTACKDEPTH = 100;
     const qtype_preg_dot_ARG_DECL = '0';
-    const YYNSTATE = 38;
-    const YYNRULE = 22;
+    const YYNSTATE = 39;
+    const YYNRULE = 24;
     const YYERRORSYMBOL = 19;
     const YYERRSYMDT = 'yy0';
     const YYFALLBACK = 0;
@@ -394,9 +395,9 @@ static public $yy_action = array(
   'EQUALS',        'DOTTED',        'COLOR',         'VIOLET',      
   'BLUE',          'RED',           'MAINSTART',     'MAINEND',     
   'OPEN',          'LEAF',          'CLOSE',         'error',       
-  'start',         'automaton_body',  'transitions_list',  'transition_stmt',
-  'transition_merged_list',  'main_transition',  'transition_params',  'merged_transition',
-  'transition_params_type',  'transition_desc',
+  'start',         'automaton_body',  'start_end_states_description',  'transitions_list',
+  'transition_stmt',  'transition_merged_list',  'main_transition',  'transition_params',
+  'merged_transition',  'transition_params_type',  'transition_desc',
     );
 
     /**
@@ -405,27 +406,29 @@ static public $yy_action = array(
      */
     static public $yyRuleName = array(
  /*   0 */ "start ::= DIGRAPH automaton_body CLOSEBODY",
- /*   1 */ "automaton_body ::= START END transitions_list",
- /*   2 */ "transitions_list ::= transition_stmt",
- /*   3 */ "transitions_list ::= transition_stmt transitions_list",
- /*   4 */ "transition_stmt ::= TRANSITIONSTATES transition_merged_list main_transition transition_merged_list",
- /*   5 */ "transition_stmt ::= TRANSITIONSTATES transition_merged_list main_transition",
- /*   6 */ "transition_stmt ::= TRANSITIONSTATES main_transition transition_merged_list",
- /*   7 */ "transition_stmt ::= TRANSITIONSTATES main_transition",
- /*   8 */ "transition_stmt ::= TRANSITIONSTATES transition_merged_list main_transition transition_merged_list transition_params",
- /*   9 */ "transition_stmt ::= TRANSITIONSTATES transition_merged_list main_transition transition_params",
- /*  10 */ "transition_stmt ::= TRANSITIONSTATES main_transition transition_merged_list transition_params",
- /*  11 */ "transition_stmt ::= TRANSITIONSTATES main_transition transition_params",
- /*  12 */ "transition_merged_list ::= merged_transition",
- /*  13 */ "transition_merged_list ::= merged_transition transition_merged_list",
- /*  14 */ "transition_params ::= transition_params_type",
- /*  15 */ "transition_params ::= transition_params_type COMMA STYLE EQUALS DOTTED",
- /*  16 */ "transition_params_type ::= COLOR EQUALS VIOLET",
- /*  17 */ "transition_params_type ::= COLOR EQUALS BLUE",
- /*  18 */ "transition_params_type ::= COLOR EQUALS RED",
- /*  19 */ "merged_transition ::= transition_desc",
- /*  20 */ "main_transition ::= MAINSTART transition_desc MAINEND",
- /*  21 */ "transition_desc ::= OPEN LEAF CLOSE",
+ /*   1 */ "automaton_body ::= start_end_states_description",
+ /*   2 */ "automaton_body ::= start_end_states_description transitions_list",
+ /*   3 */ "start_end_states_description ::= START END",
+ /*   4 */ "transitions_list ::= transition_stmt",
+ /*   5 */ "transitions_list ::= transition_stmt transitions_list",
+ /*   6 */ "transition_stmt ::= TRANSITIONSTATES transition_merged_list main_transition transition_merged_list",
+ /*   7 */ "transition_stmt ::= TRANSITIONSTATES transition_merged_list main_transition",
+ /*   8 */ "transition_stmt ::= TRANSITIONSTATES main_transition transition_merged_list",
+ /*   9 */ "transition_stmt ::= TRANSITIONSTATES main_transition",
+ /*  10 */ "transition_stmt ::= TRANSITIONSTATES transition_merged_list main_transition transition_merged_list transition_params",
+ /*  11 */ "transition_stmt ::= TRANSITIONSTATES transition_merged_list main_transition transition_params",
+ /*  12 */ "transition_stmt ::= TRANSITIONSTATES main_transition transition_merged_list transition_params",
+ /*  13 */ "transition_stmt ::= TRANSITIONSTATES main_transition transition_params",
+ /*  14 */ "transition_merged_list ::= merged_transition",
+ /*  15 */ "transition_merged_list ::= merged_transition transition_merged_list",
+ /*  16 */ "transition_params ::= transition_params_type",
+ /*  17 */ "transition_params ::= transition_params_type COMMA STYLE EQUALS DOTTED",
+ /*  18 */ "transition_params_type ::= COLOR EQUALS VIOLET",
+ /*  19 */ "transition_params_type ::= COLOR EQUALS BLUE",
+ /*  20 */ "transition_params_type ::= COLOR EQUALS RED",
+ /*  21 */ "merged_transition ::= transition_desc",
+ /*  22 */ "main_transition ::= MAINSTART transition_desc MAINEND",
+ /*  23 */ "transition_desc ::= OPEN LEAF CLOSE",
     );
 
     /**
@@ -791,27 +794,29 @@ static public $yy_action = array(
      */
     static public $yyRuleInfo = array(
   array( 'lhs' => 20, 'rhs' => 3 ),
-  array( 'lhs' => 21, 'rhs' => 3 ),
-  array( 'lhs' => 22, 'rhs' => 1 ),
+  array( 'lhs' => 21, 'rhs' => 1 ),
+  array( 'lhs' => 21, 'rhs' => 2 ),
   array( 'lhs' => 22, 'rhs' => 2 ),
-  array( 'lhs' => 23, 'rhs' => 4 ),
-  array( 'lhs' => 23, 'rhs' => 3 ),
-  array( 'lhs' => 23, 'rhs' => 3 ),
+  array( 'lhs' => 23, 'rhs' => 1 ),
   array( 'lhs' => 23, 'rhs' => 2 ),
-  array( 'lhs' => 23, 'rhs' => 5 ),
-  array( 'lhs' => 23, 'rhs' => 4 ),
-  array( 'lhs' => 23, 'rhs' => 4 ),
-  array( 'lhs' => 23, 'rhs' => 3 ),
-  array( 'lhs' => 24, 'rhs' => 1 ),
+  array( 'lhs' => 24, 'rhs' => 4 ),
+  array( 'lhs' => 24, 'rhs' => 3 ),
+  array( 'lhs' => 24, 'rhs' => 3 ),
   array( 'lhs' => 24, 'rhs' => 2 ),
-  array( 'lhs' => 26, 'rhs' => 1 ),
-  array( 'lhs' => 26, 'rhs' => 5 ),
-  array( 'lhs' => 28, 'rhs' => 3 ),
-  array( 'lhs' => 28, 'rhs' => 3 ),
-  array( 'lhs' => 28, 'rhs' => 3 ),
+  array( 'lhs' => 24, 'rhs' => 5 ),
+  array( 'lhs' => 24, 'rhs' => 4 ),
+  array( 'lhs' => 24, 'rhs' => 4 ),
+  array( 'lhs' => 24, 'rhs' => 3 ),
+  array( 'lhs' => 25, 'rhs' => 1 ),
+  array( 'lhs' => 25, 'rhs' => 2 ),
   array( 'lhs' => 27, 'rhs' => 1 ),
-  array( 'lhs' => 25, 'rhs' => 3 ),
+  array( 'lhs' => 27, 'rhs' => 5 ),
   array( 'lhs' => 29, 'rhs' => 3 ),
+  array( 'lhs' => 29, 'rhs' => 3 ),
+  array( 'lhs' => 29, 'rhs' => 3 ),
+  array( 'lhs' => 28, 'rhs' => 1 ),
+  array( 'lhs' => 26, 'rhs' => 3 ),
+  array( 'lhs' => 30, 'rhs' => 3 ),
     );
 
     /**
@@ -821,8 +826,6 @@ static public $yy_action = array(
      * If a rule is not set, it has no handler.
      */
     static public $yyReduceMap = array(
-        1 => 1,
-        2 => 2,
         3 => 3,
         4 => 4,
         5 => 5,
@@ -842,6 +845,8 @@ static public $yy_action = array(
         19 => 19,
         20 => 20,
         21 => 21,
+        22 => 22,
+        23 => 23,
     );
     /* Beginning here are the reduction cases.  A typical example
     ** follows:
@@ -849,27 +854,27 @@ static public $yy_action = array(
     **   function yy_r0($yymsp){ ... }           // User supplied code
     **  #line <lineno> <thisfile>
     */
-#line 32 "../preg_dot_parser.y"
-    function yy_r1(){
-    foreach ($this->yystack[$this->yyidx + -2]->minor as $start) {
+#line 36 "../preg_dot_parser.y"
+    function yy_r3(){
+    foreach ($this->yystack[$this->yyidx + -1]->minor as $start) {
         $this->automaton->add_start_state($this->automaton->add_state($start));
     }
-    foreach ($this->yystack[$this->yyidx + -1]->minor as $end) {
+    foreach ($this->yystack[$this->yyidx + 0]->minor as $end) {
         $this->automaton->add_end_state($this->automaton->add_state($end));
     }
     }
-#line 867 "../preg_dot_parser.php"
-#line 40 "../preg_dot_parser.y"
-    function yy_r2(){
+#line 872 "../preg_dot_parser.php"
+#line 45 "../preg_dot_parser.y"
+    function yy_r4(){
 	$fromid = $this->automaton->add_state($this->yystack[$this->yyidx + 0]->minor->from);
 	$toid = $this->automaton->add_state($this->yystack[$this->yyidx + 0]->minor->to);
 	$this->yystack[$this->yyidx + 0]->minor->from = $fromid;
 	$this->yystack[$this->yyidx + 0]->minor->to = $toid;
     	$this->automaton->add_transition($this->yystack[$this->yyidx + 0]->minor);
     }
-#line 876 "../preg_dot_parser.php"
-#line 48 "../preg_dot_parser.y"
-    function yy_r3(){
+#line 881 "../preg_dot_parser.php"
+#line 53 "../preg_dot_parser.y"
+    function yy_r5(){
 	$fromid = $this->automaton->add_state($this->yystack[$this->yyidx + -1]->minor->from);
 	$toid = $this->automaton->add_state($this->yystack[$this->yyidx + -1]->minor->to);
 	$this->yystack[$this->yyidx + -1]->minor->from = $fromid;
@@ -877,100 +882,100 @@ static public $yy_action = array(
     $this->automaton->add_transition($this->yystack[$this->yyidx + -1]->minor);
 
     }
-#line 886 "../preg_dot_parser.php"
-#line 56 "../preg_dot_parser.y"
-    function yy_r4(){
+#line 891 "../preg_dot_parser.php"
+#line 61 "../preg_dot_parser.y"
+    function yy_r6(){
     $this->_retvalue = $this->get_transition($this->yystack[$this->yyidx + -3]->minor[0], $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + -3]->minor[1], qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST, false, $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + 0]->minor);
     }
-#line 891 "../preg_dot_parser.php"
-#line 59 "../preg_dot_parser.y"
-    function yy_r5(){
+#line 896 "../preg_dot_parser.php"
+#line 64 "../preg_dot_parser.y"
+    function yy_r7(){
     $this->_retvalue = $this->get_transition($this->yystack[$this->yyidx + -2]->minor[0], $this->yystack[$this->yyidx + 0]->minor, $this->yystack[$this->yyidx + -2]->minor[1], qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST, true, $this->yystack[$this->yyidx + -1]->minor);
     }
-#line 896 "../preg_dot_parser.php"
-#line 62 "../preg_dot_parser.y"
-    function yy_r6(){
+#line 901 "../preg_dot_parser.php"
+#line 67 "../preg_dot_parser.y"
+    function yy_r8(){
     $this->_retvalue = $this->get_transition($this->yystack[$this->yyidx + -2]->minor[0], $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + -2]->minor[1], qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST, true, array(), $this->yystack[$this->yyidx + 0]->minor);
     }
-#line 901 "../preg_dot_parser.php"
-#line 65 "../preg_dot_parser.y"
-    function yy_r7(){
+#line 906 "../preg_dot_parser.php"
+#line 70 "../preg_dot_parser.y"
+    function yy_r9(){
     $this->_retvalue = $this->get_transition($this->yystack[$this->yyidx + -1]->minor[0], $this->yystack[$this->yyidx + 0]->minor, $this->yystack[$this->yyidx + -1]->minor[1], qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST, true);
     }
-#line 906 "../preg_dot_parser.php"
-#line 68 "../preg_dot_parser.y"
-    function yy_r8(){
+#line 911 "../preg_dot_parser.php"
+#line 73 "../preg_dot_parser.y"
+    function yy_r10(){
     $this->_retvalue = $this->get_transition($this->yystack[$this->yyidx + -4]->minor[0], $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -4]->minor[1], $this->yystack[$this->yyidx + 0]->minor['type'], $this->yystack[$this->yyidx + 0]->minor['consumes'], $this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -1]->minor);
     }
-#line 911 "../preg_dot_parser.php"
-#line 71 "../preg_dot_parser.y"
-    function yy_r9(){
+#line 916 "../preg_dot_parser.php"
+#line 76 "../preg_dot_parser.y"
+    function yy_r11(){
     $this->_retvalue = $this->get_transition($this->yystack[$this->yyidx + -3]->minor[0], $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + -3]->minor[1], $this->yystack[$this->yyidx + 0]->minor['type'], $this->yystack[$this->yyidx + 0]->minor['consumes'], $this->yystack[$this->yyidx + -2]->minor);
     }
-#line 916 "../preg_dot_parser.php"
-#line 74 "../preg_dot_parser.y"
-    function yy_r10(){
+#line 921 "../preg_dot_parser.php"
+#line 79 "../preg_dot_parser.y"
+    function yy_r12(){
     $this->_retvalue = $this->get_transition($this->yystack[$this->yyidx + -3]->minor[0], $this->yystack[$this->yyidx + -2]->minor, $this->yystack[$this->yyidx + -3]->minor[1], $this->yystack[$this->yyidx + 0]->minor['type'], $this->yystack[$this->yyidx + 0]->minor['consumes'], array(), $this->yystack[$this->yyidx + -1]->minor);
     }
-#line 921 "../preg_dot_parser.php"
-#line 77 "../preg_dot_parser.y"
-    function yy_r11(){
+#line 926 "../preg_dot_parser.php"
+#line 82 "../preg_dot_parser.y"
+    function yy_r13(){
     $this->_retvalue = $this->get_transition($this->yystack[$this->yyidx + -2]->minor[0], $this->yystack[$this->yyidx + -1]->minor, $this->yystack[$this->yyidx + -2]->minor[1], $this->yystack[$this->yyidx + 0]->minor['type'], $this->yystack[$this->yyidx + 0]->minor['consumes']);
     }
-#line 926 "../preg_dot_parser.php"
-#line 80 "../preg_dot_parser.y"
-    function yy_r12(){
+#line 931 "../preg_dot_parser.php"
+#line 85 "../preg_dot_parser.y"
+    function yy_r14(){
     $this->_retvalue = array();
     $this->_retvalue[] = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 932 "../preg_dot_parser.php"
-#line 84 "../preg_dot_parser.y"
-    function yy_r13(){
+#line 937 "../preg_dot_parser.php"
+#line 89 "../preg_dot_parser.y"
+    function yy_r15(){
     $this->yystack[$this->yyidx + 0]->minor[] = $this->yystack[$this->yyidx + -1]->minor;
     $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 938 "../preg_dot_parser.php"
-#line 88 "../preg_dot_parser.y"
-    function yy_r14(){
+#line 943 "../preg_dot_parser.php"
+#line 93 "../preg_dot_parser.y"
+    function yy_r16(){
     $this->_retvalue =  array();
     $this->_retvalue['type'] = $this->yystack[$this->yyidx + 0]->minor;
     $this->_retvalue['consumes'] = true;
     }
-#line 945 "../preg_dot_parser.php"
-#line 93 "../preg_dot_parser.y"
-    function yy_r15(){
+#line 950 "../preg_dot_parser.php"
+#line 98 "../preg_dot_parser.y"
+    function yy_r17(){
     $this->_retvalue =  array();
     $this->_retvalue['type'] = $this->yystack[$this->yyidx + -4]->minor;
     $this->_retvalue['consumes'] = false;
     }
-#line 952 "../preg_dot_parser.php"
-#line 98 "../preg_dot_parser.y"
-    function yy_r16(){
+#line 957 "../preg_dot_parser.php"
+#line 103 "../preg_dot_parser.y"
+    function yy_r18(){
     $this->_retvalue = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
     }
-#line 957 "../preg_dot_parser.php"
-#line 101 "../preg_dot_parser.y"
-    function yy_r17(){
+#line 962 "../preg_dot_parser.php"
+#line 106 "../preg_dot_parser.y"
+    function yy_r19(){
     $this->_retvalue = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
     }
-#line 962 "../preg_dot_parser.php"
-#line 104 "../preg_dot_parser.y"
-    function yy_r18(){
+#line 967 "../preg_dot_parser.php"
+#line 109 "../preg_dot_parser.y"
+    function yy_r20(){
     $this->_retvalue = qtype_preg_fa_transition::ORIGIN_TRANSITION_INTER;
     }
-#line 967 "../preg_dot_parser.php"
-#line 107 "../preg_dot_parser.y"
-    function yy_r19(){
+#line 972 "../preg_dot_parser.php"
+#line 112 "../preg_dot_parser.y"
+    function yy_r21(){
     $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 972 "../preg_dot_parser.php"
-#line 110 "../preg_dot_parser.y"
-    function yy_r20(){
+#line 977 "../preg_dot_parser.php"
+#line 115 "../preg_dot_parser.y"
+    function yy_r22(){
     $this->_retvalue = $this->yystack[$this->yyidx + -1]->minor;
     }
-#line 977 "../preg_dot_parser.php"
-#line 113 "../preg_dot_parser.y"
-    function yy_r21(){
+#line 982 "../preg_dot_parser.php"
+#line 118 "../preg_dot_parser.y"
+    function yy_r23(){
     $pregleaf = $this->yystack[$this->yyidx + -1]->minor;
     $this->_retvalue = new qtype_preg_fa_transition(0, $pregleaf, 1);
     foreach ($this->yystack[$this->yyidx + -2]->minor as $tag) {
@@ -984,7 +989,7 @@ static public $yy_action = array(
         $this->_retvalue->closetags[] = $close;
     }
     }
-#line 993 "../preg_dot_parser.php"
+#line 998 "../preg_dot_parser.php"
 
     /**
      * placeholder for the left hand side in a reduce operation.
