@@ -1298,29 +1298,29 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
 
     // --------------------- Copy branches tests ------------------------
 
-    /*
+
     public function test_copy_whole_branch() {
-        $sourcedescription = 'digraph example {
+        $sourcedescription = 'digraph {
                                 0;
                                 4;
-                                0->1[label="[df]"];
-                                0->2[label="[0-9]"];
-                                1->3[label="[abc]"];
-                                2->3[label="[01]"];
-                                3->4[label="[a]"];
+                                0->1[label=<<B>o: [df] c:</B>>];
+                                0->2[label=<<B>o: [0-9] c:</B>>];
+                                1->3[label=<<B>o: [abc] c:</B>>];
+                                2->3[label=<<B>o: [01] c:</B>>];
+                                3->4[label=<<B>o: a c:</B>>];
                             }';
-        $dotresult = 'digraph res {
-                        "0,";
-                        "1,";"4,";
-                        "0,"->"1,"[label = "[df]", color = violet];
-                        "0,"->"2,"[label = "[0-9]", color = violet];
-                        "2,"->"3,"[label = "[01]", color = violet];
-                        "3,"->"4,"[label = "[a]", color = violet];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,"[shape=rarrow];
+                    "1,"[shape=doublecircle];
+                    "4,"[shape=doublecircle];
+                        "0,"->"2,"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "0,"->"1,"[label = <<B>o: [df] c:</B>>, color = violet, penwidth = 2];
+                        "2,"->"3,"[label = <<B>o: [01] c:</B>>, color = violet, penwidth = 2];
+                        "3,"->"4,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
                     }';
 
-        $source = new qtype_preg_fa();
-        $source->read_fa($sourcedescription);
-        $resultautomata = new qtype_preg_fa();
+        $source = qtype_preg_fa::read_fa($sourcedescription);
         $direct = new qtype_preg_fa();
         $numbers = $source->get_state_numbers();
         $stopcoping = array_search('1', $numbers);
@@ -1330,32 +1330,32 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                     ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $result = $direct->fa_to_dot();
+        $result = $direct->fa_to_dot(null, null, true);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_copy_impliciment_cycle() {
-        $sourcedescription = 'digraph example {
+        $sourcedescription = 'digraph {
                                 0;
                                 3;
-                                0->1[label="[ab]"];
-                                0->2[label="[0-9]"];
-                                1->3[label="[.]"];
-                                2->3[label="[01]"];
-                                3->0[label="[a]"];
+                                0->1[label=<<B>o: [ab] c:</B>>];
+                                0->2[label=<<B>o: [0-9] c:</B>>];
+                                1->3[label=<<B>o: . c:</B>>];
+                                2->3[label=<<B>o: [01] c:</B>>];
+                                3->0[label=<<B>o: a c:</B>>];
                             }';
-        $dotresult = 'digraph res {
-                        "0,";
-                        "1,";"3,";
-                        "0,"->"1,"[label = "[ab]", color = violet];
-                        "0,"->"2,"[label = "[0-9]", color = violet];
-                        "2,"->"3,"[label = "[01]", color = violet];
-                        "3,"->"0,"[label = "[a]", color = violet];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,"[shape=rarrow];
+                    "1,"[shape=doublecircle];
+                    "3,"[shape=doublecircle];
+                        "0,"->"2,"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "0,"->"1,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "2,"->"3,"[label = <<B>o: [01] c:</B>>, color = violet, penwidth = 2];
+                        "3,"->"0,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
                     }';
 
-        $source = new qtype_preg_fa();
-        $source->read_fa($sourcedescription);
-        $resultautomata = new qtype_preg_fa();
+        $source = qtype_preg_fa::read_fa($sourcedescription);
         $direct = new qtype_preg_fa();
         $numbers = $source->get_state_numbers();
         $stopcoping = array_search('1', $numbers);
@@ -1365,67 +1365,68 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                     ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $result = $direct->fa_to_dot();
+        $result = $direct->fa_to_dot(null, null, true);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_copy_cycle_end() {
-        $sourcedescription = 'digraph example {
+        $sourcedescription = 'digraph {
                                 0;
                                 2;
-                                0->1[label="[ab]"];
-                                1->1[label="[0-9]"];
-                                1->2[label="[a]"];
+                                0->1[label=<<B>o: [ab] c:</B>>];
+                                1->1[label=<<B>o: [0-9] c:</B>>];
+                                1->2[label=<<B>o: a c:</B>>];
                             }';
-        $dotresult = 'digraph example {
-                        "0,";
-                        "1,";
-                        "0,"->"1,"[label="[ab]"];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,"[shape=rarrow];
+                    "1,"[shape=doublecircle];
+                        "0,"->"1,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
                     }';
 
-        $source = new qtype_preg_fa();
-        $source->read_fa($sourcedescription);
-        $resultautomata = new qtype_preg_fa();
+        $source = qtype_preg_fa::read_fa($sourcedescription);
         $direct = new qtype_preg_fa();
         $numbers = $source->get_state_numbers();
         $stopcoping = array_search('1', $numbers);
         $oldfront = array(array_search('0', $numbers));
         $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
-        $result = new qtype_preg_fa();
-        $result->read_fa($dotresult);
-        $this->assertEquals($direct, $result, 'Result automata is not equal to expected');
+        $search = '
+                    ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $direct->fa_to_dot(null, null, true);
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_copy_not_empty_direct() {
-        $sourcedescription = 'digraph example {
+        $sourcedescription = 'digraph {
                                 0;
                                 4;
-                                0->1[label="[df]"];
-                                0->2[label="[0-9]"];
-                                1->3[label="[abc]"];
-                                2->3[label="[01]"];
-                                3->4[label="[a]"];
+                                0->1[label=<<B>o: [df] c:</B>>];
+                                0->2[label=<<B>o: [0-9] c:</B>>];
+                                1->3[label=<<B>o: [abc] c:</B>>];
+                                2->3[label=<<B>o: [01] c:</B>>];
+                                3->4[label=<<B>o: a c:</B>>];
                             }';
-        $dotresult = 'digraph res {
-                        "0,";
-                        "4,";
-                        "0,"->"1,"[label = "[df]", color = violet];
-                        "0,"->"2,"[label = "[0-9]", color = violet];
-                        "1,"->"3,"[label = "[abc]", color = violet];
-                        "2,"->"3,"[label = "[01]", color = violet];
-                        "3,"->"4,"[label = "[a]", color = violet];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,"[shape=rarrow];
+                    "4,"[shape=doublecircle];
+                        "0,"->"1,"[label = <<B>o: [df] c:</B>>, color = violet, penwidth = 2];
+                        "0,"->"2,"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"3,"[label = <<B>o: [abc] c:</B>>, color = violet, penwidth = 2];
+                        "2,"->"3,"[label = <<B>o: [01] c:</B>>, color = violet, penwidth = 2];
+                        "3,"->"4,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
                     }';
-        $directdescription = 'digraph example {
+        $directdescription = 'digraph {
                                 "0,";
                                 "1,";
-                                "0,"->"1,"[label="[df]"];
+                                "0,"->"1,"[label=<<B>o: [df] c:</B>>];
                             }';
 
-        $source = new qtype_preg_fa();
-        $source->read_fa($sourcedescription);
-        $resultautomata = new qtype_preg_fa();
-        $direct = new qtype_preg_fa();
-        $direct->read_fa($directdescription);
+
+        $source = qtype_preg_fa::read_fa($sourcedescription);
+        $direct = qtype_preg_fa::read_fa($directdescription);
         $numbers = $source->get_state_numbers();
         $stopcoping = array_search('4', $numbers);
         $oldfront = array(array_search('2', $numbers));
@@ -1434,36 +1435,34 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                     ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $result = $direct->fa_to_dot();
+        $result = $direct->fa_to_dot(null, null, true);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
-    public function test_direct_has_states_for_coping() {
-        $sourcedescription = 'digraph example {
+   public function test_direct_has_states_for_coping() {
+        $sourcedescription = 'digraph {
                                 0;
                                 2;
-                                0->1[label="[ab]"];
-                                1->2[label="[ab]"];
-                                2->0[label="[ab]"];
+                                0->1[label=<<B>o: [ab] c:</B>>];
+                                1->2[label=<<B>o: [ab] c:</B>>];
+                                2->0[label=<<B>o: [ab] c:</B>>];
                             }';
-        $dotresult = 'digraph res {
-                        "0,";
-                        "2,";
-                        "0,"->"1,"[label = "[ab]", color = violet];
-                        "1,"->"2,"[label = "[ab]", color = violet];
-                        "2,"->"0,"[label = "[ab]", color = violet];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,"[shape=rarrow];
+                    "2,"[shape=doublecircle];
+                        "0,"->"1,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"2,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "2,"->"0,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
                     }';
-        $directdescription = 'digraph example {
+        $directdescription = 'digraph {
                                 "0,";
                                 "1,";
-                                "0,"->"1,"[label="[ab]"];
+                                "0,"->"1,"[label=<<B>o: [ab] c:</B>>];
                             }';
 
-        $source = new qtype_preg_fa();
-        $source->read_fa($sourcedescription);
-        $resultautomata = new qtype_preg_fa();
-        $direct = new qtype_preg_fa();
-        $direct->read_fa($directdescription);
+        $source = qtype_preg_fa::read_fa($sourcedescription);
+        $direct = qtype_preg_fa::read_fa($directdescription);
         $numbers = $source->get_state_numbers();
         $stopcoping = array_search('1', $numbers);
         $oldfront = array(array_search('2', $numbers));
@@ -1472,70 +1471,70 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                     ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $result = $direct->fa_to_dot();
+        $result = $direct->fa_to_dot(null, null, true);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_coping_not_nessesary() {
-        $sourcedescription = 'digraph example {
+        $sourcedescription = 'digraph {
                                 0;
                                 2;
-                                0->1[label="[ab]"];
-                                1->2[label="[ab]"];
-                                2->0[label="[ab]"];
+                                0->1[label=<<B>o: [ab] c:</B>>];
+                                1->2[label=<<B>o: [ab] c:</B>>];
+                                2->0[label=<<B>o: [ab] c:</B>>];
                             }';
-        $dotresult = 'digraph example {
-                        "0,";
-                        "2,";
-                        "0,"->"1,"[label="[ab]"];
-                        "1,"->"2,"[label="[ab]"];
-                        "2,"->"0,"[label="[ab]"];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,"[shape=rarrow];
+                    "2,"[shape=doublecircle];
+                        "2,"->"0,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "0,"->"1,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"2,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
                     }';
-        $directdescription = 'digraph example {
+        $directdescription = 'digraph {
                                 "0,";
                                 "2,";
-                                "0,"->"1,"[label="[ab]"];
-                                "1,"->"2,"[label="[ab]"];
-                                "2,"->"0,"[label="[ab]"];
+                                "0,"->"1,"[label=<<B>o: [ab] c:</B>>];
+                                "1,"->"2,"[label=<<B>o: [ab] c:</B>>];
+                                "2,"->"0,"[label=<<B>o: [ab] c:</B>>];
                             }';
 
-        $source = new qtype_preg_fa();
-        $source->read_fa($sourcedescription);
-        $resultautomata = new qtype_preg_fa();
-        $direct = new qtype_preg_fa();
-        $direct->read_fa($directdescription);
+        $source = qtype_preg_fa::read_fa($sourcedescription);
+        $direct = qtype_preg_fa::read_fa($directdescription);
         $numbers = $source->get_state_numbers();
         $stopcoping = array_search('0', $numbers);
         $oldfront = array(array_search('2', $numbers));
         $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
-        $result = new qtype_preg_fa();
-        $result->read_fa($dotresult);
-        $this->assertEquals($direct, $result, 'Result automata is not equal to expected');
+        $search = '
+                    ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $direct->fa_to_dot(null, null, true);
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_coping_back() {
-        $sourcedescription = 'digraph example {
+        $sourcedescription = 'digraph {
                                 0;
                                 4;
-                                0->1[label="[df]"];
-                                0->2[label="[0-9]"];
-                                1->3[label="[abc]"];
-                                2->3[label="[01]"];
-                                3->4[label="[a]"];
+                                0->1[label=<<B>o: [df] c:</B>>];
+                                0->2[label=<<B>o: [0-9] c:</B>>];
+                                1->3[label=<<B>o: [abc] c:</B>>];
+                                2->3[label=<<B>o: [01] c:</B>>];
+                                3->4[label=<<B>o: [a] c:</B>>];
                             }';
-        $dotresult = 'digraph res {
-                        "0,";
-                        "4,";
-                        "3,"->"4,"[label = "[a]", color = violet];
-                        "1,"->"3,"[label = "[abc]", color = violet];
-                        "2,"->"3,"[label = "[01]", color = violet];
-                        "0,"->"1,"[label = "[df]", color = violet];
-                        "0,"->"2,"[label = "[0-9]", color = violet];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,"[shape=rarrow];
+                    "4,"[shape=doublecircle];
+                        "3,"->"4,"[label = <<B>o: [a] c:</B>>, color = violet, penwidth = 2];
+                        "2,"->"3,"[label = <<B>o: [01] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"3,"[label = <<B>o: [abc] c:</B>>, color = violet, penwidth = 2];
+                        "0,"->"2,"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "0,"->"1,"[label = <<B>o: [df] c:</B>>, color = violet, penwidth = 2];
                     }';
 
-        $source = new qtype_preg_fa();
-        $source->read_fa($sourcedescription);
-        $resultautomata = new qtype_preg_fa();
+        $source = qtype_preg_fa::read_fa($sourcedescription);
         $direct = new qtype_preg_fa();
         $numbers = $source->get_state_numbers();
         $stopcoping = array_search('0', $numbers);
@@ -1545,34 +1544,34 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                     ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $result = $direct->fa_to_dot();
+        $result = $direct->fa_to_dot(null, null, true);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_copy_second_automata() {
-        $sourcedescription = 'digraph example {
+        $sourcedescription = 'digraph {
                                 0;
                                 4;
-                                0->1[label="[df]"];
-                                0->2[label="[0-9]"];
-                                1->3[label="[abc]"];
-                                2->3[label="[01]"];
-                                3->4[label="[a]"];
+                                0->1[label=<<B>o: [df] c:</B>>, color = blue];
+                                0->2[label=<<B>o: [0-9] c:</B>>, color = blue];
+                                1->3[label=<<B>o: [abc] c:</B>>, color = blue];
+                                2->3[label=<<B>o: [01] c:</B>>, color = blue];
+                                3->4[label=<<B>o: [a] c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        ",0";
-                        ",1";",4";
-                        ",0"->",1"[label = "[df]", color = blue, style = dotted];
-                        ",0"->",2"[label = "[0-9]", color = blue, style = dotted];
-                        ",2"->",3"[label = "[01]", color = blue, style = dotted];
-                        ",3"->",4"[label = "[a]", color = blue, style = dotted];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        ",0"[shape=rarrow];
+                    ",1"[shape=doublecircle];
+                    ",4"[shape=doublecircle];
+                        ",0"->",2"[label = <<B>o: [0-9] c:</B>>, color = blue, penwidth = 2];
+                        ",0"->",1"[label = <<B>o: [df] c:</B>>, color = blue, penwidth = 2];
+                        ",2"->",3"[label = <<B>o: [01] c:</B>>, color = blue, penwidth = 2];
+                        ",3"->",4"[label = <<B>o: [a] c:</B>>, color = blue, penwidth = 2];
                     }';
 
         $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-        $source = new qtype_preg_fa();
-        $source->read_fa($sourcedescription, $origin);
-        $resultautomata = new qtype_preg_fa();
-        $direct = new qtype_preg_fa();
+        $source = qtype_preg_fa::read_fa($sourcedescription);
+        $direct = $direct = new qtype_preg_fa();;
         $numbers = $source->get_state_numbers();
         $stopcoping = array_search('1', $numbers);
         $oldfront = array(array_search('0', $numbers));
@@ -1581,34 +1580,34 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                     ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $result = $direct->fa_to_dot();
+        $result = $direct->fa_to_dot(null, null, true);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_copy_second_cycle() {
-        $sourcedescription = 'digraph example {
+        $sourcedescription = 'digraph {
                                 0;
                                 3;
-                                0->1[label="[ab]"];
-                                0->2[label="[0-9]"];
-                                1->3[label="[.]"];
-                                2->3[label="[01]"];
-                                3->0[label="[a]"];
+                                0->1[label=<<B>o: [ab] c:</B>>, color = blue];
+                                0->2[label=<<B>o: [0-9] c:</B>>, color = blue];
+                                1->3[label=<<B>o: [.] c:</B>>, color = blue];
+                                2->3[label=<<B>o: [01] c:</B>>, color = blue];
+                                3->0[label=<<B>o: [a] c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        ",0";
-                        ",1";",3";
-                        ",0"->",1"[label = "[ab]", color = blue, style = dotted];
-                        ",0"->",2"[label = "[0-9]", color = blue, style = dotted];
-                        ",2"->",3"[label = "[01]", color = blue, style = dotted];
-                        ",3"->",0"[label = "[a]", color = blue, style = dotted];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        ",0"[shape=rarrow];
+                    ",1"[shape=doublecircle];
+                    ",3"[shape=doublecircle];
+                        ",0"->",2"[label = <<B>o: [0-9] c:</B>>, color = blue, penwidth = 2];
+                        ",0"->",1"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
+                        ",2"->",3"[label = <<B>o: [01] c:</B>>, color = blue, penwidth = 2];
+                        ",3"->",0"[label = <<B>o: [a] c:</B>>, color = blue, penwidth = 2];
                     }';
 
         $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-        $source = new qtype_preg_fa();
-        $source->read_fa($sourcedescription, $origin);
-        $resultautomata = new qtype_preg_fa();
-        $direct = new qtype_preg_fa();
+        $source = qtype_preg_fa::read_fa($sourcedescription);
+        $direct = $direct = new qtype_preg_fa();
         $numbers = $source->get_state_numbers();
         $stopcoping = array_search('1', $numbers);
         $oldfront = array(array_search('0', $numbers));
@@ -1617,41 +1616,39 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                     ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $result = $direct->fa_to_dot();
+        $result = $direct->fa_to_dot(null, null, true);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_copy_not_empty_second() {
-        $sourcedescription = 'digraph example {
+        $sourcedescription = 'digraph {
                                 0;
                                 4;
-                                0->1[label="[df]"];
-                                0->2[label="[0-9]"];
-                                1->3[label="[abc]"];
-                                2->3[label="[01]"];
-                                3->4[label="[a]"];
+                                0->1[label=<<B>o: [df] c:</B>>, color = blue];
+                                0->2[label=<<B>o: [0-9] c:</B>>, color = blue];
+                                1->3[label=<<B>o: [abc] c:</B>>, color = blue];
+                                2->3[label=<<B>o: [01] c:</B>>, color = blue];
+                                3->4[label=<<B>o: [a] c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        ",0";
-                        ",4";
-                        ",0"->",1"[label = "[df]", color = blue, style = dotted];
-                        ",0"->",2"[label = "[0-9]", color = blue, style = dotted];
-                        ",1"->",3"[label = "[abc]", color = blue, style = dotted];
-                        ",2"->",3"[label = "[01]", color = blue, style = dotted];
-                        ",3"->",4"[label = "[a]", color = blue, style = dotted];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        ",0"[shape=rarrow];
+                    ",4"[shape=doublecircle];
+                        ",0"->",1"[label = <<B>o: [df] c:</B>>, color = blue, penwidth = 2];
+                        ",0"->",2"[label = <<B>o: [0-9] c:</B>>, color = blue, penwidth = 2];
+                        ",1"->",3"[label = <<B>o: [abc] c:</B>>, color = blue, penwidth = 2];
+                        ",2"->",3"[label = <<B>o: [01] c:</B>>, color = blue, penwidth = 2];
+                        ",3"->",4"[label = <<B>o: [a] c:</B>>, color = blue, penwidth = 2];
                     }';
-        $directdescription = 'digraph example {
+        $directdescription = 'digraph {
                                 ",0";
                                 ",1";
-                                ",0"->",1"[label="[df]"];
+                                ",0"->",1"[label=<<B>o: [df] c:</B>>, color = blue];
                             }';
 
         $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-        $source = new qtype_preg_fa();
-        $source->read_fa($sourcedescription, $origin);
-        $resultautomata = new qtype_preg_fa();
-        $direct = new qtype_preg_fa();
-        $direct->read_fa($directdescription, $origin);
+        $source = qtype_preg_fa::read_fa($sourcedescription);
+        $direct = qtype_preg_fa::read_fa($directdescription);
         $numbers = $source->get_state_numbers();
         $stopcoping = array_search('4', $numbers);
         $oldfront = array(array_search('2', $numbers));
@@ -1660,48 +1657,49 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                     ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $result = $direct->fa_to_dot();
+        $result = $direct->fa_to_dot(null, null, true);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_coping_not_nessesary_second() {
-        $sourcedescription = 'digraph example {
+        $sourcedescription = 'digraph {
                                 0;
                                 2;
-                                0->1[label="[ab]"];
-                                1->2[label="[ab]"];
-                                2->0[label="[ab]"];
+                                0->1[label=<<B>o: [ab] c:</B>>, color = blue];
+                                1->2[label=<<B>o: [ab] c:</B>>, color = blue];
+                                2->0[label=<<B>o: [ab] c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph example {
-                        ",0";
-                        ",2";
-                        ",0"->",1"[label="[ab]"];
-                        ",1"->",2"[label="[ab]"];
-                        ",2"->",0"[label="[ab]"];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        ",0"[shape=rarrow];
+                    ",2"[shape=doublecircle];
+                        ",2"->",0"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
+                        ",0"->",1"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
+                        ",1"->",2"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
                     }';
-        $directdescription = 'digraph example {
+        $directdescription = 'digraph {
                                 ",0";
                                 ",2";
-                                ",0"->",1"[label="[ab]"];
-                                ",1"->",2"[label="[ab]"];
-                                ",2"->",0"[label="[ab]"];
+                                ",0"->",1"[label=<<B>o: [ab] c:</B>>, color = blue];
+                                ",1"->",2"[label=<<B>o: [ab] c:</B>>, color = blue];
+                                ",2"->",0"[label=<<B>o: [ab] c:</B>>, color = blue];
                             }';
 
         $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-        $source = new qtype_preg_fa();
-        $source->read_fa($sourcedescription, $origin);
-        $resultautomata = new qtype_preg_fa();
-        $direct = new qtype_preg_fa();
-        $direct->read_fa($directdescription, $origin);
+        $source = qtype_preg_fa::read_fa($sourcedescription);
+        $direct = qtype_preg_fa::read_fa($directdescription);
         $numbers = $source->get_state_numbers();
         $stopcoping = array_search('0', $numbers);
         $oldfront = array(array_search('2', $numbers));
         $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
-        $result = new qtype_preg_fa();
-        $result->read_fa($dotresult, $origin);
-        $this->assertEquals($direct, $result, 'Result automata is not equal to expected');
+        $search = '
+                    ';
+        $replace = "\n";
+        $dotresult = str_replace($search, $replace, $dotresult);
+        $result = $direct->fa_to_dot(null, null, true);
+        $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
-    */
+
 
     // --------------------- Remove unreachable tests ------------------------
 
@@ -1859,12 +1857,12 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         }';
         $dotresult = 'digraph {
     rankdir=LR;
-    ""0,""[shape=rarrow];
-"",5""[shape=doublecircle];
-    ""1,2""->"",3""[label = <<B>o: [01] c:</B>>, color = violet, penwidth = 2];
-    "",3""->"",5""[label = <<B>o: [kmn] c:</B>>, color = violet, penwidth = 2];
-    ""0,""->"",3""[label = <<B>o: [a-v] c:</B>>, color = violet, penwidth = 2];
-    ""0,""->""1,2""[label = <<B>o: [01] c:</B>>, color = violet, penwidth = 2];
+    "0,"[shape=rarrow];
+",5"[shape=doublecircle];
+    "1,2"->",3"[label = <<B>o: [01] c:</B>>, color = violet, penwidth = 2];
+    ",3"->",5"[label = <<B>o: [kmn] c:</B>>, color = violet, penwidth = 2];
+    "0,"->",3"[label = <<B>o: [a-v] c:</B>>, color = violet, penwidth = 2];
+    "0,"->"1,2"[label = <<B>o: [01] c:</B>>, color = violet, penwidth = 2];
 }';
         $input = qtype_preg_fa::read_fa($dotdescription);
         $input->remove_unreachable_states();
