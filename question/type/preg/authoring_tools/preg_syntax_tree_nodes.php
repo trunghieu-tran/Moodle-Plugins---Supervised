@@ -557,6 +557,9 @@ class qtype_preg_syntax_tree_node_template extends qtype_preg_syntax_tree_operat
     }
 
     public function label_for_edge($operand) {
+        if (count($this->operands) < 2) {
+            return '';
+        }
         $available = qtype_preg\template::available_templates();
         $parametersdescription = null;
         if ($this->pregnode->name != '' && array_key_exists($this->pregnode->name, $available)) {
