@@ -852,14 +852,20 @@ class qtype_preg_explaining_graph_node_template extends qtype_preg_explaining_gr
         $left->color = 'lightgray';
         $left->tooltip = $parametersdescription === null ? get_string('explain_parameter', 'qtype_preg') :  $parametersdescription[0];
         $inner_left = $this->operands[0]->create_graph();
-        $left->assume_subgraph($inner_left);
-        $left->entries[] = end($inner_left->entries);
-        $left->exits[] = end($inner_left->exits);
-        $template->subgraphs[] = $left;
-        $template->entries[] = end($left->entries);
-        $right = $left;
-
         $n = count($this->operands);
+        if ($n == 1) {
+            $template->assume_subgraph($inner_left);
+            $template->entries[] = end($inner_left->entries);
+            $right = $inner_left;
+        } else {
+            $left->assume_subgraph($inner_left);
+            $left->entries[] = end($inner_left->entries);
+            $left->exits[] = end($inner_left->exits);
+            $template->subgraphs[] = $left;
+            $template->entries[] = end($left->entries);
+            $right = $left;
+        }
+
         for ($i = 1; $i < $n; ++$i) {
             $right = new qtype_preg_explaining_graph_tool_subgraph('');
             $right->color = 'lightgray';
@@ -870,8 +876,12 @@ class qtype_preg_explaining_graph_node_template extends qtype_preg_explaining_gr
             $right->exits[] = end($inner_right->exits);
             $template->subgraphs[] = $right;
 
-            $tmplink = new qtype_preg_explaining_graph_tool_link('', end($left->exits), end($right->entries), $template);
-            $template->links[] = $tmplink;
+            $point = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $template, -1);
+            $tmplink1 = new qtype_preg_explaining_graph_tool_link('', end($left->exits), $point, $template);
+            $tmplink2 = new qtype_preg_explaining_graph_tool_link('', $point, end($right->entries), $template);
+            $template->links[] = $tmplink1;
+            $template->links[] = $tmplink2;
+            $template->nodes[] = $point;
 
             if ($i != $n-1) {
                 $left = $right;
