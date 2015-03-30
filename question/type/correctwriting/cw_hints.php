@@ -39,7 +39,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
  */
 class qtype_correctwriting_hintwhatis extends qtype_poasquestion\hint {
 
-    /** @var mistake, with which this hint is associated. */
+    /** @var qtype_correctwriting_sequence_mistake, with which this hint is associated. */
     protected $mistake;
     /** @var token(s) descriptions for the hint. */
     protected $tokendescr;
@@ -93,7 +93,12 @@ class qtype_correctwriting_hintwhatis extends qtype_poasquestion\hint {
 
     public function render_hint($renderer, question_attempt $qa, question_display_options $options, $response = null) {
         if ($this->mistake !== null) {
-            $hinttext = new qtype_poasquestion\string($this->mistake->token_descriptions(true));
+            $hinttext = '';
+            if (method_exists($this->mistake, 'what_is_description')) {
+                $hinttext = $this->mistake->what_is_description();
+            } else {
+                $hinttext = new qtype_poasquestion\string($this->mistake->token_descriptions(true));
+            }
             // Capitalize first letter.
             $hinttext[0] = core_text::strtoupper($hinttext[0]);
             return $hinttext;
