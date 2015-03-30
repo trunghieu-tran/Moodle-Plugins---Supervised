@@ -62,7 +62,7 @@ abstract class  qtype_correctwriting_response_mistake {
      * @param $answerindex
      * @return mixed
      */
-    protected function map_from_current_answer_string_to_correct_string($answerindex) {
+    public function map_from_current_answer_string_to_correct_string($answerindex) {
         return $answerindex;
     }
 
