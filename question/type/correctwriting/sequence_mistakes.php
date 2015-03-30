@@ -125,7 +125,7 @@ abstract class qtype_correctwriting_sequence_mistake extends qtype_correctwritin
      * @param $answerindex
      * @return mixed
      */
-    protected function map_from_current_answer_string_to_correct_string($answerindex) {
+    public function map_from_current_answer_string_to_correct_string($answerindex) {
         return  $this->stringpair->map_from_enum_correct_string_to_correct_string($answerindex);
     }
 
