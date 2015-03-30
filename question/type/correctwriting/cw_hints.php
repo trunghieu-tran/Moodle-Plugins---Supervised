@@ -139,7 +139,11 @@ class qtype_correctwriting_hintwheretxt extends qtype_poasquestion\hint {
                 $this->token = $this->mistake->token_description($answerindex);
             } else {
                 if (is_a($this->mistake, 'qtype_correctwriting_sequence_mistake')) {
-                    $this->token = $this->mistake->response_description();
+                    if (count($this->mistake->responsemistaken) != 0) {
+                        $this->token = $this->mistake->response_description();
+                    } else {
+                        $this->token = $this->mistake->answer_description();
+                    }
                 } else {
                     $this->token = null;
                 }
@@ -232,7 +236,11 @@ class qtype_correctwriting_hintwherepic extends qtype_poasquestion\hint {
                 $this->token = $this->mistake->token_description($answerindex);
             } else {
                 if (is_a($this->mistake, 'qtype_correctwriting_sequence_mistake')) {
-                    $this->token = $this->mistake->response_description();
+                    if (count($this->mistake->responsemistaken) != 0) {
+                        $this->token = $this->mistake->response_description();
+                    } else {
+                        $this->token = $this->mistake->answer_description();
+                    }
                 } else {
                     $this->token = null;
                 }
@@ -296,7 +304,7 @@ class qtype_correctwriting_hintwherepic extends qtype_poasquestion\hint {
      * @return string
      */
     protected function create_response_text_for_image() {
-        $stream = $this->mistake->stringpair->correctedstring()->stream;
+        $stream = $this->mistake->stringpair->comparedstring()->stream;
         $temp  = array_map('qtype_correctwriting_hintwherepic::to_string', $stream->tokens);
         $temp = array_map('base64_encode', $temp);
         return implode('|', $temp);
@@ -322,7 +330,8 @@ class qtype_correctwriting_hintwherepic extends qtype_poasquestion\hint {
     protected function prepare_image_data_for_moved_mistake() {
         $result = array();
         $result[]  = 'moved';
-        $result[] = $this->mistake->responsemistaken[0];
+        $indexes = $this->mistake->stringpair->map_from_corrected_string_to_compared_string($this->mistake->responsemistaken[0]);
+        $result[] =  implode('|', $indexes);
         $pos =  $this->find_insertion_position_for($this->mistake->answermistaken[0]);
         $result[] = $pos->position;
         $result[] = $pos->relative;
@@ -344,7 +353,7 @@ class qtype_correctwriting_hintwherepic extends qtype_poasquestion\hint {
         $dist = 1;
         $curposition = $position + $direction;
         $found = null;
-        $answerstream = $selmistake->stringpair->correctstring()->stream;
+        $answerstream = $selmistake->stringpair->enum_correct_string()->stream;
         while (($curposition > -1) && ($curposition < count($answerstream->tokens)) && ($found === null)) {
             if (array_key_exists($curposition, $lcs)) {
                 $found = $lcs[$curposition];
@@ -379,19 +388,27 @@ class qtype_correctwriting_hintwherepic extends qtype_poasquestion\hint {
                     $result->position = 0;
                     $result->relative = 'before';
                 } else {
+                    $posnext = $this->mistake->stringpair->map_from_corrected_string_to_compared_string($posnext);
+                    $posnext = min($posnext);
                     $result->position = $posnext;
                     $result->relative = 'before';
                 }
             } else {
                 if ($posnext === null) {
+                    $posprevious = $this->mistake->stringpair->map_from_corrected_string_to_compared_string($posprevious);
+                    $posprevious = max($posprevious);
                     $result->position = $posprevious;
                     $result->relative = 'after';
                 } else {
                     // Pick nearest.
                     if ($distprevious < $distnext) {
+                        $posprevious = $this->mistake->stringpair->map_from_corrected_string_to_compared_string($posprevious);
+                        $posprevious = max($posprevious);
                         $result->position = $posprevious;
                         $result->relative = 'after';
                     } else {
+                        $posnext = $this->mistake->stringpair->map_from_corrected_string_to_compared_string($posnext);
+                        $posnext = min($posnext);
                         $result->position = $posnext;
                         $result->relative = 'before';
                     }
