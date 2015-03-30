@@ -1,0 +1,37 @@
+[
+ (program) {
+  (stmt_list) {
+   (stmt_or_defined_macro) {
+    (stmt) {
+     (variable_declaration) {
+      (builtintype) {
+       int
+      }
+      (assign) {
+       a
+       =
+       (expr_assign) {
+        b
+        =
+        (expr_assign) {
+         c
+         =
+         (expr_assign) {
+          e
+          =
+          (expr_assign) {
+           j
+           =
+           k
+          }
+         }
+        }
+       }
+      }
+     }
+     ;
+    }
+   }
+  }
+ }
+]

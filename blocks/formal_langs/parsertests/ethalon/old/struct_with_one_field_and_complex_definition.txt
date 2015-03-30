@@ -1,0 +1,42 @@
+[
+ (program) {
+  (stmt_list) {
+   (stmt_list) {
+    (stmt_or_defined_macro) {
+     (class_or_union_or_struct) {
+      (identified_type_meta_specifier_with_template_def) {
+       struct
+       A
+      }
+      (structure_body) {
+       {
+       (stmt_or_defined_macro) {
+        (stmt) {
+         (variable_declaration) {
+          (builtintype) {
+           int
+          }
+          k
+         }
+         ;
+        }
+       }
+       }
+      }
+      B
+      ;
+     }
+    }
+   }
+   (stmt_or_defined_macro) {
+    (stmt) {
+     (variable_declaration) {
+      A
+      k
+     }
+     ;
+    }
+   }
+  }
+ }
+]

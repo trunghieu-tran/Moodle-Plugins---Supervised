@@ -1,0 +1,14 @@
+[
+ (sizeof) {
+  sizeof
+  (
+  (scoped_type) {
+   (namespace_resolve) {
+    std
+    ::
+   }
+   vector
+  }
+  )
+ }
+]

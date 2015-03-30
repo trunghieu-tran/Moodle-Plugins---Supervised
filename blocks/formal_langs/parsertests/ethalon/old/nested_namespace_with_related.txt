@@ -1,0 +1,86 @@
+[
+ (program) {
+  (stmt_list) {
+   (stmt_list) {
+    (stmt_or_defined_macro) {
+     (namespace) {
+      (namespace_definition_start) {
+       namespace
+       A
+      }
+      (namespace_body) {
+       {
+       (stmt_list) {
+        (stmt_or_defined_macro) {
+         (namespace) {
+          (namespace_definition_start) {
+           namespace
+           B
+          }
+          (namespace_body) {
+           {
+           (stmt_list) {
+            (stmt_or_defined_macro) {
+             (namespace) {
+              (namespace_definition_start) {
+               namespace
+               C
+              }
+              (namespace_body) {
+               {
+               (stmt_list) {
+                (stmt_or_defined_macro) {
+                 (class_or_union_or_struct) {
+                  (identified_type_meta_specifier_with_template_def) {
+                   class
+                   D
+                  }
+                  (structure_body) {
+                   {
+                   }
+                  }
+                  ;
+                 }
+                }
+               }
+               }
+              }
+             }
+            }
+           }
+           }
+          }
+         }
+        }
+       }
+       }
+      }
+     }
+    }
+   }
+   (stmt_or_defined_macro) {
+    (stmt) {
+     (variable_declaration) {
+      (scoped_type) {
+       (namespace_resolve) {
+        (namespace_resolve) {
+         (namespace_resolve) {
+          A
+          ::
+         }
+         B
+         ::
+        }
+        C
+        ::
+       }
+       D
+      }
+      k
+     }
+     ;
+    }
+   }
+  }
+ }
+]

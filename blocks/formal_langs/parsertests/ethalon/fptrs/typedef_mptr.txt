@@ -1,0 +1,68 @@
+[
+ (program) {
+  (stmt_list) {
+   (stmt_list) {
+    (stmt_or_defined_macro) {
+     (typedef_declaration) {
+      typedef
+      (builtintype) {
+       int
+      }
+      (lvalue) {
+       (
+       (namespace_resolve) {
+        a
+        ::
+       }
+       (lvalue) {
+        *
+        f
+       }
+       )
+       (formal_args_list_with_or_without_const) {
+        (formal_args_list) {
+         (
+         (arg_list) {
+          (arg_list) {
+           (builtintype) {
+            double
+           }
+          }
+          ,
+          (builtintype) {
+           double
+          }
+         }
+         )
+        }
+       }
+      }
+      ;
+     }
+    }
+   }
+   (stmt_or_defined_macro) {
+    (stmt) {
+     (variable_declaration) {
+      f
+      (assign) {
+       m
+       =
+       (expr_take_adress) {
+        &
+        (scoped_identifier) {
+         (namespace_resolve) {
+          a
+          ::
+         }
+         method
+        }
+       }
+      }
+     }
+     ;
+    }
+   }
+  }
+ }
+]
