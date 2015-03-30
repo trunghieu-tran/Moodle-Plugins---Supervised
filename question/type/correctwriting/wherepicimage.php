@@ -1,4 +1,4 @@
-<?
+<?php
 // This file is part of CorrectWriting question type - https://code.google.com/p/oasychev-moodle-plugins/
 //
 // CorrectWriting question type is free software: you can redistribute it and/or modify
@@ -68,6 +68,8 @@ define('MOVED_LEXEME_TINYSPACE_Y', 2);
 define('MOVED_LEXEME_TOP_MARK_WIDTH', 4);
 // Defines a moved lexeme top mark height
 define('MOVED_LEXEME_TOP_MARK_HEIGHT', 5);
+// A tiny space between arrow connector and label
+define('TINY_SPACE', 2);
 /**
  * This style of require_once is used intentionally, due to non-availability of Moodle here
  */
