@@ -1980,7 +1980,7 @@ class block_formal_langs_processed_string {
                     $a->line = $pos->linestart();
                     return get_string('quoteat', 'block_formal_langs', $a);
                 }
-            } else {//Just quote 
+            } else {//Just quote
                 return get_string('quote', 'block_formal_langs', $value);
             }
         }
@@ -2344,21 +2344,6 @@ class block_formal_langs_string_pair {
         return $result;
     }
 
-
-    private function count_indexes_correct($nodenumber) {
-        $count = 0;
-        return $count;
-    }
-    
-    private function count_indexes_incorrect($nodenumber) {
-		$count = 0;
-        return $count;
-    }
-    
-    private function index_pair_from_lexeme($nodenumber) {
-		$index = 0;
-        return $index;
-    }
     /**
      * Returns description string for passed node. If there is no description, token value from compared string is used, 
      * if it is not available too, than token value from correct string is used.  TODO - check the rules.
@@ -2369,82 +2354,6 @@ class block_formal_langs_string_pair {
      * @return string - description of node if present, quoted node value otherwise.
      */
     public function node_description($nodenumber, $quotevalue = true, $at = false) {
-        $correctindexs = $this->count_indexes_incorrect($nodenumber);
-        $comparedindexs = $this->count_indexes_incorrect($nodenumber);
-        // typo
-        if (count($correctindexs)==1 && count($comparedindexs)==1) {
-            $index = $this->index_pair_from_lexeme($nodenumber);
-            if($this->correctstring()->has_description($nodenumber)) {
-                return $this->correctstring()->node_description($nodenumber, false, true);
-            } else {
-                $tokens = $this->comparedstring()->stream->tokens;
-                $value = '';
-                if (array_key_exists($index, $tokens)) {
-                    $value = $tokens[$index]->value();
-                }
-                return get_string('quote', 'block_formal_langs', $value);
-            }
-        }
-        // extra separator
-        if(count($correctindexs)==1 && count($comparedindexs)==2) {
-            $index = $this->index_pair_from_lexeme($nodenumber);
-            if($this->correctstring()->has_description($nodenumber)) {
-                return $this->correctstring()->node_description($nodenumber, false, true);
-            } else {
-                $value1 = $this->comparedstring()->stream->tokens[$index]->value();
-                $value2 = $this->comparedstring()->stream->tokens[$index+1]->value();
-                $value = $value1.' and '.$value2;
-                return get_string('quote', 'block_formal_langs', $value);
-            }
-        }
-        if(count($correctindexs)==2 && count($comparedindexs)==1) {
-            $index = $this->index_pair_from_lexeme($nodenumber);
-            if($this->correctstring()->has_description($nodenumber) && !$this->correctstring()->has_description($nodenumber+1)) {
-                $value=$this->comparedstring()->stream->tokens[$index+1]->value();
-                return $this->correctstring()->node_description($nodenumber, false, true).' and '.get_string('quote', 'block_formal_langs', $value);
-            } 
-            if(!$this->correctstring()->has_description($nodenumber) && $this->correctstring()->has_description($nodenumber+1)) {
-                $value=$this->comparedstring()->stream->tokens[$index]->value();
-                return get_string('quote', 'block_formal_langs', $value).' and '.$this->correctstring()->node_description($nodenumber+1, false, true);
-            } 
-            if($this->correctstring()->has_description($nodenumber) && $this->correctstring()->has_description($nodenumber+1)) {
-                return $this->correctstring()->node_description($nodenumber, false, true).' and '.$this->correctstring()->node_description($nodenumber+1, false, true);
-            } 
-            else {
-                $value=$this->comparedstring()->stream->tokens[$index]->value();
-                return get_string('quote', 'block_formal_langs', $value);
-            }
-        }
-    
-    
-    
-        // $this->node_descriptions_list(); //Not needed, since has_description will call node_descriptions_list anyway.
-        /* TODO - implement, this code from processed_string may be useful
-        $result = '';
-        if ($this->has_description($nodenumber)) {
-            return $this->descriptions[$nodenumber];
-        } else {
-            $value = $this->tokenstream->tokens[$nodenumber]->value();
-            if (!is_string($value)) {
-                $value = $value->string();
-            }
-            if (!$quotevalue) {
-                return $value;
-            } else if ($at) {// Should return position information.
-                $a = new stdClass();
-                $a->value = $value;
-                $pos = $this->tokenstream->tokens[$nodenumber]->position();
-                $a->column = $pos->colstart();
-                if ($this->single_line_string()) {
-                    return get_string('quoteatsingleline', 'block_formal_langs', $a);
-                } else {
-                    $a->line = $pos->linestart();
-                    return get_string('quoteat', 'block_formal_langs', $a);
-                }
-            } else {// Just quote
-                return get_string('quote', 'block_formal_langs', $value);
-            }
-        }*/
         return $this->correctstring()->node_description($nodenumber, $quotevalue, $at);
     }
 }
