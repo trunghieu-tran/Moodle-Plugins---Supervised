@@ -404,6 +404,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $maxstatescount = isset($CFG->qtype_preg_fa_simulation_state_limit)
                         ? $CFG->qtype_preg_fa_simulation_state_limit
                         : 1000;
+        $maxstatescount = max($maxstatescount, 100);
 
         $endstates = $this->automaton->end_states($laststate->subexpr());
         $resumestate = $this->get_resume_state($str, $laststate);
@@ -475,6 +476,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $maxstatescount = isset($CFG->qtype_preg_fa_simulation_state_limit)
                         ? $CFG->qtype_preg_fa_simulation_state_limit
                         : 1000;
+        $maxstatescount = max($maxstatescount, 100);
 
         $endstates = $this->automaton->end_states($laststate->subexpr());
         $resumestate = $this->get_resume_state($str, $laststate);
@@ -586,6 +588,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $maxstatescount = isset($CFG->qtype_preg_fa_simulation_state_limit)
                         ? $CFG->qtype_preg_fa_simulation_state_limit
                         : 1000;
+        $maxstatescount = max($maxstatescount, 100);
 
         $fullmatches = array();       // Possible full matches.
         $partialmatches = array();    // Possible partial matches.
@@ -732,6 +735,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $maxstatescount = isset($CFG->qtype_preg_fa_simulation_state_limit)
                         ? $CFG->qtype_preg_fa_simulation_state_limit
                         : 1000;
+        $maxstatescount = max($maxstatescount, 100);
 
         $states = array('0' => array()); // Objects of qtype_preg_fa_exec_state. First dimension is recursion level, second is state number.
         $curstates = array();          // Indexes of states which the automaton is in at the current wave front. Use stdClass with "recursionlevel" and "state" fields.
