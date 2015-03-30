@@ -134,7 +134,17 @@ class qtype_correctwriting_hintwheretxt extends qtype_poasquestion\hint {
         $this->hintkey = $hintkey;
         $this->mistake = $mistake;
         if ($mistake !== null) {
-            $this->token = $this->mistake->token_description($this->mistake->answermistaken[0]);
+            $answerindex = $this->mistake->map_from_current_answer_string_to_correct_string($this->mistake->answermistaken[0]);
+            if  ($this->mistake->stringpair->correctstring()->has_description($answerindex)) {
+                $this->token = $this->mistake->token_description($answerindex);
+            } else {
+                if (is_a($this->mistake, 'qtype_correctwriting_sequence_mistake')) {
+                    $this->token = $this->mistake->response_description();
+                } else {
+                    $this->token = null;
+                }
+            }
+
         }
     }
 
@@ -152,7 +162,7 @@ class qtype_correctwriting_hintwheretxt extends qtype_poasquestion\hint {
      * Mistake === null if attempt to create hint was unsuccessfull.
      */
     public function hint_available($response = null) {
-        return $this->question->wheretxthintpenalty <= 1.0 && $this->mistake !== null;
+        return $this->question->wheretxthintpenalty <= 1.0 && $this->mistake !== null && $this->token !== null;
     }
 
     public function penalty_for_specific_hint($response = null) {
@@ -167,7 +177,7 @@ class qtype_correctwriting_hintwheretxt extends qtype_poasquestion\hint {
     public function render_hint($renderer, question_attempt $qa, question_display_options $options, $response = null) {
         $hinttext = '';
         if ($this->mistake !== null) {
-            $tokenindex = $this->mistake->answermistaken[0];
+            $tokenindex = $this->mistake->map_from_current_answer_string_to_correct_string($this->mistake->answermistaken[0]);
             $a = new stdClass;
             $a->token = $this->token;
             if ($tokenindex == 0) {// First token.
@@ -217,7 +227,16 @@ class qtype_correctwriting_hintwherepic extends qtype_poasquestion\hint {
         $this->hintkey = $hintkey;
         $this->mistake = $mistake;
         if ($mistake !== null) {
-            $this->token = $this->mistake->token_description($this->mistake->answermistaken[0]);
+            $answerindex = $this->mistake->map_from_current_answer_string_to_correct_string($this->mistake->answermistaken[0]);
+            if  ($this->mistake->stringpair->correctstring()->has_description($answerindex)) {
+                $this->token = $this->mistake->token_description($answerindex);
+            } else {
+                if (is_a($this->mistake, 'qtype_correctwriting_sequence_mistake')) {
+                    $this->token = $this->mistake->response_description();
+                } else {
+                    $this->token = null;
+                }
+            }
         }
     }
 
