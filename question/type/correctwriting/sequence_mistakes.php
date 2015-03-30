@@ -119,6 +119,16 @@ abstract class qtype_correctwriting_sequence_mistake extends qtype_correctwritin
         }
         return $a;
     }
+
+    /**
+     * Maps current answer string to correct string
+     * @param $answerindex
+     * @return mixed
+     */
+    protected function map_from_current_answer_string_to_correct_string($answerindex) {
+        return  $this->stringpair->map_from_enum_correct_string_to_correct_string($answerindex);
+    }
+
 }
 
 
@@ -169,6 +179,25 @@ class qtype_correctwriting_lexeme_moved_mistake extends qtype_correctwriting_seq
 
     public function supported_hints() {
         return array('whatis', 'wheretxt', 'wherepic');
+    }
+
+    /**
+     * Returns description for whatis hint as text
+     * @return string
+     */
+    public function what_is_description() {
+        $description = $this->answer_description();
+        $response = $this->response_description();
+        $response = core_text::substr($response, 1, core_text::strlen($response) - 2);
+        $a = new stdClass();
+        $a->tokendescr = $description;
+        $a->tokenvalue = $response;
+        $a->inthiscase =  get_string('inyouranswer', 'qtype_correctwriting', $a);
+        if (!is_string($a->tokenvalue)) {
+            $a->tokenvalue = $a->tokenvalue->string();
+        }
+        $description = get_string('whatishint', 'qtype_correctwriting', $a);
+        return $description;
     }
 }
 
