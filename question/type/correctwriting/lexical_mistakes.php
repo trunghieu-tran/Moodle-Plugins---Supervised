@@ -45,7 +45,7 @@ class qtype_correctwriting_lexical_mistake extends qtype_correctwriting_response
     }
     
     public function supported_hints() {
-        return array('whatis');
+        return array('whatis', 'howtofixpic');
     }
     
     public function __construct($tokenpair){

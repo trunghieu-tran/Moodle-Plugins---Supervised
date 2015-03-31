@@ -1127,9 +1127,13 @@ class qtype_correctwriting_image_generator
                                    $correctpos += 1;
                                } else {
                                    $dorm = false;
+                                   $i = $j;
                                }
                            }
                        }
+                   }
+                   if ($dorm) {
+                       $i = core_text::strlen($ops);
                    }
 
                    for($j =  0; $j < core_text::strlen($inserttext); $j++) {
