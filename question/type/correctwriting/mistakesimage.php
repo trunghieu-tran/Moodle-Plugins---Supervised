@@ -1127,7 +1127,7 @@ class qtype_correctwriting_image_generator
                                    $correctpos += 1;
                                } else {
                                    $dorm = false;
-                                   $i = $j;
+                                   $i = $j - 1;
                                }
                            }
                        }
