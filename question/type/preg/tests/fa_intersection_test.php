@@ -3050,571 +3050,509 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
 
 
     // --------------------- Intersect fa tests ------------------------
-    /*
+
     public function test_nessesary_merging() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 4;5;
-                                0->1[label="[]"];
-                                0->2[label="[0-9]"];
-                                1->3[label="[a-c]"];
-                                2->4[label="[.]"];
-                                3->4[label="[.]"];
-                                2->5[label="[01]"];
+                                0->2[label=<<B>o: [0-9] c:</B>>];
+                                0->3[label=<o: ε c:<BR/><B>o: [a-c] c:</B>>];
+                                2->4[label=<<B>o: . c:</B>>];
+                                3->4[label=<<B>o: . c:</B>>];
+                                2->5[label=<<B>o: [01] c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 3;
-                                0->1[label="[01]"];
-                                0->2[label="[]"];
-                                0->3[label="[ab]"];
-                                1->1[label="[<>]"];
-                                1->3[label="[xy]"];
-                                2->3[label="[cd]"];
+                                0->1[label=<<B>o: [01] c:</B>>, color = blue];
+                                0->3[label=<<B>o: [ab] c:</B>>, color = blue];
+                                1->1[label=<<B>o: [<>] c:</B>>, color = blue];
+                                1->3[label=<<B>o: [xy] c:</B>>, color = blue];
+                                2->3[label=<o: ε c:<BR/><B>o: [cd] c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0   1,";
-                        "4,";
-                        "0   1,"->"2,0   2"[label = "[0-9]", color = violet];
-                        "0   1,"->"3,"[label = "[a-c]", color = violet];
-                        "2,0   2"->"4,1"[label = "[. ∩ 01]", color = red];
-                        "2,0   2"->"4,3"[label = "[. ∩ abcd]", color = red];
-                        "2,0   2"->"5,1"[label = "[01 ∩ 01]", color = red];
-                        "3,"->"4,"[label = "[.]", color = violet];
-                        "4,1"->",1"[label = "[<>]", color = blue, style = dotted];
-                        "4,1"->",3"[label = "[xy]", color = blue, style = dotted];
-                        "4,3"->"4,"[label = "[]", color = red];
-                        "5,1"->",1"[label = "[<>]", color = blue, style = dotted];
-                        "5,1"->",3"[label = "[xy]", color = blue, style = dotted];
-                        ",1"->",1"[label = "[<>]", color = blue, style = dotted];
-                        ",1"->",3"[label = "[xy]", color = blue, style = dotted];
-                        ",3"->"4,"[label = "[]", color = blue, style = dotted];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,"[shape=rarrow];
+                    "4,"[shape=doublecircle];
+                        "0,"->"3,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "0,"->"2,0"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "3,"->"4,"[label = <<B>o: . c:</B>>, color = violet, penwidth = 2];
+                        "2,0"->"5,1"[label = <<B>o: [01] ∩ [01] c:</B>>, color = red, penwidth = 2];
+                        "2,0"->"4,3"[label = <<B>o: . ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "2,0"->"4,1"[label = <<B>o: . ∩ [01] c:</B>>, color = red, penwidth = 2];
+                        "5,1"->",3"[label = <<B>o: [xy] c:</B>>, color = blue, penwidth = 2];
+                        "5,1"->",1"[label = <<B>o: [<>] c:</B>>, color = blue, penwidth = 2];
+                        "4,3"->"4,"[label = <<B>o: ε c:</B>>, color = red, penwidth = 2];
+                        "4,1"->",3"[label = <<B>o: [xy] c:</B>>, color = blue, penwidth = 2];
+                        "4,1"->",1"[label = <<B>o: [<>] c:</B>>, color = blue, penwidth = 2];
+                        ",3"->"4,"[label = <<B>o: ε c:</B>>, color = blue, penwidth = 2];
+                        ",1"->",3"[label = <<B>o: [xy] c:</B>>, color = blue, penwidth = 2];
+                        ",1"->",1"[label = <<B>o: [<>] c:</B>>, color = blue, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, '2', 0);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_with_blind() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 4;
-                                0->1[label="[0-9]"];
-                                1->2[label="[a-c]"];
-                                1->4[label="[01]"];
-                                2->3[label="[\\-\\\\&,]"];
-                                2->2[label="[a-z]"];
-                                3->4[label="[a]"];
+                                0->1[label=<<B>o: [0-9] c:</B>>];
+                                1->2[label=<<B>o: [a-c] c:</B>>];
+                                1->4[label=<<B>o: [01] c:</B>>];
+                                2->3[label=<<B>o: [\\-\\\\&,] c:</B>>];
+                                2->2[label=<<B>o: [a-z] c:</B>>];
+                                3->4[label=<<B>o: a c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 3;
-                                0->1[label="[01]"];
-                                1->2[label="[?]"];
-                                1->3[label="[ab]"];
-                                2->3[label="[01]"];
+                                0->1[label=<<B>o: [01] c:</B>>, color = blue];
+                                1->2[label=<<B>o: ? c:</B>>, color = blue];
+                                1->3[label=<<B>o: [ab] c:</B>>, color = blue];
+                                2->3[label=<<B>o: [01] c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0,";"0,0";
-                        "4,";
-                        "1,"->"4,"[label = "[01]", color = violet];
-                        "3,"->"4,"[label = "[a]", color = violet];
-                        "0,"->"1,"[label = "[0-9]", color = violet];
-                        "2,3"->"3,"[label = "[\-\\\\&,]", color = violet];
-                        "1,1"->"2,3"[label = "[a-c ∩ ab]", color = red];
-                        "0,0"->"1,1"[label = "[0-9 ∩ 01]", color = red];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,"[shape=rarrow];
+                    "0,0"[shape=rarrow];
+                    "4,"[shape=doublecircle];
+                        "3,"->"4,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"4,"[label = <<B>o: [01] c:</B>>, color = violet, penwidth = 2];
+                        "2,3"->"3,"[label = <<B>o: [\\\\-\\\\\\\\&,] c:</B>>, color = violet, penwidth = 2];
+                        "0,"->"1,"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "1,1"->"2,3"[label = <<B>o: [a-c] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "0,0"->"1,1"[label = <<B>o: [0-9] ∩ [01] c:</B>>, color = red, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, '2', 1);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_back_with_changing_state_for_inter() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 5;6;
-                                0->1[label="[a]"];
-                                1->2[label="[a]"];
-                                1->3[label="[^]"];
-                                2->1[label="[a]"];
-                                2->4[label="[a]"];
-                                3->4[label="[a]"];
-                                4->5[label="[a]"];
-                                4->6[label="[a]"];
-                                5->5[label="[a]"];
-                                5->6[label="[a]"];
-                                6->6[label="[a]"];
+                                0->1[label=<<B>o: a c:</B>>];
+                                1->2[label=<<B>o: a c:</B>>];
+                                0->3[label=<<B>o: a c:</B><BR/>o: ^ c:>];
+                                2->1[label=<<B>o: a c:</B>>];
+                                2->4[label=<<B>o: a c:</B>>];
+                                3->4[label=<<B>o: a c:</B>>];
+                                4->5[label=<<B>o: a c:</B>>];
+                                4->6[label=<<B>o: a c:</B>>];
+                                5->5[label=<<B>o: a c:</B>>];
+                                5->6[label=<<B>o: a c:</B>>];
+                                6->6[label=<<B>o: a c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 5;
-                                0->2[label="[a]"];
-                                0->3[label="[a]"];
-                                2->4[label="[a]"];
-                                2->3[label="[a]"];
-                                3->5[label="[a]"];
-                                4->3[label="[a]"];
-                                4->5[label="[a]"];
+                                0->2[label=<<B>o: a c:</B>>, color = blue];
+                                0->3[label=<<B>o: a c:</B>>, color = blue];
+                                2->4[label=<<B>o: a c:</B>>, color = blue];
+                                2->3[label=<<B>o: a c:</B>>, color = blue];
+                                3->5[label=<<B>o: a c:</B>>, color = blue];
+                                4->3[label=<<B>o: a c:</B>>, color = blue];
+                                4->5[label=<<B>o: a c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0,";
-                        "5,5";
-                        "0,"->"1   3,0"[label = "[a^]", color = violet];
-                        "0,"->"1   3,"[label = "[a^]", color = violet];
-                        "1   3,0"->"2,2"[label = "[a ∩ a]", color = red];
-                        "1   3,0"->"2,3"[label = "[a ∩ a]", color = red];
-                        "1   3,0"->"4,2"[label = "[a ∩ a]", color = red];
-                        "1   3,0"->"4,3"[label = "[a ∩ a]", color = red];
-                        "2,2"->"1   3,4"[label = "[a ∩ a^]", color = red];
-                        "2,2"->"1   3,3"[label = "[a ∩ a^]", color = red];
-                        "2,2"->"4,4"[label = "[a ∩ a]", color = red];
-                        "2,2"->"4,3"[label = "[a ∩ a]", color = red];
-                        "2,3"->"1   3,5"[label = "[a ∩ a^]", color = red];
-                        "2,3"->"4,5"[label = "[a ∩ a]", color = red];
-                        "4,2"->"5,4"[label = "[a ∩ a]", color = red];
-                        "4,2"->"5,3"[label = "[a ∩ a]", color = red];
-                        "4,2"->"6,4"[label = "[a ∩ a]", color = red];
-                        "4,2"->"6,3"[label = "[a ∩ a]", color = red];
-                        "4,3"->"5,5"[label = "[a ∩ a]", color = red];
-                        "4,3"->"6,5"[label = "[a ∩ a]", color = red];
-                        "1   3,4"->"2,3"[label = "[a ∩ a]", color = red];
-                        "1   3,4"->"2,5"[label = "[a ∩ a]", color = red];
-                        "1   3,4"->"4,3"[label = "[a ∩ a]", color = red];
-                        "1   3,4"->"4,5"[label = "[a ∩ a]", color = red];
-                        "1   3,3"->"2,5"[label = "[a ∩ a]", color = red];
-                        "1   3,3"->"4,5"[label = "[a ∩ a]", color = red];
-                        "4,4"->"5,3"[label = "[a ∩ a]", color = red];
-                        "4,4"->"5,5"[label = "[a ∩ a]", color = red];
-                        "4,4"->"6,3"[label = "[a ∩ a]", color = red];
-                        "4,4"->"6,5"[label = "[a ∩ a]", color = red];
-                        "1   3,5"->"2,"[label = "[a]", color = violet];
-                        "1   3,5"->"4,"[label = "[a]", color = violet];
-                        "4,5"->"5,"[label = "[a]", color = violet];
-                        "4,5"->"6,"[label = "[a]", color = violet];
-                        "5,4"->"5,3"[label = "[a ∩ a]", color = red];
-                        "5,4"->"5,5"[label = "[a ∩ a]", color = red];
-                        "5,4"->"6,3"[label = "[a ∩ a]", color = red];
-                        "5,4"->"6,5"[label = "[a ∩ a]", color = red];
-                        "5,3"->"5,5"[label = "[a ∩ a]", color = red];
-                        "5,3"->"6,5"[label = "[a ∩ a]", color = red];
-                        "6,4"->"6,3"[label = "[a ∩ a]", color = red];
-                        "6,4"->"6,5"[label = "[a ∩ a]", color = red];
-                        "6,3"->"6,5"[label = "[a ∩ a]", color = red];
-                        "6,5"->"5,5"[label = "[]", color = red];
-                        "2,5"->"1   3,"[label = "[a^]", color = violet];
-                        "2,5"->"4,"[label = "[a]", color = violet];
-                        "2,"->"1   3,"[label = "[a^]", color = violet];
-                        "2,"->"4,"[label = "[a]", color = violet];
-                        "4,"->"5,"[label = "[a]", color = violet];
-                        "4,"->"6,"[label = "[a]", color = violet];
-                        "1   3,"->"2,"[label = "[a]", color = violet];
-                        "1   3,"->"4,"[label = "[a]", color = violet];
-                        "5,"->"5,"[label = "[a]", color = violet];
-                        "5,"->"6,"[label = "[a]", color = violet];
-                        "5,"->"5,5"[label = "[]", color = violet];
-                        "6,"->"6,"[label = "[a]", color = violet];
-                        "6,"->"5,5"[label = "[]", color = violet];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,"[shape=rarrow];
+                    "6,"[shape=doublecircle];
+                        "0,"->"3,0"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "0,"->"1,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "3,0"->"4,3"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "3,0"->"4,2"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "1,"->"2,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "2,"->"4,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "2,"->"1,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "4,"->"6,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "4,"->"5,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "6,"->"6,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "5,"->"6,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "5,"->"6,"[label = <<B>o: ε c:</B>>, color = violet, penwidth = 2];
+                        "5,"->"5,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "4,3"->"6,5"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "4,3"->"5,5"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "4,2"->"6,3"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "4,2"->"6,4"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "4,2"->"5,3"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "4,2"->"5,4"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "6,5"->"6,"[label = <<B>o: ε c:</B>>, color = red, penwidth = 2];
+                        "5,5"->"6,"[label = <<B>o: ε c:</B>>, color = red, penwidth = 2];
+                        "6,3"->"6,5"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "6,4"->"6,5"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "6,4"->"6,3"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "5,3"->"6,5"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "5,3"->"5,5"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "5,4"->"6,5"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "5,4"->"6,3"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "5,4"->"5,5"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "5,4"->"5,3"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, '3', 0);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_simple() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 2;
-                                0->1[label="[b]"];
-                                1->2[label="[a]"];
-                                1->1[label="[]"];
-                                0->2[label="[a]"];
+                                0->1[label=<<B>o: b c:</B>>];
+                                1->2[label=<<B>o: a c:</B>>];
+                                1->1[label=<<B>o: ε c:</B>>];
+                                0->2[label=<<B>o: a c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 2;
-                                0->1[label="[ab]"];
-                                1->2[label="[ab]"];
+                                0->1[label=<<B>o: [ab] c:</B>>, color = blue];
+                                1->2[label=<<B>o: [ab] c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0,";
-                        "2,";
-                        "0,"->"1,0"[label = "[b]", color = violet];
-                        "0,"->"2,"[label = "[a]", color = violet];
-                        "1,0"->"2,1"[label = "[a ∩ ab]", color = red];
-                        "2,1"->",2"[label = "[ab]", color = blue, style = dotted];
-                        ",2"->"2,"[label = "[]", color = blue, style = dotted];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,"[shape=rarrow];
+                    "2,"[shape=doublecircle];
+                        "0,"->"2,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "0,"->"1,0"[label = <<B>o: b c:</B>>, color = violet, penwidth = 2];
+                        "1,0"->"2,1"[label = <<B>o: a ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "2,1"->",2"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
+                        ",2"->"2,"[label = <<B>o: ε c:</B>>, color = blue, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, '1', 0);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_inter_branches() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 2;
-                                0->1[label="[b]"];
-                                1->2[label="[a]"];
-                                0->2[label="[a]"];
+                                0->1[label=<<B>o: b c:</B>>];
+                                1->2[label=<<B>o: a c:</B>>];
+                                0->2[label=<<B>o: a c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 2;
-                                0->1[label="[ab]"];
-                                1->2[label="[ab]"];
+                                0->1[label=<<B>o: [ab] c:</B>>, color = blue];
+                                1->2[label=<<B>o: [ab] c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0,0";
-                        "2,2";
-                        "0,0"->"1,1"[label = "[b ∩ ab]", color = red];
-                        "0,0"->"2,1"[label = "[a ∩ ab]", color = red];
-                        "1,1"->"2,2"[label = "[a ∩ ab]", color = red];
-                        "2,1"->",2"[label = "[ab]", color = blue, style = dotted];
-                        ",2"->"2,2"[label = "[]", color = blue, style = dotted];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,0"[shape=rarrow];
+                    "2,2"[shape=doublecircle];
+                        "0,0"->"2,1"[label = <<B>o: a ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "0,0"->"1,1"[label = <<B>o: b ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "2,1"->",2"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
+                        "1,1"->"2,2"[label = <<B>o: a ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        ",2"->"2,2"[label = <<B>o: ε c:</B>>, color = blue, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, '0', 0);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_eps_cycle() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 3;
-                                0->1[label="[b]"];
-                                1->2[label="[]"];
-                                2->1[label="[]"];
-                                2->3[label="[a]"];
+                                0->1[label=<<B>o: b c:</B>>];
+                                1->1[label=<<B>o: ε c:</B>>];
+                                1->3[label=<<B>o: a c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 2;
-                                0->1[label="[ab]"];
-                                1->2[label="[ab]"];
+                                0->1[label=<<B>o: [ab] c:</B>>, color = blue];
+                                1->2[label=<<B>o: [ab] c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0,0";
-                        "3,2";
-                        "0,0"->"1   2,1"[label = "[b ∩ ab]", color = red];
-                        "1   2,1"->"3,2"[label = "[a ∩ ab]", color = red];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,0"[shape=rarrow];
+                    "3,2"[shape=doublecircle];
+                        "0,0"->"1,1"[label = <<B>o: b ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "1,1"->"3,2"[label = <<B>o: a ∩ [ab] c:</B>>, color = red, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, '0', 0);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_assert_cycle() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 3;
-                                0->1[label="[b]"];
-                                1->2[label="[^]"];
-                                2->1[label="[^]"];
-                                2->3[label="[a]"];
+                                0->1[label=<<B>o: b c:</B><BR/>o: ^ c:>];
+                                1->1[label=<<B>o: ^ c:</B>>];
+                                1->3[label=<<B>o: a c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 2;
-                                0->1[label="[ab]"];
-                                1->2[label="[ab]"];
+                                0->1[label=<<B>o: [ab] c:</B>>, color = blue];
+                                1->2[label=<<B>o: [ab] c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0,0";
-                        "3,2";
-                        "0,0"->"1   2,1"[label = "[b ∩ ab^]", color = red];
-                        "1   2,1"->"3,2"[label = "[a ∩ ab]", color = red];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,0"[shape=rarrow];
+                    "3,2"[shape=doublecircle];
+                        "0,0"->"1,1"[label = <<B>o: b ∩ [ab] c:</B><BR/>o: ^ c:(0,1)>, color = red, penwidth = 2];
+                        "1,1"->"3,2"[label = <<B>o: a ∩ [ab] c:</B>>, color = red, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, '0', 0);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_start_implicent_cycle() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 5;
-                                0->1[label="[a-c]"];
-                                1->2[label="[0-9]"];
-                                2->3[label="[a]"];
-                                3->4[label="[a-z]"];
-                                4->5[label="[a-z]"];
-                                4->1[label="[m]"];
+                                0->1[label=<<B>o: [a-c] c:</B>>];
+                                1->2[label=<<B>o: [0-9] c:</B>>];
+                                2->3[label=<<B>o: a c:</B>>];
+                                3->4[label=<<B>o: [a-z] c:</B>>];
+                                4->5[label=<<B>o: [a-z] c:</B>>];
+                                4->1[label=<<B>o: m c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 2;
-                                0->1[label="[ab]"];
-                                1->2[label="[01]"];
+                                0->1[label=<<B>o: [ab] c:</B>>, color = blue];
+                                1->2[label=<<B>o: [01] c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0,0";
-                        "5,";
-                        "0,0"->"1,1"[label = "[a-c ∩ ab]", color = red];
-                        "1,1"->"2,2"[label = "[0-9 ∩ 01]", color = red];
-                        "2,2"->"3,"[label = "[a]", color = violet];
-                        "3,"->"4,"[label = "[a-z]", color = violet];
-                        "4,"->"5,"[label = "[a-z]", color = violet];
-                        "4,"->"1,"[label = "[m]", color = violet];
-                        "1,"->"2,"[label = "[0-9]", color = violet];
-                        "2,"->"3,"[label = "[a]", color = violet];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,0"[shape=rarrow];
+                    "5,"[shape=doublecircle];
+                        "0,0"->"1,1"[label = <<B>o: [a-c] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "1,1"->"2,2"[label = <<B>o: [0-9] ∩ [01] c:</B>>, color = red, penwidth = 2];
+                        "2,2"->"3,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "3,"->"4,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "4,"->"1,"[label = <<B>o: m c:</B>>, color = violet, penwidth = 2];
+                        "4,"->"5,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"2,"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "2,"->"3,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, '0', 0);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_three_time_in_cycle() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 5;
-                                0->1[label="[a-c]"];
-                                1->2[label="[a]"];
-                                2->3[label="[a]"];
-                                3->4[label="[a-z]"];
-                                4->5[label="[a-z]"];
-                                4->1[label="[a]"];
+                                0->1[label=<<B>o: [a-c] c:</B>>];
+                                1->2[label=<<B>o: a c:</B>>];
+                                2->3[label=<<B>o: a c:</B>>];
+                                3->4[label=<<B>o: [a-z] c:</B>>];
+                                4->5[label=<<B>o: [a-z] c:</B>>];
+                                4->1[label=<<B>o: a c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 9;
-                                0->1[label="[a]"];
-                                1->2[label="[a]"];
-                                2->3[label="[a]"];
-                                3->4[label="[a]"];
-                                4->5[label="[ab]"];
-                                5->6[label="[a]"];
-                                6->7[label="[a]"];
-                                7->8[label="[a]"];
-                                8->9[label="[a]"];
+                                0->1[label=<<B>o: a c:</B>>, color = blue];
+                                1->2[label=<<B>o: a c:</B>>, color = blue];
+                                2->3[label=<<B>o: a c:</B>>, color = blue];
+                                3->4[label=<<B>o: a c:</B>>, color = blue];
+                                4->5[label=<<B>o: [ab] c:</B>>, color = blue];
+                                5->6[label=<<B>o: a c:</B>>, color = blue];
+                                6->7[label=<<B>o: a c:</B>>, color = blue];
+                                7->8[label=<<B>o: a c:</B>>, color = blue];
+                                8->9[label=<<B>o: a c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        ",0";
-                        "5,";
-                        "4,9"->"5,"[label = "[a-z]", color = violet];
-                        "3,8"->"4,9"[label = "[a-z ∩ a]", color = red];
-                        "2,7"->"3,8"[label = "[a ∩ a]", color = red];
-                        "1,6"->"2,7"[label = "[a ∩ a]", color = red];
-                        "0,5"->"1,6"[label = "[a-c ∩ a]", color = red];
-                        "4,5   9"->"1,6"[label = "[a ∩ a]", color = red];
-                        "3,4   8"->"4,5   9"[label = "[a-z ∩ ab]", color = red];
-                        "2,3   7"->"3,4   8"[label = "[a ∩ a]", color = red];
-                        "1,2   6"->"2,3   7"[label = "[a ∩ a]", color = red];
-                        "1,2   6"->"(2,3   7)"[label = "[a ∩ a]", color = red];
-                        "0,1"->"1,2   6"[label = "[a-c ∩ a]", color = red];
-                        "4,1   5   9"->"1,2   6"[label = "[a ∩ a]", color = red];
-                        "3,0   4   8"->"4,1   5   9"[label = "[a-z ∩ a]", color = red];
-                        "(2,3   7)"->"3,0   4   8"[label = "[a ∩ a]", color = red];
-                        ",4"->"0,5"[label = "[ab]", color = blue, style = dotted];
-                        ",3"->",4"[label = "[a]", color = blue, style = dotted];
-                        ",2"->",3"[label = "[a]", color = blue, style = dotted];
-                        ",1"->",2"[label = "[a]", color = blue, style = dotted];
-                        ",0"->",1"[label = "[a]", color = blue, style = dotted];
-                        ",0"->"0,1"[label = "[a]", color = blue, style = dotted];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        ",0"[shape=rarrow];
+                    "5,"[shape=doublecircle];
+                        "4,9"->"5,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "3,8"->"4,9"[label = <<B>o: [a-z] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "2,7"->"3,8"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "1,6"->"2,7"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "0,5"->"1,6"[label = <<B>o: [a-c] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "4,5   9"->"1,6"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "3,4   8"->"4,5   9"[label = <<B>o: [a-z] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "2,3   7"->"3,4   8"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "1,2   6"->"2,3   7"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "1,2   6"->"(2,3   7)"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "0,1"->"1,2   6"[label = <<B>o: [a-c] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "4,1   5   9"->"1,2   6"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "3,0   4   8"->"4,1   5   9"[label = <<B>o: [a-z] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "(2,3   7)"->"3,0   4   8"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        ",4"->"0,5"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
+                        ",3"->",4"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
+                        ",2"->",3"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
+                        ",1"->",2"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
+                        ",0"->",1"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
+                        ",0"->"0,1"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, '4', 1);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_two_time_in_cycle() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 5;
-                                0->1[label="[a-c]"];
-                                1->2[label="[0-9]"];
-                                2->3[label="[a]"];
-                                3->4[label="[a-z]"];
-                                4->5[label="[a-z]"];
-                                4->1[label="[a]"];
+                                0->1[label=<<B>o: [a-c] c:</B>>];
+                                1->2[label=<<B>o: [0-9] c:</B>>];
+                                2->3[label=<<B>o: a c:</B>>];
+                                3->4[label=<<B>o: [a-z] c:</B>>];
+                                4->5[label=<<B>o: [a-z] c:</B>>];
+                                4->1[label=<<B>o: a c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 8;
-                                0->1[label="[.]"];
-                                1->2[label="[.]"];
-                                2->3[label="[.]"];
-                                3->4[label="[.]"];
-                                4->5[label="[.]"];
-                                5->6[label="[.]"];
-                                6->7[label="[.]"];
-                                7->8[label="[.]"];
+                                0->1[label=<<B>o: . c:</B>>, color = blue];
+                                1->2[label=<<B>o: . c:</B>>, color = blue];
+                                2->3[label=<<B>o: . c:</B>>, color = blue];
+                                3->4[label=<<B>o: . c:</B>>, color = blue];
+                                4->5[label=<<B>o: . c:</B>>, color = blue];
+                                5->6[label=<<B>o: . c:</B>>, color = blue];
+                                6->7[label=<<B>o: . c:</B>>, color = blue];
+                                7->8[label=<<B>o: . c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        ",0";
-                        "5,8";
-                        "4,7"->"5,8"[label = "[a-z ∩ .]", color = red];
-                        "3,6"->"4,7"[label = "[a-z ∩ .]", color = red];
-                        "2,5"->"3,6"[label = "[a ∩ .]", color = red];
-                        "1,4"->"2,5"[label = "[0-9 ∩ .]", color = red];
-                        "1,4"->"1,0   4"[label = "[]", color = red];
-                        "0,3"->"1,4"[label = "[a-c ∩ .]", color = red];
-                        "4,3   7"->"1,4"[label = "[a ∩ .]", color = red];
-                        "3,2   6"->"4,3   7"[label = "[a-z ∩ .]", color = red];
-                        "2,1   5"->"3,2   6"[label = "[a ∩ .]", color = red];
-                        "1,0   4"->"2,1   5"[label = "[0-9 ∩ .]", color = red];
-                        ",2"->"0,3"[label = "[.]", color = blue, style = dotted];
-                        ",1"->",2"[label = "[.]", color = blue, style = dotted];
-                        ",0"->",1"[label = "[.]", color = blue, style = dotted];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        ",0"[shape=rarrow];
+                    "5,8"[shape=doublecircle];
+                        "4,7"->"5,8"[label = <<B>o: [a-z] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "3,6"->"4,7"[label = <<B>o: [a-z] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "2,5"->"3,6"[label = <<B>o: a ∩ . c:</B>>, color = red, penwidth = 2];
+                        "1,4"->"2,5"[label = <<B>o: [0-9] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "1,4"->"1,0   4"[label = <<B>o: ε c:</B>>, color = red, penwidth = 2];
+                        "0,3"->"1,4"[label = <<B>o: [a-c] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "4,3   7"->"1,4"[label = <<B>o: a ∩ . c:</B>>, color = red, penwidth = 2];
+                        "3,2   6"->"4,3   7"[label = <<B>o: [a-z] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "2,1   5"->"3,2   6"[label = <<B>o: a ∩ . c:</B>>, color = red, penwidth = 2];
+                        "1,0   4"->"2,1   5"[label = <<B>o: [0-9] ∩ . c:</B>>, color = red, penwidth = 2];
+                        ",2"->"0,3"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
+                        ",1"->",2"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
+                        ",0"->",1"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, '5', 1);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
-    public function test_no_intersection() {
-        $dotdescription1 = 'digraph example {
+    public function test_res_no_intersection() {
+        $dotdescription1 = 'digraph {
                                 0;
                                 5;
-                                0->1[label="[a-c]"];
-                                1->2[label="[0-9]"];
-                                2->3[label="[a]"];
-                                3->4[label="[a-z]"];
-                                4->5[label="[a-z]"];
-                                4->1[label="[m]"];
+                                0->1[label=<<B>o: [a-c] c:</B>>];
+                                1->2[label=<<B>o: [0-9] c:</B>>];
+                                2->3[label=<<B>o: a c:</B>>];
+                                3->4[label=<<B>o: [a-z] c:</B>>];
+                                4->5[label=<<B>o: [a-z] c:</B>>];
+                                4->1[label=<<B>o: m c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 2;
-                                0->1[label="[ab]"];
-                                1->2[label="[01]"];
+                                0->1[label=<<B>o: [ab] c:</B>>, color = blue];
+                                1->2[label=<<B>o: [01] c:</B>>, color = blue];
                             }';
 
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, '2', 0);
@@ -3623,300 +3561,285 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
     }
 
     public function test_implicent_cycle_not_start() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 5;
-                                0->1[label="[a-c]"];
-                                1->2[label="[0-9]"];
-                                2->3[label="[a]"];
-                                3->4[label="[a-z]"];
-                                4->5[label="[a-z]"];
-                                4->1[label="[m]"];
+                                0->1[label=<<B>o: [a-c] c:</B>>];
+                                1->2[label=<<B>o: [0-9] c:</B>>];
+                                2->3[label=<<B>o: a c:</B>>];
+                                3->4[label=<<B>o: [a-z] c:</B>>];
+                                4->5[label=<<B>o: [a-z] c:</B>>];
+                                4->1[label=<<B>o: m c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 2;
-                                0->1[label="[ab]"];
-                                1->2[label="[a-k]"];
+                                0->1[label=<<B>o: [ab] c:</B>>, color = blue];
+                                1->2[label=<<B>o: [a-k] c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0,";
-                        "5,";
-                        "0,"->"1,"[label = "[a-c]", color = violet];
-                        "1,"->"2,0"[label = "[0-9]", color = violet];
-                        "1,"->"2,"[label = "[0-9]", color = violet];
-                        "2,0"->"3,1"[label = "[a ∩ ab]", color = red];
-                        "3,1"->"4,2"[label = "[a-z ∩ a-k]", color = red];
-                        "4,2"->"5,"[label = "[a-z]", color = violet];
-                        "4,2"->"1,"[label = "[m]", color = violet];
-                        "2,"->"3,"[label = "[a]", color = violet];
-                        "3,"->"4,"[label = "[a-z]", color = violet];
-                        "4,"->"5,"[label = "[a-z]", color = violet];
-                        "4,"->"1,"[label = "[m]", color = violet];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,"[shape=rarrow];
+                    "5,"[shape=doublecircle];
+                        "0,"->"1,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"2,0"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"2,"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "2,0"->"3,1"[label = <<B>o: a ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "3,1"->"4,2"[label = <<B>o: [a-z] ∩ [a-k] c:</B>>, color = red, penwidth = 2];
+                        "4,2"->"1,"[label = <<B>o: m c:</B>>, color = violet, penwidth = 2];
+                        "4,2"->"5,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "2,"->"3,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "3,"->"4,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "4,"->"1,"[label = <<B>o: m c:</B>>, color = violet, penwidth = 2];
+                        "4,"->"5,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, '2', 0);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_implicent_cycle_in_branch() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 7;
-                                0->1[label="[a-c]"];
-                                1->2[label="[0-9]"];
-                                2->4[label="[a]"];
-                                1->3[label="[a-z]"];
-                                3->5[label="[012]"];
-                                4->6[label="[a-z]"];
-                                4->1[label="[m]"];
-                                5->6[label="[+=]"];
-                                6->1[label="[a-s]"];
-                                6->7[label="[a-c]"];
+                                0->1[label=<<B>o: [a-c] c:</B>>];
+                                1->2[label=<<B>o: [0-9] c:</B>>];
+                                2->4[label=<<B>o: a c:</B>>];
+                                1->3[label=<<B>o: [a-z] c:</B>>];
+                                3->5[label=<<B>o: [012] c:</B>>];
+                                4->6[label=<<B>o: [a-z] c:</B>>];
+                                4->1[label=<<B>o: m c:</B>>];
+                                5->6[label=<<B>o: [+=] c:</B>>];
+                                6->1[label=<<B>o: [a-s] c:</B>>];
+                                6->7[label=<<B>o: [a-c] c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 2;
-                                0->1[label="[ab]"];
-                                1->2[label="[01]"];
+                                0->1[label=<<B>o: [ab] c:</B>>, color = blue];
+                                1->2[label=<<B>o: [01] c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0,0";
-                        "7,";
-                        "0,0"->"1,1"[label = "[a-c ∩ ab]", color = red];
-                        "1,1"->"2,2"[label = "[0-9 ∩ 01]", color = red];
-                        "2,2"->"4,"[label = "[a]", color = violet];
-                        "4,"->"6,"[label = "[a-z]", color = violet];
-                        "4,"->"1,"[label = "[m]", color = violet];
-                        "6,"->"1,"[label = "[a-s]", color = violet];
-                        "6,"->"7,"[label = "[a-c]", color = violet];
-                        "1,"->"2,"[label = "[0-9]", color = violet];
-                        "1,"->"3,"[label = "[a-z]", color = violet];
-                        "2,"->"4,"[label = "[a]", color = violet];
-                        "3,"->"5,"[label = "[012]", color = violet];
-                        "5,"->"6,"[label = "[+=]", color = violet];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,0"[shape=rarrow];
+                    "7,"[shape=doublecircle];
+                        "0,0"->"1,1"[label = <<B>o: [a-c] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "1,1"->"2,2"[label = <<B>o: [0-9] ∩ [01] c:</B>>, color = red, penwidth = 2];
+                        "2,2"->"4,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "4,"->"1,"[label = <<B>o: m c:</B>>, color = violet, penwidth = 2];
+                        "4,"->"6,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"3,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"2,"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "6,"->"7,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "6,"->"1,"[label = <<B>o: [a-s] c:</B>>, color = violet, penwidth = 2];
+                        "3,"->"5,"[label = <<B>o: [012] c:</B>>, color = violet, penwidth = 2];
+                        "2,"->"4,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "5,"->"6,"[label = <<B>o: [+=] c:</B>>, color = violet, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, '0', 0);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_cycle_three_times_back() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 5;
-                                0->1[label="[a-c]"];
-                                1->2[label="[a]"];
-                                2->3[label="[a]"];
-                                3->4[label="[a-z]"];
-                                4->5[label="[a-z]"];
-                                4->1[label="[a]"];
+                                0->1[label=<<B>o: [a-c] c:</B>>];
+                                1->2[label=<<B>o: a c:</B>>];
+                                2->3[label=<<B>o: a c:</B>>];
+                                3->4[label=<<B>o: [a-z] c:</B>>];
+                                4->5[label=<<B>o: [a-z] c:</B>>];
+                                4->1[label=<<B>o: a c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 5;
-                                0->1[label="[a]"];
-                                1->2[label="[a]"];
-                                2->3[label="[a]"];
-                                3->4[label="[a]"];
-                                4->5[label="[ab]"];
+                                0->1[label=<<B>o: a c:</B>>, color = blue];
+                                1->2[label=<<B>o: a c:</B>>, color = blue];
+                                2->3[label=<<B>o: a c:</B>>, color = blue];
+                                3->4[label=<<B>o: a c:</B>>, color = blue];
+                                4->5[label=<<B>o: [ab] c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        ",0";
-                        "5,";
-                        "4,5"->"5,"[label = "[a-z]", color = violet];
-                        "3,4"->"4,5"[label = "[a-z ∩ ab]", color = red];
-                        "2,3"->"3,4"[label = "[a ∩ a]", color = red];
-                        "1,2"->"2,3"[label = "[a ∩ a]", color = red];
-                        "1,2"->"(2,3)"[label = "[a ∩ a]", color = red];
-                        "0,1"->"1,2"[label = "[a-c ∩ a]", color = red];
-                        "4,1   5"->"1,2"[label = "[a ∩ a]", color = red];
-                        "3,0   4"->"4,1   5"[label = "[a-z ∩ a]", color = red];
-                        "(2,3)"->"3,0   4"[label = "[a ∩ a]", color = red];
-                        ",0"->"0,1"[label = "[a]", color = blue, style = dotted];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        ",0"[shape=rarrow];
+                    "5,"[shape=doublecircle];
+                        "4,5"->"5,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "3,4"->"4,5"[label = <<B>o: [a-z] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "2,3"->"3,4"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "1,2"->"2,3"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "1,2"->"(2,3)"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "0,1"->"1,2"[label = <<B>o: [a-c] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "4,1   5"->"1,2"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "3,0   4"->"4,1   5"[label = <<B>o: [a-z] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "(2,3)"->"3,0   4"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        ",0"->"0,1"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, '4', 1);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_cycle_in_branch() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 7;
-                                0->1[label="[a-c]"];
-                                1->2[label="[0-9]"];
-                                2->4[label="[a]"];
-                                1->3[label="[a-z]"];
-                                3->5[label="[012]"];
-                                4->6[label="[0]"];
-                                4->1[label="[m]"];
-                                5->6[label="[+=]"];
-                                6->1[label="[a-s]"];
-                                6->7[label="[a-c]"];
+                                0->1[label=<<B>o: [a-c] c:</B>>];
+                                1->2[label=<<B>o: [0-9] c:</B>>];
+                                2->4[label=<<B>o: a c:</B>>];
+                                1->3[label=<<B>o: [a-z] c:</B>>];
+                                3->5[label=<<B>o: [012] c:</B>>];
+                                4->6[label=<<B>o: 0 c:</B>>];
+                                4->1[label=<<B>o: m c:</B>>];
+                                5->6[label=<<B>o: [+=] c:</B>>];
+                                6->1[label=<<B>o: [a-s] c:</B>>];
+                                6->7[label=<<B>o: [a-c] c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 2;
-                                0->1[label="[ab]"];
-                                1->2[label="[01]"];
+                                0->1[label=<<B>o: [ab] c:</B>>, color = blue];
+                                1->2[label=<<B>o: [01] c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0,";
-                        "7,";
-                        "0,"->"1,"[label = "[a-c]", color = violet];
-                        "1,"->"2,0"[label = "[0-9]", color = violet];
-                        "1,"->"3,"[label = "[a-z]", color = violet];
-                        "1,"->"2,"[label = "[0-9]", color = violet];
-                        "2,0"->"4,1"[label = "[a ∩ ab]", color = red];
-                        "3,"->"5,"[label = "[012]", color = violet];
-                        "5,"->"6,"[label = "[+=]", color = violet];
-                        "6,"->"1,"[label = "[a-s]", color = violet];
-                        "6,"->"7,"[label = "[a-c]", color = violet];
-                        "4,1"->"6,2"[label = "[0 ∩ 01]", color = red];
-                        "6,2"->"1,"[label = "[a-s]", color = violet];
-                        "6,2"->"7,"[label = "[a-c]", color = violet];
-                        "2,"->"4,"[label = "[a]", color = violet];
-                        "4,"->"6,"[label = "[0]", color = violet];
-                        "4,"->"1,"[label = "[m]", color = violet];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,"[shape=rarrow];
+                    "7,"[shape=doublecircle];
+                        "0,"->"1,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"3,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"2,0"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"2,"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "3,"->"5,"[label = <<B>o: [012] c:</B>>, color = violet, penwidth = 2];
+                        "2,0"->"4,1"[label = <<B>o: a ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "5,"->"6,"[label = <<B>o: [+=] c:</B>>, color = violet, penwidth = 2];
+                        "6,"->"7,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "6,"->"1,"[label = <<B>o: [a-s] c:</B>>, color = violet, penwidth = 2];
+                        "4,1"->"6,2"[label = <<B>o: 0 ∩ [01] c:</B>>, color = red, penwidth = 2];
+                        "6,2"->"7,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "6,2"->"1,"[label = <<B>o: [a-s] c:</B>>, color = violet, penwidth = 2];
+                        "2,"->"4,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "4,"->"6,"[label = <<B>o: 0 c:</B>>, color = violet, penwidth = 2];
+                        "4,"->"1,"[label = <<B>o: m c:</B>>, color = violet, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, '2', 0);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_inter_two_branches_back() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 7;
-                                0->1[label="[a-c]"];
-                                1->2[label="[0-9]"];
-                                2->4[label="[a]"];
-                                1->3[label="[a-z]"];
-                                3->5[label="[a-z]"];
-                                4->6[label="[0]"];
-                                4->1[label="[m]"];
-                                5->6[label="[0-9]"];
-                                6->1[label="[a-s]"];
-                                6->7[label="[a-c]"];
+                                0->1[label=<<B>o: [a-c] c:</B>>];
+                                1->2[label=<<B>o: [0-9] c:</B>>];
+                                2->4[label=<<B>o: a c:</B>>];
+                                1->3[label=<<B>o: [a-z] c:</B>>];
+                                3->5[label=<<B>o: [a-z] c:</B>>];
+                                4->6[label=<<B>o: 0 c:</B>>];
+                                4->1[label=<<B>o: m c:</B>>];
+                                5->6[label=<<B>o: [0-9] c:</B>>];
+                                6->1[label=<<B>o: [a-s] c:</B>>];
+                                6->7[label=<<B>o: [a-c] c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 2;
-                                0->1[label="[ab]"];
-                                1->2[label="[01]"];
+                                0->1[label=<<B>o: [ab] c:</B>>, color = blue];
+                                1->2[label=<<B>o: [01] c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0,";
-                        "7,";
-                        "6,2"->"7,"[label = "[a-c]", color = violet];
-                        "4,1"->"6,2"[label = "[0 ∩ 01]", color = red];
-                        "5,1"->"6,2"[label = "[0-9 ∩ 01]", color = red];
-                        "2,0"->"4,1"[label = "[a ∩ ab]", color = red];
-                        "3,0"->"5,1"[label = "[a-z ∩ ab]", color = red];
-                        "1,"->"2,"[label = "[0-9]", color = violet];
-                        "1,"->"3,"[label = "[a-z]", color = violet];
-                        "1,"->"2,0"[label = "[0-9]", color = violet];
-                        "1,"->"3,0"[label = "[a-z]", color = violet];
-                        "0,"->"1,"[label = "[a-c]", color = violet];
-                        "4,"->"1,"[label = "[m]", color = violet];
-                        "4,"->"6,"[label = "[0]", color = violet];
-                        "6,"->"7,"[label = "[a-c]", color = violet];
-                        "6,"->"1,"[label = "[a-s]", color = violet];
-                        "2,"->"4,"[label = "[a]", color = violet];
-                        "5,"->"6,"[label = "[0-9]", color = violet];
-                        "3,"->"5,"[label = "[a-z]", color = violet];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,"[shape=rarrow];
+                    "7,"[shape=doublecircle];
+                        "6,2"->"7,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "5,1"->"6,2"[label = <<B>o: [0-9] ∩ [01] c:</B>>, color = red, penwidth = 2];
+                        "4,1"->"6,2"[label = <<B>o: 0 ∩ [01] c:</B>>, color = red, penwidth = 2];
+                        "3,0"->"5,1"[label = <<B>o: [a-z] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "2,0"->"4,1"[label = <<B>o: a ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "1,"->"2,"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"3,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"3,0"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"2,0"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "0,"->"1,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "6,"->"7,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "6,"->"1,"[label = <<B>o: [a-s] c:</B>>, color = violet, penwidth = 2];
+                        "4,"->"1,"[label = <<B>o: m c:</B>>, color = violet, penwidth = 2];
+                        "4,"->"6,"[label = <<B>o: 0 c:</B>>, color = violet, penwidth = 2];
+                        "5,"->"6,"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "2,"->"4,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "3,"->"5,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, '6', 1);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_inter_two_branches_asserts_back() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 7;
-                                0->1[label="[a-c]"];
-                                1->2[label="[0-9]"];
-                                2->4[label="[a]"];
-                                1->3[label="[a-z]"];
-                                3->5[label="[a-z]"];
-                                4->6[label="[0]"];
-                                4->1[label="[m]"];
-                                5->6[label="[0-9]"];
-                                6->1[label="[^]"];
-                                6->7[label="[a-c]"];
+                                0->1[label=<<B>o: [a-c] c:</B>>];
+                                1->2[label=<<B>o: [0-9] c:</B>>];
+                                2->4[label=<<B>o: a c:</B>>];
+                                1->3[label=<<B>o: [a-z] c:</B>>];
+                                3->5[label=<<B>o: [a-z] c:</B>>];
+                                4->6[label=<<B>o: 0 c:</B>>];
+                                4->1[label=<<B>o: m c:</B>>];
+                                5->6[label=<<B>o: [0-9] c:</B>>];
+                                5->1[label=<<B>o: [0-9] c:</B><BR/>o: ^ c:>];
+                                6->7[label=<<B>o: [a-c] c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 2;
-                                0->1[label="[ab]"];
-                                1->2[label="[01]"];
+                                0->1[label=<<B>o: [ab] c:</B>>, color = blue];
+                                1->2[label=<<B>o: [01] c:</B>>, color = blue];
                             }';
         $dotresult = 'digraph res {
                         "0,";
@@ -3947,703 +3870,674 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, '6', 1);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_inter_two_cycles() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 7;
-                                0->1[label="[a-c]"];
-                                1->2[label="[0-9]"];
-                                2->4[label="[a]"];
-                                1->3[label="[012]"];
-                                3->5[label="[+=]"];
-                                4->6[label="[0]"];
-                                4->1[label="[m]"];
-                                5->6[label="[0-9]"];
-                                6->1[label="[a-s]"];
-                                6->7[label="[a-c]"];
+                                0->1[label=<<B>o: [a-c] c:</B>>];
+                                1->2[label=<<B>o: [0-9] c:</B>>];
+                                2->4[label=<<B>o: a c:</B>>];
+                                1->3[label=<<B>o: [012] c:</B>>];
+                                3->5[label=<<B>o: [+=] c:</B>>];
+                                4->6[label=<<B>o: 0 c:</B>>];
+                                4->1[label=<<B>o: m c:</B>>];
+                                5->6[label=<<B>o: [0-9] c:</B>>];
+                                6->1[label=<<B>o: [a-s] c:</B>>];
+                                6->7[label=<<B>o: [a-c] c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 3;
-                                0->1[label="[ab]"];
-                                1->2[label="[01]"];
-                                2->3[label="[a-z]"];
+                                0->1[label=<<B>o: [ab] c:</B>>, color = blue];
+                                1->2[label=<<B>o: [01] c:</B>>, color = blue];
+                                2->3[label=<<B>o: [a-z] c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0,0";
-                        "7,";
-                        "0,0"->"1,1"[label = "[a-c ∩ ab]", color = red];
-                        "1,1"->"2,2"[label = "[0-9 ∩ 01]", color = red];
-                        "2,2"->"4,3"[label = "[a ∩ a-z]", color = red];
-                        "4,3"->"6,"[label = "[0]", color = violet];
-                        "4,3"->"1,"[label = "[m]", color = violet];
-                        "6,"->"1,"[label = "[a-s]", color = violet];
-                        "6,"->"7,"[label = "[a-c]", color = violet];
-                        "1,"->"2,"[label = "[0-9]", color = violet];
-                        "1,"->"3,"[label = "[012]", color = violet];
-                        "2,"->"4,"[label = "[a]", color = violet];
-                        "3,"->"5,"[label = "[+=]", color = violet];
-                        "4,"->"6,"[label = "[0]", color = violet];
-                        "4,"->"1,"[label = "[m]", color = violet];
-                        "5,"->"6,"[label = "[0-9]", color = violet];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,0"[shape=rarrow];
+                    "7,"[shape=doublecircle];
+                        "0,0"->"1,1"[label = <<B>o: [a-c] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "1,1"->"2,2"[label = <<B>o: [0-9] ∩ [01] c:</B>>, color = red, penwidth = 2];
+                        "2,2"->"4,3"[label = <<B>o: a ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "4,3"->"1,"[label = <<B>o: m c:</B>>, color = violet, penwidth = 2];
+                        "4,3"->"6,"[label = <<B>o: 0 c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"3,"[label = <<B>o: [012] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"2,"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "6,"->"7,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "6,"->"1,"[label = <<B>o: [a-s] c:</B>>, color = violet, penwidth = 2];
+                        "3,"->"5,"[label = <<B>o: [+=] c:</B>>, color = violet, penwidth = 2];
+                        "2,"->"4,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "5,"->"6,"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "4,"->"6,"[label = <<B>o: 0 c:</B>>, color = violet, penwidth = 2];
+                        "4,"->"1,"[label = <<B>o: m c:</B>>, color = violet, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, '0', 0);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_inter_two_start_states() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 7;
-                                0->1[label="[a-c]"];
-                                1->2[label="[0-9]"];
-                                2->4[label="[a]"];
-                                1->3[label="[012]"];
-                                3->5[label="[+=]"];
-                                4->6[label="[0]"];
-                                4->1[label="[m]"];
-                                5->7[label="[0-9]"];
-                                7->1[label="[a-s]"];
-                                6->7[label="[a-c]"];
+                                0->1[label=<<B>o: [a-c] c:</B>>];
+                                1->2[label=<<B>o: [0-9] c:</B>>];
+                                2->4[label=<<B>o: a c:</B>>];
+                                1->3[label=<<B>o: [012] c:</B>>];
+                                3->5[label=<<B>o: [+=] c:</B>>];
+                                4->6[label=<<B>o: 0 c:</B>>];
+                                4->1[label=<<B>o: m c:</B>>];
+                                5->7[label=<<B>o: [0-9] c:</B>>];
+                                7->1[label=<<B>o: [a-s] c:</B>>];
+                                6->7[label=<<B>o: [a-c] c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 3;
-                                0->1[label="[ab]"];
-                                1->2[label="[01]"];
-                                2->3[label="[a-z]"];
+                                0->1[label=<<B>o: [ab] c:</B>>, color = blue];
+                                1->2[label=<<B>o: [01] c:</B>>, color = blue];
+                                2->3[label=<<B>o: [a-z] c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0,";"0,0";
-                        "7,";
-                        "7,"->"1,"[label = "[a-s]", color = violet];
-                        "5,"->"7,"[label = "[0-9]", color = violet];
-                        "5,"->"7,0"[label = "[0-9]", color = violet];
-                        "6,"->"7,"[label = "[a-c]", color = violet];
-                        "6,"->"7,0"[label = "[a-c]", color = violet];
-                        "3,"->"5,"[label = "[+=]", color = violet];
-                        "4,3"->"6,"[label = "[0]", color = violet];
-                        "4,3"->"1,"[label = "[m]", color = violet];
-                        "1,"->"3,"[label = "[012]", color = violet];
-                        "1,"->"2,"[label = "[0-9]", color = violet];
-                        "0,"->"1,"[label = "[a-c]", color = violet];
-                        "2,2"->"4,3"[label = "[a ∩ a-z]", color = red];
-                        "1,1"->"2,2"[label = "[0-9 ∩ 01]", color = red];
-                        "0,0"->"1,1"[label = "[a-c ∩ ab]", color = red];
-                        "7,0"->"1,1"[label = "[a-s ∩ ab]", color = red];
-                        "4,"->"1,"[label = "[m]", color = violet];
-                        "4,"->"6,"[label = "[0]", color = violet];
-                        "2,"->"4,"[label = "[a]", color = violet];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,"[shape=rarrow];
+                    "0,0"[shape=rarrow];
+                    "7,"[shape=doublecircle];
+                        "7,"->"1,"[label = <<B>o: [a-s] c:</B>>, color = violet, penwidth = 2];
+                        "6,"->"7,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "6,"->"7,0"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "5,"->"7,"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "5,"->"7,0"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "4,3"->"6,"[label = <<B>o: 0 c:</B>>, color = violet, penwidth = 2];
+                        "4,3"->"1,"[label = <<B>o: m c:</B>>, color = violet, penwidth = 2];
+                        "3,"->"5,"[label = <<B>o: [+=] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"3,"[label = <<B>o: [012] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"2,"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "0,"->"1,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "2,2"->"4,3"[label = <<B>o: a ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "1,1"->"2,2"[label = <<B>o: [0-9] ∩ [01] c:</B>>, color = red, penwidth = 2];
+                        "0,0"->"1,1"[label = <<B>o: [a-c] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "7,0"->"1,1"[label = <<B>o: [a-s] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "4,"->"1,"[label = <<B>o: m c:</B>>, color = violet, penwidth = 2];
+                        "4,"->"6,"[label = <<B>o: 0 c:</B>>, color = violet, penwidth = 2];
+                        "2,"->"4,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, 4, 1);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_full_inter_in_branch() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 6;
-                                0->1[label="[a-c]"];
-                                1->2[label="[a-c]"];
-                                2->3[label="[0-5as]"];
-                                3->4[label="[+=]"];
-                                4->5[label="[0]"];
-                                4->2[label="[m]"];
-                                5->6[label="[0-9]"];
-                                5->1[label="[a-s]"];
+                                0->1[label=<<B>o: [a-c] c:</B>>];
+                                1->2[label=<<B>o: [a-c] c:</B>>];
+                                2->3[label=<<B>o: [0-5as] c:</B>>];
+                                3->4[label=<<B>o: [+=] c:</B>>];
+                                4->5[label=<<B>o: 0 c:</B>>];
+                                4->2[label=<<B>o: m c:</B>>];
+                                5->6[label=<<B>o: [0-9] c:</B>>];
+                                5->1[label=<<B>o: [a-s] c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 2;
-                                0->1[label="[ab]"];
-                                1->2[label="[01]"];
+                                0->1[label=<<B>o: [ab] c:</B>>, color = blue];
+                                1->2[label=<<B>o: [01] c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0,";
-                        "6,";
-                        "0,"->"1,0"[label = "[a-c]", color = violet];
-                        "0,"->"1,"[label = "[a-c]", color = violet];
-                        "1,0"->"2,1"[label = "[a-c ∩ ab]", color = red];
-                        "2,1"->"3,2"[label = "[0-5as ∩ 01]", color = red];
-                        "3,2"->"4,"[label = "[+=]", color = violet];
-                        "4,"->"5,"[label = "[0]", color = violet];
-                        "4,"->"2,"[label = "[m]", color = violet];
-                        "5,"->"6,"[label = "[0-9]", color = violet];
-                        "5,"->"1,"[label = "[a-s]", color = violet];
-                        "2,"->"3,"[label = "[0-5as]", color = violet];
-                        "1,"->"2,"[label = "[a-c]", color = violet];
-                        "3,"->"4,"[label = "[+=]", color = violet];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,"[shape=rarrow];
+                    "6,"[shape=doublecircle];
+                        "0,"->"1,0"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "0,"->"1,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "1,0"->"2,1"[label = <<B>o: [a-c] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "2,1"->"3,2"[label = <<B>o: [0-5as] ∩ [01] c:</B>>, color = red, penwidth = 2];
+                        "3,2"->"4,"[label = <<B>o: [+=] c:</B>>, color = violet, penwidth = 2];
+                        "4,"->"2,"[label = <<B>o: m c:</B>>, color = violet, penwidth = 2];
+                        "4,"->"5,"[label = <<B>o: 0 c:</B>>, color = violet, penwidth = 2];
+                        "2,"->"3,"[label = <<B>o: [0-5as] c:</B>>, color = violet, penwidth = 2];
+                        "5,"->"1,"[label = <<B>o: [a-s] c:</B>>, color = violet, penwidth = 2];
+                        "5,"->"6,"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "3,"->"4,"[label = <<B>o: [+=] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"2,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, 1, 0);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_full_inter_in_branch_back() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 6;
-                                0->1[label="[a-c]"];
-                                1->2[label="[a-c]"];
-                                2->3[label="[0-5as]"];
-                                3->4[label="[ab]"];
-                                4->5[label="[0]"];
-                                4->2[label="[m]"];
-                                5->6[label="[0-9]"];
-                                5->1[label="[a-s]"];
+                                0->1[label=<<B>o: [a-c] c:</B>>];
+                                1->2[label=<<B>o: [a-c] c:</B>>];
+                                2->3[label=<<B>o: [0-5as] c:</B>>];
+                                3->4[label=<<B>o: [ab] c:</B>>];
+                                4->5[label=<<B>o: 0 c:</B>>];
+                                4->2[label=<<B>o: m c:</B>>];
+                                5->6[label=<<B>o: [0-9] c:</B>>];
+                                5->1[label=<<B>o: [a-s] c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 2;
-                                0->1[label="[ab]"];
-                                1->2[label="[01]"];
+                                0->1[label=<<B>o: [ab] c:</B>>, color = blue];
+                                1->2[label=<<B>o: [01] c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0,";
-                        "6,";
-                        "5,2"->"6,"[label = "[0-9]", color = violet];
-                        "4,1"->"5,2"[label = "[0 ∩ 01]", color = red];
-                        "3,0"->"4,1"[label = "[ab ∩ ab]", color = red];
-                        "2,"->"3,"[label = "[0-5as]", color = violet];
-                        "2,"->"3,0"[label = "[0-5as]", color = violet];
-                        "1,"->"2,"[label = "[a-c]", color = violet];
-                        "4,"->"2,"[label = "[m]", color = violet];
-                        "4,"->"5,"[label = "[0]", color = violet];
-                        "0,"->"1,"[label = "[a-c]", color = violet];
-                        "5,"->"6,"[label = "[0-9]", color = violet];
-                        "5,"->"1,"[label = "[a-s]", color = violet];
-                        "3,"->"4,"[label = "[ab]", color = violet];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,"[shape=rarrow];
+                    "6,"[shape=doublecircle];
+                        "5,2"->"6,"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "4,1"->"5,2"[label = <<B>o: 0 ∩ [01] c:</B>>, color = red, penwidth = 2];
+                        "3,0"->"4,1"[label = <<B>o: [ab] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "2,"->"3,"[label = <<B>o: [0-5as] c:</B>>, color = violet, penwidth = 2];
+                        "2,"->"3,0"[label = <<B>o: [0-5as] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"2,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "4,"->"2,"[label = <<B>o: m c:</B>>, color = violet, penwidth = 2];
+                        "4,"->"5,"[label = <<B>o: 0 c:</B>>, color = violet, penwidth = 2];
+                        "0,"->"1,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "5,"->"6,"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "5,"->"1,"[label = <<B>o: [a-s] c:</B>>, color = violet, penwidth = 2];
+                        "3,"->"4,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, 5, 1);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_with_meta_dots() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 7;
-                                0->1[label="[a-c]"];
-                                1->2[label="[0-9]"];
-                                2->4[label="[a]"];
-                                1->3[label="[a-z]"];
-                                3->5[label="[012]"];
-                                4->6[label="[0]"];
-                                4->1[label="[m]"];
-                                5->6[label="[+=]"];
-                                6->1[label="[a-s]"];
-                                6->7[label="[a-c]"];
+                                0->1[label=<<B>o: [a-c] c:</B>>];
+                                1->2[label=<<B>o: [0-9] c:</B>>];
+                                2->4[label=<<B>o: a c:</B>>];
+                                1->3[label=<<B>o: [a-z] c:</B>>];
+                                3->5[label=<<B>o: [012] c:</B>>];
+                                4->6[label=<<B>o: 0 c:</B>>];
+                                4->1[label=<<B>o: m c:</B>>];
+                                5->6[label=<<B>o: [+=] c:</B>>];
+                                6->1[label=<<B>o: [a-s] c:</B>>];
+                                6->7[label=<<B>o: [a-c] c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 2;
-                                0->1[label="[.]"];
-                                1->2[label="[.]"];
-                                2->0[label="[.]"];
+                                0->1[label=<<B>o: . c:</B>>, color = blue];
+                                1->2[label=<<B>o: . c:</B>>, color = blue];
+                                2->0[label=<<B>o: . c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0,";",0";
-                        "7,";
-                        "0,"->"1,"[label = "[a-c]", color = violet];
-                        "1,"->"2,0"[label = "[0-9]", color = violet];
-                        "1,"->"3,"[label = "[a-z]", color = violet];
-                        "2,0"->"4,1"[label = "[a ∩ .]", color = red];
-                        "3,"->"5,"[label = "[012]", color = violet];
-                        "5,"->"6,"[label = "[+=]", color = violet];
-                        "6,"->"1,"[label = "[a-s]", color = violet];
-                        "6,"->"7,"[label = "[a-c]", color = violet];
-                        "4,1"->"6,2"[label = "[0 ∩ .]", color = red];
-                        "4,1"->"1,2"[label = "[m ∩ .]", color = red];
-                        "6,2"->"1,0"[label = "[a-s ∩ .]", color = red];
-                        "6,2"->"7,0"[label = "[a-c ∩ .]", color = red];
-                        "1,2"->"2,0"[label = "[0-9 ∩ .]", color = red];
-                        "1,2"->"3,0"[label = "[a-z ∩ .]", color = red];
-                        "1,0"->"2,1"[label = "[0-9 ∩ .]", color = red];
-                        "1,0"->"3,1"[label = "[a-z ∩ .]", color = red];
-                        "7,0"->",1"[label = "[.]", color = blue, style = dotted];
-                        "3,0"->"5,1"[label = "[012 ∩ .]", color = red];
-                        "2,1"->"4,2"[label = "[a ∩ .]", color = red];
-                        "3,1"->"5,2"[label = "[012 ∩ .]", color = red];
-                        "5,1"->"6,2"[label = "[+= ∩ .]", color = red];
-                        "4,2"->"6,0"[label = "[0 ∩ .]", color = red];
-                        "4,2"->"1,0"[label = "[m ∩ .]", color = red];
-                        "5,2"->"6,0"[label = "[+= ∩ .]", color = red];
-                        "6,0"->"1,1"[label = "[a-s ∩ .]", color = red];
-                        "6,0"->"7,1"[label = "[a-c ∩ .]", color = red];
-                        "1,1"->"2,2"[label = "[0-9 ∩ .]", color = red];
-                        "1,1"->"3,2"[label = "[a-z ∩ .]", color = red];
-                        "7,1"->",2"[label = "[.]", color = blue, style = dotted];
-                        "2,2"->"4,0"[label = "[a ∩ .]", color = red];
-                        "3,2"->"5,0"[label = "[012 ∩ .]", color = red];
-                        "4,0"->"6,1"[label = "[0 ∩ .]", color = red];
-                        "4,0"->"1,1"[label = "[m ∩ .]", color = red];
-                        "5,0"->"6,1"[label = "[+= ∩ .]", color = red];
-                        "6,1"->"1,2"[label = "[a-s ∩ .]", color = red];
-                        "6,1"->"7,2"[label = "[a-c ∩ .]", color = red];
-                        "7,2"->"7,"[label = "[]", color = red];
-                        ",1"->",2"[label = "[.]", color = blue, style = dotted];
-                        ",2"->",0"[label = "[.]", color = blue, style = dotted];
-                        ",2"->"7,"[label = "[]", color = blue, style = dotted];
-                        ",0"->",1"[label = "[.]", color = blue, style = dotted];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,"[shape=rarrow];
+                    ",0"[shape=rarrow];
+                    "7,"[shape=doublecircle];
+                        "0,"->"1,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"3,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"2,0"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "3,"->"5,"[label = <<B>o: [012] c:</B>>, color = violet, penwidth = 2];
+                        "2,0"->"4,1"[label = <<B>o: a ∩ . c:</B>>, color = red, penwidth = 2];
+                        "5,"->"6,"[label = <<B>o: [+=] c:</B>>, color = violet, penwidth = 2];
+                        "6,"->"7,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "6,"->"1,"[label = <<B>o: [a-s] c:</B>>, color = violet, penwidth = 2];
+                        "4,1"->"1,2"[label = <<B>o: m ∩ . c:</B>>, color = red, penwidth = 2];
+                        "4,1"->"6,2"[label = <<B>o: 0 ∩ . c:</B>>, color = red, penwidth = 2];
+                        "1,2"->"3,0"[label = <<B>o: [a-z] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "1,2"->"2,0"[label = <<B>o: [0-9] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "6,2"->"7,0"[label = <<B>o: [a-c] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "6,2"->"1,0"[label = <<B>o: [a-s] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "3,0"->"5,1"[label = <<B>o: [012] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "7,0"->",1"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
+                        "1,0"->"3,1"[label = <<B>o: [a-z] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "1,0"->"2,1"[label = <<B>o: [0-9] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "5,1"->"6,2"[label = <<B>o: [+=] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "3,1"->"5,2"[label = <<B>o: [012] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "2,1"->"4,2"[label = <<B>o: a ∩ . c:</B>>, color = red, penwidth = 2];
+                        "5,2"->"6,0"[label = <<B>o: [+=] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "4,2"->"1,0"[label = <<B>o: m ∩ . c:</B>>, color = red, penwidth = 2];
+                        "4,2"->"6,0"[label = <<B>o: 0 ∩ . c:</B>>, color = red, penwidth = 2];
+                        "6,0"->"7,1"[label = <<B>o: [a-c] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "6,0"->"1,1"[label = <<B>o: [a-s] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "7,1"->",2"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
+                        "1,1"->"3,2"[label = <<B>o: [a-z] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "1,1"->"2,2"[label = <<B>o: [0-9] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "3,2"->"5,0"[label = <<B>o: [012] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "2,2"->"4,0"[label = <<B>o: a ∩ . c:</B>>, color = red, penwidth = 2];
+                        "5,0"->"6,1"[label = <<B>o: [+=] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "4,0"->"1,1"[label = <<B>o: m ∩ . c:</B>>, color = red, penwidth = 2];
+                        "4,0"->"6,1"[label = <<B>o: 0 ∩ . c:</B>>, color = red, penwidth = 2];
+                        "6,1"->"7,2"[label = <<B>o: [a-c] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "6,1"->"1,2"[label = <<B>o: [a-s] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "7,2"->"7,"[label = <<B>o: ε c:</B>>, color = red, penwidth = 2];
+                        ",1"->",2"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
+                        ",2"->",0"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
+                        ",2"->"7,"[label = <<B>o: ε c:</B>>, color = blue, penwidth = 2];
+                        ",0"->",1"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, 2, 0);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_full_intersection() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 7;
-                                0->1[label="[01]"];
-                                1->2[label="[ab]"];
-                                2->4[label="[a]"];
-                                1->3[label="[a-z]"];
-                                3->5[label="[012]"];
-                                4->6[label="[0]"];
-                                4->1[label="[m]"];
-                                5->6[label="[+=]"];
-                                6->1[label="[a-s]"];
-                                6->7[label="[a-c]"];
+                                0->1[label=<<B>o: [01] c:</B>>];
+                                1->2[label=<<B>o: [ab] c:</B>>];
+                                2->4[label=<<B>o: a c:</B>>];
+                                1->3[label=<<B>o: [a-z] c:</B>>];
+                                3->5[label=<<B>o: [012] c:</B>>];
+                                4->6[label=<<B>o: 0 c:</B>>];
+                                4->1[label=<<B>o: m c:</B>>];
+                                5->6[label=<<B>o: [+=] c:</B>>];
+                                6->1[label=<<B>o: [a-s] c:</B>>];
+                                6->7[label=<<B>o: [a-c] c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 2;
-                                0->1[label="[01]"];
-                                1->2[label="[ab]"];
-                                2->0[label="[.]"];
+                                0->1[label=<<B>o: [01] c:</B>>, color = blue];
+                                1->2[label=<<B>o: [ab] c:</B>>, color = blue];
+                                2->0[label=<<B>o: . c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0,0";
-                        "7,2";
-                        "6,1"->"7,2"[label = "[a-c ∩ ab]", color = red];
-                        "4,0"->"6,1"[label = "[0 ∩ 01]", color = red];
-                        "2,2"->"4,0"[label = "[a ∩ .]", color = red];
-                        "1,1"->"2,2"[label = "[ab ∩ ab]", color = red];
-                        "0,0"->"1,1"[label = "[01 ∩ 01]", color = red];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,0"[shape=rarrow];
+                    "7,2"[shape=doublecircle];
+                        "6,1"->"7,2"[label = <<B>o: [a-c] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "4,0"->"6,1"[label = <<B>o: 0 ∩ [01] c:</B>>, color = red, penwidth = 2];
+                        "2,2"->"4,0"[label = <<B>o: a ∩ . c:</B>>, color = red, penwidth = 2];
+                        "1,1"->"2,2"[label = <<B>o: [ab] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "0,0"->"1,1"[label = <<B>o: [01] ∩ [01] c:</B>>, color = red, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, 7, 1);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_branches_in_intersection() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 7;
-                                0->1[label="[a-c]"];
-                                1->2[label="[0-9]"];
-                                2->4[label="[0]"];
-                                1->3[label="[a-z]"];
-                                3->5[label="[012]"];
-                                4->6[label="[ab]"];
-                                4->1[label="[m]"];
-                                5->6[label="[^a]"];
-                                6->1[label="[a-s]"];
-                                6->7[label="[a-c]"];
+                                0->1[label=<<B>o: [a-c] c:</B>>];
+                                1->2[label=<<B>o: [0-9] c:</B>>];
+                                2->4[label=<<B>o: 0 c:</B>>];
+                                1->3[label=<<B>o: [a-z] c:</B>>];
+                                3->5[label=<<B>o: [012] c:</B>>];
+                                4->6[label=<<B>o: [ab] c:</B>>];
+                                4->1[label=<<B>o: m c:</B>>];
+                                5->6[label=<o: $ c:<BR/><B>o: a c:</B>>];
+                                6->1[label=<<B>o: [a-s] c:</B>>];
+                                6->7[label=<<B>o: [a-c] c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 2;
-                                0->1[label="[01]"];
-                                1->2[label="[ab]"];
-                                2->0[label="[.]"];
+                                0->1[label=<<B>o: [01] c:</B>>, color = blue];
+                                1->2[label=<<B>o: [ab] c:</B>>, color = blue];
+                                2->0[label=<<B>o: . c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        ",0";
-                        "7,";
-                        "6,2"->"7,"[label = "[a-c]", color = violet];
-                        "4,1"->"6,2"[label = "[ab ∩ ab]", color = red];
-                        "5,1"->"6,2"[label = "[a ∩ ab^]", color = red];
-                        "2,0"->"4,1"[label = "[0 ∩ 01]", color = red];
-                        "3,0"->"5,1"[label = "[012 ∩ 01]", color = red];
-                        "1,2"->"2,0"[label = "[0-9 ∩ .]", color = red];
-                        "1,2"->"3,0"[label = "[a-z ∩ .]", color = red];
-                        "0,1"->"1,2"[label = "[a-c ∩ ab]", color = red];
-                        ",0"->",1"[label = "[01]", color = blue, style = dotted];
-                        ",0"->"0,1"[label = "[01]", color = blue, style = dotted];
-                        ",2"->",0"[label = "[.]", color = blue, style = dotted];
-                        ",2"->"7,"[label = "[]", color = blue, style = dotted];
-                        ",1"->",2"[label = "[ab]", color = blue, style = dotted];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        ",0"[shape=rarrow];
+                    "7,"[shape=doublecircle];
+                        "6,2"->"7,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "5,1"->"6,2"[label = <o: $ c:(5,6)<BR/><B>o: a ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "4,1"->"6,2"[label = <<B>o: [ab] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "3,0"->"5,1"[label = <<B>o: [012] ∩ [01] c:</B>>, color = red, penwidth = 2];
+                        "2,0"->"4,1"[label = <<B>o: 0 ∩ [01] c:</B>>, color = red, penwidth = 2];
+                        "1,2"->"3,0"[label = <<B>o: [a-z] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "1,2"->"2,0"[label = <<B>o: [0-9] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "0,1"->"1,2"[label = <<B>o: [a-c] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        ",0"->",1"[label = <<B>o: [01] c:</B>>, color = blue, penwidth = 2];
+                        ",0"->"0,1"[label = <<B>o: [01] c:</B>>, color = blue, penwidth = 2];
+                        ",2"->",0"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
+                        ",2"->"7,"[label = <<B>o: ε c:</B>>, color = blue, penwidth = 2];
+                        ",1"->",2"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, 6, 1);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_with_meta_dots_back() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 7;
-                                0->1[label="[0-9]"];
-                                1->2[label="[a-n]"];
-                                2->4[label="[a]"];
-                                1->3[label="[a-z]"];
-                                3->5[label="[012]"];
-                                4->6[label="[0]"];
-                                4->1[label="[m]"];
-                                5->6[label="[+=]"];
-                                6->1[label="[a-s]"];
-                                6->7[label="[a-c]"];
+                                0->1[label=<<B>o: [0-9] c:</B>>];
+                                1->2[label=<<B>o: [a-n] c:</B>>];
+                                2->4[label=<<B>o: a c:</B>>];
+                                1->3[label=<<B>o: [a-z] c:</B>>];
+                                3->5[label=<<B>o: [012] c:</B>>];
+                                4->6[label=<<B>o: 0 c:</B>>];
+                                4->1[label=<<B>o: m c:</B>>];
+                                5->6[label=<<B>o: [+=] c:</B>>];
+                                6->1[label=<<B>o: [a-s] c:</B>>];
+                                6->7[label=<<B>o: [a-c] c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 2;
-                                0->1[label="[.]"];
-                                1->2[label="[.]"];
-                                2->0[label="[.]"];
+                                0->1[label=<<B>o: . c:</B>>, color = blue];
+                                1->2[label=<<B>o: . c:</B>>, color = blue];
+                                2->0[label=<<B>o: . c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0,0";",0";
-                        "7,2";
-                        "6,1"->"7,2"[label = "[a-c ∩ .]", color = red];
-                        "6,1"->"1,2"[label = "[a-s ∩ .]", color = red];
-                        "4,0"->"6,1"[label = "[0 ∩ .]", color = red];
-                        "4,0"->"1,1"[label = "[m ∩ .]", color = red];
-                        "5,0"->"6,1"[label = "[+= ∩ .]", color = red];
-                        "2,2"->"4,0"[label = "[a ∩ .]", color = red];
-                        "3,2"->"5,0"[label = "[012 ∩ .]", color = red];
-                        "1,1"->"2,2"[label = "[a-n ∩ .]", color = red];
-                        "1,1"->"3,2"[label = "[a-z ∩ .]", color = red];
-                        "0,0"->"1,1"[label = "[0-9 ∩ .]", color = red];
-                        "6,0"->"1,1"[label = "[a-s ∩ .]", color = red];
-                        "4,2"->"6,0"[label = "[0 ∩ .]", color = red];
-                        "4,2"->"1,0"[label = "[m ∩ .]", color = red];
-                        "5,2"->"6,0"[label = "[+= ∩ .]", color = red];
-                        "2,1"->"4,2"[label = "[a ∩ .]", color = red];
-                        "3,1"->"5,2"[label = "[012 ∩ .]", color = red];
-                        "1,0"->"2,1"[label = "[a-n ∩ .]", color = red];
-                        "1,0"->"3,1"[label = "[a-z ∩ .]", color = red];
-                        "0,2"->"1,0"[label = "[0-9 ∩ .]", color = red];
-                        "6,2"->"1,0"[label = "[a-s ∩ .]", color = red];
-                        "4,1"->"6,2"[label = "[0 ∩ .]", color = red];
-                        "4,1"->"1,2"[label = "[m ∩ .]", color = red];
-                        "5,1"->"6,2"[label = "[+= ∩ .]", color = red];
-                        "2,0"->"4,1"[label = "[a ∩ .]", color = red];
-                        "3,0"->"5,1"[label = "[012 ∩ .]", color = red];
-                        "1,2"->"2,0"[label = "[a-n ∩ .]", color = red];
-                        "1,2"->"3,0"[label = "[a-z ∩ .]", color = red];
-                        "0,1"->"1,2"[label = "[0-9 ∩ .]", color = red];
-                        ",1"->",2"[label = "[.]", color = blue, style = dotted];
-                        ",1"->"0,2"[label = "[.]", color = blue, style = dotted];
-                        ",0"->",1"[label = "[.]", color = blue, style = dotted];
-                        ",0"->"0,1"[label = "[.]", color = blue, style = dotted];
-                        ",2"->",0"[label = "[.]", color = blue, style = dotted];
-                        ",2"->"7,2"[label = "[]", color = blue, style = dotted];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,0"[shape=rarrow];
+                    ",0"[shape=rarrow];
+                    "7,2"[shape=doublecircle];
+                        "6,1"->"7,2"[label = <<B>o: [a-c] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "6,1"->"1,2"[label = <<B>o: [a-s] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "5,0"->"6,1"[label = <<B>o: [+=] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "4,0"->"6,1"[label = <<B>o: 0 ∩ . c:</B>>, color = red, penwidth = 2];
+                        "4,0"->"1,1"[label = <<B>o: m ∩ . c:</B>>, color = red, penwidth = 2];
+                        "3,2"->"5,0"[label = <<B>o: [012] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "2,2"->"4,0"[label = <<B>o: a ∩ . c:</B>>, color = red, penwidth = 2];
+                        "1,1"->"3,2"[label = <<B>o: [a-z] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "1,1"->"2,2"[label = <<B>o: [a-n] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "0,0"->"1,1"[label = <<B>o: [0-9] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "6,0"->"1,1"[label = <<B>o: [a-s] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "5,2"->"6,0"[label = <<B>o: [+=] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "4,2"->"6,0"[label = <<B>o: 0 ∩ . c:</B>>, color = red, penwidth = 2];
+                        "4,2"->"1,0"[label = <<B>o: m ∩ . c:</B>>, color = red, penwidth = 2];
+                        "3,1"->"5,2"[label = <<B>o: [012] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "2,1"->"4,2"[label = <<B>o: a ∩ . c:</B>>, color = red, penwidth = 2];
+                        "1,0"->"3,1"[label = <<B>o: [a-z] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "1,0"->"2,1"[label = <<B>o: [a-n] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "0,2"->"1,0"[label = <<B>o: [0-9] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "6,2"->"1,0"[label = <<B>o: [a-s] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "5,1"->"6,2"[label = <<B>o: [+=] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "4,1"->"6,2"[label = <<B>o: 0 ∩ . c:</B>>, color = red, penwidth = 2];
+                        "4,1"->"1,2"[label = <<B>o: m ∩ . c:</B>>, color = red, penwidth = 2];
+                        "3,0"->"5,1"[label = <<B>o: [012] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "2,0"->"4,1"[label = <<B>o: a ∩ . c:</B>>, color = red, penwidth = 2];
+                        "1,2"->"3,0"[label = <<B>o: [a-z] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "1,2"->"2,0"[label = <<B>o: [a-n] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "0,1"->"1,2"[label = <<B>o: [0-9] ∩ . c:</B>>, color = red, penwidth = 2];
+                        ",1"->",2"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
+                        ",1"->"0,2"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
+                        ",0"->",1"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
+                        ",0"->"0,1"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
+                        ",2"->",0"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
+                        ",2"->"7,2"[label = <<B>o: ε c:</B>>, color = blue, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, 7, 1);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_full_coping_with_intersection() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 9;
-                                0->1[label="[a-c]"];
-                                1->2[label="[0-9]"];
-                                1->3[label="[ab]"];
-                                2->8[label="[as]"];
-                                1->5[label="[a-z]"];
-                                3->4[label="[a-c]"];
-                                4->8[label="[ab]"];
-                                5->6[label="[0-9]"];
-                                7->8[label="[0-9]"];
-                                6->7[label="[0-9]"];
-                                8->9[label="[0-9]"];
-                                8->1[label="[0-9]"];
-                                9->2[label="[0-9]"];
+                                0->1[label=<<B>o: [a-c] c:</B>>];
+                                1->2[label=<<B>o: [0-9] c:</B>>];
+                                1->3[label=<<B>o: [ab] c:</B>>];
+                                2->8[label=<<B>o: [as] c:</B>>];
+                                1->5[label=<<B>o: [a-z] c:</B>>];
+                                3->4[label=<<B>o: [a-c] c:</B>>];
+                                4->8[label=<<B>o: [ab] c:</B>>];
+                                5->6[label=<<B>o: [0-9] c:</B>>];
+                                7->8[label=<<B>o: [0-9] c:</B>>];
+                                6->7[label=<<B>o: [0-9] c:</B>>];
+                                8->9[label=<<B>o: [0-9] c:</B>>];
+                                8->1[label=<<B>o: [0-9] c:</B>>];
+                                9->2[label=<<B>o: [0-9] c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 9;
-                                0->1[label="[a-z]"];
-                                1->2[label="[ab]"];
-                                1->3[label="[as]"];
-                                2->6[label="[a-c]"];
-                                3->4[label="[.]"];
-                                4->5[label="[a-d]"];
-                                5->6[label="[as01]"];
-                                6->7[label="[axy]"];
-                                6->8[label="[.]"];
-                                7->9[label="[a]"];
-                                8->9[label="[a-c]"];
-                                7->2[label="[a-z]"];
-                                8->1[label="[a-f]"];
+                                0->1[label=<<B>o: [a-z] c:</B>>, color = blue];
+                                1->2[label=<<B>o: [ab] c:</B>>, color = blue];
+                                1->3[label=<<B>o: [as] c:</B>>, color = blue];
+                                2->6[label=<<B>o: [a-c] c:</B>>, color = blue];
+                                3->4[label=<<B>o: . c:</B>>, color = blue];
+                                4->5[label=<<B>o: [a-d] c:</B>>, color = blue];
+                                5->6[label=<<B>o: [as01] c:</B>>, color = blue];
+                                6->7[label=<<B>o: [axy] c:</B>>, color = blue];
+                                6->8[label=<<B>o: . c:</B>>, color = blue];
+                                7->9[label=<<B>o: a c:</B>>, color = blue];
+                                8->9[label=<<B>o: [a-c] c:</B>>, color = blue];
+                                7->2[label=<<B>o: [a-z] c:</B>>, color = blue];
+                                8->1[label=<<B>o: [a-f] c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0,";"0,0";",0";
-                        "9,";
-                        "9,"->"2,"[label = "[0-9]", color = violet];
-                        "8,"->"9,"[label = "[0-9]", color = violet];
-                        "8,"->"1,"[label = "[0-9]", color = violet];
-                        "8,"->"1,0"[label = "[0-9]", color = violet];
-                        "2,"->"8,"[label = "[as]", color = violet];
-                        "4,"->"8,"[label = "[ab]", color = violet];
-                        "7,"->"8,"[label = "[0-9]", color = violet];
-                        "1,"->"2,"[label = "[0-9]", color = violet];
-                        "1,"->"3,"[label = "[ab]", color = violet];
-                        "1,"->"5,"[label = "[a-z]", color = violet];
-                        "3,"->"4,"[label = "[a-c]", color = violet];
-                        "6,"->"7,"[label = "[0-9]", color = violet];
-                        "0,"->"1,"[label = "[a-c]", color = violet];
-                        "0,"->"1,0"[label = "[a-c]", color = violet];
-                        "5,9"->"6,"[label = "[0-9]", color = violet];
-                        "1,7"->"5,9"[label = "[a-z ∩ a]", color = red];
-                        "1,8"->"5,9"[label = "[a-z ∩ a-c]", color = red];
-                        "1,8"->"3,1"[label = "[ab ∩ a-f]", color = red];
-                        "0,6"->"1,7"[label = "[a-c ∩ axy]", color = red];
-                        "0,6"->"1,8"[label = "[a-c ∩ .]", color = red];
-                        "8,6"->"1,8"[label = "[0-9 ∩ .]", color = red];
-                        "4,2"->"8,6"[label = "[ab ∩ a-c]", color = red];
-                        "4,5"->"8,6"[label = "[ab ∩ as01]", color = red];
-                        "3,1"->"4,2"[label = "[a-c ∩ ab]", color = red];
-                        "3,7"->"4,2"[label = "[a-c ∩ a-z]", color = red];
-                        "3,4"->"4,5"[label = "[a-c ∩ a-d]", color = red];
-                        "1,0"->"3,1"[label = "[ab ∩ a-z]", color = red];
-                        "1,6"->"3,7"[label = "[ab ∩ axy]", color = red];
-                        "1,3"->"3,4"[label = "[ab ∩ .]", color = red];
-                        "1,3"->"2,4"[label = "[0-9 ∩ .]", color = red];
-                        "0,2"->"1,6"[label = "[a-c ∩ a-c]", color = red];
-                        "0,5"->"1,6"[label = "[a-c ∩ as01]", color = red];
-                        "8,5"->"1,6"[label = "[0-9 ∩ as01]", color = red];
-                        "0,1"->"1,3"[label = "[a-c ∩ as]", color = red];
-                        "2,4"->"8,5"[label = "[as ∩ a-d]", color = red];
-                        "4,4"->"8,5"[label = "[ab ∩ a-d]", color = red];
-                        "3,3"->"4,4"[label = "[a-c ∩ .]", color = red];
-                        "1,1"->"3,3"[label = "[ab ∩ as]", color = red];
-                        "0,0"->"1,1"[label = "[a-c ∩ a-z]", color = red];
-                        "0,8"->"1,1"[label = "[a-c ∩ a-f]", color = red];
-                        ",2"->",6"[label = "[a-c]", color = blue, style = dotted];
-                        ",2"->"0,6"[label = "[a-c]", color = blue, style = dotted];
-                        ",5"->",6"[label = "[as01]", color = blue, style = dotted];
-                        ",5"->"0,6"[label = "[as01]", color = blue, style = dotted];
-                        ",1"->",2"[label = "[ab]", color = blue, style = dotted];
-                        ",1"->",3"[label = "[as]", color = blue, style = dotted];
-                        ",1"->"0,2"[label = "[ab]", color = blue, style = dotted];
-                        ",7"->",2"[label = "[a-z]", color = blue, style = dotted];
-                        ",7"->"0,2"[label = "[a-z]", color = blue, style = dotted];
-                        ",4"->",5"[label = "[a-d]", color = blue, style = dotted];
-                        ",4"->"0,5"[label = "[a-d]", color = blue, style = dotted];
-                        ",0"->",1"[label = "[a-z]", color = blue, style = dotted];
-                        ",0"->"0,1"[label = "[a-z]", color = blue, style = dotted];
-                        ",8"->",1"[label = "[a-f]", color = blue, style = dotted];
-                        ",8"->"0,1"[label = "[a-f]", color = blue, style = dotted];
-                        ",6"->",7"[label = "[axy]", color = blue, style = dotted];
-                        ",6"->",8"[label = "[.]", color = blue, style = dotted];
-                        ",6"->"0,8"[label = "[.]", color = blue, style = dotted];
-                        ",3"->",4"[label = "[.]", color = blue, style = dotted];
-                        "5,"->"6,"[label = "[0-9]", color = violet];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,"[shape=rarrow];
+                    "0,0"[shape=rarrow];
+                    ",0"[shape=rarrow];
+                    "9,"[shape=doublecircle];
+                        "9,"->"2,"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "8,"->"9,"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "8,"->"1,"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "8,"->"1,0"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "2,"->"8,"[label = <<B>o: [as] c:</B>>, color = violet, penwidth = 2];
+                        "7,"->"8,"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "4,"->"8,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"2,"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"3,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"5,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "6,"->"7,"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "3,"->"4,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "0,"->"1,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "0,"->"1,0"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "5,9"->"6,"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "1,8"->"5,9"[label = <<B>o: [a-z] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "1,8"->"3,1"[label = <<B>o: [ab] ∩ [a-f] c:</B>>, color = red, penwidth = 2];
+                        "1,7"->"5,9"[label = <<B>o: [a-z] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "0,6"->"1,8"[label = <<B>o: [a-c] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "0,6"->"1,7"[label = <<B>o: [a-c] ∩ [axy] c:</B>>, color = red, penwidth = 2];
+                        "8,6"->"1,8"[label = <<B>o: [0-9] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "4,2"->"8,6"[label = <<B>o: [ab] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "4,5"->"8,6"[label = <<B>o: [ab] ∩ [as01] c:</B>>, color = red, penwidth = 2];
+                        "3,1"->"4,2"[label = <<B>o: [a-c] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "3,7"->"4,2"[label = <<B>o: [a-c] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "3,4"->"4,5"[label = <<B>o: [a-c] ∩ [a-d] c:</B>>, color = red, penwidth = 2];
+                        "1,0"->"3,1"[label = <<B>o: [ab] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "1,6"->"3,7"[label = <<B>o: [ab] ∩ [axy] c:</B>>, color = red, penwidth = 2];
+                        "1,3"->"3,4"[label = <<B>o: [ab] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "1,3"->"2,4"[label = <<B>o: [0-9] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "0,2"->"1,6"[label = <<B>o: [a-c] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "0,5"->"1,6"[label = <<B>o: [a-c] ∩ [as01] c:</B>>, color = red, penwidth = 2];
+                        "8,5"->"1,6"[label = <<B>o: [0-9] ∩ [as01] c:</B>>, color = red, penwidth = 2];
+                        "0,1"->"1,3"[label = <<B>o: [a-c] ∩ [as] c:</B>>, color = red, penwidth = 2];
+                        "2,4"->"8,5"[label = <<B>o: [as] ∩ [a-d] c:</B>>, color = red, penwidth = 2];
+                        "4,4"->"8,5"[label = <<B>o: [ab] ∩ [a-d] c:</B>>, color = red, penwidth = 2];
+                        "3,3"->"4,4"[label = <<B>o: [a-c] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "1,1"->"3,3"[label = <<B>o: [ab] ∩ [as] c:</B>>, color = red, penwidth = 2];
+                        "0,0"->"1,1"[label = <<B>o: [a-c] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "0,8"->"1,1"[label = <<B>o: [a-c] ∩ [a-f] c:</B>>, color = red, penwidth = 2];
+                        ",2"->",6"[label = <<B>o: [a-c] c:</B>>, color = blue, penwidth = 2];
+                        ",2"->"0,6"[label = <<B>o: [a-c] c:</B>>, color = blue, penwidth = 2];
+                        ",5"->",6"[label = <<B>o: [as01] c:</B>>, color = blue, penwidth = 2];
+                        ",5"->"0,6"[label = <<B>o: [as01] c:</B>>, color = blue, penwidth = 2];
+                        ",1"->",2"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
+                        ",1"->",3"[label = <<B>o: [as] c:</B>>, color = blue, penwidth = 2];
+                        ",1"->"0,2"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
+                        ",7"->",2"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
+                        ",7"->"0,2"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
+                        ",4"->",5"[label = <<B>o: [a-d] c:</B>>, color = blue, penwidth = 2];
+                        ",4"->"0,5"[label = <<B>o: [a-d] c:</B>>, color = blue, penwidth = 2];
+                        ",0"->",1"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
+                        ",0"->"0,1"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
+                        ",8"->",1"[label = <<B>o: [a-f] c:</B>>, color = blue, penwidth = 2];
+                        ",8"->"0,1"[label = <<B>o: [a-f] c:</B>>, color = blue, penwidth = 2];
+                        ",6"->",7"[label = <<B>o: [axy] c:</B>>, color = blue, penwidth = 2];
+                        ",6"->",8"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
+                        ",6"->"0,8"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
+                        ",3"->",4"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
+                        "5,"->"6,"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, 5, 1);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_two_times_in_cycle_back() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 4;
-                                0->1[label="[a-c]"];
-                                1->2[label="[a-z]"];
-                                2->3[label="[a]"];
-                                3->4[label="[a-z]"];
-                                3->1[label="[a]"];
+                                0->1[label=<<B>o: [a-c] c:</B>>];
+                                1->2[label=<<B>o: [a-z] c:</B>>];
+                                2->3[label=<<B>o: a c:</B>>];
+                                3->4[label=<<B>o: [a-z] c:</B>>];
+                                3->1[label=<<B>o: a c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 3;
-                                0->1[label="[ab]"];
-                                1->2[label="[a-z]"];
-                                2->3[label="[a]"];
+                                0->1[label=<<B>o: [ab] c:</B>>, color = blue];
+                                1->2[label=<<B>o: [a-z] c:</B>>, color = blue];
+                                2->3[label=<<B>o: a c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0,";
-                        ",3";
-                        "0,"->"1,"[label = "[a-c]", color = violet];
-                        "1,"->"2,0"[label = "[a-z]", color = violet];
-                        "2,0"->"3,1"[label = "[a ∩ ab]", color = red];
-                        "3,1"->"4,2"[label = "[a-z ∩ a-z]", color = red];
-                        "3,1"->"1,2"[label = "[a ∩ a-z]", color = red];
-                        "4,2"->",3"[label = "[a]", color = blue, style = dotted];
-                        "1,2"->"2,3   0"[label = "[a-z ∩ a]", color = red];
-                        "2,3   0"->"3,1"[label = "[a ∩ ab]", color = red];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,"[shape=rarrow];
+                    ",3"[shape=doublecircle];
+                        "0,"->"1,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"2,0"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "2,0"->"3,1"[label = <<B>o: a ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "3,1"->"1,2"[label = <<B>o: a ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "3,1"->"4,2"[label = <<B>o: [a-z] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "1,2"->"2,3   0"[label = <<B>o: [a-z] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "4,2"->",3"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
+                        "2,3   0"->"3,1"[label = <<B>o: a ∩ [ab] c:</B>>, color = red, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, '2', 0);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_two_times_in_cycle_merged() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 5;
-                                0->1[label="[a-c]"];
-                                1->2[label="[a-z]"];
-                                1->3[label="[a-z]"];
-                                2->4[label="[a]"];
-                                3->4[label="[a-z]"];
-                                4->1[label="[a]"];
-                                4->5[label="[a]"];
+                                0->1[label=<<B>o: [a-c] c:</B>>];
+                                1->2[label=<<B>o: [a-z] c:</B>>];
+                                1->3[label=<<B>o: [a-z] c:</B>>];
+                                2->4[label=<<B>o: a c:</B>>];
+                                3->4[label=<<B>o: [a-z] c:</B>>];
+                                4->1[label=<<B>o: a c:</B>>];
+                                4->5[label=<<B>o: a c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 9;
-                                0->1[label="[ab]"];
-                                1->2[label="[a-z]"];
-                                2->3[label="[a]"];
-                                3->4[label="[ab]"];
-                                4->5[label="[a-z]"];
-                                5->6[label="[a]"];
-                                6->7[label="[ab]"];
-                                7->8[label="[a-z]"];
-                                8->9[label="[a]"];
+                                0->1[label=<<B>o: [ab] c:</B>>, color = blue];
+                                1->2[label=<<B>o: [a-z] c:</B>>, color = blue];
+                                2->3[label=<<B>o: a c:</B>>, color = blue];
+                                3->4[label=<<B>o: [ab] c:</B>>, color = blue];
+                                4->5[label=<<B>o: [a-z] c:</B>>, color = blue];
+                                5->6[label=<<B>o: a c:</B>>, color = blue];
+                                6->7[label=<<B>o: [ab] c:</B>>, color = blue];
+                                7->8[label=<<B>o: [a-z] c:</B>>, color = blue];
+                                8->9[label=<<B>o: a c:</B>>, color = blue];
                             }';
         $dotresult = 'digraph res {
                         "0,";
@@ -4684,925 +4578,903 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $replace = "\n";
         $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
 
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, 1, 0);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_merged_first_and_cycle() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 4;
-                                0->1[label="[]"];
-                                1->2[label="[a-z]"];
-                                2->3[label="[a-z]"];
-                                3->4[label="[a]"];
-                                3->1[label="[a]"];
+                                0->2[label=<o: ε c:<BR/><B>o: [a-z] c:</B>>];
+                                2->3[label=<<B>o: [a-z] c:</B>>];
+                                3->4[label=<<B>o: a c:</B>>];
+                                3->1[label=<<B>o: a c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 6;
-                                0->1[label="[ab]"];
-                                1->2[label="[a-z]"];
-                                2->3[label="[a]"];
-                                3->4[label="[ab]"];
-                                4->5[label="[a-z]"];
-                                5->6[label="[a]"];
+                                0->1[label=<<B>o: [ab] c:</B>>, color = blue];
+                                1->2[label=<<B>o: [a-z] c:</B>>, color = blue];
+                                2->3[label=<<B>o: a c:</B>>, color = blue];
+                                3->4[label=<<B>o: [ab] c:</B>>, color = blue];
+                                4->5[label=<<B>o: [a-z] c:</B>>, color = blue];
+                                5->6[label=<<B>o: a c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0   1,0";
-                        "4,6";
-                        "0   1,0"->"2,1"[label = "[a-z ∩ ab]", color = red];
-                        "2,1"->"3,2"[label = "[a-z ∩ a-z]", color = red];
-                        "3,2"->"4,3"[label = "[a ∩ a]", color = red];
-                        "3,2"->"0   1,3   0"[label = "[a ∩ a]", color = red];
-                        "4,3"->",4"[label = "[ab]", color = blue, style = dotted];
-                        "0   1,3   0"->"2,4   1"[label = "[a-z ∩ ab]", color = red];
-                        "2,4   1"->"3,5   2"[label = "[a-z ∩ a-z]", color = red];
-                        "3,5   2"->"4,6"[label = "[a ∩ a]", color = red];
-                        "3,5   2"->"0   1,6   3   0"[label = "[a ∩ a]", color = red];
-                        "0   1,6   3   0"->"2,4   1"[label = "[a-z ∩ ab]", color = red];
-                        ",4"->",5"[label = "[a-z]", color = blue, style = dotted];
-                        ",5"->",6"[label = "[a]", color = blue, style = dotted];
-                        ",6"->"4,6"[label = "[]", color = blue, style = dotted];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,"[shape=rarrow];
+                    ",6"[shape=doublecircle];
+                        "0,"->"2,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "2,"->"3,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "3,"->"4,0"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "4,0"->",1"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
+                        ",1"->",2"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
+                        ",2"->",3"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
+                        ",3"->",4"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
+                        ",4"->",5"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
+                        ",5"->",6"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, 1, 0);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_merged_first_in_both() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 4;
-                                0->1[label="[]"];
-                                1->2[label="[a-z]"];
-                                2->3[label="[a-z]"];
-                                3->4[label="[a]"];
-                                3->1[label="[a]"];
+                                0->2[label=<o: ε c:<BR/><B>o: [a-z] c:</B>>];
+                                1->2[label=<<B>o: [a-z] c:</B>>];
+                                2->3[label=<<B>o: [a-z] c:</B>>];
+                                3->4[label=<<B>o: a c:</B>>];
+                                3->1[label=<<B>o: a c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 6;
-                                0->1[label="[]"];
-                                1->2[label="[a-z]"];
-                                2->3[label="[a]"];
-                                3->4[label="[ab]"];
-                                4->5[label="[a-z]"];
-                                5->6[label="[a]"];
+                                0->2[label=<o: ε c:<BR/><B>o: [a-z] c:</B>>, color = blue];
+                                1->2[label=<<B>o: [a-z] c:</B>>, color = blue];
+                                2->3[label=<<B>o: a c:</B>>, color = blue];
+                                3->4[label=<<B>o: [ab] c:</B>>, color = blue];
+                                4->5[label=<<B>o: [a-z] c:</B>>, color = blue];
+                                5->6[label=<<B>o: a c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0   1,";
-                        "4,6";
-                        "0   1,"->"2,0   1"[label = "[a-z]", color = violet];
-                        "2,0   1"->"3,2"[label = "[a-z ∩ a-z]", color = red];
-                        "3,2"->"4,3"[label = "[a ∩ a]", color = red];
-                        "3,2"->"0   1,3"[label = "[a ∩ a]", color = red];
-                        "4,3"->",4"[label = "[ab]", color = blue, style = dotted];
-                        "0   1,3"->"2,4   0   1"[label = "[a-z ∩ ab]", color = red];
-                        "2,4   0   1"->"3,5   2"[label = "[a-z ∩ a-z]", color = red];
-                        "3,5   2"->"4,6"[label = "[a ∩ a]", color = red];
-                        "3,5   2"->"0   1,6   3"[label = "[a ∩ a]", color = red];
-                        "0   1,6   3"->"2,4   0   1"[label = "[a-z ∩ ab]", color = red];
-                        ",4"->",5"[label = "[a-z]", color = blue, style = dotted];
-                        ",5"->",6"[label = "[a]", color = blue, style = dotted];
-                        ",6"->"4,6"[label = "[]", color = blue, style = dotted];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,"[shape=rarrow];
+                    "4,6"[shape=doublecircle];
+                        "0,"->"2,0"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "0,"->"2,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "2,0"->"3,2"[label = <o: ε c:(0,2)<BR/><B>o: [a-z] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "3,2"->"1,3"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "3,2"->"4,3"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "1,3"->"2,4"[label = <<B>o: [a-z] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "4,3"->",4"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
+                        "2,4"->"3,5"[label = <<B>o: [a-z] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "3,5"->"1,6"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "3,5"->"4,6"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "1,6"->"2,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        ",4"->",5"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
+                        ",5"->",6"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
+                        ",6"->"4,6"[label = <<B>o: ε c:</B>>, color = blue, penwidth = 2];
+                        "1,"->"2,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "2,"->"3,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "3,"->"1,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "3,"->"4,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "4,"->"4,6"[label = <<B>o: ε c:</B>>, color = violet, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, 2, 0);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_branches_same_length_cycle() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 5;
-                                0->1[label="[a-c]"];
-                                1->2[label="[a]"];
-                                2->3[label="[a]"];
-                                3->4[label="[a-z]"];
-                                4->5[label="[a-z]"];
-                                4->1[label="[a]"];
+                                0->1[label=<<B>o: [a-c] c:</B>>];
+                                1->2[label=<<B>o: a c:</B>>];
+                                2->3[label=<<B>o: a c:</B>>];
+                                3->4[label=<<B>o: [a-z] c:</B>>];
+                                4->5[label=<<B>o: [a-z] c:</B>>];
+                                4->1[label=<<B>o: a c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 8;
-                                0->1[label="[a]"];
-                                1->2[label="[a]"];
-                                2->3[label="[a]"];
-                                3->4[label="[a]"];
-                                4->5[label="[ab]"];
-                                5->6[label="[ab]"];
-                                6->7[label="[ab]"];
-                                7->8[label="[ab]"];
+                                0->1[label=<<B>o: a c:</B>>, color = blue];
+                                1->2[label=<<B>o: a c:</B>>, color = blue];
+                                2->3[label=<<B>o: a c:</B>>, color = blue];
+                                3->4[label=<<B>o: a c:</B>>, color = blue];
+                                4->5[label=<<B>o: [ab] c:</B>>, color = blue];
+                                5->6[label=<<B>o: [ab] c:</B>>, color = blue];
+                                6->7[label=<<B>o: [ab] c:</B>>, color = blue];
+                                7->8[label=<<B>o: [ab] c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0,0";",0";
-                        "5,";
-                        "4,8"->"5,"[label = "[a-z]", color = violet];
-                        "3,7"->"4,8"[label = "[a-z ∩ ab]", color = red];
-                        "2,6"->"3,7"[label = "[a ∩ ab]", color = red];
-                        "1,5"->"2,6"[label = "[a ∩ ab]", color = red];
-                        "0,4"->"1,5"[label = "[a-c ∩ ab]", color = red];
-                        "4,4   8"->"1,5"[label = "[a ∩ ab]", color = red];
-                        "3,3   7"->"4,4   8"[label = "[a-z ∩ a]", color = red];
-                        "2,2   6"->"3,3   7"[label = "[a ∩ a]", color = red];
-                        "1,1   5"->"2,2   6"[label = "[a ∩ a]", color = red];
-                        "1,1   5"->"(2,2   6)"[label = "[a ∩ a]", color = red];
-                        "0,0"->"1,1   5"[label = "[a-c ∩ a]", color = red];
-                        "4,0   4   8"->"1,1   5"[label = "[a ∩ a]", color = red];
-                        "(3,3   7)"->"4,0   4   8"[label = "[a-z ∩ a]", color = red];
-                        "(2,2   6)"->"(3,3   7)"[label = "[a ∩ a]", color = red];
-                        ",3"->"0,4"[label = "[a]", color = blue, style = dotted];
-                        ",2"->",3"[label = "[a]", color = blue, style = dotted];
-                        ",1"->",2"[label = "[a]", color = blue, style = dotted];
-                        ",0"->",1"[label = "[a]", color = blue, style = dotted];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,0"[shape=rarrow];
+                    ",0"[shape=rarrow];
+                    "5,"[shape=doublecircle];
+                        "4,8"->"5,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "3,7"->"4,8"[label = <<B>o: [a-z] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "2,6"->"3,7"[label = <<B>o: a ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "1,5"->"2,6"[label = <<B>o: a ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "0,4"->"1,5"[label = <<B>o: [a-c] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "4,4   8"->"1,5"[label = <<B>o: a ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "3,3   7"->"4,4   8"[label = <<B>o: [a-z] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "2,2   6"->"3,3   7"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "1,1   5"->"2,2   6"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "1,1   5"->"(2,2   6)"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "0,0"->"1,1   5"[label = <<B>o: [a-c] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "4,0   4   8"->"1,1   5"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "(3,3   7)"->"4,0   4   8"[label = <<B>o: [a-z] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "(2,2   6)"->"(3,3   7)"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        ",3"->"0,4"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
+                        ",2"->",3"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
+                        ",1"->",2"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
+                        ",0"->",1"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, 4, 1);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_inter_with_cycles_full_first() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 8;
-                                0->1[label="[ab]"];
-                                1->2[label="[a-z]"];
-                                2->3[label="[a-z]"];
-                                1->4[label="[ab]"];
-                                4->5[label="[ab]"];
-                                5->6[label="[ab]"];
-                                6->7[label="[ab]"];
-                                3->7[label="[a]"];
-                                3->1[label="[a]"];
-                                7->1[label="[ab]"];
-                                7->8[label="[ab]"];
+                                0->1[label=<<B>o: [ab] c:</B>>];
+                                1->2[label=<<B>o: [a-z] c:</B>>];
+                                2->3[label=<<B>o: [a-z] c:</B>>];
+                                1->4[label=<<B>o: [ab] c:</B>>];
+                                4->5[label=<<B>o: [ab] c:</B>>];
+                                5->6[label=<<B>o: [ab] c:</B>>];
+                                6->7[label=<<B>o: [ab] c:</B>>];
+                                3->7[label=<<B>o: a c:</B>>];
+                                3->1[label=<<B>o: a c:</B>>];
+                                7->1[label=<<B>o: [ab] c:</B>>];
+                                7->8[label=<<B>o: [ab] c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 6;
-                                0->1[label="[ab]"];
-                                1->2[label="[a-z]"];
-                                2->3[label="[a]"];
-                                3->4[label="[ab]"];
-                                4->5[label="[a-z]"];
-                                5->6[label="[a]"];
+                                0->1[label=<<B>o: [ab] c:</B>>, color = blue];
+                                1->2[label=<<B>o: [a-z] c:</B>>, color = blue];
+                                2->3[label=<<B>o: a c:</B>>, color = blue];
+                                3->4[label=<<B>o: [ab] c:</B>>, color = blue];
+                                4->5[label=<<B>o: [a-z] c:</B>>, color = blue];
+                                5->6[label=<<B>o: a c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0,";
-                        "8,";
-                        "0,"->"1,"[label = "[ab]", color = violet];
-                        "1,"->"2,0"[label = "[a-z]", color = violet];
-                        "1,"->"4,"[label = "[ab]", color = violet];
-                        "1,"->"2,"[label = "[a-z]", color = violet];
-                        "2,0"->"3,1"[label = "[a-z ∩ ab]", color = red];
-                        "4,"->"5,"[label = "[ab]", color = violet];
-                        "5,"->"6,"[label = "[ab]", color = violet];
-                        "6,"->"7,"[label = "[ab]", color = violet];
-                        "7,"->"1,"[label = "[ab]", color = violet];
-                        "7,"->"8,"[label = "[ab]", color = violet];
-                        "3,1"->"7,2"[label = "[a ∩ a-z]", color = red];
-                        "3,1"->"1,2"[label = "[a ∩ a-z]", color = red];
-                        "7,2"->"1,3"[label = "[ab ∩ a]", color = red];
-                        "7,2"->"8,3"[label = "[ab ∩ a]", color = red];
-                        "1,2"->"2,3   0"[label = "[a-z ∩ a]", color = red];
-                        "1,2"->"4,3"[label = "[ab ∩ a]", color = red];
-                        "1,3"->"2,4   0"[label = "[a-z ∩ ab]", color = red];
-                        "1,3"->"4,4"[label = "[ab ∩ ab]", color = red];
-                        "8,3"->",4"[label = "[ab]", color = blue, style = dotted];
-                        "2,3   0"->"3,4   1"[label = "[a-z ∩ ab]", color = red];
-                        "4,3"->"5,4"[label = "[ab ∩ ab]", color = red];
-                        "2,4   0"->"3,5   1"[label = "[a-z ∩ a-z]", color = red];
-                        "4,4"->"5,5"[label = "[ab ∩ a-z]", color = red];
-                        "3,4   1"->"7,5"[label = "[a ∩ a-z]", color = red];
-                        "3,4   1"->"1,5   2"[label = "[a ∩ a-z]", color = red];
-                        "5,4"->"6,5"[label = "[ab ∩ a-z]", color = red];
-                        "3,5   1"->"7,6   2"[label = "[a ∩ a]", color = red];
-                        "3,5   1"->"1,6   3"[label = "[a ∩ a]", color = red];
-                        "5,5"->"6,6"[label = "[ab ∩ a]", color = red];
-                        "7,5"->"1,6   2"[label = "[ab ∩ a]", color = red];
-                        "7,5"->"8,6"[label = "[ab ∩ a]", color = red];
-                        "1,5   2"->"2,6   3   0"[label = "[a-z ∩ a]", color = red];
-                        "1,5   2"->"4,6"[label = "[ab ∩ a]", color = red];
-                        "6,5"->"7,6"[label = "[ab ∩ a]", color = red];
-                        "7,6   2"->"1,3"[label = "[ab ∩ a]", color = red];
-                        "7,6   2"->"8,3"[label = "[ab ∩ a]", color = red];
-                        "1,6   3"->"2,4   0"[label = "[a-z ∩ ab]", color = red];
-                        "1,6   3"->"4,4"[label = "[ab ∩ ab]", color = red];
-                        "6,6"->"7,"[label = "[ab]", color = violet];
-                        "1,6   2"->"2,3   0"[label = "[a-z ∩ a]", color = red];
-                        "1,6   2"->"4,3"[label = "[ab ∩ a]", color = red];
-                        "8,6"->"8,"[label = "[]", color = red];
-                        "2,6   3   0"->"3,4   1"[label = "[a-z ∩ ab]", color = red];
-                        "4,6"->"5,"[label = "[ab]", color = violet];
-                        "7,6"->"1,"[label = "[ab]", color = violet];
-                        "7,6"->"8,"[label = "[ab]", color = violet];
-                        ",4"->",5"[label = "[a-z]", color = blue, style = dotted];
-                        ",5"->",6"[label = "[a]", color = blue, style = dotted];
-                        ",6"->"8,"[label = "[]", color = blue, style = dotted];
-                        "2,"->"3,"[label = "[a-z]", color = violet];
-                        "3,"->"7,"[label = "[a]", color = violet];
-                        "3,"->"1,"[label = "[a]", color = violet];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,"[shape=rarrow];
+                    "8,"[shape=doublecircle];
+                        "0,"->"1,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"4,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"2,0"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"2,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "4,"->"5,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "2,0"->"3,1"[label = <<B>o: [a-z] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "5,"->"6,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "6,"->"7,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "7,"->"8,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "7,"->"1,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "3,1"->"1,2"[label = <<B>o: a ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "3,1"->"7,2"[label = <<B>o: a ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "1,2"->"4,3"[label = <<B>o: [ab] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "1,2"->"2,3   0"[label = <<B>o: [a-z] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "7,2"->"8,3"[label = <<B>o: [ab] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "7,2"->"1,3"[label = <<B>o: [ab] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "4,3"->"5,4"[label = <<B>o: [ab] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "2,3   0"->"3,4   1"[label = <<B>o: [a-z] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "8,3"->",4"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
+                        "1,3"->"4,4"[label = <<B>o: [ab] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "1,3"->"2,4   0"[label = <<B>o: [a-z] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "5,4"->"6,5"[label = <<B>o: [ab] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "3,4   1"->"1,5   2"[label = <<B>o: a ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "3,4   1"->"7,5"[label = <<B>o: a ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "4,4"->"5,5"[label = <<B>o: [ab] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "2,4   0"->"3,5   1"[label = <<B>o: [a-z] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "6,5"->"7,6"[label = <<B>o: [ab] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "1,5   2"->"4,6"[label = <<B>o: [ab] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "1,5   2"->"2,6   3   0"[label = <<B>o: [a-z] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "7,5"->"8,6"[label = <<B>o: [ab] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "7,5"->"1,6   2"[label = <<B>o: [ab] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "5,5"->"6,6"[label = <<B>o: [ab] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "3,5   1"->"1,6   3"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "3,5   1"->"7,6   2"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "7,6"->"8,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "7,6"->"1,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "4,6"->"5,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "2,6   3   0"->"3,4   1"[label = <<B>o: [a-z] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "8,6"->"8,"[label = <<B>o: ε c:</B>>, color = red, penwidth = 2];
+                        "1,6   2"->"4,3"[label = <<B>o: [ab] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "1,6   2"->"2,3   0"[label = <<B>o: [a-z] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "6,6"->"7,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "1,6   3"->"4,4"[label = <<B>o: [ab] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "1,6   3"->"2,4   0"[label = <<B>o: [a-z] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "7,6   2"->"8,3"[label = <<B>o: [ab] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "7,6   2"->"1,3"[label = <<B>o: [ab] ∩ a c:</B>>, color = red, penwidth = 2];
+                        ",4"->",5"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
+                        ",5"->",6"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
+                        ",6"->"8,"[label = <<B>o: ε c:</B>>, color = blue, penwidth = 2];
+                        "2,"->"3,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "3,"->"1,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "3,"->"7,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, 2, 0);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_inter_with_cycle_back() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 5;
-                                0->1[label="[a-c]"];
-                                1->2[label="[a]"];
-                                2->3[label="[a]"];
-                                3->4[label="[a-z]"];
-                                4->5[label="[a-z]"];
-                                4->1[label="[a]"];
+                                0->1[label=<<B>o: [a-c] c:</B>>];
+                                1->2[label=<<B>o: a c:</B>>];
+                                2->3[label=<<B>o: a c:</B>>];
+                                3->4[label=<<B>o: [a-z] c:</B>>];
+                                4->5[label=<<B>o: [a-z] c:</B>>];
+                                4->1[label=<<B>o: a c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 7;
-                                0->1[label="[a]"];
-                                1->2[label="[a]"];
-                                2->3[label="[a]"];
-                                3->4[label="[a]"];
-                                4->5[label="[ab]"];
-                                5->6[label="[ab]"];
-                                6->7[label="[ab]"];
+                                0->1[label=<<B>o: a c:</B>>, color = blue];
+                                1->2[label=<<B>o: a c:</B>>, color = blue];
+                                2->3[label=<<B>o: a c:</B>>, color = blue];
+                                3->4[label=<<B>o: a c:</B>>, color = blue];
+                                4->5[label=<<B>o: [ab] c:</B>>, color = blue];
+                                5->6[label=<<B>o: [ab] c:</B>>, color = blue];
+                                6->7[label=<<B>o: [ab] c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        ",0";
-                        "5,";
-                        "4,7"->"5,"[label = "[a-z]", color = violet];
-                        "3,6"->"4,7"[label = "[a-z ∩ ab]", color = red];
-                        "2,5"->"3,6"[label = "[a ∩ ab]", color = red];
-                        "1,4"->"2,5"[label = "[a ∩ ab]", color = red];
-                        "1,4"->"1,0   4"[label = "[]", color = red];
-                        "0,3"->"1,4"[label = "[a-c ∩ a]", color = red];
-                        "4,3   7"->"1,4"[label = "[a ∩ a]", color = red];
-                        "3,2   6"->"4,3   7"[label = "[a-z ∩ a]", color = red];
-                        "2,1   5"->"3,2   6"[label = "[a ∩ a]", color = red];
-                        "1,0   4"->"2,1   5"[label = "[a ∩ a]", color = red];
-                        ",2"->"0,3"[label = "[a]", color = blue, style = dotted];
-                        ",1"->",2"[label = "[a]", color = blue, style = dotted];
-                        ",0"->",1"[label = "[a]", color = blue, style = dotted];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        ",0"[shape=rarrow];
+                    "5,"[shape=doublecircle];
+                        "4,7"->"5,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "3,6"->"4,7"[label = <<B>o: [a-z] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "2,5"->"3,6"[label = <<B>o: a ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "1,4"->"2,5"[label = <<B>o: a ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "1,4"->"1,0   4"[label = <<B>o: ε c:</B>>, color = red, penwidth = 2];
+                        "0,3"->"1,4"[label = <<B>o: [a-c] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "4,3   7"->"1,4"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "3,2   6"->"4,3   7"[label = <<B>o: [a-z] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "2,1   5"->"3,2   6"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "1,0   4"->"2,1   5"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        ",2"->"0,3"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
+                        ",1"->",2"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
+                        ",0"->",1"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, 4, 1);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_inter_with_three_times_in_cycle_back() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 5;
-                                0->1[label="[a-c]"];
-                                1->2[label="[a]"];
-                                2->3[label="[a]"];
-                                3->4[label="[a-z]"];
-                                4->5[label="[a-z]"];
-                                4->1[label="[a]"];
+                                0->1[label=<<B>o: [a-c] c:</B>>];
+                                1->2[label=<<B>o: a c:</B>>];
+                                2->3[label=<<B>o: a c:</B>>];
+                                3->4[label=<<B>o: [a-z] c:</B>>];
+                                4->5[label=<<B>o: [a-z] c:</B>>];
+                                4->1[label=<<B>o: a c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 8;
-                                0->1[label="[a]"];
-                                1->2[label="[a]"];
-                                2->3[label="[a]"];
-                                3->4[label="[a]"];
-                                4->5[label="[ab]"];
-                                5->6[label="[ab]"];
-                                6->7[label="[ab]"];
-                                7->8[label="[ab]"];
+                                0->1[label=<<B>o: a c:</B>>, color = blue];
+                                1->2[label=<<B>o: a c:</B>>, color = blue];
+                                2->3[label=<<B>o: a c:</B>>, color = blue];
+                                3->4[label=<<B>o: a c:</B>>, color = blue];
+                                4->5[label=<<B>o: [ab] c:</B>>, color = blue];
+                                5->6[label=<<B>o: [ab] c:</B>>, color = blue];
+                                6->7[label=<<B>o: [ab] c:</B>>, color = blue];
+                                7->8[label=<<B>o: [ab] c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0,0";",0";
-                        "5,";
-                        "4,8"->"5,"[label = "[a-z]", color = violet];
-                        "3,7"->"4,8"[label = "[a-z ∩ ab]", color = red];
-                        "2,6"->"3,7"[label = "[a ∩ ab]", color = red];
-                        "1,5"->"2,6"[label = "[a ∩ ab]", color = red];
-                        "0,4"->"1,5"[label = "[a-c ∩ ab]", color = red];
-                        "4,4   8"->"1,5"[label = "[a ∩ ab]", color = red];
-                        "3,3   7"->"4,4   8"[label = "[a-z ∩ a]", color = red];
-                        "2,2   6"->"3,3   7"[label = "[a ∩ a]", color = red];
-                        "1,1   5"->"2,2   6"[label = "[a ∩ a]", color = red];
-                        "1,1   5"->"(2,2   6)"[label = "[a ∩ a]", color = red];
-                        "0,0"->"1,1   5"[label = "[a-c ∩ a]", color = red];
-                        "4,0   4   8"->"1,1   5"[label = "[a ∩ a]", color = red];
-                        "(3,3   7)"->"4,0   4   8"[label = "[a-z ∩ a]", color = red];
-                        "(2,2   6)"->"(3,3   7)"[label = "[a ∩ a]", color = red];
-                        ",3"->"0,4"[label = "[a]", color = blue, style = dotted];
-                        ",2"->",3"[label = "[a]", color = blue, style = dotted];
-                        ",1"->",2"[label = "[a]", color = blue, style = dotted];
-                        ",0"->",1"[label = "[a]", color = blue, style = dotted];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,0"[shape=rarrow];
+                    ",0"[shape=rarrow];
+                    "5,"[shape=doublecircle];
+                        "4,8"->"5,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "3,7"->"4,8"[label = <<B>o: [a-z] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "2,6"->"3,7"[label = <<B>o: a ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "1,5"->"2,6"[label = <<B>o: a ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "0,4"->"1,5"[label = <<B>o: [a-c] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "4,4   8"->"1,5"[label = <<B>o: a ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "3,3   7"->"4,4   8"[label = <<B>o: [a-z] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "2,2   6"->"3,3   7"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "1,1   5"->"2,2   6"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "1,1   5"->"(2,2   6)"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "0,0"->"1,1   5"[label = <<B>o: [a-c] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "4,0   4   8"->"1,1   5"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "(3,3   7)"->"4,0   4   8"[label = <<B>o: [a-z] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "(2,2   6)"->"(3,3   7)"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        ",3"->"0,4"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
+                        ",2"->",3"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
+                        ",1"->",2"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
+                        ",0"->",1"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, 4, 1);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_big_forward() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 9;
-                                0->1[label="[a-c]"];
-                                1->2[label="[ab]"];
-                                1->3[label="[ab]"];
-                                2->8[label="[as]"];
-                                1->5[label="[a-z]"];
-                                3->4[label="[a-c]"];
-                                4->8[label="[ab]"];
-                                5->6[label="[^a]"];
-                                7->8[label="[a-c]"];
-                                6->7[label="[a-c]"];
-                                8->9[label="[ab]"];
-                                8->1[label="[ab]"];
-                                9->2[label="[ab]"];
+                                0->1[label=<<B>o: [a-c] c:</B>>];
+                                1->2[label=<<B>o: [ab] c:</B>>];
+                                1->3[label=<<B>o: [ab] c:</B>>];
+                                2->8[label=<<B>o: [as] c:</B>>];
+                                1->5[label=<<B>o: [a-z] c:</B>>];
+                                3->4[label=<<B>o: [a-c] c:</B>>];
+                                4->8[label=<<B>o: [ab] c:</B>>];
+                                5->6[label=<<B>o: a c:</B><BR/>o: ^ c:>];
+                                7->8[label=<<B>o: [a-c] c:</B>>];
+                                6->7[label=<<B>o: [a-c] c:</B>>];
+                                8->9[label=<<B>o: [ab] c:</B>>];
+                                8->1[label=<<B>o: [ab] c:</B>>];
+                                9->2[label=<<B>o: [ab] c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+        $dotdescription2 = 'digraph {
                                 0;
                                 9;
-                                0->1[label="[a-z]"];
-                                1->2[label="[ab]"];
-                                1->3[label="[as]"];
-                                2->6[label="[a-c]"];
-                                3->4[label="[.]"];
-                                4->5[label="[a-d]"];
-                                5->6[label="[as01]"];
-                                6->7[label="[axy]"];
-                                6->8[label="[.]"];
-                                7->9[label="[a]"];
-                                8->9[label="[a-c]"];
-                                7->2[label="[a-z]"];
-                                8->1[label="[a-f]"];
-                                9->9[label="[b-n]"];
+                                0->1[label=<<B>o: [a-z] c:</B>>, color = blue];
+                                1->2[label=<<B>o: [ab] c:</B>>, color = blue];
+                                1->3[label=<<B>o: [as] c:</B>>, color = blue];
+                                2->6[label=<<B>o: [a-c] c:</B>>, color = blue];
+                                3->4[label=<<B>o: . c:</B>>, color = blue];
+                                4->5[label=<<B>o: [a-d] c:</B>>, color = blue];
+                                5->6[label=<<B>o: [as01] c:</B>>, color = blue];
+                                6->7[label=<<B>o: [axy] c:</B>>, color = blue];
+                                6->8[label=<<B>o: . c:</B>>, color = blue];
+                                7->9[label=<<B>o: a c:</B>>, color = blue];
+                                8->9[label=<<B>o: [a-c] c:</B>>, color = blue];
+                                7->2[label=<<B>o: [a-z] c:</B>>, color = blue];
+                                8->1[label=<<B>o: [a-f] c:</B>>, color = blue];
+                                9->9[label=<<B>o: [b-n] c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0,";
-                        "9,";
-                        "0,"->"1,"[label = "[a-c]", color = violet];
-                        "1,"->"2,"[label = "[ab]", color = violet];
-                        "1,"->"3,"[label = "[ab]", color = violet];
-                        "1,"->"5,0"[label = "[a-z]", color = violet];
-                        "1,"->"5,"[label = "[a-z]", color = violet];
-                        "2,"->"8,"[label = "[as]", color = violet];
-                        "3,"->"4,"[label = "[a-c]", color = violet];
-                        "5,0"->"6,1"[label = "[a ∩ a-z^]", color = red];
-                        "8,"->"9,"[label = "[ab]", color = violet];
-                        "8,"->"1,"[label = "[ab]", color = violet];
-                        "4,"->"8,"[label = "[ab]", color = violet];
-                        "9,"->"2,"[label = "[ab]", color = violet];
-                        "6,1"->"7,2"[label = "[a-c ∩ ab]", color = red];
-                        "6,1"->"7,3"[label = "[a-c ∩ as]", color = red];
-                        "7,2"->"8,6"[label = "[a-c ∩ a-c]", color = red];
-                        "7,3"->"8,4"[label = "[a-c ∩ .]", color = red];
-                        "8,6"->"9,7"[label = "[ab ∩ axy]", color = red];
-                        "8,6"->"9,8"[label = "[ab ∩ .]", color = red];
-                        "8,6"->"1,7"[label = "[ab ∩ axy]", color = red];
-                        "8,6"->"1,8"[label = "[ab ∩ .]", color = red];
-                        "8,4"->"9,5"[label = "[ab ∩ a-d]", color = red];
-                        "8,4"->"1,5"[label = "[ab ∩ a-d]", color = red];
-                        "9,7"->"2,9"[label = "[ab ∩ a]", color = red];
-                        "9,7"->"2,2"[label = "[ab ∩ a-z]", color = red];
-                        "9,8"->"2,9"[label = "[ab ∩ a-c]", color = red];
-                        "9,8"->"2,1"[label = "[ab ∩ a-f]", color = red];
-                        "1,7"->"2,9"[label = "[ab ∩ a]", color = red];
-                        "1,7"->"2,2"[label = "[ab ∩ a-z]", color = red];
-                        "1,7"->"3,9"[label = "[ab ∩ a]", color = red];
-                        "1,7"->"3,2"[label = "[ab ∩ a-z]", color = red];
-                        "1,7"->"5,9"[label = "[a-z ∩ a]", color = red];
-                        "1,7"->"5,2"[label = "[a-z ∩ a-z]", color = red];
-                        "1,8"->"2,9"[label = "[ab ∩ a-c]", color = red];
-                        "1,8"->"2,1"[label = "[ab ∩ a-f]", color = red];
-                        "1,8"->"3,9"[label = "[ab ∩ a-c]", color = red];
-                        "1,8"->"3,1"[label = "[ab ∩ a-f]", color = red];
-                        "1,8"->"5,9"[label = "[a-z ∩ a-c]", color = red];
-                        "1,8"->"5,1"[label = "[a-z ∩ a-f]", color = red];
-                        "9,5"->"2,6"[label = "[ab ∩ as01]", color = red];
-                        "1,5"->"2,6"[label = "[ab ∩ as01]", color = red];
-                        "1,5"->"3,6"[label = "[ab ∩ as01]", color = red];
-                        "1,5"->"5,6"[label = "[a-z ∩ as01]", color = red];
-                        "2,9"->"8,"[label = "[as]", color = violet];
-                        "2,2"->"8,6"[label = "[as ∩ a-c]", color = red];
-                        "2,1"->"8,2"[label = "[as ∩ ab]", color = red];
-                        "2,1"->"8,3"[label = "[as ∩ as]", color = red];
-                        "3,9"->"4,9"[label = "[a-c ∩ b-n]", color = red];
-                        "3,2"->"4,6"[label = "[a-c ∩ a-c]", color = red];
-                        "5,9"->"6,"[label = "[a^]", color = violet];
-                        "5,2"->"6,6"[label = "[a ∩ a-c^]", color = red];
-                        "3,1"->"4,2"[label = "[a-c ∩ ab]", color = red];
-                        "3,1"->"4,3"[label = "[a-c ∩ as]", color = red];
-                        "5,1"->"6,2"[label = "[a ∩ ab^]", color = red];
-                        "5,1"->"6,3"[label = "[a ∩ as^]", color = red];
-                        "2,6"->"8,7"[label = "[as ∩ axy]", color = red];
-                        "2,6"->"8,8"[label = "[as ∩ .]", color = red];
-                        "3,6"->"4,7"[label = "[a-c ∩ axy]", color = red];
-                        "3,6"->"4,8"[label = "[a-c ∩ .]", color = red];
-                        "5,6"->"6,7"[label = "[a ∩ axy^]", color = red];
-                        "5,6"->"6,8"[label = "[a ∩ .^]", color = red];
-                        "8,2"->"9,6"[label = "[ab ∩ a-c]", color = red];
-                        "8,2"->"1,6"[label = "[ab ∩ a-c]", color = red];
-                        "8,3"->"9,4"[label = "[ab ∩ .]", color = red];
-                        "8,3"->"1,4"[label = "[ab ∩ .]", color = red];
-                        "4,9"->"8,9"[label = "[ab ∩ b-n]", color = red];
-                        "4,6"->"8,7"[label = "[ab ∩ axy]", color = red];
-                        "4,6"->"8,8"[label = "[ab ∩ .]", color = red];
-                        "6,6"->"7,7"[label = "[a-c ∩ axy]", color = red];
-                        "6,6"->"7,8"[label = "[a-c ∩ .]", color = red];
-                        "4,2"->"8,6"[label = "[ab ∩ a-c]", color = red];
-                        "4,3"->"8,4"[label = "[ab ∩ .]", color = red];
-                        "6,2"->"7,6"[label = "[a-c ∩ a-c]", color = red];
-                        "6,3"->"7,4"[label = "[a-c ∩ .]", color = red];
-                        "8,7"->"9,9"[label = "[ab ∩ a]", color = red];
-                        "8,7"->"9,2"[label = "[ab ∩ a-z]", color = red];
-                        "8,7"->"1,9"[label = "[ab ∩ a]", color = red];
-                        "8,7"->"1,2"[label = "[ab ∩ a-z]", color = red];
-                        "8,8"->"9,9"[label = "[ab ∩ a-c]", color = red];
-                        "8,8"->"9,1"[label = "[ab ∩ a-f]", color = red];
-                        "8,8"->"1,9"[label = "[ab ∩ a-c]", color = red];
-                        "8,8"->"1,1"[label = "[ab ∩ a-f]", color = red];
-                        "4,7"->"8,9"[label = "[ab ∩ a]", color = red];
-                        "4,7"->"8,2"[label = "[ab ∩ a-z]", color = red];
-                        "4,8"->"8,9"[label = "[ab ∩ a-c]", color = red];
-                        "4,8"->"8,1"[label = "[ab ∩ a-f]", color = red];
-                        "6,7"->"7,9"[label = "[a-c ∩ a]", color = red];
-                        "6,7"->"7,2"[label = "[a-c ∩ a-z]", color = red];
-                        "6,8"->"7,9"[label = "[a-c ∩ a-c]", color = red];
-                        "6,8"->"7,1"[label = "[a-c ∩ a-f]", color = red];
-                        "9,6"->"2,7"[label = "[ab ∩ axy]", color = red];
-                        "9,6"->"2,8"[label = "[ab ∩ .]", color = red];
-                        "1,6"->"2,7"[label = "[ab ∩ axy]", color = red];
-                        "1,6"->"2,8"[label = "[ab ∩ .]", color = red];
-                        "1,6"->"3,7"[label = "[ab ∩ axy]", color = red];
-                        "1,6"->"3,8"[label = "[ab ∩ .]", color = red];
-                        "1,6"->"5,7"[label = "[a-z ∩ axy]", color = red];
-                        "1,6"->"5,8"[label = "[a-z ∩ .]", color = red];
-                        "9,4"->"2,5"[label = "[ab ∩ a-d]", color = red];
-                        "1,4"->"2,5"[label = "[ab ∩ a-d]", color = red];
-                        "1,4"->"3,5"[label = "[ab ∩ a-d]", color = red];
-                        "1,4"->"5,5"[label = "[a-z ∩ a-d]", color = red];
-                        "8,9"->"9,9"[label = "[ab ∩ b-n]", color = red];
-                        "8,9"->"1,9"[label = "[ab ∩ b-n]", color = red];
-                        "7,7"->"8,9"[label = "[a-c ∩ a]", color = red];
-                        "7,7"->"8,2"[label = "[a-c ∩ a-z]", color = red];
-                        "7,8"->"8,9"[label = "[a-c ∩ a-c]", color = red];
-                        "7,8"->"8,1"[label = "[a-c ∩ a-f]", color = red];
-                        "7,6"->"8,7"[label = "[a-c ∩ axy]", color = red];
-                        "7,6"->"8,8"[label = "[a-c ∩ .]", color = red];
-                        "7,4"->"8,5"[label = "[a-c ∩ a-d]", color = red];
-                        "9,9"->"2,9"[label = "[ab ∩ b-n]", color = red];
-                        "9,9"->"9,"[label = "[]", color = red];
-                        "9,2"->"2,6"[label = "[ab ∩ a-c]", color = red];
-                        "1,9"->"2,9"[label = "[ab ∩ b-n]", color = red];
-                        "1,9"->"3,9"[label = "[ab ∩ b-n]", color = red];
-                        "1,9"->"5,9"[label = "[a-z ∩ b-n]", color = red];
-                        "1,2"->"2,6"[label = "[ab ∩ a-c]", color = red];
-                        "1,2"->"3,6"[label = "[ab ∩ a-c]", color = red];
-                        "1,2"->"5,6"[label = "[a-z ∩ a-c]", color = red];
-                        "9,1"->"2,2"[label = "[ab ∩ ab]", color = red];
-                        "9,1"->"2,3"[label = "[ab ∩ as]", color = red];
-                        "1,1"->"2,2"[label = "[ab ∩ ab]", color = red];
-                        "1,1"->"2,3"[label = "[ab ∩ as]", color = red];
-                        "1,1"->"3,2"[label = "[ab ∩ ab]", color = red];
-                        "1,1"->"3,3"[label = "[ab ∩ as]", color = red];
-                        "1,1"->"5,2"[label = "[a-z ∩ ab]", color = red];
-                        "1,1"->"5,3"[label = "[a-z ∩ as]", color = red];
-                        "8,1"->"9,2"[label = "[ab ∩ ab]", color = red];
-                        "8,1"->"9,3"[label = "[ab ∩ as]", color = red];
-                        "8,1"->"1,2"[label = "[ab ∩ ab]", color = red];
-                        "8,1"->"1,3"[label = "[ab ∩ as]", color = red];
-                        "7,9"->"8,9"[label = "[a-c ∩ b-n]", color = red];
-                        "7,1"->"8,2"[label = "[a-c ∩ ab]", color = red];
-                        "7,1"->"8,3"[label = "[a-c ∩ as]", color = red];
-                        "2,7"->"8,9"[label = "[as ∩ a]", color = red];
-                        "2,7"->"8,2"[label = "[as ∩ a-z]", color = red];
-                        "2,8"->"8,9"[label = "[as ∩ a-c]", color = red];
-                        "2,8"->"8,1"[label = "[as ∩ a-f]", color = red];
-                        "3,7"->"4,9"[label = "[a-c ∩ a]", color = red];
-                        "3,7"->"4,2"[label = "[a-c ∩ a-z]", color = red];
-                        "3,8"->"4,9"[label = "[a-c ∩ a-c]", color = red];
-                        "3,8"->"4,1"[label = "[a-c ∩ a-f]", color = red];
-                        "5,7"->"6,9"[label = "[a ∩ a^]", color = red];
-                        "5,7"->"6,2"[label = "[a ∩ a-z^]", color = red];
-                        "5,8"->"6,9"[label = "[a ∩ a-c^]", color = red];
-                        "5,8"->"6,1"[label = "[a ∩ a-f^]", color = red];
-                        "2,5"->"8,6"[label = "[as ∩ as01]", color = red];
-                        "3,5"->"4,6"[label = "[a-c ∩ as01]", color = red];
-                        "5,5"->"6,6"[label = "[a ∩ as01^]", color = red];
-                        "8,5"->"9,6"[label = "[ab ∩ as01]", color = red];
-                        "8,5"->"1,6"[label = "[ab ∩ as01]", color = red];
-                        "2,3"->"8,4"[label = "[as ∩ .]", color = red];
-                        "3,3"->"4,4"[label = "[a-c ∩ .]", color = red];
-                        "5,3"->"6,4"[label = "[a ∩ .^]", color = red];
-                        "9,3"->"2,4"[label = "[ab ∩ .]", color = red];
-                        "1,3"->"2,4"[label = "[ab ∩ .]", color = red];
-                        "1,3"->"3,4"[label = "[ab ∩ .]", color = red];
-                        "1,3"->"5,4"[label = "[a-z ∩ .]", color = red];
-                        "4,1"->"8,2"[label = "[ab ∩ ab]", color = red];
-                        "4,1"->"8,3"[label = "[ab ∩ as]", color = red];
-                        "6,9"->"7,9"[label = "[a-c ∩ b-n]", color = red];
-                        "4,4"->"8,5"[label = "[ab ∩ a-d]", color = red];
-                        "6,4"->"7,5"[label = "[a-c ∩ a-d]", color = red];
-                        "2,4"->"8,5"[label = "[as ∩ a-d]", color = red];
-                        "3,4"->"4,5"[label = "[a-c ∩ a-d]", color = red];
-                        "5,4"->"6,5"[label = "[a ∩ a-d^]", color = red];
-                        "7,5"->"8,6"[label = "[a-c ∩ as01]", color = red];
-                        "4,5"->"8,6"[label = "[ab ∩ as01]", color = red];
-                        "6,5"->"7,6"[label = "[a-c ∩ as01]", color = red];
-                        "5,"->"6,"[label = "[a^]", color = violet];
-                        "6,"->"7,"[label = "[a-c]", color = violet];
-                        "7,"->"8,"[label = "[a-c]", color = violet];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,"[shape=rarrow];
+                    "9,"[shape=doublecircle];
+                        "0,"->"1,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"5,0"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"3,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"2,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"5,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "5,0"->"6,1"[label = <<B>o: a ∩ [a-z] c:</B><BR/>o: ^ c:(5,6)>, color = red, penwidth = 2];
+                        "3,"->"4,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "2,"->"8,"[label = <<B>o: [as] c:</B>>, color = violet, penwidth = 2];
+                        "4,"->"8,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "8,"->"1,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "8,"->"9,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "9,"->"2,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "6,1"->"7,3"[label = <<B>o: [a-c] ∩ [as] c:</B>>, color = red, penwidth = 2];
+                        "6,1"->"7,2"[label = <<B>o: [a-c] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "7,3"->"8,4"[label = <<B>o: [a-c] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "7,2"->"8,6"[label = <<B>o: [a-c] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "8,4"->"1,5"[label = <<B>o: [ab] ∩ [a-d] c:</B>>, color = red, penwidth = 2];
+                        "8,4"->"9,5"[label = <<B>o: [ab] ∩ [a-d] c:</B>>, color = red, penwidth = 2];
+                        "8,6"->"1,8"[label = <<B>o: [ab] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "8,6"->"1,7"[label = <<B>o: [ab] ∩ [axy] c:</B>>, color = red, penwidth = 2];
+                        "8,6"->"9,8"[label = <<B>o: [ab] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "8,6"->"9,7"[label = <<B>o: [ab] ∩ [axy] c:</B>>, color = red, penwidth = 2];
+                        "1,5"->"5,6"[label = <<B>o: [a-z] ∩ [as01] c:</B>>, color = red, penwidth = 2];
+                        "1,5"->"3,6"[label = <<B>o: [ab] ∩ [as01] c:</B>>, color = red, penwidth = 2];
+                        "1,5"->"2,6"[label = <<B>o: [ab] ∩ [as01] c:</B>>, color = red, penwidth = 2];
+                        "9,5"->"2,6"[label = <<B>o: [ab] ∩ [as01] c:</B>>, color = red, penwidth = 2];
+                        "1,8"->"5,1"[label = <<B>o: [a-z] ∩ [a-f] c:</B>>, color = red, penwidth = 2];
+                        "1,8"->"5,9"[label = <<B>o: [a-z] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "1,8"->"3,1"[label = <<B>o: [ab] ∩ [a-f] c:</B>>, color = red, penwidth = 2];
+                        "1,8"->"3,9"[label = <<B>o: [ab] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "1,8"->"2,1"[label = <<B>o: [ab] ∩ [a-f] c:</B>>, color = red, penwidth = 2];
+                        "1,8"->"2,9"[label = <<B>o: [ab] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "1,7"->"5,2"[label = <<B>o: [a-z] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "1,7"->"5,9"[label = <<B>o: [a-z] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "1,7"->"3,2"[label = <<B>o: [ab] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "1,7"->"3,9"[label = <<B>o: [ab] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "1,7"->"2,2"[label = <<B>o: [ab] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "1,7"->"2,9"[label = <<B>o: [ab] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "9,8"->"2,1"[label = <<B>o: [ab] ∩ [a-f] c:</B>>, color = red, penwidth = 2];
+                        "9,8"->"2,9"[label = <<B>o: [ab] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "9,7"->"2,2"[label = <<B>o: [ab] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "9,7"->"2,9"[label = <<B>o: [ab] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "5,6"->"6,8"[label = <<B>o: a ∩ . c:</B><BR/>o: ^ c:(5,6)>, color = red, penwidth = 2];
+                        "5,6"->"6,7"[label = <<B>o: a ∩ [axy] c:</B><BR/>o: ^ c:(5,6)>, color = red, penwidth = 2];
+                        "3,6"->"4,8"[label = <<B>o: [a-c] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "3,6"->"4,7"[label = <<B>o: [a-c] ∩ [axy] c:</B>>, color = red, penwidth = 2];
+                        "2,6"->"8,8"[label = <<B>o: [as] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "2,6"->"8,7"[label = <<B>o: [as] ∩ [axy] c:</B>>, color = red, penwidth = 2];
+                        "5,1"->"6,3"[label = <<B>o: a ∩ [as] c:</B><BR/>o: ^ c:(5,6)>, color = red, penwidth = 2];
+                        "5,1"->"6,2"[label = <<B>o: a ∩ [ab] c:</B><BR/>o: ^ c:(5,6)>, color = red, penwidth = 2];
+                        "5,9"->"6,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "3,1"->"4,3"[label = <<B>o: [a-c] ∩ [as] c:</B>>, color = red, penwidth = 2];
+                        "3,1"->"4,2"[label = <<B>o: [a-c] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "3,9"->"4,9"[label = <<B>o: [a-c] ∩ [b-n] c:</B>>, color = red, penwidth = 2];
+                        "2,1"->"8,3"[label = <<B>o: [as] ∩ [as] c:</B>>, color = red, penwidth = 2];
+                        "2,1"->"8,2"[label = <<B>o: [as] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "2,9"->"8,"[label = <<B>o: [as] c:</B>>, color = violet, penwidth = 2];
+                        "5,2"->"6,6"[label = <<B>o: a ∩ [a-c] c:</B><BR/>o: ^ c:(5,6)>, color = red, penwidth = 2];
+                        "3,2"->"4,6"[label = <<B>o: [a-c] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "2,2"->"8,6"[label = <<B>o: [as] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "6,8"->"7,1"[label = <<B>o: [a-c] ∩ [a-f] c:</B>>, color = red, penwidth = 2];
+                        "6,8"->"7,9"[label = <<B>o: [a-c] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "6,7"->"7,2"[label = <<B>o: [a-c] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "6,7"->"7,9"[label = <<B>o: [a-c] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "4,8"->"8,1"[label = <<B>o: [ab] ∩ [a-f] c:</B>>, color = red, penwidth = 2];
+                        "4,8"->"8,9"[label = <<B>o: [ab] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "4,7"->"8,2"[label = <<B>o: [ab] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "4,7"->"8,9"[label = <<B>o: [ab] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "8,8"->"1,1"[label = <<B>o: [ab] ∩ [a-f] c:</B>>, color = red, penwidth = 2];
+                        "8,8"->"1,9"[label = <<B>o: [ab] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "8,8"->"9,1"[label = <<B>o: [ab] ∩ [a-f] c:</B>>, color = red, penwidth = 2];
+                        "8,8"->"9,9"[label = <<B>o: [ab] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "8,7"->"1,2"[label = <<B>o: [ab] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "8,7"->"1,9"[label = <<B>o: [ab] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "8,7"->"9,2"[label = <<B>o: [ab] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "8,7"->"9,9"[label = <<B>o: [ab] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "6,3"->"7,4"[label = <<B>o: [a-c] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "6,2"->"7,6"[label = <<B>o: [a-c] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "4,3"->"8,4"[label = <<B>o: [ab] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "4,2"->"8,6"[label = <<B>o: [ab] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "4,9"->"8,9"[label = <<B>o: [ab] ∩ [b-n] c:</B>>, color = red, penwidth = 2];
+                        "8,3"->"1,4"[label = <<B>o: [ab] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "8,3"->"9,4"[label = <<B>o: [ab] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "8,2"->"1,6"[label = <<B>o: [ab] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "8,2"->"9,6"[label = <<B>o: [ab] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "6,6"->"7,8"[label = <<B>o: [a-c] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "6,6"->"7,7"[label = <<B>o: [a-c] ∩ [axy] c:</B>>, color = red, penwidth = 2];
+                        "4,6"->"8,8"[label = <<B>o: [ab] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "4,6"->"8,7"[label = <<B>o: [ab] ∩ [axy] c:</B>>, color = red, penwidth = 2];
+                        "7,1"->"8,3"[label = <<B>o: [a-c] ∩ [as] c:</B>>, color = red, penwidth = 2];
+                        "7,1"->"8,2"[label = <<B>o: [a-c] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "7,9"->"8,9"[label = <<B>o: [a-c] ∩ [b-n] c:</B>>, color = red, penwidth = 2];
+                        "8,1"->"1,3"[label = <<B>o: [ab] ∩ [as] c:</B>>, color = red, penwidth = 2];
+                        "8,1"->"1,2"[label = <<B>o: [ab] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "8,1"->"9,3"[label = <<B>o: [ab] ∩ [as] c:</B>>, color = red, penwidth = 2];
+                        "8,1"->"9,2"[label = <<B>o: [ab] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "8,9"->"1,9"[label = <<B>o: [ab] ∩ [b-n] c:</B>>, color = red, penwidth = 2];
+                        "8,9"->"9,9"[label = <<B>o: [ab] ∩ [b-n] c:</B>>, color = red, penwidth = 2];
+                        "1,1"->"5,3"[label = <<B>o: [a-z] ∩ [as] c:</B>>, color = red, penwidth = 2];
+                        "1,1"->"5,2"[label = <<B>o: [a-z] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "1,1"->"3,3"[label = <<B>o: [ab] ∩ [as] c:</B>>, color = red, penwidth = 2];
+                        "1,1"->"3,2"[label = <<B>o: [ab] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "1,1"->"2,3"[label = <<B>o: [ab] ∩ [as] c:</B>>, color = red, penwidth = 2];
+                        "1,1"->"2,2"[label = <<B>o: [ab] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "1,9"->"5,9"[label = <<B>o: [a-z] ∩ [b-n] c:</B>>, color = red, penwidth = 2];
+                        "1,9"->"3,9"[label = <<B>o: [ab] ∩ [b-n] c:</B>>, color = red, penwidth = 2];
+                        "1,9"->"2,9"[label = <<B>o: [ab] ∩ [b-n] c:</B>>, color = red, penwidth = 2];
+                        "9,1"->"2,3"[label = <<B>o: [ab] ∩ [as] c:</B>>, color = red, penwidth = 2];
+                        "9,1"->"2,2"[label = <<B>o: [ab] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "9,9"->"2,9"[label = <<B>o: [ab] ∩ [b-n] c:</B>>, color = red, penwidth = 2];
+                        "9,9"->"9,"[label = <<B>o: ε c:</B>>, color = red, penwidth = 2];
+                        "1,2"->"5,6"[label = <<B>o: [a-z] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "1,2"->"3,6"[label = <<B>o: [ab] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "1,2"->"2,6"[label = <<B>o: [ab] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "9,2"->"2,6"[label = <<B>o: [ab] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "7,4"->"8,5"[label = <<B>o: [a-c] ∩ [a-d] c:</B>>, color = red, penwidth = 2];
+                        "7,6"->"8,8"[label = <<B>o: [a-c] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "7,6"->"8,7"[label = <<B>o: [a-c] ∩ [axy] c:</B>>, color = red, penwidth = 2];
+                        "1,4"->"5,5"[label = <<B>o: [a-z] ∩ [a-d] c:</B>>, color = red, penwidth = 2];
+                        "1,4"->"3,5"[label = <<B>o: [ab] ∩ [a-d] c:</B>>, color = red, penwidth = 2];
+                        "1,4"->"2,5"[label = <<B>o: [ab] ∩ [a-d] c:</B>>, color = red, penwidth = 2];
+                        "9,4"->"2,5"[label = <<B>o: [ab] ∩ [a-d] c:</B>>, color = red, penwidth = 2];
+                        "1,6"->"5,8"[label = <<B>o: [a-z] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "1,6"->"5,7"[label = <<B>o: [a-z] ∩ [axy] c:</B>>, color = red, penwidth = 2];
+                        "1,6"->"3,8"[label = <<B>o: [ab] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "1,6"->"3,7"[label = <<B>o: [ab] ∩ [axy] c:</B>>, color = red, penwidth = 2];
+                        "1,6"->"2,8"[label = <<B>o: [ab] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "1,6"->"2,7"[label = <<B>o: [ab] ∩ [axy] c:</B>>, color = red, penwidth = 2];
+                        "9,6"->"2,8"[label = <<B>o: [ab] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "9,6"->"2,7"[label = <<B>o: [ab] ∩ [axy] c:</B>>, color = red, penwidth = 2];
+                        "7,8"->"8,1"[label = <<B>o: [a-c] ∩ [a-f] c:</B>>, color = red, penwidth = 2];
+                        "7,8"->"8,9"[label = <<B>o: [a-c] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "7,7"->"8,2"[label = <<B>o: [a-c] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "7,7"->"8,9"[label = <<B>o: [a-c] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "1,3"->"5,4"[label = <<B>o: [a-z] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "1,3"->"3,4"[label = <<B>o: [ab] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "1,3"->"2,4"[label = <<B>o: [ab] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "9,3"->"2,4"[label = <<B>o: [ab] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "5,3"->"6,4"[label = <<B>o: a ∩ . c:</B><BR/>o: ^ c:(5,6)>, color = red, penwidth = 2];
+                        "3,3"->"4,4"[label = <<B>o: [a-c] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "2,3"->"8,4"[label = <<B>o: [as] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "8,5"->"1,6"[label = <<B>o: [ab] ∩ [as01] c:</B>>, color = red, penwidth = 2];
+                        "8,5"->"9,6"[label = <<B>o: [ab] ∩ [as01] c:</B>>, color = red, penwidth = 2];
+                        "5,5"->"6,6"[label = <<B>o: a ∩ [as01] c:</B><BR/>o: ^ c:(5,6)>, color = red, penwidth = 2];
+                        "3,5"->"4,6"[label = <<B>o: [a-c] ∩ [as01] c:</B>>, color = red, penwidth = 2];
+                        "2,5"->"8,6"[label = <<B>o: [as] ∩ [as01] c:</B>>, color = red, penwidth = 2];
+                        "5,8"->"6,1"[label = <<B>o: a ∩ [a-f] c:</B><BR/>o: ^ c:(5,6)>, color = red, penwidth = 2];
+                        "5,8"->"6,9"[label = <<B>o: a ∩ [a-c] c:</B><BR/>o: ^ c:(5,6)>, color = red, penwidth = 2];
+                        "5,7"->"6,2"[label = <<B>o: a ∩ [a-z] c:</B><BR/>o: ^ c:(5,6)>, color = red, penwidth = 2];
+                        "5,7"->"6,9"[label = <<B>o: a ∩ a c:</B><BR/>o: ^ c:(5,6)>, color = red, penwidth = 2];
+                        "3,8"->"4,1"[label = <<B>o: [a-c] ∩ [a-f] c:</B>>, color = red, penwidth = 2];
+                        "3,8"->"4,9"[label = <<B>o: [a-c] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "3,7"->"4,2"[label = <<B>o: [a-c] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "3,7"->"4,9"[label = <<B>o: [a-c] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "2,8"->"8,1"[label = <<B>o: [as] ∩ [a-f] c:</B>>, color = red, penwidth = 2];
+                        "2,8"->"8,9"[label = <<B>o: [as] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "2,7"->"8,2"[label = <<B>o: [as] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "2,7"->"8,9"[label = <<B>o: [as] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "5,4"->"6,5"[label = <<B>o: a ∩ [a-d] c:</B><BR/>o: ^ c:(5,6)>, color = red, penwidth = 2];
+                        "3,4"->"4,5"[label = <<B>o: [a-c] ∩ [a-d] c:</B>>, color = red, penwidth = 2];
+                        "2,4"->"8,5"[label = <<B>o: [as] ∩ [a-d] c:</B>>, color = red, penwidth = 2];
+                        "6,4"->"7,5"[label = <<B>o: [a-c] ∩ [a-d] c:</B>>, color = red, penwidth = 2];
+                        "4,4"->"8,5"[label = <<B>o: [ab] ∩ [a-d] c:</B>>, color = red, penwidth = 2];
+                        "6,9"->"7,9"[label = <<B>o: [a-c] ∩ [b-n] c:</B>>, color = red, penwidth = 2];
+                        "4,1"->"8,3"[label = <<B>o: [ab] ∩ [as] c:</B>>, color = red, penwidth = 2];
+                        "4,1"->"8,2"[label = <<B>o: [ab] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "6,5"->"7,6"[label = <<B>o: [a-c] ∩ [as01] c:</B>>, color = red, penwidth = 2];
+                        "4,5"->"8,6"[label = <<B>o: [ab] ∩ [as01] c:</B>>, color = red, penwidth = 2];
+                        "7,5"->"8,6"[label = <<B>o: [a-c] ∩ [as01] c:</B>>, color = red, penwidth = 2];
+                        "6,"->"7,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "7,"->"8,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "5,"->"6,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, '5', 0);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
 
     public function test_big_back() {
-        $dotdescription1 = 'digraph example {
+        $dotdescription1 = 'digraph {
                                 0;
                                 9;
-                                0->1[label="[a-c]"];
-                                1->2[label="[ab]"];
-                                1->3[label="[ab]"];
-                                2->8[label="[as]"];
-                                1->5[label="[a-z]"];
-                                3->4[label="[a-c]"];
-                                4->8[label="[ab]"];
-                                5->6[label="[^a]"];
-                                7->8[label="[a-c]"];
-                                6->7[label="[a-c]"];
-                                8->9[label="[ab]"];
-                                8->1[label="[ab]"];
-                                9->2[label="[ab]"];
+                                0->1[label=<<B>o: [a-c] c:</B>>];
+                                1->2[label=<<B>o: [ab] c:</B>>];
+                                1->3[label=<<B>o: [ab] c:</B>>];
+                                2->8[label=<<B>o: [as] c:</B>>];
+                                1->5[label=<<B>o: [a-z] c:</B>>];
+                                3->4[label=<<B>o: [a-c] c:</B>>];
+                                4->8[label=<<B>o: [ab] c:</B>>];
+                                5->6[label=<<B>o: a c:</B><BR/>o: ^ c:>];
+                                7->8[label=<<B>o: [a-c] c:</B>>];
+                                6->7[label=<<B>o: [a-c] c:</B>>];
+                                8->9[label=<<B>o: [ab] c:</B>>];
+                                8->1[label=<<B>o: [ab] c:</B>>];
+                                9->2[label=<<B>o: [ab] c:</B>>];
                             }';
-        $dotdescription2 = 'digraph example {
+
+        $dotdescription2 = 'digraph {
                                 0;
                                 9;
-                                0->1[label="[a-z]"];
-                                1->2[label="[ab]"];
-                                1->3[label="[as]"];
-                                2->6[label="[a-c]"];
-                                3->4[label="[.]"];
-                                4->5[label="[a-d]"];
-                                5->6[label="[as01]"];
-                                6->7[label="[axy]"];
-                                6->8[label="[.]"];
-                                7->9[label="[a]"];
-                                8->9[label="[a-c]"];
-                                7->2[label="[a-z]"];
-                                8->1[label="[a-f]"];
-                                9->9[label="[b-n]"];
+                                0->1[label=<<B>o: [a-z] c:</B>>, color = blue];
+                                1->2[label=<<B>o: [ab] c:</B>>, color = blue];
+                                1->3[label=<<B>o: [as] c:</B>>, color = blue];
+                                2->6[label=<<B>o: [a-c] c:</B>>, color = blue];
+                                3->4[label=<<B>o: . c:</B>>, color = blue];
+                                4->5[label=<<B>o: [a-d] c:</B>>, color = blue];
+                                5->6[label=<<B>o: [as01] c:</B>>, color = blue];
+                                6->7[label=<<B>o: [axy] c:</B>>, color = blue];
+                                6->8[label=<<B>o: . c:</B>>, color = blue];
+                                7->9[label=<<B>o: a c:</B>>, color = blue];
+                                8->9[label=<<B>o: [a-c] c:</B>>, color = blue];
+                                7->2[label=<<B>o: [a-z] c:</B>>, color = blue];
+                                8->1[label=<<B>o: [a-f] c:</B>>, color = blue];
+                                9->9[label=<<B>o: [b-n] c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0,";"0,0";",0";
-                        "9,";
-                        "9,"->"2,"[label = "[ab]", color = violet];
-                        "9,"->"2,0"[label = "[ab]", color = violet];
-                        "8,"->"9,"[label = "[ab]", color = violet];
-                        "8,"->"1,"[label = "[ab]", color = violet];
-                        "8,"->"1,0"[label = "[ab]", color = violet];
-                        "8,"->"9,0"[label = "[ab]", color = violet];
-                        "2,"->"8,"[label = "[as]", color = violet];
-                        "2,"->"8,0"[label = "[as]", color = violet];
-                        "4,"->"8,"[label = "[ab]", color = violet];
-                        "4,"->"8,0"[label = "[ab]", color = violet];
-                        "7,"->"8,"[label = "[a-c]", color = violet];
-                        "7,"->"8,0"[label = "[a-c]", color = violet];
-                        "1,"->"2,"[label = "[ab]", color = violet];
-                        "1,"->"3,"[label = "[ab]", color = violet];
-                        "1,"->"5,"[label = "[a-z]", color = violet];
-                        "1,"->"5,0"[label = "[a-z]", color = violet];
-                        "1,"->"2,0"[label = "[ab]", color = violet];
-                        "1,"->"3,0"[label = "[ab]", color = violet];
-                        "3,"->"4,"[label = "[a-c]", color = violet];
-                        "3,"->"4,0"[label = "[a-c]", color = violet];
-                        "6,"->"7,"[label = "[a-c]", color = violet];
-                        "6,"->"7,0"[label = "[a-c]", color = violet];
-                        "0,"->"1,"[label = "[a-c]", color = violet];
-                        "0,"->"1,0"[label = "[a-c]", color = violet];
-                        "5,9"->"6,"[label = "[a^]", color = violet];
-                        "1,9"->"5,9"[label = "[a-z ∩ b-n]", color = red];
-                        "1,9"->"3,9"[label = "[ab ∩ b-n]", color = red];
-                        "1,7"->"5,9"[label = "[a-z ∩ a]", color = red];
-                        "1,7"->"2,2"[label = "[ab ∩ a-z]", color = red];
-                        "1,7"->"3,9"[label = "[ab ∩ a]", color = red];
-                        "1,7"->"3,2"[label = "[ab ∩ a-z]", color = red];
-                        "1,7"->"5,2"[label = "[a-z ∩ a-z]", color = red];
-                        "1,8"->"5,9"[label = "[a-z ∩ a-c]", color = red];
-                        "1,8"->"3,9"[label = "[ab ∩ a-c]", color = red];
-                        "1,8"->"3,1"[label = "[ab ∩ a-f]", color = red];
-                        "1,8"->"5,1"[label = "[a-z ∩ a-f]", color = red];
-                        "1,8"->"2,1"[label = "[ab ∩ a-f]", color = red];
-                        "0,9"->"1,9"[label = "[a-c ∩ b-n]", color = red];
-                        "0,7"->"1,9"[label = "[a-c ∩ a]", color = red];
-                        "0,7"->"1,2"[label = "[a-c ∩ a-z]", color = red];
-                        "0,8"->"1,9"[label = "[a-c ∩ a-c]", color = red];
-                        "0,8"->"1,1"[label = "[a-c ∩ a-f]", color = red];
-                        "8,9"->"1,9"[label = "[ab ∩ b-n]", color = red];
-                        "8,7"->"1,9"[label = "[ab ∩ a]", color = red];
-                        "8,7"->"9,2"[label = "[ab ∩ a-z]", color = red];
-                        "8,7"->"1,2"[label = "[ab ∩ a-z]", color = red];
-                        "8,8"->"1,9"[label = "[ab ∩ a-c]", color = red];
-                        "8,8"->"9,1"[label = "[ab ∩ a-f]", color = red];
-                        "8,8"->"1,1"[label = "[ab ∩ a-f]", color = red];
-                        "0,6"->"1,7"[label = "[a-c ∩ axy]", color = red];
-                        "0,6"->"1,8"[label = "[a-c ∩ .]", color = red];
-                        "8,6"->"1,7"[label = "[ab ∩ axy]", color = red];
-                        "8,6"->"1,8"[label = "[ab ∩ .]", color = red];
-                        "8,6"->"9,7"[label = "[ab ∩ axy]", color = red];
-                        "8,6"->"9,8"[label = "[ab ∩ .]", color = red];
-                        "2,7"->"8,9"[label = "[as ∩ a]", color = red];
-                        "2,7"->"8,2"[label = "[as ∩ a-z]", color = red];
-                        "2,8"->"8,9"[label = "[as ∩ a-c]", color = red];
-                        "2,8"->"8,1"[label = "[as ∩ a-f]", color = red];
-                        "4,9"->"8,9"[label = "[ab ∩ b-n]", color = red];
-                        "4,7"->"8,9"[label = "[ab ∩ a]", color = red];
-                        "4,7"->"8,2"[label = "[ab ∩ a-z]", color = red];
-                        "4,8"->"8,9"[label = "[ab ∩ a-c]", color = red];
-                        "4,8"->"8,1"[label = "[ab ∩ a-f]", color = red];
-                        "7,9"->"8,9"[label = "[a-c ∩ b-n]", color = red];
-                        "7,7"->"8,9"[label = "[a-c ∩ a]", color = red];
-                        "7,7"->"8,2"[label = "[a-c ∩ a-z]", color = red];
-                        "7,8"->"8,9"[label = "[a-c ∩ a-c]", color = red];
-                        "7,8"->"8,1"[label = "[a-c ∩ a-f]", color = red];
-                        "2,6"->"8,7"[label = "[as ∩ axy]", color = red];
-                        "2,6"->"8,8"[label = "[as ∩ .]", color = red];
-                        "4,6"->"8,7"[label = "[ab ∩ axy]", color = red];
-                        "4,6"->"8,8"[label = "[ab ∩ .]", color = red];
-                        "7,6"->"8,7"[label = "[a-c ∩ axy]", color = red];
-                        "7,6"->"8,8"[label = "[a-c ∩ .]", color = red];
-                        "2,2"->"8,6"[label = "[as ∩ a-c]", color = red];
-                        "2,5"->"8,6"[label = "[as ∩ as01]", color = red];
-                        "4,2"->"8,6"[label = "[ab ∩ a-c]", color = red];
-                        "4,5"->"8,6"[label = "[ab ∩ as01]", color = red];
-                        "7,2"->"8,6"[label = "[a-c ∩ a-c]", color = red];
-                        "7,5"->"8,6"[label = "[a-c ∩ as01]", color = red];
-                        "9,6"->"2,7"[label = "[ab ∩ axy]", color = red];
-                        "9,6"->"2,8"[label = "[ab ∩ .]", color = red];
-                        "1,6"->"2,7"[label = "[ab ∩ axy]", color = red];
-                        "1,6"->"2,8"[label = "[ab ∩ .]", color = red];
-                        "1,6"->"3,7"[label = "[ab ∩ axy]", color = red];
-                        "1,6"->"3,8"[label = "[ab ∩ .]", color = red];
-                        "1,6"->"5,7"[label = "[a-z ∩ axy]", color = red];
-                        "1,6"->"5,8"[label = "[a-z ∩ .]", color = red];
-                        "3,9"->"4,9"[label = "[a-c ∩ b-n]", color = red];
-                        "3,7"->"4,9"[label = "[a-c ∩ a]", color = red];
-                        "3,7"->"4,2"[label = "[a-c ∩ a-z]", color = red];
-                        "3,8"->"4,9"[label = "[a-c ∩ a-c]", color = red];
-                        "3,8"->"4,1"[label = "[a-c ∩ a-f]", color = red];
-                        "3,6"->"4,7"[label = "[a-c ∩ axy]", color = red];
-                        "3,6"->"4,8"[label = "[a-c ∩ .]", color = red];
-                        "6,9"->"7,9"[label = "[a-c ∩ b-n]", color = red];
-                        "6,7"->"7,9"[label = "[a-c ∩ a]", color = red];
-                        "6,7"->"7,2"[label = "[a-c ∩ a-z]", color = red];
-                        "6,8"->"7,9"[label = "[a-c ∩ a-c]", color = red];
-                        "6,8"->"7,1"[label = "[a-c ∩ a-f]", color = red];
-                        "6,6"->"7,7"[label = "[a-c ∩ axy]", color = red];
-                        "6,6"->"7,8"[label = "[a-c ∩ .]", color = red];
-                        "9,2"->"2,6"[label = "[ab ∩ a-c]", color = red];
-                        "9,5"->"2,6"[label = "[ab ∩ as01]", color = red];
-                        "1,2"->"2,6"[label = "[ab ∩ a-c]", color = red];
-                        "1,2"->"3,6"[label = "[ab ∩ a-c]", color = red];
-                        "1,2"->"5,6"[label = "[a-z ∩ a-c]", color = red];
-                        "1,5"->"2,6"[label = "[ab ∩ as01]", color = red];
-                        "1,5"->"3,6"[label = "[ab ∩ as01]", color = red];
-                        "1,5"->"5,6"[label = "[a-z ∩ as01]", color = red];
-                        "3,2"->"4,6"[label = "[a-c ∩ a-c]", color = red];
-                        "3,5"->"4,6"[label = "[a-c ∩ as01]", color = red];
-                        "6,2"->"7,6"[label = "[a-c ∩ a-c]", color = red];
-                        "6,5"->"7,6"[label = "[a-c ∩ as01]", color = red];
-                        "9,1"->"2,2"[label = "[ab ∩ ab]", color = red];
-                        "9,1"->"2,3"[label = "[ab ∩ as]", color = red];
-                        "9,7"->"2,2"[label = "[ab ∩ a-z]", color = red];
-                        "1,1"->"2,2"[label = "[ab ∩ ab]", color = red];
-                        "1,1"->"3,2"[label = "[ab ∩ ab]", color = red];
-                        "1,1"->"5,2"[label = "[a-z ∩ ab]", color = red];
-                        "1,1"->"5,3"[label = "[a-z ∩ as]", color = red];
-                        "1,1"->"2,3"[label = "[ab ∩ as]", color = red];
-                        "1,1"->"3,3"[label = "[ab ∩ as]", color = red];
-                        "9,4"->"2,5"[label = "[ab ∩ a-d]", color = red];
-                        "1,4"->"2,5"[label = "[ab ∩ a-d]", color = red];
-                        "1,4"->"3,5"[label = "[ab ∩ a-d]", color = red];
-                        "1,4"->"5,5"[label = "[a-z ∩ a-d]", color = red];
-                        "3,1"->"4,2"[label = "[a-c ∩ ab]", color = red];
-                        "3,1"->"4,3"[label = "[a-c ∩ as]", color = red];
-                        "3,4"->"4,5"[label = "[a-c ∩ a-d]", color = red];
-                        "6,1"->"7,2"[label = "[a-c ∩ ab]", color = red];
-                        "6,1"->"7,3"[label = "[a-c ∩ as]", color = red];
-                        "6,4"->"7,5"[label = "[a-c ∩ a-d]", color = red];
-                        "8,2"->"9,6"[label = "[ab ∩ a-c]", color = red];
-                        "8,2"->"1,6"[label = "[ab ∩ a-c]", color = red];
-                        "8,5"->"9,6"[label = "[ab ∩ as01]", color = red];
-                        "8,5"->"1,6"[label = "[ab ∩ as01]", color = red];
-                        "0,2"->"1,6"[label = "[a-c ∩ a-c]", color = red];
-                        "0,5"->"1,6"[label = "[a-c ∩ as01]", color = red];
-                        "5,7"->"6,9"[label = "[a ∩ a^]", color = red];
-                        "5,7"->"6,2"[label = "[a ∩ a-z^]", color = red];
-                        "5,8"->"6,9"[label = "[a ∩ a-c^]", color = red];
-                        "5,8"->"6,1"[label = "[a ∩ a-f^]", color = red];
-                        "5,6"->"6,7"[label = "[a ∩ axy^]", color = red];
-                        "5,6"->"6,8"[label = "[a ∩ .^]", color = red];
-                        "5,2"->"6,6"[label = "[a ∩ a-c^]", color = red];
-                        "5,5"->"6,6"[label = "[a ∩ as01^]", color = red];
-                        "8,1"->"9,2"[label = "[ab ∩ ab]", color = red];
-                        "8,1"->"1,2"[label = "[ab ∩ ab]", color = red];
-                        "8,1"->"1,3"[label = "[ab ∩ as]", color = red];
-                        "8,1"->"9,3"[label = "[ab ∩ as]", color = red];
-                        "8,4"->"9,5"[label = "[ab ∩ a-d]", color = red];
-                        "8,4"->"1,5"[label = "[ab ∩ a-d]", color = red];
-                        "0,1"->"1,2"[label = "[a-c ∩ ab]", color = red];
-                        "0,1"->"1,3"[label = "[a-c ∩ as]", color = red];
-                        "0,4"->"1,5"[label = "[a-c ∩ a-d]", color = red];
-                        "5,1"->"6,2"[label = "[a ∩ ab^]", color = red];
-                        "5,1"->"6,3"[label = "[a ∩ as^]", color = red];
-                        "5,4"->"6,5"[label = "[a ∩ a-d^]", color = red];
-                        "8,0"->"9,1"[label = "[ab ∩ a-z]", color = red];
-                        "8,0"->"1,1"[label = "[ab ∩ a-z]", color = red];
-                        "0,0"->"1,1"[label = "[a-c ∩ a-z]", color = red];
-                        "8,3"->"9,4"[label = "[ab ∩ .]", color = red];
-                        "8,3"->"1,4"[label = "[ab ∩ .]", color = red];
-                        "0,3"->"1,4"[label = "[a-c ∩ .]", color = red];
-                        "1,0"->"3,1"[label = "[ab ∩ a-z]", color = red];
-                        "1,0"->"5,1"[label = "[a-z ∩ a-z]", color = red];
-                        "1,0"->"2,1"[label = "[ab ∩ a-z]", color = red];
-                        "1,3"->"3,4"[label = "[ab ∩ .]", color = red];
-                        "1,3"->"5,4"[label = "[a-z ∩ .]", color = red];
-                        "1,3"->"2,4"[label = "[ab ∩ .]", color = red];
-                        "5,0"->"6,1"[label = "[a ∩ a-z^]", color = red];
-                        "5,3"->"6,4"[label = "[a ∩ .^]", color = red];
-                        "2,1"->"8,2"[label = "[as ∩ ab]", color = red];
-                        "2,1"->"8,3"[label = "[as ∩ as]", color = red];
-                        "4,1"->"8,2"[label = "[ab ∩ ab]", color = red];
-                        "4,1"->"8,3"[label = "[ab ∩ as]", color = red];
-                        "7,1"->"8,2"[label = "[a-c ∩ ab]", color = red];
-                        "7,1"->"8,3"[label = "[a-c ∩ as]", color = red];
-                        "2,4"->"8,5"[label = "[as ∩ a-d]", color = red];
-                        "4,4"->"8,5"[label = "[ab ∩ a-d]", color = red];
-                        "7,4"->"8,5"[label = "[a-c ∩ a-d]", color = red];
-                        "2,0"->"8,1"[label = "[as ∩ a-z]", color = red];
-                        "4,0"->"8,1"[label = "[ab ∩ a-z]", color = red];
-                        "7,0"->"8,1"[label = "[a-c ∩ a-z]", color = red];
-                        "2,3"->"8,4"[label = "[as ∩ .]", color = red];
-                        "4,3"->"8,4"[label = "[ab ∩ .]", color = red];
-                        "7,3"->"8,4"[label = "[a-c ∩ .]", color = red];
-                        "9,0"->"2,1"[label = "[ab ∩ a-z]", color = red];
-                        "9,8"->"2,1"[label = "[ab ∩ a-f]", color = red];
-                        "3,0"->"4,1"[label = "[a-c ∩ a-z]", color = red];
-                        "6,0"->"7,1"[label = "[a-c ∩ a-z]", color = red];
-                        "9,3"->"2,4"[label = "[ab ∩ .]", color = red];
-                        "3,3"->"4,4"[label = "[a-c ∩ .]", color = red];
-                        "6,3"->"7,4"[label = "[a-c ∩ .]", color = red];
-                        ",9"->",9"[label = "[b-n]", color = blue, style = dotted];
-                        ",9"->"0,9"[label = "[b-n]", color = blue, style = dotted];
-                        ",9"->"9,"[label = "[]", color = blue, style = dotted];
-                        ",7"->",9"[label = "[a]", color = blue, style = dotted];
-                        ",7"->",2"[label = "[a-z]", color = blue, style = dotted];
-                        ",7"->"0,9"[label = "[a]", color = blue, style = dotted];
-                        ",7"->"0,2"[label = "[a-z]", color = blue, style = dotted];
-                        ",8"->",9"[label = "[a-c]", color = blue, style = dotted];
-                        ",8"->",1"[label = "[a-f]", color = blue, style = dotted];
-                        ",8"->"0,9"[label = "[a-c]", color = blue, style = dotted];
-                        ",8"->"0,1"[label = "[a-f]", color = blue, style = dotted];
-                        ",6"->",7"[label = "[axy]", color = blue, style = dotted];
-                        ",6"->",8"[label = "[.]", color = blue, style = dotted];
-                        ",6"->"0,7"[label = "[axy]", color = blue, style = dotted];
-                        ",6"->"0,8"[label = "[.]", color = blue, style = dotted];
-                        ",2"->",6"[label = "[a-c]", color = blue, style = dotted];
-                        ",2"->"0,6"[label = "[a-c]", color = blue, style = dotted];
-                        ",5"->",6"[label = "[as01]", color = blue, style = dotted];
-                        ",5"->"0,6"[label = "[as01]", color = blue, style = dotted];
-                        ",1"->",2"[label = "[ab]", color = blue, style = dotted];
-                        ",1"->",3"[label = "[as]", color = blue, style = dotted];
-                        ",1"->"0,2"[label = "[ab]", color = blue, style = dotted];
-                        ",1"->"0,3"[label = "[as]", color = blue, style = dotted];
-                        ",4"->",5"[label = "[a-d]", color = blue, style = dotted];
-                        ",4"->"0,5"[label = "[a-d]", color = blue, style = dotted];
-                        ",0"->",1"[label = "[a-z]", color = blue, style = dotted];
-                        ",0"->"0,1"[label = "[a-z]", color = blue, style = dotted];
-                        ",3"->",4"[label = "[.]", color = blue, style = dotted];
-                        ",3"->"0,4"[label = "[.]", color = blue, style = dotted];
-                        "5,"->"6,"[label = "[a^]", color = violet];
-                        "5,"->"6,0"[label = "[a^]", color = violet];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,"[shape=rarrow];
+                    "0,0"[shape=rarrow];
+                    ",0"[shape=rarrow];
+                    "9,"[shape=doublecircle];
+                        "9,"->"2,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "9,"->"2,0"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "8,"->"9,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "8,"->"1,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "8,"->"1,0"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "8,"->"9,0"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "2,"->"8,"[label = <<B>o: [as] c:</B>>, color = violet, penwidth = 2];
+                        "2,"->"8,0"[label = <<B>o: [as] c:</B>>, color = violet, penwidth = 2];
+                        "7,"->"8,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "7,"->"8,0"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "4,"->"8,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "4,"->"8,0"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"2,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"3,"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"5,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"5,0"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"2,0"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"3,0"[label = <<B>o: [ab] c:</B>>, color = violet, penwidth = 2];
+                        "6,"->"7,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "6,"->"7,0"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "3,"->"4,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "3,"->"4,0"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "0,"->"1,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "0,"->"1,0"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "5,9"->"6,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "1,9"->"5,9"[label = <<B>o: [a-z] ∩ [b-n] c:</B>>, color = red, penwidth = 2];
+                        "1,9"->"3,9"[label = <<B>o: [ab] ∩ [b-n] c:</B>>, color = red, penwidth = 2];
+                        "1,8"->"5,9"[label = <<B>o: [a-z] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "1,8"->"3,9"[label = <<B>o: [ab] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "1,8"->"3,1"[label = <<B>o: [ab] ∩ [a-f] c:</B>>, color = red, penwidth = 2];
+                        "1,8"->"5,1"[label = <<B>o: [a-z] ∩ [a-f] c:</B>>, color = red, penwidth = 2];
+                        "1,8"->"2,1"[label = <<B>o: [ab] ∩ [a-f] c:</B>>, color = red, penwidth = 2];
+                        "1,7"->"5,9"[label = <<B>o: [a-z] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "1,7"->"2,2"[label = <<B>o: [ab] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "1,7"->"3,9"[label = <<B>o: [ab] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "1,7"->"3,2"[label = <<B>o: [ab] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "1,7"->"5,2"[label = <<B>o: [a-z] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "0,9"->"1,9"[label = <<B>o: [a-c] ∩ [b-n] c:</B>>, color = red, penwidth = 2];
+                        "0,8"->"1,9"[label = <<B>o: [a-c] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "0,8"->"1,1"[label = <<B>o: [a-c] ∩ [a-f] c:</B>>, color = red, penwidth = 2];
+                        "0,7"->"1,9"[label = <<B>o: [a-c] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "0,7"->"1,2"[label = <<B>o: [a-c] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "8,9"->"1,9"[label = <<B>o: [ab] ∩ [b-n] c:</B>>, color = red, penwidth = 2];
+                        "8,8"->"1,9"[label = <<B>o: [ab] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "8,8"->"9,1"[label = <<B>o: [ab] ∩ [a-f] c:</B>>, color = red, penwidth = 2];
+                        "8,8"->"1,1"[label = <<B>o: [ab] ∩ [a-f] c:</B>>, color = red, penwidth = 2];
+                        "8,7"->"1,9"[label = <<B>o: [ab] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "8,7"->"9,2"[label = <<B>o: [ab] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "8,7"->"1,2"[label = <<B>o: [ab] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "0,6"->"1,8"[label = <<B>o: [a-c] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "0,6"->"1,7"[label = <<B>o: [a-c] ∩ [axy] c:</B>>, color = red, penwidth = 2];
+                        "8,6"->"1,8"[label = <<B>o: [ab] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "8,6"->"1,7"[label = <<B>o: [ab] ∩ [axy] c:</B>>, color = red, penwidth = 2];
+                        "8,6"->"9,7"[label = <<B>o: [ab] ∩ [axy] c:</B>>, color = red, penwidth = 2];
+                        "8,6"->"9,8"[label = <<B>o: [ab] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "2,8"->"8,9"[label = <<B>o: [as] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "2,8"->"8,1"[label = <<B>o: [as] ∩ [a-f] c:</B>>, color = red, penwidth = 2];
+                        "2,7"->"8,9"[label = <<B>o: [as] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "2,7"->"8,2"[label = <<B>o: [as] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "7,9"->"8,9"[label = <<B>o: [a-c] ∩ [b-n] c:</B>>, color = red, penwidth = 2];
+                        "7,8"->"8,9"[label = <<B>o: [a-c] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "7,8"->"8,1"[label = <<B>o: [a-c] ∩ [a-f] c:</B>>, color = red, penwidth = 2];
+                        "7,7"->"8,9"[label = <<B>o: [a-c] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "7,7"->"8,2"[label = <<B>o: [a-c] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "4,9"->"8,9"[label = <<B>o: [ab] ∩ [b-n] c:</B>>, color = red, penwidth = 2];
+                        "4,8"->"8,9"[label = <<B>o: [ab] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "4,8"->"8,1"[label = <<B>o: [ab] ∩ [a-f] c:</B>>, color = red, penwidth = 2];
+                        "4,7"->"8,9"[label = <<B>o: [ab] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "4,7"->"8,2"[label = <<B>o: [ab] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "2,6"->"8,8"[label = <<B>o: [as] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "2,6"->"8,7"[label = <<B>o: [as] ∩ [axy] c:</B>>, color = red, penwidth = 2];
+                        "7,6"->"8,8"[label = <<B>o: [a-c] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "7,6"->"8,7"[label = <<B>o: [a-c] ∩ [axy] c:</B>>, color = red, penwidth = 2];
+                        "4,6"->"8,8"[label = <<B>o: [ab] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "4,6"->"8,7"[label = <<B>o: [ab] ∩ [axy] c:</B>>, color = red, penwidth = 2];
+                        "2,2"->"8,6"[label = <<B>o: [as] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "2,5"->"8,6"[label = <<B>o: [as] ∩ [as01] c:</B>>, color = red, penwidth = 2];
+                        "7,2"->"8,6"[label = <<B>o: [a-c] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "7,5"->"8,6"[label = <<B>o: [a-c] ∩ [as01] c:</B>>, color = red, penwidth = 2];
+                        "4,2"->"8,6"[label = <<B>o: [ab] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "4,5"->"8,6"[label = <<B>o: [ab] ∩ [as01] c:</B>>, color = red, penwidth = 2];
+                        "9,6"->"2,8"[label = <<B>o: [ab] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "9,6"->"2,7"[label = <<B>o: [ab] ∩ [axy] c:</B>>, color = red, penwidth = 2];
+                        "1,6"->"2,8"[label = <<B>o: [ab] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "1,6"->"2,7"[label = <<B>o: [ab] ∩ [axy] c:</B>>, color = red, penwidth = 2];
+                        "1,6"->"3,8"[label = <<B>o: [ab] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "1,6"->"3,7"[label = <<B>o: [ab] ∩ [axy] c:</B>>, color = red, penwidth = 2];
+                        "1,6"->"5,8"[label = <<B>o: [a-z] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "1,6"->"5,7"[label = <<B>o: [a-z] ∩ [axy] c:</B>>, color = red, penwidth = 2];
+                        "6,9"->"7,9"[label = <<B>o: [a-c] ∩ [b-n] c:</B>>, color = red, penwidth = 2];
+                        "6,8"->"7,9"[label = <<B>o: [a-c] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "6,8"->"7,1"[label = <<B>o: [a-c] ∩ [a-f] c:</B>>, color = red, penwidth = 2];
+                        "6,7"->"7,9"[label = <<B>o: [a-c] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "6,7"->"7,2"[label = <<B>o: [a-c] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "6,6"->"7,8"[label = <<B>o: [a-c] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "6,6"->"7,7"[label = <<B>o: [a-c] ∩ [axy] c:</B>>, color = red, penwidth = 2];
+                        "3,9"->"4,9"[label = <<B>o: [a-c] ∩ [b-n] c:</B>>, color = red, penwidth = 2];
+                        "3,8"->"4,9"[label = <<B>o: [a-c] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "3,8"->"4,1"[label = <<B>o: [a-c] ∩ [a-f] c:</B>>, color = red, penwidth = 2];
+                        "3,7"->"4,9"[label = <<B>o: [a-c] ∩ a c:</B>>, color = red, penwidth = 2];
+                        "3,7"->"4,2"[label = <<B>o: [a-c] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "3,6"->"4,8"[label = <<B>o: [a-c] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "3,6"->"4,7"[label = <<B>o: [a-c] ∩ [axy] c:</B>>, color = red, penwidth = 2];
+                        "9,2"->"2,6"[label = <<B>o: [ab] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "9,5"->"2,6"[label = <<B>o: [ab] ∩ [as01] c:</B>>, color = red, penwidth = 2];
+                        "1,2"->"2,6"[label = <<B>o: [ab] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "1,2"->"3,6"[label = <<B>o: [ab] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "1,2"->"5,6"[label = <<B>o: [a-z] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "1,5"->"2,6"[label = <<B>o: [ab] ∩ [as01] c:</B>>, color = red, penwidth = 2];
+                        "1,5"->"3,6"[label = <<B>o: [ab] ∩ [as01] c:</B>>, color = red, penwidth = 2];
+                        "1,5"->"5,6"[label = <<B>o: [a-z] ∩ [as01] c:</B>>, color = red, penwidth = 2];
+                        "6,2"->"7,6"[label = <<B>o: [a-c] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "6,5"->"7,6"[label = <<B>o: [a-c] ∩ [as01] c:</B>>, color = red, penwidth = 2];
+                        "3,2"->"4,6"[label = <<B>o: [a-c] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "3,5"->"4,6"[label = <<B>o: [a-c] ∩ [as01] c:</B>>, color = red, penwidth = 2];
+                        "9,1"->"2,2"[label = <<B>o: [ab] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "9,1"->"2,3"[label = <<B>o: [ab] ∩ [as] c:</B>>, color = red, penwidth = 2];
+                        "9,7"->"2,2"[label = <<B>o: [ab] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "1,1"->"2,2"[label = <<B>o: [ab] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "1,1"->"3,2"[label = <<B>o: [ab] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "1,1"->"5,2"[label = <<B>o: [a-z] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "1,1"->"5,3"[label = <<B>o: [a-z] ∩ [as] c:</B>>, color = red, penwidth = 2];
+                        "1,1"->"2,3"[label = <<B>o: [ab] ∩ [as] c:</B>>, color = red, penwidth = 2];
+                        "1,1"->"3,3"[label = <<B>o: [ab] ∩ [as] c:</B>>, color = red, penwidth = 2];
+                        "9,4"->"2,5"[label = <<B>o: [ab] ∩ [a-d] c:</B>>, color = red, penwidth = 2];
+                        "1,4"->"2,5"[label = <<B>o: [ab] ∩ [a-d] c:</B>>, color = red, penwidth = 2];
+                        "1,4"->"3,5"[label = <<B>o: [ab] ∩ [a-d] c:</B>>, color = red, penwidth = 2];
+                        "1,4"->"5,5"[label = <<B>o: [a-z] ∩ [a-d] c:</B>>, color = red, penwidth = 2];
+                        "6,1"->"7,2"[label = <<B>o: [a-c] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "6,1"->"7,3"[label = <<B>o: [a-c] ∩ [as] c:</B>>, color = red, penwidth = 2];
+                        "6,4"->"7,5"[label = <<B>o: [a-c] ∩ [a-d] c:</B>>, color = red, penwidth = 2];
+                        "3,1"->"4,2"[label = <<B>o: [a-c] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "3,1"->"4,3"[label = <<B>o: [a-c] ∩ [as] c:</B>>, color = red, penwidth = 2];
+                        "3,4"->"4,5"[label = <<B>o: [a-c] ∩ [a-d] c:</B>>, color = red, penwidth = 2];
+                        "8,2"->"9,6"[label = <<B>o: [ab] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "8,2"->"1,6"[label = <<B>o: [ab] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "8,5"->"9,6"[label = <<B>o: [ab] ∩ [as01] c:</B>>, color = red, penwidth = 2];
+                        "8,5"->"1,6"[label = <<B>o: [ab] ∩ [as01] c:</B>>, color = red, penwidth = 2];
+                        "0,2"->"1,6"[label = <<B>o: [a-c] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
+                        "0,5"->"1,6"[label = <<B>o: [a-c] ∩ [as01] c:</B>>, color = red, penwidth = 2];
+                        "5,8"->"6,9"[label = <<B>o: a ∩ [a-c] c:</B><BR/>o: ^ c:(5,6)>, color = red, penwidth = 2];
+                        "5,8"->"6,1"[label = <<B>o: a ∩ [a-f] c:</B><BR/>o: ^ c:(5,6)>, color = red, penwidth = 2];
+                        "5,7"->"6,9"[label = <<B>o: a ∩ a c:</B><BR/>o: ^ c:(5,6)>, color = red, penwidth = 2];
+                        "5,7"->"6,2"[label = <<B>o: a ∩ [a-z] c:</B><BR/>o: ^ c:(5,6)>, color = red, penwidth = 2];
+                        "5,6"->"6,8"[label = <<B>o: a ∩ . c:</B><BR/>o: ^ c:(5,6)>, color = red, penwidth = 2];
+                        "5,6"->"6,7"[label = <<B>o: a ∩ [axy] c:</B><BR/>o: ^ c:(5,6)>, color = red, penwidth = 2];
+                        "5,2"->"6,6"[label = <<B>o: a ∩ [a-c] c:</B><BR/>o: ^ c:(5,6)>, color = red, penwidth = 2];
+                        "5,5"->"6,6"[label = <<B>o: a ∩ [as01] c:</B><BR/>o: ^ c:(5,6)>, color = red, penwidth = 2];
+                        "8,1"->"9,2"[label = <<B>o: [ab] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "8,1"->"1,2"[label = <<B>o: [ab] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "8,1"->"1,3"[label = <<B>o: [ab] ∩ [as] c:</B>>, color = red, penwidth = 2];
+                        "8,1"->"9,3"[label = <<B>o: [ab] ∩ [as] c:</B>>, color = red, penwidth = 2];
+                        "8,4"->"9,5"[label = <<B>o: [ab] ∩ [a-d] c:</B>>, color = red, penwidth = 2];
+                        "8,4"->"1,5"[label = <<B>o: [ab] ∩ [a-d] c:</B>>, color = red, penwidth = 2];
+                        "0,1"->"1,2"[label = <<B>o: [a-c] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "0,1"->"1,3"[label = <<B>o: [a-c] ∩ [as] c:</B>>, color = red, penwidth = 2];
+                        "0,4"->"1,5"[label = <<B>o: [a-c] ∩ [a-d] c:</B>>, color = red, penwidth = 2];
+                        "5,1"->"6,2"[label = <<B>o: a ∩ [ab] c:</B><BR/>o: ^ c:(5,6)>, color = red, penwidth = 2];
+                        "5,1"->"6,3"[label = <<B>o: a ∩ [as] c:</B><BR/>o: ^ c:(5,6)>, color = red, penwidth = 2];
+                        "5,4"->"6,5"[label = <<B>o: a ∩ [a-d] c:</B><BR/>o: ^ c:(5,6)>, color = red, penwidth = 2];
+                        "8,0"->"9,1"[label = <<B>o: [ab] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "8,0"->"1,1"[label = <<B>o: [ab] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "0,0"->"1,1"[label = <<B>o: [a-c] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "8,3"->"9,4"[label = <<B>o: [ab] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "8,3"->"1,4"[label = <<B>o: [ab] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "0,3"->"1,4"[label = <<B>o: [a-c] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "5,0"->"6,1"[label = <<B>o: a ∩ [a-z] c:</B><BR/>o: ^ c:(5,6)>, color = red, penwidth = 2];
+                        "5,3"->"6,4"[label = <<B>o: a ∩ . c:</B><BR/>o: ^ c:(5,6)>, color = red, penwidth = 2];
+                        "1,0"->"3,1"[label = <<B>o: [ab] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "1,0"->"5,1"[label = <<B>o: [a-z] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "1,0"->"2,1"[label = <<B>o: [ab] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "1,3"->"3,4"[label = <<B>o: [ab] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "1,3"->"5,4"[label = <<B>o: [a-z] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "1,3"->"2,4"[label = <<B>o: [ab] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "2,1"->"8,2"[label = <<B>o: [as] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "2,1"->"8,3"[label = <<B>o: [as] ∩ [as] c:</B>>, color = red, penwidth = 2];
+                        "7,1"->"8,2"[label = <<B>o: [a-c] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "7,1"->"8,3"[label = <<B>o: [a-c] ∩ [as] c:</B>>, color = red, penwidth = 2];
+                        "4,1"->"8,2"[label = <<B>o: [ab] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "4,1"->"8,3"[label = <<B>o: [ab] ∩ [as] c:</B>>, color = red, penwidth = 2];
+                        "2,4"->"8,5"[label = <<B>o: [as] ∩ [a-d] c:</B>>, color = red, penwidth = 2];
+                        "7,4"->"8,5"[label = <<B>o: [a-c] ∩ [a-d] c:</B>>, color = red, penwidth = 2];
+                        "4,4"->"8,5"[label = <<B>o: [ab] ∩ [a-d] c:</B>>, color = red, penwidth = 2];
+                        "2,0"->"8,1"[label = <<B>o: [as] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "7,0"->"8,1"[label = <<B>o: [a-c] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "4,0"->"8,1"[label = <<B>o: [ab] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "2,3"->"8,4"[label = <<B>o: [as] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "7,3"->"8,4"[label = <<B>o: [a-c] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "4,3"->"8,4"[label = <<B>o: [ab] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "9,0"->"2,1"[label = <<B>o: [ab] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "9,8"->"2,1"[label = <<B>o: [ab] ∩ [a-f] c:</B>>, color = red, penwidth = 2];
+                        "6,0"->"7,1"[label = <<B>o: [a-c] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "3,0"->"4,1"[label = <<B>o: [a-c] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "9,3"->"2,4"[label = <<B>o: [ab] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "6,3"->"7,4"[label = <<B>o: [a-c] ∩ . c:</B>>, color = red, penwidth = 2];
+                        "3,3"->"4,4"[label = <<B>o: [a-c] ∩ . c:</B>>, color = red, penwidth = 2];
+                        ",9"->",9"[label = <<B>o: [b-n] c:</B>>, color = blue, penwidth = 2];
+                        ",9"->"0,9"[label = <<B>o: [b-n] c:</B>>, color = blue, penwidth = 2];
+                        ",9"->"9,"[label = <<B>o: ε c:</B>>, color = blue, penwidth = 2];
+                        ",8"->",9"[label = <<B>o: [a-c] c:</B>>, color = blue, penwidth = 2];
+                        ",8"->",1"[label = <<B>o: [a-f] c:</B>>, color = blue, penwidth = 2];
+                        ",8"->"0,9"[label = <<B>o: [a-c] c:</B>>, color = blue, penwidth = 2];
+                        ",8"->"0,1"[label = <<B>o: [a-f] c:</B>>, color = blue, penwidth = 2];
+                        ",7"->",9"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
+                        ",7"->",2"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
+                        ",7"->"0,9"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
+                        ",7"->"0,2"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
+                        ",6"->",8"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
+                        ",6"->",7"[label = <<B>o: [axy] c:</B>>, color = blue, penwidth = 2];
+                        ",6"->"0,8"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
+                        ",6"->"0,7"[label = <<B>o: [axy] c:</B>>, color = blue, penwidth = 2];
+                        ",2"->",6"[label = <<B>o: [a-c] c:</B>>, color = blue, penwidth = 2];
+                        ",2"->"0,6"[label = <<B>o: [a-c] c:</B>>, color = blue, penwidth = 2];
+                        ",5"->",6"[label = <<B>o: [as01] c:</B>>, color = blue, penwidth = 2];
+                        ",5"->"0,6"[label = <<B>o: [as01] c:</B>>, color = blue, penwidth = 2];
+                        ",1"->",2"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
+                        ",1"->",3"[label = <<B>o: [as] c:</B>>, color = blue, penwidth = 2];
+                        ",1"->"0,2"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
+                        ",1"->"0,3"[label = <<B>o: [as] c:</B>>, color = blue, penwidth = 2];
+                        ",4"->",5"[label = <<B>o: [a-d] c:</B>>, color = blue, penwidth = 2];
+                        ",4"->"0,5"[label = <<B>o: [a-d] c:</B>>, color = blue, penwidth = 2];
+                        ",0"->",1"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
+                        ",0"->"0,1"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
+                        ",3"->",4"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
+                        ",3"->"0,4"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
+                        "5,"->"6,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "5,"->"6,0"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
                     }';
 
         $search = '
                     ';
         $replace = "\n";
-        $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
-
-        $firstautomata = new qtype_preg_fa();
-        $firstautomata->read_fa($dotdescription1);
-        $secondautomata = new qtype_preg_fa();
-        $secondautomata->read_fa($dotdescription2, $origin);
+        $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
+        $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
         $resultautomata = $firstautomata->intersect($secondautomata, '5', 1);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
     }
-    */
-
 }
