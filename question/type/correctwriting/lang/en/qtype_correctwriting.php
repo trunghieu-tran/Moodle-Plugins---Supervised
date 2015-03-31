@@ -40,6 +40,7 @@ $string['hinting'] = 'Hinting options';
 $string['hinting_help'] = 'Hinting options allows you to set availability and penalties for various hints. To disable any hint type, just set its penalty above 1.';
 $string['hintgradeborder'] = 'Minimum grade for answer to display mistakes';
 $string['hintgradeborder_help'] = 'Only answers with grade greater or equal this grade will be considered correct and display mistakes and hints. An answers with the lower grades will be used only when exactly matched. You could use an answers with the lower grade to give a special feedback for some mistakes.';
+$string['howtofixpic'] = 'how to fix {$a} (image)';
 $string['imageanswer']  = 'Answer: ';
 $string['imageresponse']  = 'Response: ';
 $string['imageanswer']  = 'Correct answer: ';

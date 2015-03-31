@@ -104,6 +104,10 @@ class qtype_correctwriting_lexical_mistake extends qtype_correctwriting_response
         }
         return null;
     }
+
+    public function token_descriptions_as_mistake($andvalue = false) {
+        return parent::token_descriptions($andvalue);
+    }
 }
 
 class qtype_correctwriting_scanning_mistake extends qtype_correctwriting_lexical_mistake {
