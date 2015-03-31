@@ -921,51 +921,12 @@ class qtype_correctwriting_image_generator
     *  @param qtype_correctwriting_question $question
     */
    public function __construct($pair, $question) {
-       // Preprocess answers
-       $answer = array();
-       $tokens = $pair->enum_correct_string()->stream->tokens;
-       if (count($tokens) != 0) {
-           foreach($tokens as $answertoken) {
-               /** @var block_formal_langs_token_base $answertoken */
-               /** @var qtype_poasquestion\string $value */
-               $value = $answertoken->value();
-               if (is_object($value)) {
-                   $value = $value->string();
-               }
-               $answer[] = new qtype_correctwriting_lexeme_label($value);
-           }
-       }
-
-       // Preprocess response
-       $response = array();
-       $tokens = $pair->comparedstring()->stream->tokens;
-       // Preprocess responses
-       if (count($tokens) != 0) {
-           foreach($tokens as $responsetoken) {
-               /** @var block_formal_langs_token_base $responsetoken */
-               /** @var qtype_poasquestion\string $value */
-               $value = $responsetoken->value();
-               if (is_object($value)) {
-                   $value = $value->string();
-               }
-               $response[] = new qtype_correctwriting_lexeme_label($value);
-           }
-       }
-
+       list($answer, $response, $correcttocorrect, $comparedtocompared) = self::pair_to_answer_response_list($pair);
        // $grouping = intval($question->issyntaxanalyzerenabled);
 
        $absentlexemes = array();
        $addedlexemes  = array();
        $movedlexemes = array();
-
-       $correcttocorrect = array();
-       $comparedtocompared = array();
-       for($i = 0; $i < count($answer); $i++) {
-           $correcttocorrect[$i] = $i;
-       }
-       for($i = 0; $i < count($response); $i++) {
-           $comparedtocompared[$i] = $i;
-       }
 
        foreach($pair->mistakes() as $mistake) {
            // If this is lexical mistake, we should mark some lexeme as fixed
@@ -1060,6 +1021,59 @@ class qtype_correctwriting_image_generator
        $this->table  = new qtype_correctwriting_table($answer, $response, $lcs, $mistakes);
    }
 
+   /** Maps pair to an array of objects
+    *  @param qtype_correctwriting_string_pair $pair
+    *  @return array ob blocks of answer, response and mappings
+    */
+   public static function pair_to_answer_response_list($pair) {
+       // Preprocess answers
+       $answer = array();
+       $tokens = $pair->enum_correct_string()->stream->tokens;
+       if (count($tokens) != 0) {
+           foreach($tokens as $answertoken) {
+               /** @var block_formal_langs_token_base $answertoken */
+               /** @var qtype_poasquestion\string $value */
+               $value = $answertoken->value();
+               if (is_object($value)) {
+                   $value = $value->string();
+               }
+               $answer[] = new qtype_correctwriting_lexeme_label($value);
+           }
+       }
+
+       // Preprocess response
+       $response = array();
+       $tokens = $pair->comparedstring()->stream->tokens;
+       // Preprocess responses
+       if (count($tokens) != 0) {
+           foreach($tokens as $responsetoken) {
+               /** @var block_formal_langs_token_base $responsetoken */
+               /** @var qtype_poasquestion\string $value */
+               $value = $responsetoken->value();
+               if (is_object($value)) {
+                   $value = $value->string();
+               }
+               $response[] = new qtype_correctwriting_lexeme_label($value);
+           }
+       }
+
+       $correcttocorrect = array();
+       $comparedtocompared = array();
+       for($i = 0; $i < count($answer); $i++) {
+           $correcttocorrect[$i] = $i;
+       }
+       for($i = 0; $i < count($response); $i++) {
+           $comparedtocompared[$i] = $i;
+       }
+
+       return array(
+           $answer,
+           $response,
+           $correcttocorrect,
+           $comparedtocompared
+       );
+   }
+
    /**
     * Handles, changes, emitted by lexical mistakes
     * @param array $answer answer
@@ -1068,6 +1082,7 @@ class qtype_correctwriting_image_generator
     * @param qtype_correctwriting_string_pair $pair a pair
     * @param array $correcttocorrect mappings from correct tokens to a blocks of tokens
     * @param array $comparedtocompared mappings from com[ared tokens to blocks of tokens
+    * @return null||qtype_correctwriting_abstract_label
     */
    public static function handle_lexical_mistake_change(&$answer, &$response, $mistake, $pair, &$correcttocorrect, &$comparedtocompared)  {
        /** @var qtype_correctwriting_lexical_mistake $lexicalmistake */
@@ -1160,6 +1175,7 @@ class qtype_correctwriting_image_generator
 
            $correcttocorrect[$correctindex2] = $correctindex1;
 
+           $label = $comparedlabel;
 
            $comparedlabel->insert_missing_separator(core_text::strlen($correctlabel->text()));
        }
@@ -1174,11 +1190,13 @@ class qtype_correctwriting_image_generator
            $comparedlabel1 = $response[$comparedindex1];
            $comparedlabel2 = $response[$comparedindex2];
            $comparedlabel1->append_extra_separator_lexeme($comparedlabel2->text());
+           $label = $comparedlabel1;
 
            unset($response[$comparedindex2]);
 
            $comparedtocompared[$comparedindex2] = $comparedindex1;
        }
+       return $label;
    }
 
     /**
@@ -1338,12 +1356,13 @@ class qtype_correctwriting_image_generator
         }
         return $lcs;
     }
-   /*! Produces an image performing all painting actions and sending it to buffer
-    */
-   public function produce_image() {
-       // Align labels in a rows, without a links between them
-       $size = $this->table->get_size();
 
+   /**
+    * Returns created default image
+    * @param array $size of width height
+    * @return array of <image, array of palette>
+    */
+   public static function create_default_image($size) {
        // Create image
        $sizex = $size[0] + 2 * FRAME_SPACE;
        $sizey = $size[1] + 2 * FRAME_SPACE;
@@ -1365,6 +1384,15 @@ class qtype_correctwriting_image_generator
        imageline($im, $sizex - 1, $sizey - 1, 0, $sizey - 1, $palette['black']);
        imageline($im, 0, $sizey - 1, 0, 0, $palette['black']);
 
+       return array($im, $palette);
+   }
+   /*! Produces an image performing all painting actions and sending it to buffer
+    */
+   public function produce_image() {
+       // Align labels in a rows, without a links between them
+       $size = $this->table->get_size();
+
+       list($im, $palette) = $this->create_default_image($size);
 
        // Draw a table
        $this->table->paint($im, $palette);
