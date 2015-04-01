@@ -25,7 +25,6 @@ class block_formal_langs_language_simple_english extends block_formal_langs_pred
      */
     protected function preprocess_for_scan($string) {
         return $string;
-        //return str_replace('’', "'", $string);
     }
     public function name() {
         return 'simple_english';

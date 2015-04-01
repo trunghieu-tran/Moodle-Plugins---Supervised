@@ -54,8 +54,9 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
     private $hintfloatfields = array('whatishintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2),       // "What is" hint penalty.
                                      'wheretxthintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2),     // "Where" text hint penalty.
                                      'absenthintpenaltyfactor' => array('default' => 1.0, 'advanced' => true, 'min' => 0, 'max' => 100),// Absent token mistake hint penalty factor.
-                                     'wherepichintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2)      // "Where" picture hint penalty.
-                                     );
+                                     'wherepichintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2),     // "Where" picture hint penalty.
+                                     'howtofixpichintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2)   // "How to fix" picture hint penalty.
+                                    );
 
     private $analyzers = null;
     /** Contains list of answer ids, that should be hidden

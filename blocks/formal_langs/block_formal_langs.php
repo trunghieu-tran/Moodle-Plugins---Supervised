@@ -64,8 +64,8 @@ class block_formal_langs extends block_base {
     /**
      * Constructs and returns a language object for given languaged id
      *
-     * @param langid id of the language
-     * @return an intialised object of the child of the block_formal_langs_abstract_language class
+     * @param int $langid id of the language
+     * @return block_formal_langs_abstract_language an intialised object of the child of the block_formal_langs_abstract_language class
      */
     public static function lang_object($langid) {
         global $DB, $CFG;
@@ -78,6 +78,45 @@ class block_formal_langs extends block_base {
             require_once($CFG->dirroot.'/blocks/formal_langs/language_' . $record->name . '.php');
             $langname = 'block_formal_langs_language_' . $record->name;
             $result = new $langname($langid, $record);
+        }
+        return $result;
+    }
+
+    /**
+     * Finds or insers language definition.
+     * All fields must be set
+     * @param array $language as tuple <ui_name, description, name, scanrules, parserules, version visible>.
+     * @return int id of inserted language
+     */
+    public static function find_or_insert_language($language) {
+        global $DB;
+        // Seek for language and insert it if not found, handling some error stuff
+        // Also cannot compare strings in some common case.
+        $sql = 'SELECT id
+                      FROM {block_formal_langs}
+                     WHERE ';
+        $filternames = array('name', 'version');
+        $filtervalues = array($language['name'], $language['version']);
+        if ($language['scanrules'] != null || $language['parserules'] != null) {
+            $filternames[] = 'scanrules';
+            $filternames[] = 'parserules';
+            $filtervalues[]  = $language['scanrules'] ;
+            $filtervalues[]  = $language['parserules'];
+        }
+        // Transform columns into sql comparisons
+        $sqlfilternames = array();
+        foreach($filternames as $name) {
+            $sqlfilternames[] = $DB->sql_compare_text($name, 512) . ' = ' . $DB->sql_compare_text('?', 512);
+        }
+        // Build actual sql request
+        $sql .= implode(' AND ', $sqlfilternames);
+        $sql .= ';';
+
+        $record = $DB->get_record_sql($sql, $filtervalues);
+        if ($record == false) {
+            $result = $DB->insert_record('block_formal_langs', $language);
+        } else {
+            $result = $record->id;
         }
         return $result;
     }
