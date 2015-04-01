@@ -16,6 +16,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 require_once($CFG->dirroot . '/question/type/preg/fa_matcher/fa_matcher.php');
 require_once($CFG->dirroot . '/question/type/poasquestion/stringstream/stringstream.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
+require_once('override_templates.php');
 
 class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
 
@@ -430,6 +431,24 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($node->position->indlast === 30);
     }
 
+    function test_node_by_regex_fragment_template_with_multiple_params() {
+        $options = new qtype_preg_handling_options();
+        $options->preserveallnodes = true;
+        $handler = new qtype_preg_regex_handler("(?###custom_parens_req<)a(?###,)b(?###,)c(?###>)", $options);
+        $idcounter = 1000;
+
+        $root = clone $handler->get_ast_root();
+        $node = $root->node_by_regex_fragment(24, 24, $idcounter);
+        $this->assertTrue($node->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+
+        $root = clone $handler->get_ast_root();
+        $node = $root->node_by_regex_fragment(32, 32, $idcounter);
+        $this->assertTrue($node->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+
+        $root = clone $handler->get_ast_root();
+        $node = $root->node_by_regex_fragment(24, 32, $idcounter);
+        $this->assertTrue($node === $root);
+    }
 
     function test_selection_as_option() {
         $options = new qtype_preg_handling_options();
