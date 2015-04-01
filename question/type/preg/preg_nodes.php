@@ -417,7 +417,10 @@ abstract class qtype_preg_node {
                     $to = $count - $i - 1;
                 }
             }
-            $result->expand($from, $to, $idcounter);
+
+            if ($result->is_expandable()) {
+                $result->expand($from, $to, $idcounter);
+            }
 
             // Update the result again.
             foreach ($result->operands as $operand) {
@@ -673,6 +676,13 @@ abstract class qtype_preg_operator extends qtype_preg_node {
             $this->firstpos = array();
             $this->lastpos = array();
         }
+    }
+
+    /**
+     * N-ary concatenation and alternation can be expanded, but templates can not.
+     */
+    public function is_expandable() {
+        return true;
     }
 
     public function expand($from, $to, &$idcounter, $expandsubtree = false) {
@@ -2390,6 +2400,10 @@ class qtype_preg_node_template extends qtype_preg_operator {
     public function is_equal($node, $numberoffset) {
         return parent::is_equal($node, $numberoffset)
             && $this->name==$node->name;
+    }
+
+    public function is_expandable() {
+        return false;
     }
 }
 

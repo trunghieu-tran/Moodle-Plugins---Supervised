@@ -1094,6 +1094,13 @@ class qtype_preg_parser_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($root->operands[2]->type === qtype_preg_node::TYPE_NODE_ALT);
         $this->assertTrue($root->position->indfirst === 0);
         $this->assertTrue($root->position->indlast === 39);
+        $handler = $this->run_handler("(?###custom_parens_req<)a(?###,)b(?###,)c(?###>)", $options);
+        $root = $handler->get_ast_root();
+        $this->assertTrue($root->type === qtype_preg_node::TYPE_NODE_TEMPLATE);
+        $this->assertTrue(count($root->operands) === 3);
+        $this->assertTrue($root->operands[0]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[1]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
+        $this->assertTrue($root->operands[2]->type === qtype_preg_node::TYPE_LEAF_CHARSET);
         // Okay, these guys can be nested
         $handler = $this->run_handler("(?###outer<)a(?###,)(?###inner<)a(?###,)b?(?###,)(c)(?###>)(?###,)c|(d)(?###>)", $options);
         $root = $handler->get_ast_root();
