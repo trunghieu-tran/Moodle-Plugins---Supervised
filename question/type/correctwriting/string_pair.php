@@ -44,6 +44,19 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
     protected $aretokensequencesequal = false;
 
     /**
+     * A string with processed enumerations
+     * @var null|block_formal_langs_processed_string
+     */
+    protected $enumcorrectstring = null;
+
+    /**
+     * Array, where keys are indexes from string , filled by enum analyzer
+     * and values, are indexes from correct string
+     * @var array
+     */
+    protected $enumcorrecttocorrect = array();
+
+    /**
      * A mistake set for arrays
      *
      * @var array
@@ -51,91 +64,73 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
     protected $mistakes = array();
 
     /**
-     * A token mappings for each of analyzers
-     * as 'analyzer class name' => mappings for tokens of each of lexeme
-     * of transformed by lexer to previous. Order of key creation matters,
-     * A mapping is array of two arrays. First array is indexes of string, corrected
-     * by analyzer and second is array of source indexes of previous analyzed string.
-     *
-     * You can align two arrays as following
-     * array(
-     *   First array - corrected lexemes array( 0, 1 ), array( 2 ), array(3 ),
-     *   Second array - source lexemes   array( 0 )  , array(1, 2), array(3)
-     * )
-     * @var array
-     */
-    public $tokenmappings = array();
-
-    /**
      * Holds sequence of scanned analyzers to know how far we should go
      * @var array
      */
     public $analyzersequence = array();
 
+
     /**
-     * Indexes of skipped lexemes from teacher's answer
-     * @var array
+     * Returns mapped index from correct string to enum correct string
+     * @param int $index index part
+     * @return int resulting index
      */
-    public $skippedlexemesindexes = array();
+    public function map_from_correct_string_to_enum_correct_string($index) {
+        return $this->map($index, $this->enumcorrecttocorrect, true, $index);
+    }
+
     /**
-     * Indexes of added lexemes from student's answer
-     * @var array
+     * Returns mapped index from enum correct string to correct string
+     * @param $index
+     * @return int
      */
-    public $addedlexemesindexes = array();
-    /**
-     * Indexes of moved lexemes from teacher's answer, using student answer's as a key
-     * @var array
-     */
-    public $movedlexemesindexes = array();
+    public function map_from_enum_correct_string_to_correct_string($index) {
+        return $this->map($index, $this->enumcorrecttocorrect, false, $index);
+    }
 
 
     /**
-     * Maps index from source token index of one analyzer to
-     * source token index, entered by user
-     * @param int $source индекс исходной лексемы
-     * @param string $sourceanalyzer анализатор, строке которого соответствует индекс
-     * @return array результирующие индексы
+     * Returns matches as set by enum analyzer
+     * @return arrray|null
      */
-    protected function map_index_to_source_string($source, $sourceanalyzer) {
-        // If no analyzers - just return source
-        if (count($this->tokenmappings) == 0) {
-            return $source;
+    public function enum_correct_to_correct() {
+        return $this->enumcorrecttocorrect;
+    }
+
+    /**
+     * A matches, as set by enum analyzer
+     * @param array $matches
+     */
+    public function set_enum_correct_to_correct($matches) {
+        $this->enumcorrecttocorrect = $matches;
+    }
+
+    /**
+     * Returns processed string, returned enum_analyzer.
+     * It's like corrected, but with enum positions swapped
+     * @return block_formal_langs_processed_string|null
+     */
+    public function enum_correct_string()  {
+        if ($this->enumcorrectstring == null) {
+            return $this->correctstring();
         }
+        return $this->enumcorrectstring;
+    }
 
-        $currentnalyzerindex = $this->analyzersequence[count($this->analyzersequence) - 1];
-        if (testlib::strlen($sourceanalyzer) != 0) {
-            $foundanalyzer = array_search($sourceanalyzer, $this->analyzersequence);
-            if ($foundanalyzer !== false) {
-                $currentnalyzerindex = $foundanalyzer;
-            }
-        }
-
-        $result = array( $source );
-        $newresult = array();
-        if ($currentnalyzerindex > 0) {
-            for($i = $currentnalyzerindex - 1; $i > -1 ; $i--) {
-                $mappings = $this->tokenmappings[$this->analyzersequence[$currentnalyzerindex]];
-                for($j = 0; $j < count($mappings[0]); $j++) {
-                    // If any results from source is in array, than we must merge results
-                    $intersections = array_intersect($mappings[0][$j], $result);
-                    if (count($intersections)) {
-                        if (count($newresult)) {
-                            $newresult = array_merge($newresult, $mappings[1][$j]);
-                        } else {
-                            $newresult = $mappings[1][$j];
-                        }
-                    }
-                }
-                if (count($newresult)) {
-                    $result = $newresult;
-                }
-            }
-        }
-        return $result;
+    /**
+     * Sets processed correct string, returned by enum analyzer
+     * It's like corrected, but with enum positions swapped
+     * @param block_formal_langs_processed_string $string
+     */
+    public function set_enum_correct_string($string) {
+        $this->enumcorrectstring = $string;
     }
 
     public function __clone() {
         parent::__clone();
+        if (is_object($this->enumcorrectstring)) {
+            $this->enumcorrectstring = clone $this->enumcorrectstring;
+        }
         $oldmistakes = $this->mistakes;
         if (is_array($oldmistakes)) {
             foreach($oldmistakes as $type => $mistakes) {
@@ -222,6 +217,8 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
      */
     public function lcs() {
         return $this->lcs;
-    }    
+    }
+
+
 
 }
