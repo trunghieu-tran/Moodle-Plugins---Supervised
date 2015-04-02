@@ -958,7 +958,7 @@ class qtype_preg_fa {
     }
 
     public function has_transition($from, $to) {
-        return array_key_exists($to, $this->adjacencymatrix[$from]) && !empty($this->adjacencymatrix[$from][$to]);
+        return array_key_exists($from, $this->adjacencymatrix) && array_key_exists($to, $this->adjacencymatrix[$from]) && !empty($this->adjacencymatrix[$from][$to]);
     }
 
     /**
@@ -1435,6 +1435,17 @@ class qtype_preg_fa {
         return $resultstate;
     }
 
+    private function has_same_transition($transition) {
+        if ($this->has_transition($transition->from, $transition->to)) {
+            $innertransitions = $this->adjacencymatrix[$transition->from][$transition->to];
+            foreach ($innertransitions as $inner) {
+                if ($transition->equal($inner)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     /**
      * Copy transitions to workstate from automata source in given direction.
      *
@@ -1479,21 +1490,21 @@ class qtype_preg_fa {
                     if ($sourcenum == $number) {
                         // Add transition.
                         $memstate = array_search($state, $this->statenumbers);
+                        $transition = clone $tran;
                         if ($direction == 0) {
-                            $transition = new qtype_preg_fa_transition($memstate, $tran->pregleaf, $workstate, $tran->origin, $tran->consumeschars);
+                            //$transition = new qtype_preg_fa_transition($memstate, $tran->pregleaf, $workstate, $tran->origin, $tran->consumeschars);
+                            $transition->from = $memstate;
+                            $transition->to = $workstate;
                         } else {
-                            $transition = new qtype_preg_fa_transition($workstate, $tran->pregleaf, $memstate, $tran->origin, $tran->consumeschars);
+                            //$transition = new qtype_preg_fa_transition($workstate, $tran->pregleaf, $memstate, $tran->origin, $tran->consumeschars);
+                            $transition->to = $memstate;
+                            $transition->from = $workstate;
                         }
+
+                        $transition->redirect_merged_transitions();
                         $transition->set_transition_type();
-                        $hassametransition = false;
-                        if ($this->has_transition($transition->from, $transition->to)) {
-                            $innertransitions = $this->adjacencymatrix[$transition->from][$transition->to];
-                            foreach ($innertransitions as $inner) {
-                                if ($transition->equal($inner)) {
-                                    $hassametransition = true;
-                                }
-                            }
-                        }
+                        $hassametransition = $this->has_same_transition($transition);
+
                         if (!$hassametransition) {
                             $this->add_transition($transition);
                         }
@@ -1513,22 +1524,20 @@ class qtype_preg_fa {
                     $sourcenum = trim($numbers[$tran->to], '()');
                 }
                 if ($sourcenum == $number) {
+                    $transition = clone $tran;
                     // Add transition.
                     if ($direction == 0) {
-                        $transition = new qtype_preg_fa_transition($state, $tran->pregleaf, $workstate, $tran->origin, $tran->consumeschars);
+                        //$transition = new qtype_preg_fa_transition($state, $tran->pregleaf, $workstate, $tran->origin, $tran->consumeschars);
+                        $transition->from = $state;
+                        $transition->to = $workstate;
                     } else {
-                        $transition = new qtype_preg_fa_transition($workstate, $tran->pregleaf, $state, $tran->origin, $tran->consumeschars);
+                        //$transition = new qtype_preg_fa_transition($workstate, $tran->pregleaf, $state, $tran->origin, $tran->consumeschars);
+                        $transition->to = $state;
+                        $transition->from = $workstate;
                     }
+                    $transition->redirect_merged_transitions();
                     $transition->set_transition_type();
-                    $hassametransition = false;
-                        if ($this->has_transition($transition->from, $transition->to)) {
-                            $innertransitions = $this->adjacencymatrix[$transition->from][$transition->to];
-                            foreach ($innertransitions as $inner) {
-                                if ($transition->equal($inner)) {
-                                    $hassametransition = true;
-                                }
-                            }
-                        }
+                    $hassametransition = $this->has_same_transition($transition);
                         if (!$hassametransition) {
                             $this->add_transition($transition);
                         }
@@ -2062,7 +2071,10 @@ class qtype_preg_fa {
                         $resulttransitions[$i]->from = $newstate;
                         $resulttransitions[$i]->to = $curstate;
                     }
-                    $result->add_transition($resulttransitions[$i]);
+                    if (!$this->has_same_transition($resulttransitions[$i]))
+                    {
+                        $result->add_transition($resulttransitions[$i]);
+                    }
                 }
                 // Removing arrays.
                 $intertransitions1 = array();
@@ -2288,7 +2300,11 @@ class qtype_preg_fa {
                         $number = $number . ',';
                         $copiedstate = array_search($number, $this->statenumbers);
                         // Add transition.
-                        $addtran = new qtype_preg_fa_transition($state, $tran->pregleaf, $copiedstate, $tran->origin, $tran->consumeschars);
+                        //$addtran = new qtype_preg_fa_transition($state, $tran->pregleaf, $copiedstate, $tran->origin, $tran->consumeschars);
+                        $addtran = clone $tran;
+                        $addtran->from = $state;
+                        $addtran->to = $copiedstate;
+                        $addtran->redirect_merged_transitions();
                         $this->add_transition($addtran);
                     }
                 }
@@ -2310,7 +2326,11 @@ class qtype_preg_fa {
                         $number = ',' . $number;
                         $copiedstate = array_search($number, $this->statenumbers);
                         // Add transition.
-                        $addtran = new qtype_preg_fa_transition($state, $tran->pregleaf, $copiedstate, $tran->origin, $tran->consumeschars);
+                        //$addtran = new qtype_preg_fa_transition($state, $tran->pregleaf, $copiedstate, $tran->origin, $tran->consumeschars);
+                        $addtran = clone $tran;
+                        $addtran->from = $state;
+                        $addtran->to = $copiedstate;
+                        $addtran->redirect_merged_transitions();
                         $this->add_transition($addtran);
                     }
                 }
@@ -2351,7 +2371,11 @@ class qtype_preg_fa {
                         $number = $number . ',';
                         $copiedstate = array_search($number, $this->statenumbers);
                         // Add transition.
-                        $addtran = new qtype_preg_fa_transition($copiedstate, $tran->pregleaf, $state);
+                        //$addtran = new qtype_preg_fa_transition($copiedstate, $tran->pregleaf, $state);
+                        $addtran = clone $tran;
+                        $addtran->to = $state;
+                        $addtran->from = $copiedstate;
+                        $addtran->redirect_merged_transitions();
                         $this->add_transition($addtran);
                     }
                 }
@@ -2373,7 +2397,11 @@ class qtype_preg_fa {
                         $number = ',' . $number;
                         $copiedstate = array_search($number, $this->statenumbers);
                         // Add transition.
-                        $addtran = new qtype_preg_fa_transition($copiedstate, $tran->pregleaf, $state, $tran->origin, $tran->consumeschars);
+                        //$addtran = new qtype_preg_fa_transition($copiedstate, $tran->pregleaf, $state, $tran->origin, $tran->consumeschars);
+                        $addtran = clone $tran;
+                        $addtran->to = $state;
+                        $addtran->from = $copiedstate;
+                        $addtran->redirect_merged_transitions();
                         $this->add_transition($addtran);
                     }
                 }
