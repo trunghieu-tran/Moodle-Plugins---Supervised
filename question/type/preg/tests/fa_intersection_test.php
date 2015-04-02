@@ -2507,11 +2507,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                             "2,2";
                             "2,2";
                         }';
-        $dotresult = 'digraph res {
-                        "0,0";
-                        "2,2";
-                        "1,1"->"2,2"[label = "[(/$b/)]", color = blue, style = dotted];
-                        "0,0"->"1,1"[label = "[a^]", color = blue, style = dotted];
+        $dotresult = 'digraph {
+                         rankdir=LR;
+        "2,2"[shape=rarrow];
                     }';
 
         $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
@@ -2521,7 +2519,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $realnumbers = $direct->get_state_numbers();
         $startstate = array_search('2,2', $realnumbers);
         $resultautomata = $firstautomata->get_intersection_part($secondautomata, $direct, $startstate, 1, false);
-        $result = $resultautomata->fa_to_dot();
+        $result = $resultautomata->fa_to_dot(null, null, true);
         $search = '
                     ';
         $replace = "\n";
@@ -3074,7 +3072,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         rankdir=LR;
                         "0,"[shape=rarrow];
                     "4,"[shape=doublecircle];
-                        "0,"->"3,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "0,"->"3,"[label = <o: ε c:(0,1)<BR/><B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
                         "0,"->"2,0"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
                         "3,"->"4,"[label = <<B>o: . c:</B>>, color = violet, penwidth = 2];
                         "2,0"->"5,1"[label = <<B>o: [01] ∩ [01] c:</B>>, color = red, penwidth = 2];
@@ -3179,7 +3177,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         rankdir=LR;
                         "0,"[shape=rarrow];
                     "6,"[shape=doublecircle];
-                        "0,"->"3,0"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "0,"->"3,0"[label = <<B>o: a c:</B><BR/>o: ^ c:(0,1)>, color = violet, penwidth = 2];
                         "0,"->"1,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
                         "3,0"->"4,3"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
                         "3,0"->"4,2"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
@@ -4611,7 +4609,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         rankdir=LR;
                         "0,"[shape=rarrow];
                     ",6"[shape=doublecircle];
-                        "0,"->"2,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "0,"->"2,"[label = <o: ε c:(0,1)<BR/><B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
                         "2,"->"3,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
                         "3,"->"4,0"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
                         "4,0"->",1"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
@@ -4659,8 +4657,8 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         rankdir=LR;
                         "0,"[shape=rarrow];
                     "4,6"[shape=doublecircle];
-                        "0,"->"2,0"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
-                        "0,"->"2,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "0,"->"2,0"[label = <o: ε c:(0,1)<BR/><B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "0,"->"2,"[label = <o: ε c:(0,13)<BR/><B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
                         "2,0"->"3,2"[label = <o: ε c:(0,2)<BR/><B>o: [a-z] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
                         "3,2"->"1,3"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
                         "3,2"->"4,3"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
@@ -5056,7 +5054,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         "2,6"->"8,7"[label = <<B>o: [as] ∩ [axy] c:</B>>, color = red, penwidth = 2];
                         "5,1"->"6,3"[label = <<B>o: a ∩ [as] c:</B><BR/>o: ^ c:(5,6)>, color = red, penwidth = 2];
                         "5,1"->"6,2"[label = <<B>o: a ∩ [ab] c:</B><BR/>o: ^ c:(5,6)>, color = red, penwidth = 2];
-                        "5,9"->"6,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "5,9"->"6,"[label = <<B>o: a c:</B><BR/>o: ^ c:(23,89)>, color = violet, penwidth = 2];
                         "3,1"->"4,3"[label = <<B>o: [a-c] ∩ [as] c:</B>>, color = red, penwidth = 2];
                         "3,1"->"4,2"[label = <<B>o: [a-c] ∩ [ab] c:</B>>, color = red, penwidth = 2];
                         "3,9"->"4,9"[label = <<B>o: [a-c] ∩ [b-n] c:</B>>, color = red, penwidth = 2];
@@ -5177,7 +5175,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         "7,5"->"8,6"[label = <<B>o: [a-c] ∩ [as01] c:</B>>, color = red, penwidth = 2];
                         "6,"->"7,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
                         "7,"->"8,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
-                        "5,"->"6,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "5,"->"6,"[label = <<B>o: a c:</B><BR/>o: ^ c:(91,89)>, color = violet, penwidth = 2];
                     }';
 
         $search = '
@@ -5260,7 +5258,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         "3,"->"4,0"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
                         "0,"->"1,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
                         "0,"->"1,0"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
-                        "5,9"->"6,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "5,9"->"6,"[label = <<B>o: a c:</B><BR/>o: ^ c:(9,6)>, color = violet, penwidth = 2];
                         "1,9"->"5,9"[label = <<B>o: [a-z] ∩ [b-n] c:</B>>, color = red, penwidth = 2];
                         "1,9"->"3,9"[label = <<B>o: [ab] ∩ [b-n] c:</B>>, color = red, penwidth = 2];
                         "1,8"->"5,9"[label = <<B>o: [a-z] ∩ [a-c] c:</B>>, color = red, penwidth = 2];
@@ -5461,8 +5459,8 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ",0"->"0,1"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
                         ",3"->",4"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
                         ",3"->"0,4"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
-                        "5,"->"6,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
-                        "5,"->"6,0"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
+                        "5,"->"6,"[label = <<B>o: a c:</B><BR/>o: ^ c:(117,6)>, color = violet, penwidth = 2];
+                        "5,"->"6,0"[label = <<B>o: a c:</B><BR/>o: ^ c:(117,102)>, color = violet, penwidth = 2];
                     }';
 
         $search = '
