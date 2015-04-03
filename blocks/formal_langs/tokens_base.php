@@ -391,6 +391,12 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      */
     protected $tokenindex;
 
+    /**
+     * A cache for Damerau-Levenshtein
+     * @var array
+     */
+    protected static $dameraulevensteincache = array();
+
     public function number() {
         if ($this->number === null) {
             $this->number = $this->tokenindex;
@@ -526,6 +532,20 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * @return str redaction distance
      */
     static public function redaction($str1, $str2) {
+        $sstr1 = $str1;
+        if (!is_string($sstr1)) {
+            $sstr1 = $sstr1->string();
+        }
+        $sstr2 = $str2;
+        if (!is_string($sstr2)) {
+            $sstr2 = $sstr2->string();
+        }
+        if (array_key_exists($sstr1, self::$dameraulevensteincache)) {
+            if (array_key_exists($sstr2, self::$dameraulevensteincache[$sstr1])) {
+                return self::$dameraulevensteincache[$sstr1][$sstr2];
+            }
+        }
+
         $cache = array();
         $dameraulevensteinrecursive = function($a, $i, $b, $j,&$cache) use(&$dameraulevensteinrecursive) {
             /** @var Closure $dameraulevensteinrecursive */
@@ -645,6 +665,11 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
         */
         // Index fix
         $result[0] += 1;
+        if (array_key_exists((string)$sstr1, self::$dameraulevensteincache) == false) {
+            self::$dameraulevensteincache[$sstr1] = array();
+        }
+        self::$dameraulevensteincache[$sstr1][$sstr2] = $result[1];
+        gc_collect_cycles();
         return $result[1];
     }
      /* Calculates possible pair
@@ -706,13 +731,13 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
 	        }
         } else {
             // TODO: generic mistakes handling
-            $result = core_text::strlen($this->value) - core_text::strlen($this->value) * $threshold;
+            $result = core_text::strlen($this->value) * $threshold;
             $str = '';
             $possiblepairs = array();
             for ($k=0; $k < count($other); $k++) {
                 // incorrect lexem
                 if ($iscorrect == true) {
-                    $max = round($result);
+                    $max = ceil($result);
                     // possible pair (typo)
                     $dist = $this->possible_pair($other[$k], $max, $options);
                     if ($dist != -1) {     
@@ -1215,6 +1240,7 @@ class block_formal_langs_token_stream {
                                 $setpairs->comparedcoverage[] = $matches[$k]->comparedtokens[$g];
                             }
                         }
+                        gc_collect_cycles();
                     }
                     sort($setpairs->correctcoverage);
                     sort($setpairs->comparedcoverage);
@@ -1997,7 +2023,8 @@ class block_formal_langs_processed_string {
         if ($this->descriptions === null) {
             $istablefilledincorrect = !is_string($this->tablename) || core_text::strlen($this->tablename) == 0;
             if (!is_numeric($this->tableid)  || $istablefilledincorrect) {
-                throw new coding_exception('Trying to extract descriptions from unknown sources for string');
+                return array();
+                //throw new coding_exception('Trying to extract descriptions from unknown sources for string');
             }
             $conditions = array(" tableid='{$this->tableid}' ", "tablename = '{$this->tablename}' ");
             $records = $DB->get_records_select('block_formal_langs_node_dscr', implode(' AND ', $conditions));
