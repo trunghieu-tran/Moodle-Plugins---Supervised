@@ -502,10 +502,10 @@ class qtype_preg_templates_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($res->indexfirst[0] === 0);
         $this->assertTrue($res->length[0] === 10);
 
-        /*$res = $matcher->match('sin(((a)+b)');
+        $res = $matcher->match('sin(((a)+b)');
         $this->assertFalse($res->full);
         $this->assertTrue($res->indexfirst[0] === 0);
-        $this->assertTrue($res->length[0] === 11);*/
+        $this->assertTrue($res->length[0] === 11);
     }
 
     public function test_template_realworld_4() {   // a*b+c*d
