@@ -757,6 +757,23 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
         return false;
     }
 
+    public function equals($other) {
+        if ($this->is_full() !== $other->is_full() ||
+            $this->recursion_level() !== $other->recursion_level() ||
+            $this->length !== $other->length ||
+            $this->recursive_calls_sequence() !== $other->recursive_calls_sequence()) {
+            return false;
+        }
+
+        for ($i = 0; $i < count($this->stack); ++$i) {
+            if ($this->stack[$i]->matches !== $other->stack[$i]->matches) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public function write_tag_values($transition, $strpos, $matchlen) {
         $end = end($this->stack);
         $end->write_tag_values($transition, $strpos, $matchlen, $this->matcher);
