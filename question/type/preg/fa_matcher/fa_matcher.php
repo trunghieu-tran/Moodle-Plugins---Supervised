@@ -683,14 +683,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         }
 
         // Return array of all possible matches.
-        $result = array();
-        foreach ($fullmatches as $match) {
-            $result[] = $match;
-        }
-        if (empty($fullmatches)) {
-            foreach ($partialmatches as $partialmatch) {
-                $result[] = $partialmatch;
-            }
+        $result = $fullmatches;
+        if (empty($result)) {
+            $result = $partialmatches;
         }
         return $result;
     }
@@ -894,9 +889,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             }
         }
         if (empty($result)) {
-            foreach ($partialmatches as $partialmatch) {
-                $result[] = $partialmatch;
-            }
+            $result = $partialmatches;
         }
         return $result;
     }
@@ -929,7 +922,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 $tmp = null;
                 foreach ($cache[$cacheindex0][$cacheindex1] as $cached) {
                     if ($cached->backtrack->equals($backtrack)){
-                        echo "TAKE FROM CACHE\n";
+                        //echo "TAKE FROM CACHE\n";
                         $tmp = $cached->extendedmatch;
                         $fromcache = true;
                     }
