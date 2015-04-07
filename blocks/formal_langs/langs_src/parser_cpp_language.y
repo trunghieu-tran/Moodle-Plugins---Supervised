@@ -1479,7 +1479,7 @@ initialization_list_argument_list(R) ::= initialization_list(A) . {
 	R = A;
 }
 
-initialization_list_argument_list(R) ::= initialization_list_argument_list(A) comma(B) expr_prec_10(A) . {
+initialization_list_argument_list(R) ::= initialization_list_argument_list(A) comma(B) expr_prec_10(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%ur(именительный)"));
 	R =  $this->create_node('initialization_list_argument_list', array( A, B, C));
 }

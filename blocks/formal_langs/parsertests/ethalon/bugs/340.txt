@@ -1,0 +1,46 @@
+[
+ (program) {
+  (stmt_list) {
+   (stmt_or_defined_macro) {
+    (stmt) {
+     (variable_declaration) {
+      (builtintype) {
+       int
+      }
+      (assign) {
+       (lvalue) {
+        k
+        [
+        5
+        ]
+       }
+       =
+       (initialization_list) {
+        {
+        (initialization_list_argument_list) {
+         (initialization_list_argument_list) {
+          (initialization_list_argument_list) {
+           (initialization_list_argument_list) {
+            1
+            ,
+            2
+           }
+           ,
+           4
+          }
+          ,
+          3
+         }
+         ,
+         0
+        }
+        }
+       }
+      }
+     }
+     ;
+    }
+   }
+  }
+ }
+]
