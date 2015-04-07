@@ -729,7 +729,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
         // Create an array of processing states for all fa states (the only initial state, other states are null yet).
         foreach ($this->automaton->get_states() as $curstate) {
-            $states['0'][$curstate] = array();
             $states['0'][$curstate] = in_array($curstate, $startstates)
                                   ? $this->create_initial_state($curstate, $str, $startpos)
                                   : null;
