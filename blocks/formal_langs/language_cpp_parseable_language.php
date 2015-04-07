@@ -443,7 +443,7 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
         $table = array(
             'singleline_comment' => array( $any => 'COMMENT' ),
             'multiline_comment' => array( $any => 'COMMENT' ),            
-            'identifier' => array( $any => 'IDENTIFIER' ),
+            'identifier' => array( $any => 'IDENTIFIER', 'bool' => 'TYPENAME' ),
             'typename'   => array( 
 				$any => 'TYPENAME', 
 				'signed' => 'SIGNED', 
@@ -454,7 +454,7 @@ class block_formal_langs_lexer_cpp_mapper extends block_formal_langs_lexer_to_pa
 				'int' => 'INT',
 				'float' => 'FLOAT',
 				'double' => 'DOUBLE',                
-                'void' => 'VOID'
+                'void' => 'VOID',
 			),
             'numeric'    => array( $any => 'NUMERIC'),
             'ellipsis'   => array( $any => 'ELLIPSIS'),
