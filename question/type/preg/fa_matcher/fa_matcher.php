@@ -423,6 +423,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             }
             $transitions = $this->automaton->get_adjacent_transitions($curstate->state(), true);
             foreach ($transitions as $transition) {
+                if ($transition->pregleaf->type === qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL) {
+                    continue;
+                }
                 // Skip loops.
                 if ($transition->loopsback) {
                     continue;
@@ -511,7 +514,10 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 }
                 $transitions = $this->automaton->get_adjacent_transitions($curstate->state(), true);
                 foreach ($transitions as $transition) {
-                    if ($transition->pregleaf->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
+                    if ($transition->pregleaf->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
+                        continue;
+                    }
+                    if ($transition->pregleaf->type === qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL) {
                         continue;
                     }
                     // Skip loops.
