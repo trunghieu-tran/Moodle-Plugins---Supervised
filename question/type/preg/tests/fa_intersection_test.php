@@ -1563,10 +1563,10 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ",0"[shape=rarrow];
                     ",1"[shape=doublecircle];
                     ",4"[shape=doublecircle];
-                        ",0"->",2"[label = <<B>o: [0-9] c:</B>>, color = blue, penwidth = 2];
-                        ",0"->",1"[label = <<B>o: [df] c:</B>>, color = blue, penwidth = 2];
-                        ",2"->",3"[label = <<B>o: [01] c:</B>>, color = blue, penwidth = 2];
-                        ",3"->",4"[label = <<B>o: [a] c:</B>>, color = blue, penwidth = 2];
+                        ",0"->",2"[label = <<B>o: [0-9] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",0"->",1"[label = <<B>o: [df] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",2"->",3"[label = <<B>o: [01] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",3"->",4"[label = <<B>o: [a] c:</B>>, color = blue, penwidth = 2, style = dotted];
                     }';
 
         $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
@@ -1599,10 +1599,10 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ",0"[shape=rarrow];
                     ",1"[shape=doublecircle];
                     ",3"[shape=doublecircle];
-                        ",0"->",2"[label = <<B>o: [0-9] c:</B>>, color = blue, penwidth = 2];
-                        ",0"->",1"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
-                        ",2"->",3"[label = <<B>o: [01] c:</B>>, color = blue, penwidth = 2];
-                        ",3"->",0"[label = <<B>o: [a] c:</B>>, color = blue, penwidth = 2];
+                        ",0"->",2"[label = <<B>o: [0-9] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",0"->",1"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",2"->",3"[label = <<B>o: [01] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",3"->",0"[label = <<B>o: [a] c:</B>>, color = blue, penwidth = 2, style = dotted];
                     }';
 
         $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
@@ -1634,16 +1634,16 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         rankdir=LR;
                         ",0"[shape=rarrow];
                     ",4"[shape=doublecircle];
-                        ",0"->",1"[label = <<B>o: [df] c:</B>>, color = blue, penwidth = 2];
-                        ",0"->",2"[label = <<B>o: [0-9] c:</B>>, color = blue, penwidth = 2];
-                        ",1"->",3"[label = <<B>o: [abc] c:</B>>, color = blue, penwidth = 2];
-                        ",2"->",3"[label = <<B>o: [01] c:</B>>, color = blue, penwidth = 2];
-                        ",3"->",4"[label = <<B>o: [a] c:</B>>, color = blue, penwidth = 2];
+                        ",0"->",1"[label = <<B>o: [df] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",0"->",2"[label = <<B>o: [0-9] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",1"->",3"[label = <<B>o: [abc] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",2"->",3"[label = <<B>o: [01] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",3"->",4"[label = <<B>o: [a] c:</B>>, color = blue, penwidth = 2, style = dotted];
                     }';
         $directdescription = 'digraph {
                                 ",0";
                                 ",1";
-                                ",0"->",1"[label=<<B>o: [df] c:</B>>, color = blue];
+                                ",0"->",1"[label=<<B>o: [df] c:</B>>, color = blue, style = dotted];
                             }';
 
         $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
@@ -1673,16 +1673,16 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         rankdir=LR;
                         ",0"[shape=rarrow];
                     ",2"[shape=doublecircle];
-                        ",0"->",1"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
-                        ",2"->",0"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
-                        ",1"->",2"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
+                        ",0"->",1"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",2"->",0"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",1"->",2"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2, style = dotted];
                     }';
         $directdescription = 'digraph {
                                 ",0";
                                 ",2";
-                                ",0"->",1"[label=<<B>o: [ab] c:</B>>, color = blue];
-                                ",1"->",2"[label=<<B>o: [ab] c:</B>>, color = blue];
-                                ",2"->",0"[label=<<B>o: [ab] c:</B>>, color = blue];
+                                ",0"->",1"[label=<<B>o: [ab] c:</B>>, color = blue, style = dotted];
+                                ",1"->",2"[label=<<B>o: [ab] c:</B>>, color = blue, style = dotted];
+                                ",2"->",0"[label=<<B>o: [ab] c:</B>>, color = blue, style = dotted];
                             }';
 
         $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
@@ -2874,7 +2874,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                     ",2"[shape=doublecircle];
                         "0,"->"1,0"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
                         "1,0"->"2,1"[label = <<B>o: [0-9] ∩ [0-9] c:</B>>, color = red, penwidth = 2];
-                        "2,1"->",2"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
+                        "2,1"->",2"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2, style = dotted];
                     }';
 
         $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
@@ -3078,14 +3078,14 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         "2,0"->"5,1"[label = <<B>o: [01] ∩ [01] c:</B>>, color = red, penwidth = 2];
                         "2,0"->"4,3"[label = <<B>o: . ∩ [ab] c:</B>>, color = red, penwidth = 2];
                         "2,0"->"4,1"[label = <<B>o: . ∩ [01] c:</B>>, color = red, penwidth = 2];
-                        "5,1"->",3"[label = <<B>o: [xy] c:</B>>, color = blue, penwidth = 2];
-                        "5,1"->",1"[label = <<B>o: [<>] c:</B>>, color = blue, penwidth = 2];
+                        "5,1"->",3"[label = <<B>o: [xy] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        "5,1"->",1"[label = <<B>o: [<>] c:</B>>, color = blue, penwidth = 2, style = dotted];
                         "4,3"->"4,"[label = <<B>o: ε c:</B>>, color = red, penwidth = 2];
-                        "4,1"->",3"[label = <<B>o: [xy] c:</B>>, color = blue, penwidth = 2];
-                        "4,1"->",1"[label = <<B>o: [<>] c:</B>>, color = blue, penwidth = 2];
-                        ",3"->"4,"[label = <<B>o: ε c:</B>>, color = blue, penwidth = 2];
-                        ",1"->",3"[label = <<B>o: [xy] c:</B>>, color = blue, penwidth = 2];
-                        ",1"->",1"[label = <<B>o: [<>] c:</B>>, color = blue, penwidth = 2];
+                        "4,1"->",3"[label = <<B>o: [xy] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        "4,1"->",1"[label = <<B>o: [<>] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",3"->"4,"[label = <<B>o: ε c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",1"->",3"[label = <<B>o: [xy] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",1"->",1"[label = <<B>o: [<>] c:</B>>, color = blue, penwidth = 2, style = dotted];
                     }';
 
         $search = '
@@ -3244,8 +3244,8 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         "0,"->"2,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
                         "0,"->"1,0"[label = <<B>o: b c:</B>>, color = violet, penwidth = 2];
                         "1,0"->"2,1"[label = <<B>o: a ∩ [ab] c:</B>>, color = red, penwidth = 2];
-                        "2,1"->",2"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
-                        ",2"->"2,"[label = <<B>o: ε c:</B>>, color = blue, penwidth = 2];
+                        "2,1"->",2"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",2"->"2,"[label = <<B>o: ε c:</B>>, color = blue, penwidth = 2, style = dotted];
                     }';
 
         $search = '
@@ -3281,9 +3281,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                     "2,2"[shape=doublecircle];
                         "0,0"->"2,1"[label = <<B>o: a ∩ [ab] c:</B>>, color = red, penwidth = 2];
                         "0,0"->"1,1"[label = <<B>o: b ∩ [ab] c:</B>>, color = red, penwidth = 2];
-                        "2,1"->",2"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
+                        "2,1"->",2"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2, style = dotted];
                         "1,1"->"2,2"[label = <<B>o: a ∩ [ab] c:</B>>, color = red, penwidth = 2];
-                        ",2"->"2,2"[label = <<B>o: ε c:</B>>, color = blue, penwidth = 2];
+                        ",2"->"2,2"[label = <<B>o: ε c:</B>>, color = blue, penwidth = 2, style = dotted];
                     }';
 
         $search = '
@@ -3455,12 +3455,12 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         "4,1   5   9"->"1,2   6"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
                         "3,0   4   8"->"4,1   5   9"[label = <<B>o: [a-z] ∩ a c:</B>>, color = red, penwidth = 2];
                         "(2,3   7)"->"3,0   4   8"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
-                        ",4"->"0,5"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
-                        ",3"->",4"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
-                        ",2"->",3"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
-                        ",1"->",2"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
-                        ",0"->",1"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
-                        ",0"->"0,1"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
+                        ",4"->"0,5"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",3"->",4"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",2"->",3"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",1"->",2"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",0"->",1"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",0"->"0,1"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2, style = dotted];
                     }';
 
         $search = '
@@ -3513,9 +3513,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         "3,2   6"->"4,3   7"[label = <<B>o: [a-z] ∩ . c:</B>>, color = red, penwidth = 2];
                         "2,1   5"->"3,2   6"[label = <<B>o: a ∩ . c:</B>>, color = red, penwidth = 2];
                         "1,0   4"->"2,1   5"[label = <<B>o: [0-9] ∩ . c:</B>>, color = red, penwidth = 2];
-                        ",2"->"0,3"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
-                        ",1"->",2"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
-                        ",0"->",1"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
+                        ",2"->"0,3"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",1"->",2"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",0"->",1"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2, style = dotted];
                     }';
 
         $search = '
@@ -3690,7 +3690,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         "4,1   5"->"1,2"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
                         "3,0   4"->"4,1   5"[label = <<B>o: [a-z] ∩ a c:</B>>, color = red, penwidth = 2];
                         "(2,3)"->"3,0   4"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
-                        ",0"->"0,1"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
+                        ",0"->"0,1"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2, style = dotted];
                     }';
 
         $search = '
@@ -4135,7 +4135,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         "6,2"->"7,0"[label = <<B>o: [a-c] ∩ . c:</B>>, color = red, penwidth = 2];
                         "6,2"->"1,0"[label = <<B>o: [a-s] ∩ . c:</B>>, color = red, penwidth = 2];
                         "3,0"->"5,1"[label = <<B>o: [012] ∩ . c:</B>>, color = red, penwidth = 2];
-                        "7,0"->",1"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
+                        "7,0"->",1"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2, style = dotted];
                         "1,0"->"3,1"[label = <<B>o: [a-z] ∩ . c:</B>>, color = red, penwidth = 2];
                         "1,0"->"2,1"[label = <<B>o: [0-9] ∩ . c:</B>>, color = red, penwidth = 2];
                         "5,1"->"6,2"[label = <<B>o: [+=] ∩ . c:</B>>, color = red, penwidth = 2];
@@ -4146,7 +4146,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         "4,2"->"6,0"[label = <<B>o: 0 ∩ . c:</B>>, color = red, penwidth = 2];
                         "6,0"->"7,1"[label = <<B>o: [a-c] ∩ . c:</B>>, color = red, penwidth = 2];
                         "6,0"->"1,1"[label = <<B>o: [a-s] ∩ . c:</B>>, color = red, penwidth = 2];
-                        "7,1"->",2"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
+                        "7,1"->",2"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2, style = dotted];
                         "1,1"->"3,2"[label = <<B>o: [a-z] ∩ . c:</B>>, color = red, penwidth = 2];
                         "1,1"->"2,2"[label = <<B>o: [0-9] ∩ . c:</B>>, color = red, penwidth = 2];
                         "3,2"->"5,0"[label = <<B>o: [012] ∩ . c:</B>>, color = red, penwidth = 2];
@@ -4157,10 +4157,10 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         "6,1"->"7,2"[label = <<B>o: [a-c] ∩ . c:</B>>, color = red, penwidth = 2];
                         "6,1"->"1,2"[label = <<B>o: [a-s] ∩ . c:</B>>, color = red, penwidth = 2];
                         "7,2"->"7,"[label = <<B>o: ε c:</B>>, color = red, penwidth = 2];
-                        ",1"->",2"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
-                        ",2"->",0"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
-                        ",2"->"7,"[label = <<B>o: ε c:</B>>, color = blue, penwidth = 2];
-                        ",0"->",1"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
+                        ",1"->",2"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",2"->",0"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",2"->"7,"[label = <<B>o: ε c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",0"->",1"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2, style = dotted];
                     }';
 
         $search = '
@@ -4256,11 +4256,11 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         "1,2"->"3,0"[label = <<B>o: [a-z] ∩ . c:</B>>, color = red, penwidth = 2];
                         "1,2"->"2,0"[label = <<B>o: [0-9] ∩ . c:</B>>, color = red, penwidth = 2];
                         "0,1"->"1,2"[label = <<B>o: [a-c] ∩ [ab] c:</B>>, color = red, penwidth = 2];
-                        ",0"->",1"[label = <<B>o: [01] c:</B>>, color = blue, penwidth = 2];
-                        ",0"->"0,1"[label = <<B>o: [01] c:</B>>, color = blue, penwidth = 2];
-                        ",2"->",0"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
-                        ",2"->"7,"[label = <<B>o: ε c:</B>>, color = blue, penwidth = 2];
-                        ",1"->",2"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
+                        ",0"->",1"[label = <<B>o: [01] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",0"->"0,1"[label = <<B>o: [01] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",2"->",0"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",2"->"7,"[label = <<B>o: ε c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",1"->",2"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2, style = dotted];
                     }';
 
         $search = '
@@ -4331,12 +4331,12 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         "1,2"->"3,0"[label = <<B>o: [a-z] ∩ . c:</B>>, color = red, penwidth = 2];
                         "1,2"->"2,0"[label = <<B>o: [a-n] ∩ . c:</B>>, color = red, penwidth = 2];
                         "0,1"->"1,2"[label = <<B>o: [0-9] ∩ . c:</B>>, color = red, penwidth = 2];
-                        ",1"->",2"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
-                        ",1"->"0,2"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
-                        ",0"->",1"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
-                        ",0"->"0,1"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
-                        ",2"->",0"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
-                        ",2"->"7,2"[label = <<B>o: ε c:</B>>, color = blue, penwidth = 2];
+                        ",1"->",2"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",1"->"0,2"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",0"->",1"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",0"->"0,1"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",2"->",0"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",2"->"7,2"[label = <<B>o: ε c:</B>>, color = blue, penwidth = 2, style = dotted];
                     }';
 
         $search = '
@@ -4433,25 +4433,25 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         "1,1"->"3,3"[label = <<B>o: [ab] ∩ [as] c:</B>>, color = red, penwidth = 2];
                         "0,0"->"1,1"[label = <<B>o: [a-c] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
                         "0,8"->"1,1"[label = <<B>o: [a-c] ∩ [a-f] c:</B>>, color = red, penwidth = 2];
-                        ",2"->",6"[label = <<B>o: [a-c] c:</B>>, color = blue, penwidth = 2];
-                        ",2"->"0,6"[label = <<B>o: [a-c] c:</B>>, color = blue, penwidth = 2];
-                        ",5"->",6"[label = <<B>o: [as01] c:</B>>, color = blue, penwidth = 2];
-                        ",5"->"0,6"[label = <<B>o: [as01] c:</B>>, color = blue, penwidth = 2];
-                        ",1"->",2"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
-                        ",1"->",3"[label = <<B>o: [as] c:</B>>, color = blue, penwidth = 2];
-                        ",1"->"0,2"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
-                        ",7"->",2"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
-                        ",7"->"0,2"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
-                        ",4"->",5"[label = <<B>o: [a-d] c:</B>>, color = blue, penwidth = 2];
-                        ",4"->"0,5"[label = <<B>o: [a-d] c:</B>>, color = blue, penwidth = 2];
-                        ",0"->",1"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
-                        ",0"->"0,1"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
-                        ",8"->",1"[label = <<B>o: [a-f] c:</B>>, color = blue, penwidth = 2];
-                        ",8"->"0,1"[label = <<B>o: [a-f] c:</B>>, color = blue, penwidth = 2];
-                        ",6"->",7"[label = <<B>o: [axy] c:</B>>, color = blue, penwidth = 2];
-                        ",6"->",8"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
-                        ",6"->"0,8"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
-                        ",3"->",4"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
+                        ",2"->",6"[label = <<B>o: [a-c] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",2"->"0,6"[label = <<B>o: [a-c] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",5"->",6"[label = <<B>o: [as01] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",5"->"0,6"[label = <<B>o: [as01] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",1"->",2"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",1"->",3"[label = <<B>o: [as] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",1"->"0,2"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",7"->",2"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",7"->"0,2"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",4"->",5"[label = <<B>o: [a-d] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",4"->"0,5"[label = <<B>o: [a-d] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",0"->",1"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",0"->"0,1"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",8"->",1"[label = <<B>o: [a-f] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",8"->"0,1"[label = <<B>o: [a-f] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",6"->",7"[label = <<B>o: [axy] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",6"->",8"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",6"->"0,8"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",3"->",4"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2, style = dotted];
                         "5,"->"6,"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
                     }';
 
@@ -4495,7 +4495,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         "3,1"->"1,2"[label = <<B>o: a ∩ [a-z] c:</B>>, color = red, penwidth = 2];
                         "3,1"->"4,2"[label = <<B>o: [a-z] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
                         "1,2"->"2,3   0"[label = <<B>o: [a-z] ∩ a c:</B>>, color = red, penwidth = 2];
-                        "4,2"->",3"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
+                        "4,2"->",3"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2, style = dotted];
                         "2,3   0"->"3,1"[label = <<B>o: a ∩ [ab] c:</B>>, color = red, penwidth = 2];
                     }';
 
@@ -4612,12 +4612,12 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         "0,"->"2,"[label = <o: ε c:(0,1)<BR/><B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
                         "2,"->"3,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
                         "3,"->"4,0"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
-                        "4,0"->",1"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
-                        ",1"->",2"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
-                        ",2"->",3"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
-                        ",3"->",4"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
-                        ",4"->",5"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
-                        ",5"->",6"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
+                        "4,0"->",1"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",1"->",2"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",2"->",3"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",3"->",4"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",4"->",5"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",5"->",6"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2, style = dotted];
                     }';
 
         $search = '
@@ -4663,14 +4663,14 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         "3,2"->"1,3"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
                         "3,2"->"4,3"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
                         "1,3"->"2,4"[label = <<B>o: [a-z] ∩ [ab] c:</B>>, color = red, penwidth = 2];
-                        "4,3"->",4"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
+                        "4,3"->",4"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2, style = dotted];
                         "2,4"->"3,5"[label = <<B>o: [a-z] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
                         "3,5"->"1,6"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
                         "3,5"->"4,6"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
                         "1,6"->"2,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
-                        ",4"->",5"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
-                        ",5"->",6"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
-                        ",6"->"4,6"[label = <<B>o: ε c:</B>>, color = blue, penwidth = 2];
+                        ",4"->",5"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",5"->",6"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",6"->"4,6"[label = <<B>o: ε c:</B>>, color = blue, penwidth = 2, style = dotted];
                         "1,"->"2,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
                         "2,"->"3,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
                         "3,"->"1,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
@@ -4733,10 +4733,10 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         "4,0   4   8"->"1,1   5"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
                         "(3,3   7)"->"4,0   4   8"[label = <<B>o: [a-z] ∩ a c:</B>>, color = red, penwidth = 2];
                         "(2,2   6)"->"(3,3   7)"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
-                        ",3"->"0,4"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
-                        ",2"->",3"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
-                        ",1"->",2"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
-                        ",0"->",1"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
+                        ",3"->"0,4"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",2"->",3"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",1"->",2"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",0"->",1"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2, style = dotted];
                     }';
 
         $search = '
@@ -4800,7 +4800,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         "7,2"->"1,3"[label = <<B>o: [ab] ∩ a c:</B>>, color = red, penwidth = 2];
                         "4,3"->"5,4"[label = <<B>o: [ab] ∩ [ab] c:</B>>, color = red, penwidth = 2];
                         "2,3   0"->"3,4   1"[label = <<B>o: [a-z] ∩ [ab] c:</B>>, color = red, penwidth = 2];
-                        "8,3"->",4"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
+                        "8,3"->",4"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2, style = dotted];
                         "1,3"->"4,4"[label = <<B>o: [ab] ∩ [ab] c:</B>>, color = red, penwidth = 2];
                         "1,3"->"2,4   0"[label = <<B>o: [a-z] ∩ [ab] c:</B>>, color = red, penwidth = 2];
                         "5,4"->"6,5"[label = <<B>o: [ab] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
@@ -4828,9 +4828,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         "1,6   3"->"2,4   0"[label = <<B>o: [a-z] ∩ [ab] c:</B>>, color = red, penwidth = 2];
                         "7,6   2"->"8,3"[label = <<B>o: [ab] ∩ a c:</B>>, color = red, penwidth = 2];
                         "7,6   2"->"1,3"[label = <<B>o: [ab] ∩ a c:</B>>, color = red, penwidth = 2];
-                        ",4"->",5"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
-                        ",5"->",6"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
-                        ",6"->"8,"[label = <<B>o: ε c:</B>>, color = blue, penwidth = 2];
+                        ",4"->",5"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",5"->",6"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",6"->"8,"[label = <<B>o: ε c:</B>>, color = blue, penwidth = 2, style = dotted];
                         "2,"->"3,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
                         "3,"->"1,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
                         "3,"->"7,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
@@ -4885,9 +4885,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         "3,2   6"->"4,3   7"[label = <<B>o: [a-z] ∩ a c:</B>>, color = red, penwidth = 2];
                         "2,1   5"->"3,2   6"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
                         "1,0   4"->"2,1   5"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
-                        ",2"->"0,3"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
-                        ",1"->",2"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
-                        ",0"->",1"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
+                        ",2"->"0,3"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",1"->",2"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",0"->",1"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2, style = dotted];
                     }';
 
         $search = '
@@ -4945,10 +4945,10 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         "4,0   4   8"->"1,1   5"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
                         "(3,3   7)"->"4,0   4   8"[label = <<B>o: [a-z] ∩ a c:</B>>, color = red, penwidth = 2];
                         "(2,2   6)"->"(3,3   7)"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
-                        ",3"->"0,4"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
-                        ",2"->",3"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
-                        ",1"->",2"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
-                        ",0"->",1"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
+                        ",3"->"0,4"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",2"->",3"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",1"->",2"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",0"->",1"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2, style = dotted];
                     }';
 
         $search = '
@@ -5430,35 +5430,35 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         "9,3"->"2,4"[label = <<B>o: [ab] ∩ . c:</B>>, color = red, penwidth = 2];
                         "6,3"->"7,4"[label = <<B>o: [a-c] ∩ . c:</B>>, color = red, penwidth = 2];
                         "3,3"->"4,4"[label = <<B>o: [a-c] ∩ . c:</B>>, color = red, penwidth = 2];
-                        ",9"->",9"[label = <<B>o: [b-n] c:</B>>, color = blue, penwidth = 2];
-                        ",9"->"0,9"[label = <<B>o: [b-n] c:</B>>, color = blue, penwidth = 2];
-                        ",9"->"9,"[label = <<B>o: ε c:</B>>, color = blue, penwidth = 2];
-                        ",8"->",9"[label = <<B>o: [a-c] c:</B>>, color = blue, penwidth = 2];
-                        ",8"->",1"[label = <<B>o: [a-f] c:</B>>, color = blue, penwidth = 2];
-                        ",8"->"0,9"[label = <<B>o: [a-c] c:</B>>, color = blue, penwidth = 2];
-                        ",8"->"0,1"[label = <<B>o: [a-f] c:</B>>, color = blue, penwidth = 2];
-                        ",7"->",9"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
-                        ",7"->",2"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
-                        ",7"->"0,9"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2];
-                        ",7"->"0,2"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
-                        ",6"->",8"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
-                        ",6"->",7"[label = <<B>o: [axy] c:</B>>, color = blue, penwidth = 2];
-                        ",6"->"0,8"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
-                        ",6"->"0,7"[label = <<B>o: [axy] c:</B>>, color = blue, penwidth = 2];
-                        ",2"->",6"[label = <<B>o: [a-c] c:</B>>, color = blue, penwidth = 2];
-                        ",2"->"0,6"[label = <<B>o: [a-c] c:</B>>, color = blue, penwidth = 2];
-                        ",5"->",6"[label = <<B>o: [as01] c:</B>>, color = blue, penwidth = 2];
-                        ",5"->"0,6"[label = <<B>o: [as01] c:</B>>, color = blue, penwidth = 2];
-                        ",1"->",2"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
-                        ",1"->",3"[label = <<B>o: [as] c:</B>>, color = blue, penwidth = 2];
-                        ",1"->"0,2"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2];
-                        ",1"->"0,3"[label = <<B>o: [as] c:</B>>, color = blue, penwidth = 2];
-                        ",4"->",5"[label = <<B>o: [a-d] c:</B>>, color = blue, penwidth = 2];
-                        ",4"->"0,5"[label = <<B>o: [a-d] c:</B>>, color = blue, penwidth = 2];
-                        ",0"->",1"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
-                        ",0"->"0,1"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2];
-                        ",3"->",4"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
-                        ",3"->"0,4"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2];
+                        ",9"->",9"[label = <<B>o: [b-n] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",9"->"0,9"[label = <<B>o: [b-n] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",9"->"9,"[label = <<B>o: ε c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",8"->",9"[label = <<B>o: [a-c] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",8"->",1"[label = <<B>o: [a-f] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",8"->"0,9"[label = <<B>o: [a-c] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",8"->"0,1"[label = <<B>o: [a-f] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",7"->",9"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",7"->",2"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",7"->"0,9"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",7"->"0,2"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",6"->",8"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",6"->",7"[label = <<B>o: [axy] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",6"->"0,8"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",6"->"0,7"[label = <<B>o: [axy] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",2"->",6"[label = <<B>o: [a-c] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",2"->"0,6"[label = <<B>o: [a-c] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",5"->",6"[label = <<B>o: [as01] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",5"->"0,6"[label = <<B>o: [as01] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",1"->",2"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",1"->",3"[label = <<B>o: [as] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",1"->"0,2"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",1"->"0,3"[label = <<B>o: [as] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",4"->",5"[label = <<B>o: [a-d] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",4"->"0,5"[label = <<B>o: [a-d] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",0"->",1"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",0"->"0,1"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",3"->",4"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",3"->"0,4"[label = <<B>o: . c:</B>>, color = blue, penwidth = 2, style = dotted];
                         "5,"->"6,"[label = <<B>o: a c:</B><BR/>o: ^ c:(117,6)>, color = violet, penwidth = 2];
                         "5,"->"6,0"[label = <<B>o: a c:</B><BR/>o: ^ c:(117,102)>, color = violet, penwidth = 2];
                     }';
