@@ -1500,7 +1500,9 @@ class qtype_preg_fa {
                             $transition->to = $memstate;
                             $transition->from = $workstate;
                         }
-
+                        if ($tran->origin == qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND) {
+                            $transition->consumeschars = false;
+                        }
                         $transition->redirect_merged_transitions();
                         $transition->set_transition_type();
                         $hassametransition = $this->has_same_transition($transition);
@@ -1535,12 +1537,15 @@ class qtype_preg_fa {
                         $transition->to = $state;
                         $transition->from = $workstate;
                     }
+                    if ($tran->origin == qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND) {
+                        $transition->consumeschars = false;
+                    }
                     $transition->redirect_merged_transitions();
                     $transition->set_transition_type();
                     $hassametransition = $this->has_same_transition($transition);
-                        if (!$hassametransition) {
-                            $this->add_transition($transition);
-                        }
+                    if (!$hassametransition) {
+                        $this->add_transition($transition);
+                    }
                 }
             }
         }
@@ -2331,6 +2336,9 @@ class qtype_preg_fa {
                         $addtran->from = $state;
                         $addtran->to = $copiedstate;
                         $addtran->redirect_merged_transitions();
+                        if ($tran->origin == qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND) {
+                            $addtran->consumeschars = false;
+                        }
                         $this->add_transition($addtran);
                     }
                 }
@@ -2402,6 +2410,9 @@ class qtype_preg_fa {
                         $addtran->to = $state;
                         $addtran->from = $copiedstate;
                         $addtran->redirect_merged_transitions();
+                        if ($tran->origin == qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND) {
+                            $addtran->consumeschars = false;
+                        }
                         $this->add_transition($addtran);
                     }
                 }
