@@ -99,7 +99,7 @@ class template {
                 'cpp_id' => new template('cpp_id', '[_a-zA-Z]\w*', '', array('en' => 'C++ id', 'ru' => 'идентификатор в C++')),
                 'parens_req' => new template(
                     'parens_req',
-                    '(   \(    (?:(?-1)|$$1)   \)  )',
+                    '(   \s*\(\s*    (?:(?-1)|$$1)   \s*\)\s*  )',
                     'x',
                     array(
                         'en' => '%1 in parens',
@@ -135,7 +135,7 @@ class template {
                 ),
                 'brackets_req' => new template(
                     'brackets_req',
-                    '(   \[   (?:(?-1)|$$1)   \]   )',
+                    '(   \s*\[\s*   (?:(?-1)|$$1)   \s*\]\s*   )',
                     'x',
                     array(
                         'en' => '%1 in brackets',
@@ -171,7 +171,7 @@ class template {
                 ),
                 'custom_parens_req' => new template(
                     'custom_parens_req',
-                    '(   $$1    (?:(?-1)|$$2)   $$3  )',
+                    '(   \s*$$1\s*    (?:(?-1)|$$2)   \s*$$3\s*  )',
                     'x',
                     array(
                         'en' => '%2 in any number of evenly opened %1 and closed %3',
