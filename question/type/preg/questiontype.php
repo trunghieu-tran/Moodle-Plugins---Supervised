@@ -121,4 +121,16 @@ class qtype_preg extends qtype_shortanswer {
         return $options;
     }
 
+    /**
+     * Determine if the hint with specified number is not empty and should be saved.
+     * Overloaded because use custom hint controls.
+     * @param object $formdata the data from the form.
+     * @param int $number number of hint under question.
+     * @param bool $withparts whether to take into account clearwrong and shownumcorrect options.
+     * @return bool is this particular hint data empty.
+     */
+    protected function is_hint_empty_in_form_data($formdata, $number, $withparts) {
+            return parent::is_hint_empty_in_form_data($formdata, $number, $withparts) && $formdata->interactivehint[$number] == 'hintmatchingpart';
+    }
+
 }

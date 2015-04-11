@@ -46,6 +46,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
     // Should we call bruteforce method to generate a partial match extension?
     protected $bruteforcegeneration = false;
 
+    // Max number of states during simulation
+    protected $maxstatescount = 1000;
+
     public function name() {
         return 'fa_matcher';
     }
@@ -400,11 +403,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
      * @return object of qtype_preg_fa_exec_state.
      */
     protected function generate_extension_brute_force($str, $laststate) {
-        global $CFG;
-        $maxstatescount = isset($CFG->qtype_preg_fa_simulation_state_limit)
-                        ? $CFG->qtype_preg_fa_simulation_state_limit
-                        : 1000;
-
         $endstates = $this->automaton->end_states($laststate->subexpr());
         $resumestate = $this->get_resume_state($str, $laststate);
         if (in_array($resumestate->state(), $endstates)) {
@@ -425,6 +423,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             }
             $transitions = $this->automaton->get_adjacent_transitions($curstate->state(), true);
             foreach ($transitions as $transition) {
+                if ($transition->pregleaf->type === qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL) {
+                    continue;
+                }
                 // Skip loops.
                 if ($transition->loopsback) {
                     continue;
@@ -454,7 +455,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 }
 
                 // Save the new state.
-                if ($statescount >= $maxstatescount) {
+                if ($statescount >= $this->maxstatescount) {
                     break;
                 }
                 $curstates[] = $newstate;
@@ -471,11 +472,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
      * @return object of qtype_preg_fa_exec_state.
      */
     protected function generate_extension_fast($str, $laststate) {
-        global $CFG;
-        $maxstatescount = isset($CFG->qtype_preg_fa_simulation_state_limit)
-                        ? $CFG->qtype_preg_fa_simulation_state_limit
-                        : 1000;
-
         $endstates = $this->automaton->end_states($laststate->subexpr());
         $resumestate = $this->get_resume_state($str, $laststate);
         if (in_array($resumestate->state(), $endstates)) {
@@ -518,7 +514,10 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 }
                 $transitions = $this->automaton->get_adjacent_transitions($curstate->state(), true);
                 foreach ($transitions as $transition) {
-                    if ($transition->pregleaf->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
+                    if ($transition->pregleaf->subtype === qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
+                        continue;
+                    }
+                    if ($transition->pregleaf->type === qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL) {
                         continue;
                     }
                     // Skip loops.
@@ -564,7 +563,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             foreach ($reached as $curstate) {
                 // Currently stored state needs replacement if it's null, or if it's worse than the new state.
                 if ($states[$curstate->state()] === null || $curstate->leftmost_shortest($states[$curstate->state()])) {
-                    if ($statescount >= $maxstatescount) {
+                    if ($statescount >= $this->maxstatescount) {
                         break;
                     }
                     $states[$curstate->state()] = $curstate;
@@ -581,11 +580,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
      * Returns array of all possible matches.
      */
     protected function match_brute_force($str, $startpos) {
-        global $CFG;
         $maxrecursionlevel = $str->length() + 1;
-        $maxstatescount = isset($CFG->qtype_preg_fa_simulation_state_limit)
-                        ? $CFG->qtype_preg_fa_simulation_state_limit
-                        : 1000;
 
         $fullmatches = array();       // Possible full matches.
         $partialmatches = array();    // Possible partial matches.
@@ -685,7 +680,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 }
             }
             foreach ($reached as $newstate) {
-                if ($statescount >= $maxstatescount) {
+                if ($statescount >= $this->maxstatescount) {
                     break;
                 }
                 $curstates[] = $newstate;
@@ -694,18 +689,18 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         }
 
         // Return array of all possible matches.
-        $result = array();
-        foreach ($fullmatches as $match) {
-            $result[] = $match;
-        }
-        if (empty($fullmatches)) {
-            foreach ($partialmatches as $partialmatch) {
-                $result[] = $partialmatch;
-            }
+        $result = $fullmatches;
+        if (empty($result)) {
+            $result = $partialmatches;
         }
         return $result;
     }
 
+    /**
+     * Creates an index object for fast matching. In classical TNFS we would use one dimension (state number),
+     * but to support recursion we have to add one more dimension. In fact, $recursionlevel is a string
+     * sequence containing numbers of subsequently called subexpressions.
+     */
     protected static function create_index($recursionlevel, $statenumber) {
         $result = new stdClass();
         $result->recursionlevel = $recursionlevel;
@@ -713,12 +708,12 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         return $result;
     }
 
-    protected static function ensure_index_exists(&$states, $recursionlevel, $statenumber) {
-        if (!isset($states[$recursionlevel])) {
-            $states[$recursionlevel] = array();
+    protected static function ensure_index_exists(&$array, $key0, $key1, $defaultvalue) {
+        if (!isset($array[$key0])) {
+            $array[$key0] = array();
         }
-        if (!isset($states[$recursionlevel][$statenumber])) {
-            $states[$recursionlevel][$statenumber] = null;
+        if (!isset($array[$key0][$key1])) {
+            $array[$key0][$key1] = $defaultvalue;
         }
     }
 
@@ -727,11 +722,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
      * Returns array of all possible matches.
      */
     protected function match_fast($str, $startpos) {
-        global $CFG;
         $maxrecursionlevel = $str->length() + 1;
-        $maxstatescount = isset($CFG->qtype_preg_fa_simulation_state_limit)
-                        ? $CFG->qtype_preg_fa_simulation_state_limit
-                        : 1000;
 
         $states = array('0' => array()); // Objects of qtype_preg_fa_exec_state. First dimension is recursion level, second is state number.
         $curstates = array();          // Indexes of states which the automaton is in at the current wave front. Use stdClass with "recursionlevel" and "state" fields.
@@ -744,7 +735,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
         // Create an array of processing states for all fa states (the only initial state, other states are null yet).
         foreach ($this->automaton->get_states() as $curstate) {
-            $states['0'][$curstate] = array();
             $states['0'][$curstate] = in_array($curstate, $startstates)
                                   ? $this->create_initial_state($curstate, $str, $startpos)
                                   : null;
@@ -807,7 +797,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                                 $newnewstate = clone $newstate;
                                 $newnewstate->stack[] = $this->create_fa_exec_stack_item($transition->pregleaf->number, $state, $curpos);
                                 $index = self::create_index($newnewstate->recursive_calls_sequence(), $newnewstate->state());
-                                self::ensure_index_exists($reached, $index->recursionlevel, $index->state);
+                                self::ensure_index_exists($reached, $index->recursionlevel, $index->state, null);
                                 if ($reached[$index->recursionlevel][$index->state] === null || $newnewstate->leftmost_longest($reached[$index->recursionlevel][$index->state])) {
                                     //echo "add recursive state {$newnewstate->state()} for subexpr {$transition->pregleaf->number}\n";
                                     $reached[$index->recursionlevel][$index->state] = $newnewstate;
@@ -845,7 +835,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                                     $lazystates[] = $newstate;
                                 } else {
                                     $index = self::create_index($newstate->recursive_calls_sequence(), $newstate->state());
-                                    self::ensure_index_exists($reached, $index->recursionlevel, $index->state);
+                                    self::ensure_index_exists($reached, $index->recursionlevel, $index->state, null);
                                     if ($reached[$index->recursionlevel][$index->state] === null || $newstate->leftmost_longest($reached[$index->recursionlevel][$index->state])) {
                                         //echo "add state {$newstate->state()}\n";
                                         $reached[$index->recursionlevel][$index->state] = $newstate;
@@ -867,7 +857,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             if (!$endstatereached && empty($reached) && !empty($lazystates)) {
                 $lazy = array_pop($lazystates);
                 $index = self::create_index($lazy->recursive_calls_sequence(), $lazy->state());
-                self::ensure_index_exists($reached, $index->recursionlevel, $index->state);
+                self::ensure_index_exists($reached, $index->recursionlevel, $index->state, null);
                 $reached[$index->recursionlevel][$index->state] = $lazy;
             }
 
@@ -882,9 +872,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             foreach ($reached as $newstates) {
                 foreach ($newstates as $newstate) {
                     $index = self::create_index($newstate->recursive_calls_sequence(), $newstate->state());
-                    self::ensure_index_exists($states, $index->recursionlevel, $index->state);
+                    self::ensure_index_exists($states, $index->recursionlevel, $index->state, null);
                     if ($states[$index->recursionlevel][$index->state] === null || $newstate->leftmost_longest($states[$index->recursionlevel][$index->state])) {
-                        if ($statescount >= $maxstatescount) {
+                        if ($statescount >= $this->maxstatescount) {
                             break;
                         }
                         $states[$index->recursionlevel][$index->state] = $newstate;
@@ -904,28 +894,66 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             }
         }
         if (empty($result)) {
-            foreach ($partialmatches as $partialmatch) {
-                $result[] = $partialmatch;
-            }
+            $result = $partialmatches;
         }
         return $result;
     }
 
     protected function generate_extensions($matches, $str, $startpos) {
+
+        //echo "\nSTART generate_extensions\n";
+        //echo $this->bruteforcegeneration ? "brute force mode\n\n" : "fast mode\n\n";
+
+        $cache = array();
+
         foreach ($matches as $match) {
+
+            //echo "\nGENERATING FOR MATCH IN STATE ({$match->state()},{$match->recursive_calls_sequence()}) : {$match->str->substring(0, $startpos + $match->length)}\n";
+
             $match->extendedmatch = null;
             // Try each backtrack state and choose the shortest one.
             $match->backtrack_states = array_merge(array($match), $match->backtrack_states);
             foreach ($match->backtrack_states as $backtrack) {
                 $backtrack->str = $backtrack->str->substring(0, $startpos + $backtrack->length);
 
-                $tmp = $this->bruteforcegeneration
-                     ? $this->generate_extension_brute_force($str, $backtrack)
-                     : $this->generate_extension_fast($str, $backtrack);
+                //echo "\nbacktrack to state ({$backtrack->state()},{$backtrack->recursive_calls_sequence()}) : {$backtrack->str}\n";
 
+                // Look in the cache.
+                $cacheindex0 = $backtrack->recursive_calls_sequence();
+                $cacheindex1 = $backtrack->state();
+                self::ensure_index_exists($cache, $cacheindex0, $cacheindex1, array());
+
+                $fromcache = false;
+                $tmp = null;
+                foreach ($cache[$cacheindex0][$cacheindex1] as $cached) {
+                    if ($cached->backtrack->equals($backtrack)){
+                        //echo "TAKE FROM CACHE\n";
+                        $tmp = $cached->extendedmatch;
+                        $fromcache = true;
+                    }
+                }
+
+                // No cached version, generate new one.
+                if ($tmp === null) {
+                    $tmp = $this->bruteforcegeneration
+                         ? $this->generate_extension_brute_force($str, $backtrack)
+                         : $this->generate_extension_fast($str, $backtrack);
+                }
+
+                // Ain't no nothing at all.
                 if ($tmp === null) {
                     continue;
                 }
+
+                // Cache the generated match.
+                if (!$fromcache) {
+                    $tocache = new stdClass();
+                    $tocache->backtrack = $backtrack;
+                    $tocache->extendedmatch = $tmp;
+                    $cache[$cacheindex0][$cacheindex1][] = $tocache;
+                }
+
+                //echo "result str: {$tmp->str}\n";
 
                 // Calculate 'left'.
                 $prefixlen = $startpos;
@@ -958,6 +986,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $possiblematches = $this->bruteforcematch
                          ? $this->match_brute_force($str, $startpos)
                          : $this->match_fast($str, $startpos);
+
+        //$matchescount = count($possiblematches);
+        //echo "\n FOUND $matchescount matches\n\n";
 
         if (empty($possiblematches)) {
             $result = $this->create_initial_state(null, $str, $startpos);
@@ -1115,12 +1146,19 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
     }
 
     public function __construct($regex = null, $options = null) {
+        global $CFG;
+
         if ($options === null) {
             $options = new qtype_preg_matching_options();
         }
         $options->replacesubexprcalls = true;
 
         parent::__construct($regex, $options);
+
+        if (isset($CFG->qtype_preg_fa_simulation_state_limit)) {
+            $this->maxstatescount = $CFG->qtype_preg_fa_simulation_state_limit;
+        }
+        $this->maxstatescount = max($this->maxstatescount, 100);
 
         if (!isset($regex) || !empty($this->errors)) {
             return;
@@ -1144,6 +1182,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $this->calculate_nesting_map($this->astroot, array($this->astroot->subpattern));
         $this->calculate_backtrackstates();
         $this->calculate_bruteforce();
+
+        //echo "backtrack states:\n";
+        //var_dump($this->backtrackstates);
 
         // Here we need to inform the automaton that 0-subexpr is represented by the AST root.
         // But for now it's implemented in other way, using the subexpr_to_subpatt array of the exec state.

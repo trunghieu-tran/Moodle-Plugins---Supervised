@@ -831,8 +831,10 @@ class qtype_preg_explaining_graph_node_template extends qtype_preg_explaining_gr
     protected function process_operator($graph) {
         $tooltip = get_string('node_template', 'qtype_preg');
         $available = qtype_preg\template::available_templates();
+        $parametersdescription = null;
         if ($this->pregnode->name != '' && array_key_exists($this->pregnode->name, $available)) {
             $label = $tooltip . '\n' . get_string('description_template_' . $this->pregnode->name, 'qtype_preg');
+            $parametersdescription = $available[$this->pregnode->name]->get_parametersdescription();
         } else {
             $label = get_string('explain_unknow_template', 'qtype_preg');
         }
@@ -845,29 +847,43 @@ class qtype_preg_explaining_graph_node_template extends qtype_preg_explaining_gr
         $template->style = ($this->pregnode->userinscription[0]->data != '(?i:...)') ? 'solid' : 'filled';
         $template->color = ($this->pregnode->userinscription[0]->data != '(?i:...)') ? 'black' : 'lightgrey';
 
-        $left = new qtype_preg_explaining_graph_tool_subgraph('');
-        $left->tooltip = get_string('explain_parameter', 'qtype_preg');
-        $inner_left = $this->operands[0]->create_graph();
-        $left->assume_subgraph($inner_left);
-        $left->entries[] = end($inner_left->entries);
-        $left->exits[] = end($inner_left->exits);
-        $template->subgraphs[] = $left;
-        $template->entries[] = end($left->entries);
-        $right = $left;
 
+        $left = new qtype_preg_explaining_graph_tool_subgraph('');
+        $left->color = 'lightgray';
+        $left->tooltip = $parametersdescription === null ? get_string('explain_parameter', 'qtype_preg') :  $parametersdescription[0];
+        $inner_left = $this->operands[0]->create_graph();
         $n = count($this->operands);
+        if ($n == 1) {
+            $template->assume_subgraph($inner_left);
+            $template->entries[] = end($inner_left->entries);
+            $right = $inner_left;
+        } else {
+            $left->assume_subgraph($inner_left);
+            $left->label = $left->tooltip;
+            $left->entries[] = end($inner_left->entries);
+            $left->exits[] = end($inner_left->exits);
+            $template->subgraphs[] = $left;
+            $template->entries[] = end($left->entries);
+            $right = $left;
+        }
+
         for ($i = 1; $i < $n; ++$i) {
             $right = new qtype_preg_explaining_graph_tool_subgraph('');
-            $right->tooltip = get_string('explain_parameter', 'qtype_preg');
+            $right->color = 'lightgray';
+            $right->tooltip = $parametersdescription === null ? get_string('explain_parameter', 'qtype_preg') :  $parametersdescription[$i];
             $inner_right = $this->operands[$i]->create_graph();
             $right->assume_subgraph($inner_right);
+            $right->label = $right->tooltip;
             $right->entries[] = end($inner_right->entries);
             $right->exits[] = end($inner_right->exits);
             $template->subgraphs[] = $right;
 
-            $tmplink = new qtype_preg_explaining_graph_tool_link('', end($left->exits), end($right->entries), $template);
-            $tmplink->color = 'transparent';
-            $template->links[] = $tmplink;
+            $point = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $template, -1);
+            $tmplink1 = new qtype_preg_explaining_graph_tool_link('', end($left->exits), $point, $template);
+            $tmplink2 = new qtype_preg_explaining_graph_tool_link('', $point, end($right->entries), $template);
+            $template->links[] = $tmplink1;
+            $template->links[] = $tmplink2;
+            $template->nodes[] = $point;
 
             if ($i != $n-1) {
                 $left = $right;
@@ -877,8 +893,8 @@ class qtype_preg_explaining_graph_node_template extends qtype_preg_explaining_gr
 
         $graph->subgraphs[] = $template;
         $graph->entries[] = end($template->entries);
-        end($template->entries)->borderoftemplate = $template;
+//        end($template->entries)->borderoftemplate = $template;
         $graph->exits[] = end($template->exits);
-        end($template->exits)->borderoftemplate = $template;
+//        end($template->exits)->borderoftemplate = $template;
     }
 }
