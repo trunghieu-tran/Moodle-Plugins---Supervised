@@ -557,6 +557,15 @@ class qtype_preg_syntax_tree_node_template extends qtype_preg_syntax_tree_operat
     }
 
     public function label_for_edge($operand) {
-        return get_string('explain_parameter', 'qtype_preg');
+        if (count($this->operands) < 2) {
+            return '';
+        }
+        $available = qtype_preg\template::available_templates();
+        $parametersdescription = null;
+        if ($this->pregnode->name != '' && array_key_exists($this->pregnode->name, $available)) {
+            $parametersdescription = $available[$this->pregnode->name]->get_parametersdescription();
+        }
+        $j = array_search($operand, $this->operands);
+        return $parametersdescription === null ? get_string('explain_parameter', 'qtype_preg') :  $parametersdescription[$j];
     }
 }

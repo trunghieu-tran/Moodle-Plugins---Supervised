@@ -448,6 +448,19 @@ M.preg_authoring_tools_script = (function ($) {
 
             $("#tree_img svg").attr('height', tmpH.replace('pt', 'px'));
             $("#tree_img svg").attr('width', tmpW.replace('pt', 'px'));
+
+            $("#tree_img")[0].title = '';
+            // Clear all tooltip for arrows
+            var nodes = $("#tree_img svg")[0].children[0].children;
+            for(var i = 0; i < nodes.length; ++i) {
+                if (nodes[i].id.indexOf('edge') > -1) {
+                    nodes[i].children[0].innerHTML = '';
+                } else if (i == 0) {
+                    nodes[i].innerHTML = '';
+                } else if (nodes[i].id.indexOf('graph2') > -1) {
+                    nodes[i].children[0].innerHTML = '';
+                }
+            }
         } else if (typeof t != 'undefined') {
             self.tree_err().html(t);
         }
