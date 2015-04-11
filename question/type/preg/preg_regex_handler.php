@@ -695,6 +695,7 @@ class qtype_preg_regex_handler {
                 // Parsing is finished.
                 $this->parser->doParse(0, 0);
 
+                $this->regex = new qtype_poasquestion\string($resultregex);
                 $this->astroot = $this->parser->get_root();
 
                 // Look for unsupported modifiers.
