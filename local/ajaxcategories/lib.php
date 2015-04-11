@@ -18,7 +18,7 @@ defined('MOODLE_INTERNAL') || die;
 
 function local_ajaxcategories_extends_settings_navigation(settings_navigation $nav, context $context) {
     $coursenode = $nav->get('courseadmin');
-    if ($coursenode && has_capability('moodle/category:manage', $context)) {
+    if ($coursenode && has_capability('moodle/course:update', $context)) {
         $questionbank = $coursenode->find($coursenode->get_children_key_list()[count($coursenode->get_children_key_list())-1], navigation_node::TYPE_CONTAINER);
         if ($questionbank) {
             $params = array();
@@ -31,7 +31,7 @@ function local_ajaxcategories_extends_settings_navigation(settings_navigation $n
     }
     // Add to questionbank on main page.
     $frontpagenode = $nav->get('frontpage');
-    if ($frontpagenode && has_capability('moodle/category:manage', $context)) {
+    if ($frontpagenode && has_capability('moodle/course:update', $context)) {
         $questionbank = $frontpagenode->find($frontpagenode->get_children_key_list()[count($frontpagenode->get_children_key_list())-1], navigation_node::TYPE_CONTAINER);
         if ($questionbank) {
             $params = array();
