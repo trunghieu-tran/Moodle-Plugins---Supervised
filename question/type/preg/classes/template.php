@@ -96,6 +96,7 @@ class template {
             template::$templates = array(
                 'word' => new template('word', '\w+', '', array('en' => 'word', 'ru' => 'слово')),
                 'integer' => new template('integer', '[+-]?\d+', '', array('en' => 'integer', 'ru' => 'целое число')),
+                'cpp_id' => new template('cpp_id', '[_a-zA-Z]\w*', '', array('en' => 'C++ id', 'ru' => 'идентификатор в C++')),
                 'parens_req' => new template(
                     'parens_req',
                     '(   \(    (?:(?-1)|$$1)   \)  )',
