@@ -12,7 +12,6 @@ require_once($CFG->dirroot . '/question/type/preg/fa_matcher/fa_matcher.php');
 
 
 class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
-
     // --------------------- Merge wordbreaks tests ------------------------
 
     public function test_word_starts() {
@@ -28,7 +27,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -50,7 +51,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -61,7 +64,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
 
     public function test_wordbreak_into_word() {
         $regex = 'a\bc';
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $this->assertTrue(false, "fa merging wordbreaks failed\n");
         } else {
@@ -86,7 +91,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -112,7 +119,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -137,7 +146,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -162,7 +173,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -174,7 +187,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
     public function test_word_no_start() {
         $regex = '\t\Bc';
 
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $this->assertTrue(false, "fa merging wordbreaks failed\n");
         } else {
@@ -185,7 +200,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
     public function test_word_no_end() {
         $regex = 'c\B\t';
 
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $this->assertTrue(false, "fa merging wordbreaks failed\n");
         } else {
@@ -206,7 +223,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -230,7 +249,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -254,7 +275,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -281,7 +304,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -308,7 +333,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -333,7 +360,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -358,7 +387,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -383,7 +414,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -394,7 +427,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
 
     public function test_wordbreak_and_not_wordbreak_no_success() {
         $regex = '^\Bc\Ba\Bt\b$';
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertTrue(false, "fa merging wordbreaks failed\n");
@@ -418,7 +453,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -457,7 +494,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -485,7 +524,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -509,7 +550,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -533,7 +576,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -565,7 +610,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -593,7 +640,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -619,7 +668,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -642,7 +693,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -671,7 +724,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -704,7 +759,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -729,7 +786,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -756,7 +815,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -785,7 +846,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -815,7 +878,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -841,7 +906,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -869,7 +936,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -898,7 +967,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -927,7 +998,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -959,7 +1032,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -986,7 +1061,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -1013,7 +1090,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -1039,7 +1118,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -1068,7 +1149,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -1091,7 +1174,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -1117,7 +1202,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -1148,7 +1235,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -1178,7 +1267,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -1205,7 +1296,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -1229,7 +1322,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -1257,7 +1352,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                     ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -1287,7 +1384,9 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                         ';
         $replace = "\n";
         $dotresult = str_replace($search, $replace, $dotresult);
-        $matcher = new qtype_preg_fa_matcher($regex);
+        $options = new qtype_preg_matching_options();
+        $options->mergeassertions = true;
+        $matcher = new qtype_preg_fa_matcher($regex, $options);
         if (!$matcher->errors_exist()) {
             $result = $matcher->automaton->fa_to_dot();
             $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
