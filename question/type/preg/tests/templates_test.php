@@ -18,6 +18,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/fa_matcher/fa_matcher.php');
+require_once($CFG->dirroot . '/question/type/preg/php_preg_matcher/php_preg_matcher.php');
 require_once('override_templates.php');
 
 class qtype_preg_templates_test extends PHPUnit_Framework_TestCase {
@@ -535,5 +536,14 @@ class qtype_preg_templates_test extends PHPUnit_Framework_TestCase {
             $this->assertTrue($res->indexfirst[0] === 0);
             $this->assertTrue($res->length[0] === strlen($str));
         }
+    }
+
+    public function test_php_preg_matcher() {
+        $matcher = new qtype_preg_php_preg_matcher('(?###parens_req<)a(?###>)');
+
+        $res = $matcher->match('((a))');
+        $this->assertTrue($res->full);
+        $this->assertTrue($res->indexfirst[0] === 0);
+        $this->assertTrue($res->length[0] === 5);
     }
 }
