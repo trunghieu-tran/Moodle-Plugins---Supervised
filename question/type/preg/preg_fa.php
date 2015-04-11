@@ -869,7 +869,6 @@ class qtype_preg_fa {
                 }
             }
         }
-        //print_r($result);
         return array_keys($result);
     }
 
@@ -1261,7 +1260,6 @@ class qtype_preg_fa {
             $this->adjacencymatrix[$transition->from][$transition->to] = array();
         }
         $this->adjacencymatrix[$transition->from][$transition->to][] = $transition;
-
         $this->transitioncount++;
         if ($this->transitioncount > $this->transitionlimit) {
             throw new qtype_preg_toolargefa_exception('');
@@ -1437,6 +1435,7 @@ class qtype_preg_fa {
 
     private function has_same_transition($transition) {
         if ($this->has_transition($transition->from, $transition->to)) {
+
             $innertransitions = $this->adjacencymatrix[$transition->from][$transition->to];
             foreach ($innertransitions as $inner) {
                 if ($transition->equal($inner)) {
@@ -2016,6 +2015,7 @@ class qtype_preg_fa {
         $oldfront = array();
         $newfront = array();
         $clones = array();
+
         $oldfront[] = $start;
         // Work with each state.
         while (!empty($oldfront)) {
@@ -2076,7 +2076,7 @@ class qtype_preg_fa {
                         $resulttransitions[$i]->from = $newstate;
                         $resulttransitions[$i]->to = $curstate;
                     }
-                    if (!$this->has_same_transition($resulttransitions[$i]))
+                    if (!$result->has_same_transition($resulttransitions[$i]))
                     {
                         $result->add_transition($resulttransitions[$i]);
                     }
@@ -2121,6 +2121,7 @@ class qtype_preg_fa {
         $newfront = array();
         $resultnumbers = $result->get_state_numbers();
         if ($withcycle) {
+
             foreach ($possibleend as $state) {
                 $aregone = array();
                 $isfind = false;
@@ -2146,7 +2147,10 @@ class qtype_preg_fa {
                                 foreach ($transitions as $tran) {
                                     $clonetran = clone($tran);
                                     $clonetran->from = $state;
-                                    $result->add_transition($clonetran);
+                                    if (!$result->has_same_transition($clonetran))
+                                    {
+                                        $result->add_transition($clonetran);
+                                    }
                                 }
                             } else {
                                 $realdiv = explode(',', $resultnumbers[$divstate], 2);

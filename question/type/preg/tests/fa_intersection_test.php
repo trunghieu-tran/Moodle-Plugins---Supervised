@@ -2504,12 +2504,12 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                                 1->2[label=<<B>o: b c:</B>>, color = blue];
                             }';
         $dotdirect = 'digraph {
-                            "2,2";
-                            "2,2";
+                            "0,2";
+                            "0,2";
                         }';
         $dotresult = 'digraph {
-                         rankdir=LR;
-        "2,2"[shape=rarrow];
+                        rankdir=LR;
+                        "0,2"[shape=rarrow];
                     }';
 
         $firstautomata = qtype_preg_fa::read_fa($dotdescription1);
@@ -2517,7 +2517,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $direct = qtype_preg_fa::read_fa($dotdirect);
         $resultautomata = new qtype_preg_fa();
         $realnumbers = $direct->get_state_numbers();
-        $startstate = array_search('2,2', $realnumbers);
+        $startstate = array_search('0,2', $realnumbers);
         $resultautomata = $firstautomata->get_intersection_part($secondautomata, $direct, $startstate, 1, false);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $search = '
@@ -3839,30 +3839,24 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                                 0->1[label=<<B>o: [ab] c:</B>>, color = blue];
                                 1->2[label=<<B>o: [01] c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0,";
-                        "7,";
-                        "6,2"->"7,"[label = "[a-c]", color = violet];
-                        "4,1"->"6,2"[label = "[0 ∩ 01]", color = red];
-                        "5,1"->"6,2"[label = "[0-9 ∩ 01]", color = red];
-                        "2,0"->"4,1"[label = "[a ∩ ab]", color = red];
-                        "3,0"->"5,1"[label = "[a-z ∩ ab]", color = red];
-                        "1,"->"2,"[label = "[0-9]", color = violet];
-                        "1,"->"3,"[label = "[a-z]", color = violet];
-                        "1,"->"2,0"[label = "[0-9]", color = violet];
-                        "1,"->"3,0"[label = "[a-z]", color = violet];
-                        "/1,"->"2,"[label = "[0-9]", color = violet];
-                        "/1,"->"3,"[label = "[a-z]", color = violet];
-                        "/1,"->"2,0"[label = "[0-9]", color = violet];
-                        "/1,"->"3,0"[label = "[a-z]", color = violet];
-                        "0,"->"1,"[label = "[a-c]", color = violet];
-                        "0,"->"/1,"[label = "[a-c]", color = violet];
-                        "4,"->"1,"[label = "[m]", color = violet];
-                        "4,"->"/1,"[label = "[0^]", color = violet];
-                        "5,"->"1,"[label = "[0-9^]", color = violet];
-                        "5,"->"/1,"[label = "[0-9^]", color = violet];
-                        "2,"->"4,"[label = "[a]", color = violet];
-                        "3,"->"5,"[label = "[a-z]", color = violet];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,"[shape=rarrow];
+                    "7,"[shape=doublecircle];
+                        "6,2"->"7,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "5,1"->"6,2"[label = <<B>o: [0-9] ∩ [01] c:</B>>, color = red, penwidth = 2];
+                        "4,1"->"6,2"[label = <<B>o: 0 ∩ [01] c:</B>>, color = red, penwidth = 2];
+                        "3,0"->"5,1"[label = <<B>o: [a-z] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "2,0"->"4,1"[label = <<B>o: a ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "1,"->"3,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"2,"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"3,0"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "1,"->"2,0"[label = <<B>o: [0-9] c:</B>>, color = violet, penwidth = 2];
+                        "0,"->"1,"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "5,"->"1,"[label = <<B>o: [0-9] c:</B><BR/>o: ^ c:(8,6)>, color = violet, penwidth = 2];
+                        "4,"->"1,"[label = <<B>o: m c:</B>>, color = violet, penwidth = 2];
+                        "3,"->"5,"[label = <<B>o: [a-z] c:</B>>, color = violet, penwidth = 2];
+                        "2,"->"4,"[label = <<B>o: a c:</B>>, color = violet, penwidth = 2];
                     }';
 
         $search = '
@@ -4537,38 +4531,39 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
                                 7->8[label=<<B>o: [a-z] c:</B>>, color = blue];
                                 8->9[label=<<B>o: a c:</B>>, color = blue];
                             }';
-        $dotresult = 'digraph res {
-                        "0,";
-                        "5,9";
-                        "0,"->"1,0"[label = "[a-c]", color = violet];
-                        "1,0"->"2,1"[label = "[a-z ∩ ab]", color = red];
-                        "1,0"->"3,1"[label = "[a-z ∩ ab]", color = red];
-                        "2,1"->"4,2"[label = "[a ∩ a-z]", color = red];
-                        "3,1"->"4,2"[label = "[a-z ∩ a-z]", color = red];
-                        "4,2"->"1,3   0"[label = "[a ∩ a]", color = red];
-                        "4,2"->"5,3"[label = "[a ∩ a]", color = red];
-                        "1,3   0"->"2,4   1"[label = "[a-z ∩ ab]", color = red];
-                        "1,3   0"->"3,4   1"[label = "[a-z ∩ ab]", color = red];
-                        "5,3"->",4"[label = "[ab]", color = blue, style = dotted];
-                        "2,4   1"->"4,5   2"[label = "[a ∩ a-z]", color = red];
-                        "3,4   1"->"4,5   2"[label = "[a-z ∩ a-z]", color = red];
-                        "4,5   2"->"1,6   3   0"[label = "[a ∩ a]", color = red];
-                        "4,5   2"->"5,6"[label = "[a ∩ a]", color = red];
-                        "1,6   3   0"->"2,7   4   1"[label = "[a-z ∩ ab]", color = red];
-                        "1,6   3   0"->"3,7   4   1"[label = "[a-z ∩ ab]", color = red];
-                        "5,6"->",7"[label = "[ab]", color = blue, style = dotted];
-                        "2,7   4   1"->"4,8   5   2"[label = "[a ∩ a-z]", color = red];
-                        "3,7   4   1"->"4,8   5   2"[label = "[a-z ∩ a-z]", color = red];
-                        "4,8   5   2"->"1,9   6   3   0"[label = "[a ∩ a]", color = red];
-                        "4,8   5   2"->"5,9"[label = "[a ∩ a]", color = red];
-                        "1,9   6   3   0"->"2,7   4   1"[label = "[a-z ∩ ab]", color = red];
-                        "1,9   6   3   0"->"3,7   4   1"[label = "[a-z ∩ ab]", color = red];
-                        ",4"->",5"[label = "[a-z]", color = blue, style = dotted];
-                        ",5"->",6"[label = "[a]", color = blue, style = dotted];
-                        ",6"->",7"[label = "[ab]", color = blue, style = dotted];
-                        ",7"->",8"[label = "[a-z]", color = blue, style = dotted];
-                        ",8"->",9"[label = "[a]", color = blue, style = dotted];
-                        ",9"->"5,9"[label = "[]", color = blue, style = dotted];
+        $dotresult = 'digraph {
+                        rankdir=LR;
+                        "0,"[shape=rarrow];
+                    "5,9"[shape=doublecircle];
+                        "0,"->"1,0"[label = <<B>o: [a-c] c:</B>>, color = violet, penwidth = 2];
+                        "1,0"->"3,1"[label = <<B>o: [a-z] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "1,0"->"2,1"[label = <<B>o: [a-z] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "3,1"->"4,2"[label = <<B>o: [a-z] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "2,1"->"4,2"[label = <<B>o: a ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "4,2"->"5,3"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "4,2"->"1,3   0"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "5,3"->",4"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        "1,3   0"->"3,4   1"[label = <<B>o: [a-z] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "1,3   0"->"2,4   1"[label = <<B>o: [a-z] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "3,4   1"->"4,5   2"[label = <<B>o: [a-z] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "2,4   1"->"4,5   2"[label = <<B>o: a ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "4,5   2"->"5,6"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "4,5   2"->"1,6   3   0"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "5,6"->",7"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        "1,6   3   0"->"3,7   4   1"[label = <<B>o: [a-z] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "1,6   3   0"->"2,7   4   1"[label = <<B>o: [a-z] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "3,7   4   1"->"4,8   5   2"[label = <<B>o: [a-z] ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "2,7   4   1"->"4,8   5   2"[label = <<B>o: a ∩ [a-z] c:</B>>, color = red, penwidth = 2];
+                        "4,8   5   2"->"5,9"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "4,8   5   2"->"1,9   6   3   0"[label = <<B>o: a ∩ a c:</B>>, color = red, penwidth = 2];
+                        "1,9   6   3   0"->"3,7   4   1"[label = <<B>o: [a-z] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        "1,9   6   3   0"->"2,7   4   1"[label = <<B>o: [a-z] ∩ [ab] c:</B>>, color = red, penwidth = 2];
+                        ",4"->",5"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",5"->",6"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",6"->",7"[label = <<B>o: [ab] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",7"->",8"[label = <<B>o: [a-z] c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",8"->",9"[label = <<B>o: a c:</B>>, color = blue, penwidth = 2, style = dotted];
+                        ",9"->"5,9"[label = <<B>o: ε c:</B>>, color = blue, penwidth = 2, style = dotted];
                     }';
 
         $search = '
