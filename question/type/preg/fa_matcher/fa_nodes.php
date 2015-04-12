@@ -36,7 +36,9 @@ require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.ph
  */
 abstract class qtype_preg_fa_node {
 
-    public $pregnode;    // Reference to the corresponding qtype_preg_node.
+    public $pregnode;    // Corresponding AST node.
+
+    public $matcher;     // FA matcher.
 
     /**
      * Returns true if this node is supported by the engine, rejection string otherwise.
@@ -58,10 +60,11 @@ abstract class qtype_preg_fa_node {
 
     public function __construct($node, $matcher) {
         $this->pregnode = $node;
+        $this->matcher = $matcher;
     }
 
     /**
-     * Adds the opening tag for this node. Tricky when $transform == true.
+     * Adds the opening tag for this node. Tricky when $transform === true.
      */
     protected function add_open_tag($transition, $transform) {
         //echo "\nthis node: {$this->pregnode->subpattern}\n";
@@ -77,7 +80,7 @@ abstract class qtype_preg_fa_node {
 
             // Look through all merged transitions and find one with minimal subpattern number.
             foreach ($search as $merged) {
-                if (/*$merged->pregleaf->subpattern < $this->pregnode->subpattern/*/$merged->pregleaf->subpattern == -1) {
+                if (/*$merged->pregleaf->subpattern < $this->pregnode->subpattern/*/$merged->pregleaf->subpattern === -1) {
                    // continue;
                 }
                 $newdelta = $merged->pregleaf->subpattern - $this->pregnode->subpattern;
@@ -97,7 +100,7 @@ abstract class qtype_preg_fa_node {
     }
 
     /**
-     * Adds the closing tag for this node. Tricky when $transform == true.
+     * Adds the closing tag for this node. Tricky when $transform === true.
      */
     protected function add_close_tag($transition, $transform) {
         $thetransition = $transition;
@@ -111,7 +114,7 @@ abstract class qtype_preg_fa_node {
 
             // Look through all merged transitions and fine one with maximal subpattern number.
             foreach ($search as $merged) {
-                if (/*$merged->pregleaf->subpattern > */$merged->pregleaf->subpattern == -1) {
+                if (/*$merged->pregleaf->subpattern > */$merged->pregleaf->subpattern === -1) {
                   //  continue;
                 }
                 $newdelta = $merged->pregleaf->subpattern - $this->pregnode->subpattern;
@@ -129,7 +132,7 @@ abstract class qtype_preg_fa_node {
         $this->create_automaton_inner($automaton, $stack, $transform);
 
         // Don't augment transition if the node is not a subpattern.
-        if ($this->pregnode->subpattern == -1) {
+        if ($this->pregnode->subpattern === -1) {
             return;
         }
 
@@ -210,7 +213,7 @@ abstract class qtype_preg_fa_node {
 
         // Changing leafs in case of merging.
         foreach ($transitions as $transition) {
-            if (!($transition->from == $transition->to && ($transition->is_unmerged_assert() || $transition->is_eps()))) {
+            if (!($transition->from === $transition->to && ($transition->is_unmerged_assert() || $transition->is_eps()))) {
                 $tran = clone $transition;
                 $delclone = clone $del;
                 $tran->loopsback = $transition->loopsback || $del->loopsback;
@@ -282,7 +285,7 @@ abstract class qtype_preg_fa_node {
             }
         }
 
-        if (!($del->is_end_anchor() && in_array($del->to, $endstates)) && !($transition->from == $transition->to && ($transition->is_unmerged_assert() || $transition->is_eps()))) {
+        if (!($del->is_end_anchor() && in_array($del->to, $endstates)) && !($transition->from === $transition->to && ($transition->is_unmerged_assert() || $transition->is_eps()))) {
             $automaton->remove_transition($del);
         }
 
@@ -549,7 +552,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                 if ($intran->consumeschars) {
                     $fromstates[] = $intran->from;
                     foreach ($uncapturing as $tran) {
-                        if (count($fromstates == 1)) {
+                        if (count($fromstates === 1)) {
                             $tostates[] = $tran->to;
                         }
                         $resulttran = $intran->intersect($tran);
@@ -571,7 +574,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                             $automaton->remove_transition($tran);
                         }
                     }
-                    if (count($outgoing) == count($uncapturing)) {
+                    if (count($outgoing) === count($uncapturing)) {
                         $automaton->remove_transition($intran);
                     }
                 }
@@ -598,7 +601,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                 $fromstates[] = $tran->from;
                 foreach ($outgoing as $outtran) {
                     if ($outtran->consumeschars) {
-                        if (count($fromstates == 1)) {
+                        if (count($fromstates === 1)) {
                             $tostates[] = $outtran->to;
                         }
                         $resulttran = $tran->intersect($outtran);
@@ -619,7 +622,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                             $automaton->remove_transition($tran);
                         }
                     }
-                    if (count($incoming) == count($uncapturing)) {
+                    if (count($incoming) === count($uncapturing)) {
                         $automaton->remove_transition($outtran);
                     }
                 }
@@ -807,7 +810,7 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
         for ($i = 0; $i < $leftborder; $i++) {
             $this->operands[0]->create_automaton($automaton, $stack, $transform);
             // The last block is repeated.
-            if ($i == $leftborder - 1) {
+            if ($i === $leftborder - 1) {
                 $cur = array_pop($stack);
                 $greediness = $this->pregnode->lazy ? qtype_preg_fa_transition::GREED_LAZY : qtype_preg_fa_transition::GREED_GREEDY;
                 $outgoing = $automaton->get_adjacent_transitions($cur['start'], true);
@@ -854,7 +857,7 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
     }
 
     protected function create_automaton_inner(&$automaton, &$stack, $transform) {
-        if ($this->pregnode->leftborder == 0) {
+        if ($this->pregnode->leftborder === 0) {
             $this->create_aster($automaton, $stack, $transform);
         } else {
             $this->create_brace($automaton, $stack, $transform);
@@ -941,14 +944,14 @@ class qtype_preg_fa_node_finite_quant extends qtype_preg_fa_node_quant {
     }
 
     protected function create_automaton_inner(&$automaton, &$stack, $transform) {
-        if ($this->pregnode->rightborder == 0) {
+        if ($this->pregnode->rightborder === 0) {
             // Create start and end states of the resulting automaton.
             $start = $automaton->add_state();
             $end = $automaton->add_state();
             $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             $automaton->add_transition(new qtype_preg_fa_transition($start, $epsleaf, $end));
             $stack[] = array('start' => $start, 'end' => $end, 'breakpos' => null);
-        } else if ($this->pregnode->leftborder == 0 && $this->pregnode->rightborder == 1) {
+        } else if ($this->pregnode->leftborder === 0 && $this->pregnode->rightborder === 1) {
             $this->create_qu($automaton, $stack, $transform);
         } else {
             $this->create_brace($automaton, $stack, $transform);
@@ -966,7 +969,7 @@ class qtype_preg_fa_node_finite_quant extends qtype_preg_fa_node_quant {
 class qtype_preg_fa_node_subexpr extends qtype_preg_fa_operator {
 
     public function accept() {
-        if ($this->pregnode->subtype == qtype_preg_node_subexpr::SUBTYPE_ONCEONLY) {
+        if ($this->pregnode->subtype === qtype_preg_node_subexpr::SUBTYPE_ONCEONLY) {
             return get_string($this->pregnode->subtype, 'qtype_preg');
         }
         return true;
@@ -988,7 +991,7 @@ class qtype_preg_fa_node_subexpr extends qtype_preg_fa_operator {
 class qtype_preg_fa_node_cond_subexpr extends qtype_preg_fa_operator {
 
     public function __construct($node, $matcher) {
-        $this->pregnode = $node;
+        parent::__construct($node, $matcher);
 
         $shift = (int)$node->is_condition_assertion();
 
@@ -1043,5 +1046,28 @@ class qtype_preg_fa_node_cond_subexpr extends qtype_preg_fa_operator {
 
     protected function create_automaton_inner(&$automaton, &$stack, $transform) {
         $this->operands[0]->create_automaton($automaton, $stack, $transform);
+    }
+}
+
+/**
+ * Class for lookaround assertions.
+ */
+class qtype_preg_fa_node_assert extends qtype_preg_fa_operator {
+
+    public function accept() {
+        // TODO; assertions are not supported yet.
+        if ($this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_PLA ||
+            $this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_NLA ||
+            $this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_PLB ||
+            $this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_NLB) {
+            return get_string($this->pregnode->subtype, 'qtype_preg');
+        }
+        return true;
+    }
+
+    protected function create_automaton_inner(&$automaton, &$stack, $transform) {
+        $automaton = $this->matcher->build_fa($this, $transform);
+
+        // TODO: store it somewhere and intersect
     }
 }
