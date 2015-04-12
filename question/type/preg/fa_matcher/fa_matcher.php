@@ -59,6 +59,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             case qtype_preg_node::TYPE_NODE_INFINITE_QUANT:
             case qtype_preg_node::TYPE_NODE_CONCAT:
             case qtype_preg_node::TYPE_NODE_ALT:
+            case qtype_preg_node::TYPE_NODE_ASSERT:
             case qtype_preg_node::TYPE_NODE_SUBEXPR:
             case qtype_preg_node::TYPE_NODE_COND_SUBEXPR:
                 return 'qtype_preg_fa_' . $nodetype;
@@ -91,6 +92,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         }
     }
 
+    /**
+     * These subtypes do not have directly corresponding DST nodes.
+     */
     protected function is_preg_node_acceptable($pregnode) {
         switch ($pregnode->type) {
             case qtype_preg_node::TYPE_LEAF_CHARSET:
@@ -1092,13 +1096,13 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
      * Constructs an FA corresponding to the given node.
      * @return - object of qtype_preg_fa in case of success, null otherwise.
      */
-    protected function build_fa($mergeassertions = false) {
+    public function build_fa($dstnode, $mergeassertions = false) {
         $result = new qtype_preg_fa($this, $this->get_nodes_with_subexpr_refs());
 
         //$mergeassertions = true;
 
         $stack = array();
-        $this->dstroot->create_automaton($result, $stack, $mergeassertions);
+        $dstnode->create_automaton($result, $stack, $mergeassertions);
         $body = array_pop($stack);
         $result->calculate_subexpr_start_and_end_states();
 
@@ -1165,7 +1169,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         }
 
         try {
-            $this->automaton = self::build_fa($this->options->mergeassertions);
+            $this->automaton = $this->build_fa($this->dstroot, $this->options->mergeassertions);
         } catch (qtype_preg_toolargefa_exception $e) {
             $this->errors[] = new qtype_preg_too_complex_error($regex, $this);
             return;
