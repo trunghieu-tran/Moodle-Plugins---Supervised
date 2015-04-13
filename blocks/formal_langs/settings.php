@@ -30,4 +30,14 @@ require_once($CFG->dirroot.'/blocks/formal_langs/block_formal_langs.php');
 if(is_object($ADMIN)) {
     $string = get_string('formallangsvisibilitysettings', 'block_formal_langs');
     $ADMIN->add('blocksettings', new admin_externalpage('formallangsglobalsettings', $string,  $CFG->wwwroot . '/blocks/formal_langs/globalsettings.php'));
+    if ($ADMIN->fulltree) {
+        $settings->add(new admin_setting_configtext(
+            'block_formal_langs_maximum_lexical_backracking_execution_time',
+            get_string('maximumlexicalbacktrackingexecutuiontimesettingname', 'block_formal_langs'),
+            get_string('maximumlexicalbacktrackingexecutuiontimesettingdescription', 'block_formal_langs'),
+            30,
+            PARAM_INT,
+            20
+        ));
+    }
 }
