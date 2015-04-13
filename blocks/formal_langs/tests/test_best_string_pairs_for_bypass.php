@@ -116,6 +116,6 @@ class blocks_formal_langs_token_base_best_string_pairs extends UnitTestCase {
 
         $result = $stringpair->best_string_pairs_for_bypass($correctstring, $comparedstring, 0.5, $options);
 
-        $this->assertTrue(count($result) == 0);
+        $this->assertTrue(count($result) == 1);
     }
 }
