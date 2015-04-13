@@ -37,6 +37,7 @@ $string['editingnewlanguage'] = 'Editing new language';
 $string['editpermissionslink'] = 'Edit permissions in current context';
 $string['editpermissionspagename'] = 'Edit permissions';
 $string['formallangsglobalsettings'] = 'Site settings for formal language block';
+$string['formallangsvisibilitysettings'] = 'Global settings for language visibility';
 $string['formal_langs:addinstance'] = 'Add new formal languages block to current module';
 $string['formal_langs:addlanguage'] = 'Can add new formal language';
 $string['formal_langs:changelanguagevisibility'] = 'Can change language visibility in forms';
