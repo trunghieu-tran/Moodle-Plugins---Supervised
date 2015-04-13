@@ -1066,8 +1066,7 @@ class qtype_preg_fa_node_assert extends qtype_preg_fa_operator {
     }
 
     protected function create_automaton_inner(&$automaton, &$stack, $transform) {
-        $automaton = $this->matcher->build_fa($this, $transform);
-
+        $assertautomaton = $this->matcher->build_fa($this->operands[0], $transform);
         // TODO: store it somewhere and intersect
     }
 }
