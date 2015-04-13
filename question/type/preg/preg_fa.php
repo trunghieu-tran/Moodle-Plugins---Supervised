@@ -968,11 +968,12 @@ class qtype_preg_fa {
      */
     public function get_adjacent_transitions($stateid, $outgoing = true) {
         $result = array();
-        if ($outgoing) {
+        if ($outgoing && array_key_exists($stateid, $this->adjacencymatrix)) {
             foreach ($this->adjacencymatrix[$stateid] as $transitions) {
                 $result = array_merge($result, $transitions);
             }
-        } else {
+        }
+        if (!$outgoing) {
             foreach ($this->adjacencymatrix as $row) {
                 if (array_key_exists($stateid, $row)) {
                     $result = array_merge($result, $row[$stateid]);
