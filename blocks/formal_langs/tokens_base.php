@@ -1018,11 +1018,18 @@ class block_formal_langs_token_stream {
      * @var array of block_formal_langs_lexical_errors object
      */
     public $errors;
+
     /**
-     * Time limit for recursive backtracking
-     * @var int
+     * Returns time limit for recursive backtracking
+     * @return int
      */
-    public static $timelimit = 30;
+    public static function time_limit() {
+        global $CFG;
+        if ($CFG->block_formal_langs_maximum_lexical_backracking_execution_time <= 0) {
+            return 30; // Default value is 30 seconds
+        }
+        return $CFG->block_formal_langs_maximum_lexical_backracking_execution_time;
+    }
 
     public function __clone() {
         // PHP 5.3.3, which is required by Moodle 2.5, supports anonymous functions
@@ -1277,7 +1284,7 @@ class block_formal_langs_token_stream {
         $countstatus = count($status);
         for ($i = $place; $i < $countstatus; $i++) {
             $currenttime = time() - $time;
-            if ($status[$i] == 0 && $currenttime - 1 < self::$timelimit) {
+            if ($status[$i] == 0 && $currenttime - 1 < self::time_limit()) {
                 $status[$i] = 1;
                 // add new pair and bloking
                 $this->bloking($i, $matches, $status);
