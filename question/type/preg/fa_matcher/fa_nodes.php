@@ -137,7 +137,6 @@ abstract class qtype_preg_fa_node {
         }
 
         $body = array_pop($stack);
-
         // Copy this node to the starting transitions.
         foreach ($automaton->get_adjacent_transitions($body['start'], true) as $transition) {
             $this->add_open_tag($transition, $transform);
@@ -242,6 +241,7 @@ abstract class qtype_preg_fa_node {
         }
 
         $breakpos = null;
+        $newkeys = array();
         if (!$back) {
             foreach ($clonetransitions as &$tran) {
                 $tostates[] = $tran->to;
@@ -259,10 +259,12 @@ abstract class qtype_preg_fa_node {
                     $tran->redirect_merged_transitions();
                     $automaton->add_transition($tran);
                     $transitionadded = true;
+                    $newkeys[] = $tran->to;
                 } else if ($breakpos === null) {
                     $breakpos = $del->pregleaf->position->compose($tran->pregleaf->position);
                 }
             }
+            $automaton->change_state_for_intersection($del->to, $newkeys);
         } else {
             foreach ($clonetransitions as &$tran) {
                 $fromstates[] = $tran->from;
@@ -283,6 +285,7 @@ abstract class qtype_preg_fa_node {
                     $breakpos = $tran->pregleaf->position->compose($del->pregleaf->position);
                 }
             }
+            $automaton->change_state_for_intersection($del->from, array($del->to));
         }
 
         if (!($del->is_end_anchor() && in_array($del->to, $endstates)) && !($transition->from === $transition->to && ($transition->is_unmerged_assert() || $transition->is_eps()))) {
@@ -645,6 +648,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
             $cur = array_pop($stack);
             $before = false;
             $automaton->redirect_transitions($cur['end'], $result['start']);
+            $automaton->change_state_for_intersection($cur['end'], array($result['start']));
             $borderstate = $result['start'];
             $breakpos = $result['breakpos'];
             if ($breakpos === null) {
@@ -673,7 +677,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
  */
 class qtype_preg_fa_node_concat extends qtype_preg_fa_operator {
 
-    protected function create_automaton_inner(&$automaton, &$stack, $transform) {
+    public function create_automaton_inner(&$automaton, &$stack, $transform) {
         $count = count($this->operands);
         for ($i = 0; $i < $count; $i++) {
             $this->operands[$i]->create_automaton($automaton, $stack, $transform);
@@ -701,7 +705,9 @@ class qtype_preg_fa_node_alt extends qtype_preg_fa_operator {
             } else {
                 // Merge start and end states.
                 $automaton->redirect_transitions($cur['start'], $result['start']);
+                $automaton->change_state_for_intersection($cur['start'], array($result['start']));
                 $automaton->redirect_transitions($cur['end'], $result['end']);
+                $automaton->change_state_for_intersection($cur['end'], array($result['end']));
                 if ($cur['breakpos'] === null) {
                     $result['breakpos'] = null;
                 }
@@ -1060,14 +1066,20 @@ class qtype_preg_fa_node_assert extends qtype_preg_fa_operator {
             $this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_NLA ||
             $this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_PLB ||
             $this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_NLB) {
-            return get_string($this->pregnode->subtype, 'qtype_preg');
+            //return get_string($this->pregnode->subtype, 'qtype_preg');
         }
         return true;
     }
 
     protected function create_automaton_inner(&$automaton, &$stack, $transform) {
-        $automaton = $this->matcher->build_fa($this, $transform);
-
-        // TODO: store it somewhere and intersect
+        $innerautomaton = $this->matcher->build_fa($this->operands[0], $transform);
+        $body = array_pop($stack);
+        $intersectedstate = $body['end'];
+        $stack[] = $body;
+        $automaton->append_inner_automaton($intersectedstate, $innerautomaton, $this->pregnode->subtype);
+        $this->pregnode->operands = array();
+        $this->pregnode->operands[] = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        $concat =  new qtype_preg_fa_node_concat($this->pregnode, $this->matcher);
+        $concat->create_automaton_inner($automaton, $stack, $transform);
     }
 }
