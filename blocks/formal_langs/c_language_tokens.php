@@ -93,6 +93,20 @@ class block_formal_langs_c_token_typename extends block_formal_langs_c_token_bas
 */
 	return $arraypairs;
     }
+
+    /**
+     * This function returns true if editing distance is
+     * applicable to this type of tokens as lexical error weight and
+     * threshold.
+     *
+     * There are kind of tokens for which editing distances are
+     * inapplicable, like numbers.
+     *
+     * @return boolean
+     */
+    public function use_editing_distance() {
+        return true;
+    }
 }
 
 /** Describes an identifier

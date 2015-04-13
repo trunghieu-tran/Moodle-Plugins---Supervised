@@ -1017,7 +1017,7 @@ class block_formal_langs_token_stream {
      * Time limit for recursive backtracking
      * @var int
      */
-    public static $timelimit = 15;
+    public static $timelimit = 30;
 
     public function __clone() {
         // PHP 5.3.3, which is required by Moodle 2.5, supports anonymous functions
