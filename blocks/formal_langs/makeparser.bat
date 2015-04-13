@@ -1,0 +1,1 @@
+php PHP_ParserGenerator/Main.php -s langs_src/parser_cpp_language.y
