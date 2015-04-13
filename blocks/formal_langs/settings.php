@@ -28,10 +28,6 @@ require_once($CFG->dirroot.'/blocks/formal_langs/settingslib.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/block_formal_langs.php');
 
 if(is_object($ADMIN)) {
-    // To erase Moolde default settings page we must set settings to null, see lib/pluginlib.php, line 3033
-    // DO NOT UNDER ANY CIRCUMSTANCES REMOVE THIS LINE! THIS IS NOT A DECLARATION!
-    $settings = null;
-
-    $string = get_string('pluginname', 'block_formal_langs');
+    $string = get_string('formallangsvisibilitysettings', 'block_formal_langs');
     $ADMIN->add('blocksettings', new admin_externalpage('formallangsglobalsettings', $string,  $CFG->wwwroot . '/blocks/formal_langs/globalsettings.php'));
 }
