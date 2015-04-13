@@ -2318,48 +2318,13 @@ class block_formal_langs_string_pair {
         $this->correctedstring = $this->correct_mistakes();
     }
 
-    public function pairs_between_corrected_compared() {
-       /* $arraysets = array();
-        // $i - compared
-        // $j - corrected
-        $j=0;
-        for($n = 0; $n < count($this->matches); $n++) {
-            $arraypairs = array();
-            for($i = 0; $i < count($this->comparedstring->stream->tokens); $i++) {
-                if(array_search($i, $this->matches[$n]->comparedtokens)==1) {
-                    for($k=0; $k<count($this->matches[$n]->matchedpairs); $k++) {
-                    if(count($this->matches[$n]->matchedpairs[$k]->comparedtokens)==2 && ($this->matches[$n]->matchedpairs[$k]->comparedtokens[0]==$i || $this->matches[$n]->matchedpairs[$k]->comparedtokens[1]==$i)) {
-                        $arraypairs[]=array($i, array($j,$j++));
-                        $j++;
-                    }
-                    if(count($this->matches[$n]->matchedpairs[$k]->comparedtokens)==1 && ($this->matches[$n]->matchedpairs[$k]->comparedtokens[0]==$i)) {
-                        $arraypairs[]=array($i, $j);
-                        $j++;
-                    }
-                    if(count($this->matches[$n]->matchedpairs[$k]->correcttokens)==2
-                        && ($this->matches[$n]->matchedpairs[$k]->correcttokens[0]==$i || $this->matches[$n]->matchedpairs[$k]->correcttokens[1]==$i))
-                        $arraypairs[]=array(array($i, $i++), $j);
-                        $j++;
-                    }
-                } else {
-                    $arraypairs[]=array($i, $j);
-                    $j++;
-                }
-            }
-            $arraysets[]=$arraypairs;
-        }
-        return $arraysets;
-*/
-	return $this->matches();
-    }
-    
     /**
      * Correct mistakes in compared string using array of matched pairs and correct string.
      *
-     * @return array, with a new token stream where comparedtokens changed to correcttokens if mistakeweight > 0 for the pair and
+     * @return block_formal_langs_processed_string , with a new token stream where comparedtokens changed to correcttokens if mistakeweight > 0 for the pair and
      * other array, where matches between corrected and compared are stored
      */
-    protected function correct_mistakes() {
+    public function correct_mistakes() {
         // TODO Birukova - create a new string from $comparedstring and matches
         // This is somewhat more difficult, as we need to preserve existing separators (except extra ones).
         // Also, user-visible parts of the compared string should be saved where possible (e.g. not in typos)
