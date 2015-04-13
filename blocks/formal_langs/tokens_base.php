@@ -937,7 +937,12 @@ class block_formal_langs_matched_tokens_pair {
             $token = $comparedstring->stream->tokens[$index];
             /** @var qtype_poasquestion\string $string */
             $string = $token->value();
-            $strings[] =$string->string();
+            $value = $string;
+            if (is_object($string)) {
+                /** @var qtype_poasquestion\string $string */
+                $value = $string->string();
+            }
+            $strings[] = $value;
         }
         if (count($strings)) {
             $comparedmessage = implode(' ', $strings);
