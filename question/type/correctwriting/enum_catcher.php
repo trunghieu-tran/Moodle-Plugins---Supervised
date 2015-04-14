@@ -248,6 +248,17 @@ class qtype_correctwriting_enum_catcher {
     }
 
     /**
+     * Search positive expressions (+ *) in given node.
+     * @param object $node of syntax tree for correct answer.
+     */
+    protected function find_positive_math_expr($node) {
+        $types = ["expr_plus","expr_multiply"];
+        foreach($types as $type) {
+            $this->find_enumeration_by_operator_type($node,$type,-1);
+        }
+    }
+
+    /**
      * Search bit expression in given node.
      * @param object $node of syntax tree for correct answer.
      */
