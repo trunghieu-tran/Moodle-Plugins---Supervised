@@ -41,14 +41,12 @@ class qtype_correctwriting_enum_catcher {
     }
 
     /**
-     * Search variable declaration in given node.
-     * @param object $node of syntax tree for correct answer.
-     * @param boolean $root is current node is root node.
-     * @param array $enum enumaration's array.
+     * Return array of finded enumerations descriptions.
+     * @return array of enumerations descriptions.
      */
-    protected function find_var_decl($node,$root = false, &$enum) {
-        $excluded_keys = array(); // excluded keys of enumeration
-        $temp = null; // temporary variable
+    public function getEnums() {
+        return $this->enums;
+    }
 
         if ($enum == null) {
             $enum = array();
