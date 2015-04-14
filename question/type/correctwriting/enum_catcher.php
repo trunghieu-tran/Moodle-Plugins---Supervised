@@ -367,17 +367,12 @@ class qtype_correctwriting_enum_catcher {
      * @param object $node of syntax tree for correct answer.
      */
     protected function analyze_stmt($node) {
-        
-        // Search variable declaretion enumerations 
-        if ($this->find_typeword($node)) {
-            $enum = null;
-            $this->find_var_decl($node,0,true,$enum);
-        }
-
-        // Search long init and math enumerations
-        $this->find_expr_10($node);
-        $this->find_math_expr($node->childs()[0],$this->enums);
-
+        // Search math, logical, bit enumerations, assign sequence and long variable declarations. 
+        $this->find_math_expr($node);
+        $this->find_logic_expr($node);
+        $this->find_assign_expr($node);
+        $this->find_bit_expr($node);
+        $this->find_var_decl($node);        
     }
 
     /**
