@@ -223,6 +223,31 @@ class qtype_correctwriting_enum_catcher {
     }
 
     /**
+     * Search assign sequencies in given node.
+     * @param object $node of syntax tree for correct answer.
+     */
+    protected function find_assign_expr($node) {
+        $types = ["expr_assign"];
+        $count = count($this->enums);
+        foreach ($types as $type) {
+            $this->find_enumeration_by_operator_type($node,$type,-1);
+        }
+        // Find and remove last element of found enumeration.
+        foreach ($this->enums as $key=>&$enum) {
+            $key2 = 0;
+            if ($key >= $count) {
+                foreach ($enum as $key1=>$element) {
+                    if (reset($enum[$key2]) >= reset($enum[$key1])) {
+                        $key2 = $key1;
+                    }
+                }
+                unset($enum[$key2]);
+                $this->enums[$key] = array_values($enum);
+            }
+        }
+    }
+
+    /**
      * Search bit expression in given node.
      * @param object $node of syntax tree for correct answer.
      */
