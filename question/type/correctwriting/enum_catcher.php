@@ -170,6 +170,48 @@ class qtype_correctwriting_enum_catcher {
     }
 
     /**
+     * Find enumeration by operator type.
+     * @param $node - node of synax tree for correct answer.
+     * @param $type - string with current operation type.
+     * @param $enum_number - number of enumeration to append element to it.
+     */
+    protected function find_enumeration_by_operator_type($node, $type, $enum_number) {
+        // if current node is not array, analyze it
+        // else analyze its elements.
+        if (!is_array($node)) {
+            // get childs of current node.
+            $childs = $node->childs();
+            // if current node is searching operator its analyze childs
+            // else if current node has childs, append in enumeration as element and search 
+            // enumerations in they, else if enumeration is already find append element in it
+            if ($node->type() == $type) {
+
+                if(!in_array($enum_number, $this->enums)) {
+                    $enum_number = $enum_number == -1 ? count($this->enums):$enum_number;
+                    $this->enums[] = [];
+                }
+                $this->find_enumeration_by_operator_type(reset($childs), $type, $enum_number);
+                $this->find_enumeration_by_operator_type(end($childs), $type, $enum_number);
+            } else if (is_array($childs)){
+                if ($enum_number != -1) {
+                    $pos = $this->get_element_position($node);
+                    $this->enums[$enum_number][] = [reset($pos), end($pos)];
+                }
+                foreach($childs as $value) {
+                    $this->find_enumeration_by_operator_type($value,$type,-1);
+                }
+            } else if ($enum_number != -1) {
+                $pos = $this->get_element_position($node);
+                $this->enums[$enum_number][] = [reset($pos), end($pos)];
+            }
+        } else {
+            foreach($node as $value) {
+                $this->find_enumeration_by_operator_type($value,$type,-1);
+            }
+        }
+    }
+
+    /**
      * Search logic expression in given node.
      * @param object $node of syntax tree for correct answer.
      */
