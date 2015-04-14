@@ -151,17 +151,17 @@ class qtype_correctwriting_enum_catcher {
         $enumword = false; // boolean variable show is find enum keyword
         $enumbody = false; // boolean variable show is find enumeration body
         $excluded_keys = array(); // excluded keys of enumeration
-
+        $childs = NULL;
         // get childs of current node
         if(is_array($node))
-            $temp = $node;
-        else
-            $temp = $node->childs();
+            $childs = $node;
+        else if ($node != NULL)
+            $childs = $node->childs();
         // if node has childs
-        if($temp != null)
+        if($childs != null)
             // find enum keyword and enumeration body and update enumeration array.
-            foreach ($temp as $key => $value) {
-                if (get_class($value) == "block_formal_langs_c_token_keyword" && $value->value() == "enum") {
+            foreach ($childs as $key => $value) {
+                if ($value->type() == "enum_definition_start" && $value->childs()[0]->value() == "enum") {
                     $enumword = true;
                     $excluded_keys[] = $key;
                 } else if ($enumword && $value->type() == "enum_body") {
@@ -170,10 +170,10 @@ class qtype_correctwriting_enum_catcher {
                     $this->analyze_enum($value);
                 }
             }
-        
-        //if enumeration not find, analize node for others enumeration rules 
-        if(!($enumbody&&$enumword) && $temp != null) {
-            foreach ($temp as $key => $value) {
+
+        //if enumeration not find, analize node for others enumeration rules
+        if(!($enumbody&&$enumword) && $childs != null) {
+            foreach ($childs as $key => $value) {
                 if (!in_array($key, $excluded_keys)) {
                     $this->find_enum_decl($value);
                 }
