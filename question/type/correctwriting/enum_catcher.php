@@ -54,6 +54,33 @@ class qtype_correctwriting_enum_catcher {
     }
 
     /**
+     * Search variable declaration in given node.
+     * @param object $node of syntax tree for correct answer.
+     */
+    protected function find_var_decl($node) {
+        $childs = null; // array of childs for curretn node.
+        // if variable declaration find, parse it,
+        // else search it in childs of current node.
+        if (!is_array($node) && $node->type()== "variable_declaration" && 
+            $node->childs()[1]->type() == "lvalue_or_assignment_list") {
+            $this->parse_var_decl($node->childs()[1], count($this->enums));
+        } else {
+            // get childs of current node
+            if(is_array($node))
+                $childs = $node;
+            else
+                $childs = $node->childs();
+
+            // if node has childs search variable declaration in they
+            if ($childs != null) {
+                foreach ($childs as $key => $value) {
+                    $this->find_var_decl($value);
+                }
+            }
+        }
+    }
+
+    /**
      * Parse early finded variable declaration.
      * @param $node - node of syntax tree for correct answer.
      * @param $enum_number number of enumeration, where we will append elements.
