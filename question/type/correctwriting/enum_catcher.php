@@ -255,78 +255,9 @@ class qtype_correctwriting_enum_catcher {
      * @param object $node of syntax tree for correct answer.
      * @param array $enum of enumeration elements.
      */
-    protected function find_math_expr($node,&$enum) {
-        // if current node is math expr work with it
-        // else search in it's childs
-        if (method_exists($node->childs()[1], "value") && ($node->childs()[1]->value() == "*"
-                                                       || $node->childs()[1]->value() == "+")) {
-            $enumpart = array(); //array of finded enum elements
-            $end = end($node->childs()); // right value of math epxr
-            $start = reset($node->childs()); // left value of math epxr
-            // Append left value to enumeration
-            // if left value is not identifier append it and search elements in it
-            // else just append 
-            if(get_class($start) != "block_formal_langs_c_token_identifier") {
-                if(method_exists($start->childs()[1], "value")
-                   && $start->childs()[1]->value() == $node->childs()[1]->value()) {
-                    $this->append_to_math_enum($start,$enumpart);
-                } else {
-                    $this->find_math_expr($start,$this->enums);
-                    $enumpart[] = $this->get_element_position($start);
-                }
-            } else {
-                $enumpart[] = [$start->token_index(), $start->token_index()];
-            }
-            // Append right value to enumeration
-            // if right value is not identifier append it and search elements in it
-            // else just append 
-            if(get_class($end) != "block_formal_langs_c_token_identifier") {
-                if(method_exists($end->childs()[1], "value")
-                   && $end->childs()[1]->value() == $node->childs()[1]->value()) {
-                    $this->append_to_math_enum($end,$enumpart);
-                } else {
-                    $this->find_math_expr($end,$this->enums);
-                    $enumpart[] = $this->get_element_position($end);
-                }
-            } else {
-                $enumpart[] = [$end->token_index(), $end->token_index()];
-            }
-            $enum[] = $enumpart;
-        } else {
-            // if current node are expression in brakets find enumeration in it
-            $is_find = false;
-            foreach ($node->childs() as $value) {
-                if(get_class($value) == "block_formal_langs_c_token_bracket" && $value->value() == "(") {
-                    $is_find =true;
-                }
-            }
-
-            if ($is_find) {
-                $this->find_math_expr($node->childs()[1],$this->enums);
-            }
-        }
-    }
-
-    /**
-     * Search and append init as element of enum.
-     * @param object $node of syntax tree for correct answer.
-     * @param array $enum of enumeration elements.
-     */
-    protected function find_long_init($node,&$enum) {
-        $childs = $node->childs(); // childs of current node
-        // if current node is init node append it
-        if (count($childs) == 3 && get_class($childs[0]) == "block_formal_langs_c_token_identifier"
-                                        && $childs[1]->value() == "=") {
-            $enum[] = [$childs[0]->token_index(),$childs[0]->token_index()];
-        }
-        // if current node childs may include init nodes search in childs
-        if (count($childs) == 3 && $childs[2]->type() == "expr_prec_10") {
-            $this->find_long_init($childs[2],$array);
-        // if current node is identifier node append it.
-        } else if (count($childs) == 3 && get_class($childs[2]) == "block_formal_langs_c_token_identifier") {
-            $enum[] = [$childs[2]->token_index(),$childs[2]->token_index()];
-        }
-
+    protected function find_math_expr($node) {
+        $this->find_positive_math_expr($node);
+        $this->find_negative_math_expr($node);
     }
 
     /**
