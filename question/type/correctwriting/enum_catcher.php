@@ -296,74 +296,7 @@ class qtype_correctwriting_enum_catcher {
     }
 
     /**
-     * Search typeword, by given $node object.
-     * @param object $node of syntax tree for correct answer.
-     */
-    protected function find_typeword($node) {
-        
-        // if current node is typeword node return true
-        // else search in childs
-        if (!is_array($node)&& $node->type() == "type") {
-            return true;
-        } else {
-            $childs = null;// childs of current node 
-
-            //Get childs of current node
-            if(is_array($node))
-                $childs = $node;
-            else
-                $childs = $node->childs();
-
-            // Search typeword in childs if they existed
-            if ($childs != null) {
-                $result = array();
-                
-                foreach ($temp as $value) {
-                    $result[] = $this->find_typeword($value);
-                }
-                
-                foreach ($result as $value) {
-                    if($value)
-                        return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Search expr_10 node, by given $node object.
-     * @param object $node of syntax tree for correct answer.
-     */
-    protected function find_expr_10($node) {
-        $childs = null; // childs for current node
-        $is_find = false; // boolean value show find expr_10 node or no
-        // get node childs
-        if(is_array($node))
-            $childs = $node;
-        else
-        {
-            // if current node is expr_10 node, search long init in it
-            // else get childs
-            if ($node->type() == "expr_prec_10") {
-                $enum = array();
-                $this->find_long_init($node,$enum);
-                $this->enums[] = $enum;
-                $is_find = true;
-            } else {
-                $childs = $node->childs();
-            }
-        }
-        // Search expr_10 node in childs of current node
-        if (!$is_find && $childs != null) {
-            foreach ($childs as $value) {
-                $this->find_expr_10($value);
-            }
-        }
-    }
-    
-    /**
-     * Analaze stmt $node, check rules for math, variable declaration and long init enumerations.
+     * Analyze stmt $node, check rules for math, logic, bit, variable declaration and long init enumerations.
      * @param object $node of syntax tree for correct answer.
      */
     protected function analyze_stmt($node) {
