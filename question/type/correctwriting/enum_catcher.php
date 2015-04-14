@@ -216,7 +216,10 @@ class qtype_correctwriting_enum_catcher {
      * @param object $node of syntax tree for correct answer.
      */
     protected function find_logic_expr($node) {
-        // TODO search logic expressions(||,&&,==,!=) in given node and in its childs.
+        $types = ["expr_logical_or","expr_logical_and","expr_equal","expr_notequal"];
+        foreach($types as $type) {
+            $this->find_enumeration_by_operator_type($node,$type,-1);
+        }
     }
 
     /**
