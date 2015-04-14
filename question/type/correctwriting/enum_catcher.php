@@ -132,27 +132,14 @@ class qtype_correctwriting_enum_catcher {
         }
     }
 
-            // append element to enumeration
-            foreach ($temp as $key => $value) {
-                if(!in_array($key, $excluded_keys)) {
-                    if($root) {
-                        $last = array();
-                        $this->find_var_decl($value,false,$last,false);
-                        $enum[] = $last;
-                    } else {
-                        $this->find_var_decl($value,false,$enum,false);
-                    }
-                }
-            }
-        } elseif (get_class($node) == "block_formal_langs_c_token_identifier") {
-            if ($node) {
-                $enum[] = [$node->token_index(),$node->token_index()];
-            }
-        }
-
-        //if current node is root, set enumeration field
-        if ($root) {
-            $this->enums = $enum;
+    /**
+     * Analyze struct body, to find enumeraton
+     * @param $node - node of syntax tree for correct answer.
+     */
+    protected function analyze_struct($node) {
+        $types = ["stmt_or_visibility_spec_list"];
+        foreach($types as $type) {
+            $this->find_enumeration_by_operator_type($node, $type, -1);
         }
     }
 
