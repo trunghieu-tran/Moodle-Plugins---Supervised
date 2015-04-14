@@ -396,7 +396,7 @@ abstract class qtype_preg_fa_node {
             $epstran->closetags = $tran->closetags;
             $wordbreak->mergedbefore[] = $epstran;
         }
-
+        $newkeys = array();
         // Intersect transitions.
         for ($i = 0; $i < count($wordbreakinto); $i++) {
             foreach ($intotransitions as $intotran) {
@@ -407,6 +407,7 @@ abstract class qtype_preg_fa_node {
                         $resultout = $wordbreakout[$i]->intersect($outtran);
                         if ($resultout !== null) {
                             $state = $automaton->add_state();
+                            $newkeys[] = $state;
                             $clone->from = $intotran->from;
                             $clone->to = $state;
                             $resultout->from = $state;
@@ -420,6 +421,8 @@ abstract class qtype_preg_fa_node {
                 }
             }
         }
+        $automaton->change_state_for_intersection($tran->from, $newkeys);
+        $automaton->change_state_for_intersection($tran->to, $newkeys);
         // Remove repeated uncapturing transitions.
         $automaton->remove_transition($tran);
     }
@@ -549,9 +552,11 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                 $uncapturing[] = clone $tran;
             }
         }
+
         if (!empty($uncapturing)) {
             $breakpos = null;
             foreach ($incoming as $intran) {
+                $newkeys = array();
                 if ($intran->consumeschars) {
                     $fromstates[] = $intran->from;
                     foreach ($uncapturing as $tran) {
@@ -563,6 +568,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                             $hasintersect = true;
                             $resulttran->from = $intran->from;
                             $resulttran->to = $tran->to;
+                            $newkeys[] = $tran->to;
                             if ($del) {
                                 $automaton->remove_transition($tran);
                             }
@@ -571,7 +577,6 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                             $changed[] = $resulttran->to;
                         } else if ($del) {
                             if ($breakpos === null) {
-
                                 $breakpos = $intran->pregleaf->position->compose($tran->pregleaf->position);
                             }
                             $automaton->remove_transition($tran);
@@ -581,6 +586,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                         $automaton->remove_transition($intran);
                     }
                 }
+                $automaton->change_state_for_intersection($intran->to, $newkeys);
             }
             $hastransitions = qtype_preg_fa_node::check_connection($automaton, $fromstates, $tostates);
             if (!$hasintersect && $breakpos !== null && !$hastransitions) {
@@ -603,6 +609,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
             foreach ($uncapturing as $tran) {
                 $fromstates[] = $tran->from;
                 foreach ($outgoing as $outtran) {
+                    $newkeys = array();
                     if ($outtran->consumeschars) {
                         if (count($fromstates === 1)) {
                             $tostates[] = $outtran->to;
@@ -612,6 +619,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                             $hasintersect = true;
                             $resulttran->from = $tran->from;
                             $resulttran->to = $outtran->to;
+                            $newkeys[] = $tran->from;
                             if ($del) {
                                 $automaton->remove_transition($tran);
                             }
@@ -628,6 +636,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                     if (count($incoming) === count($uncapturing)) {
                         $automaton->remove_transition($outtran);
                     }
+                    $automaton->change_state_for_intersection($outtran->from, $newkeys);
                 }
             }
             $hastransitions = qtype_preg_fa_node::check_connection($automaton, $fromstates, $tostates);

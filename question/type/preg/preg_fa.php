@@ -94,8 +94,6 @@ class qtype_preg_fa_transition {
     /** Array of qtype_preg_fa_transition objects merged to this transition and matched after it. */
     public $mergedafter;
 
-    public $innerautomata;
-
     public function __toString() {
         return $this->from . ' -> ' . $this->pregleaf->leaf_tohr() . ' -> ' . $this->to;
     }
@@ -117,7 +115,6 @@ class qtype_preg_fa_transition {
         $this->loopsback = false;
         $this->mergedbefore = array();
         $this->mergedafter = array();
-        $this->innerautomata = array();
     }
 
     public function __clone() {
@@ -659,6 +656,8 @@ class qtype_preg_fa {
     protected $statelimit;
     protected $transitionlimit;
 
+    protected $innerautomata;
+
     public function __construct($handler = null, $subexprrefs = array()) {
         $this->handler = $handler;
         $this->subexpr_ref_numbers = array();
@@ -666,6 +665,7 @@ class qtype_preg_fa {
             $this->subexpr_ref_numbers[] = $ref->number;
         }
         $this->set_limits();
+        $this->innerautomata = array();
     }
 
     public function handler() {
@@ -1222,7 +1222,7 @@ class qtype_preg_fa {
     }
 
     public function append_inner_automaton($state, $automaton, $direction) {
-        if (array_key_exists($state, $this->innerautomata) {
+        if (array_key_exists($state, $this->innerautomata)) {
             $this->innerautomata[$state][] = array($automaton, $direction);
         } else {
             $this->innerautomata[$state] = array(array($automaton, $direction));
