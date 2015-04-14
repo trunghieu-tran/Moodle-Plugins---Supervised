@@ -48,9 +48,34 @@ class qtype_correctwriting_enum_catcher {
         return $this->enums;
     }
 
-        if ($enum == null) {
-            $enum = array();
+    /**
+     * Parse early finded variable declaration.
+     * @param $node - node of syntax tree for correct answer.
+     * @param $enum_number number of enumeration, where we will append elements.
+     */
+    protected function parse_var_decl($node,$enum_number) {
+        $childs = NULL;
+        // get childs of current node
+        if(is_array($node))
+            $childs = $node;
+        else if ($node != NULL)
+            $childs = $node->childs();
+        // if node has childs
+        if ($childs != null) {
+            foreach($childs as $value) {
+                if ($value->type() == "lvalue_or_assignment_list") {
+                    $this->parse_var_decl($value,$enum_number);
+                } else if ($value->type() != "comma") {
+                    if (!in_array($enum_number, $this->enums)) {
+                        $enum_number = $enum_number == -1 ? count($enums):$enum_number;
+                        $this->enums[] = [];
+                    }
+                    $position = $this->get_element_position($value);
+                    $this->enums[$enum_number][] = [reset($position),end($position)];
+                } 
+            }
         }
+    }
 
         // if current node is type-node return true
         if (!$root && !is_array($node)) {
