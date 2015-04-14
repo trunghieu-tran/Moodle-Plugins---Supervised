@@ -271,7 +271,7 @@ class qtype_correctwriting_enum_catcher {
     protected function find_stmt($node) {
         $childs = null;// childs of current node.
         $is_find = false;// boolean value show find stmt node or no.
-        
+
         //Get childs of current node and search stmt in it.
         if(is_array($node))
             $childs = $node;
@@ -279,17 +279,19 @@ class qtype_correctwriting_enum_catcher {
         {
             // if current node stmt? analaze it,
             // else get childs
-            if ($node->type() == "stmt") {
+            if ($node != NULL && $node->type() == "stmt") {
                 $this->analyze_stmt($node);
                 $is_find = true;
-            } else {
+            } else if ( $node != NULL && $node->type() == "class_or_union_or_struct") {
+                $this->find_struct_decl($node);
+            } else if ($node != NULL) {
                 $childs = $node->childs();
             }
         }
 
         // Search stmt node in childs if it is need
         if (!$is_find && $childs != null) {
-            foreach ($temp as $value) {
+            foreach ($childs as $value) {
                 $this->find_stmt($value);
             }
         }
