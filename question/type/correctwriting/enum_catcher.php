@@ -39,6 +39,10 @@ class qtype_correctwriting_enum_catcher {
                 $empty[] = $i;
             }
         }
+        foreach($empty as $i) {
+            unset($this->enums[$i]);
+        }
+        $this->enums = array_values($this->enums);
     }
 
     /**
