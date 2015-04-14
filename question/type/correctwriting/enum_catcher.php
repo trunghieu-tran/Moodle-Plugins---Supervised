@@ -263,7 +263,10 @@ class qtype_correctwriting_enum_catcher {
      * @param object $node of syntax tree for correct answer.
      */
     protected function find_bit_expr($node) {
-        // TODO search binary expressions(|,&) in given node and in its childs.
+        $types = ["expr_binary_or","expr_binary_and","expr_binary_xor"];
+        foreach($types as $type) {
+            $this->find_enumeration_by_operator_type($node,$type,-1);
+        }
     }
 
     /**
