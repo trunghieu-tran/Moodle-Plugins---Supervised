@@ -28,14 +28,15 @@ class qtype_correctwriting_enum_catcher {
      */
     public function __construct($tree) {
         $this->enums = array();
-        //find enumeration on 2 levels statement and expression.
+        $empty = []; // Array of empty enumeration keys.
+        // Find enumeration on 2 levels statement and expression.
         $this->find_stmt($tree);
         $this->find_enum_decl($tree);
 
-        //clear up empty enumerations.
+        // Clear up empty enumerations.
         for ($i=0; $i < count($this->enums); $i++) {
-            if (count($this->enums[$i])==0) {
-                unset($this->enums[$i]);
+            if (count($this->enums[$i]) < 2) {
+                $empty[] = $i;
             }
         }
     }
