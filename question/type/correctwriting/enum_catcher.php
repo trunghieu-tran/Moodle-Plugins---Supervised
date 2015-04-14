@@ -109,35 +109,28 @@ class qtype_correctwriting_enum_catcher {
         }
     }
 
-        // if current node is type-node return true
-        if (!$root && !is_array($node)) {
-            if($node->type() == "type")
-                return true;
-        }
-
+    /**
+     * Find struct declaration.
+     * @param $node - node of syntax tree for correct answer.
+     */
+    protected function find_struct_decl($node) {
+        $childs = NULL;
         // get childs of current node
-        if($root&&is_array($node))
-            $temp = $node;
-        else
-            $temp = $node->childs();
-
+        if(is_array($node))
+            $childs = $node;
+        else if ($node != NULL)
+            $childs = $node->childs();
         // if node has childs
-        // else if current node is idetifier append it to enumeration
-        if ($temp != null) {
-
-            // update exluded keys array
-            foreach ($temp as $key => $value) {
-                if (get_class($value) == "block_formal_langs_c_token_operators" && $value->value() == "=") {
-                    $enum[] = [$temp[$key-1]->token_index(),$temp[$key+1]->token_index()];
-                    $excluded_keys[] = $key-1;
-                    $excluded_keys[] = $key;
-                    $excluded_keys[] = $key+1;
-                } elseif (get_class($value) == "block_formal_langs_c_token_operators" && $value->value() == "*") {
-                    $enum[] = [$value->token_index(),$temp[$key+1]->token_index()];
-                    $excluded_keys[] = $key;
-                    $excluded_keys[] = $key+1;
+        if($childs != null) {
+            foreach ($childs as $key => $value) {
+                if ($value->type() == "structure_body") {
+                    $this->analyze_struct($value);
+                } else {
+                    $this->find_struct_decl($value);
                 }
             }
+        }
+    }
 
             // append element to enumeration
             foreach ($temp as $key => $value) {
