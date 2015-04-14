@@ -235,8 +235,7 @@ class qtype_correctwriting_enum_catcher {
      * @param object $node of syntax tree for correct answer.
      */
     protected function get_element_position($node) {
-        $position = array();//array - enumeration's element position 
-        
+        $position = array();//array - enumeration's element position
         // calculate position
         // if current node is token? get position
         // else get position of first and last childs of current node
