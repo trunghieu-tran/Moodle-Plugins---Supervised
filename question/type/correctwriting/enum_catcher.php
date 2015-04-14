@@ -27,7 +27,7 @@ class qtype_correctwriting_enum_catcher {
      * @param object $tree syntax tree of correct answer.
      */
     public function __construct($tree) {
-
+        $this->enums = array();
         //find enumeration on 2 levels statement and expression.
         $this->find_stmt($tree);
         $this->find_enum_decl($tree);
