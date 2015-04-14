@@ -427,7 +427,7 @@ class qtype_correctwriting_enum_catcher {
      * @param object $node of syntax tree for correct answer.
      */
     protected function analyze_enum($node) {
-        $enumbody = null; // enumeration body 
+        $enumbody = null; // enumeration body
         // Search enumeration body
         foreach ($node->childs() as $value) {
             if ($value->type() == "enum_value_list")
@@ -437,7 +437,7 @@ class qtype_correctwriting_enum_catcher {
         if($enumbody!=null) {
             $enum = array();
             $this->parse_enum_value_list($node,$enum);
-            $this->enums = $enum;
+            $this->enums[] = $enum;
         }
     }
 
