@@ -259,6 +259,31 @@ class qtype_correctwriting_enum_catcher {
     }
 
     /**
+     * Search negative expressions (/ % -) in given node.
+     * @param object $node of syntax tree for correct answer.
+     */
+    protected function find_negative_math_expr($node) {
+        $types = ["expr_minus","expr_division","expr_modulosign"];
+        $count = count($this->enums);
+        foreach ($types as $type) {
+            $this->find_enumeration_by_operator_type($node,$type,-1);
+        }
+        // Find and remove first element of found enumeration.
+        foreach ($this->enums as $key=>$enum) {
+            $key2 = 0;
+            if ($key >= $count) {
+                foreach ($enum as $key1=>$element) {
+                    if (reset($enum[$key2]) >= reset($enum[$key1])) {
+                        $key2 = $key1;
+                    }
+                }
+                unset($this->enums[$key][$key2]);
+                $this->enums[$key] = array_values($this->enums[$key]);
+            }
+        }
+    }
+
+    /**
      * Search bit expression in given node.
      * @param object $node of syntax tree for correct answer.
      */
