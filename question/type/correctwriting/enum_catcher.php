@@ -447,9 +447,8 @@ class qtype_correctwriting_enum_catcher {
      * @param array $enum of enumeration elements.
      */
     protected function parse_enum_value_list($node,&$enum) {
-        $excluded_keys = array(); // array of excluded keys 
+        $excluded_keys = array(); // array of excluded keys
         $enum_elem = array(); // array to keep enumeration element position
-        
         // Search enumeration body
         foreach ($node->childs() as $key => $value) {
             if ($value->type() == "enum_value_list") {
@@ -461,14 +460,11 @@ class qtype_correctwriting_enum_catcher {
         foreach ($node->childs() as $key => $value) {
             if (!in_array($key, $excluded_keys)) {
                 // if element end append it to enumeration
-                // else append token position to array 
-                if ($value->value() == ",") {
-                    if (count($enum_elem)!=0) {
-                        $enum[] = [reset($enum_elem),end($enum_elem)];
-                        $enum_elem = array();
-                    }
-                } else if (get_class($value) != "block_formal_langs_c_token_bracket") {
-                    $enum_elem[] = $value->token_index();
+                // else append token position to array
+                if ($value->type() == "enum_value") {
+                    $enum_elem = $this->get_element_position($value);
+                    $enum[] = [reset($enum_elem),end($enum_elem)];
+                    $enum_elem = array();
                 }
             }
         }
@@ -478,4 +474,4 @@ class qtype_correctwriting_enum_catcher {
             $enum_elem = array();
         }
     }
-}
+}  
