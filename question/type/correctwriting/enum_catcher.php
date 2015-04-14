@@ -255,47 +255,6 @@ class qtype_correctwriting_enum_catcher {
     }
 
     /**
-     * Append element to enumeration, check math rules.
-     * @param object $node of syntax tree for correct answer.
-     * @param array $enum of enumeration elements.
-     */
-    protected function append_to_math_enum($node,&$enum) {
-        $start = reset($node->childs());// first child of current node
-        $end = end($node->childs());// last child of current node
-        
-        // if first child is composite check it for enumerations
-        // else append identifier to current enumeration
-        if(get_class($start) != "block_formal_langs_c_token_identifier") {
-            // if first child has same operation append it's childs to current enumeration
-            //else append it as one element
-            if(method_exists($start->childs()[1], "value")
-               && $start->childs()[1]->value() == $node->childs()[1]->value()) {
-                $this->append_to_math_enum($start,$enum);
-            } else {
-                $this->find_math_expr($start,$this->enums);
-                $enum[] = $this->get_element_position($start);
-            }
-        } else {
-            $enum[] = [$start->token_index(), $start->token_index()];
-        }
-        // if last child is composite check it for enumerations
-        // else append identifair to current enumeration
-        if(get_class($end) != "block_formal_langs_c_token_identifier") {
-            // if last child has same operation append it's childs to current enumeration
-            //else append it as one element
-            if(method_exists($end->childs()[1], "value")
-               && $end->childs()[1]->value() == $node->childs()[1]->value()) {
-                $this->append_to_math_enum($end,$enum);
-            } else {
-                $this->find_math_expr($end,$this->enums);
-                $enum[] = $this->get_element_position($end);
-            }
-        } else {
-            $enum[] = [$end->token_index(), $end->token_index()];
-        }
-    }
-
-    /**
      * Search math expression, by given $node object.
      * @param object $node of syntax tree for correct answer.
      * @param array $enum of enumeration elements.
