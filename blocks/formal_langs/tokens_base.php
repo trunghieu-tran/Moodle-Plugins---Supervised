@@ -456,15 +456,16 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
     }
 
     /**
-     * Calculates and return editing distance from
-     * $this to $token
-     * @param $options - comparing options
+     * Calculates and return editing distance from current token to other token
+     * @param block_formal_langs_token_base $token other token
+     * @param block_formal_langs_comparing_options $options options for comparing tokens
+     * @return int operations length
      */
     public function editing_distance($token, block_formal_langs_comparing_options $options) {
         if ($this->is_same($token, $options)) {// If two tokens are identical, return 0.
             return 0;
         }
-        if ($this->use_editing_distance()) {// Damerau-Levenshtein distance is default now.
+        if ($this->use_editing_distance() && $token->use_editing_distance()) {
             $distance = block_formal_langs_token_base::damerau_levenshtein($this->value(), $token->value(), $options);
         } else {// Distance not applicable, so return a big number.
             $distance = core_text::strlen($this->value()) + core_text::strlen($token->value());
