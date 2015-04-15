@@ -731,7 +731,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
             for ($k=0; $k < count($other); $k++) {
                 // incorrect lexem
                 if ($iscorrect == true) {
-                    $max = ceil($result);
+                    $max = floor($result);
                     // possible pair (typo)
                     $dist = $this->possible_pair($other[$k], $max, $options);
                     if ($dist != -1) {
