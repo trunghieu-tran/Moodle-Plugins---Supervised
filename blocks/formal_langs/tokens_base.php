@@ -1249,7 +1249,8 @@ class block_formal_langs_token_stream {
         $setspairs = array();
         $arraybestgroupsmatches = array();
         // recurcive_backtracking
-        $this->recurcive_backtracking_for_bypass($matches, $status, $setspairs);
+        $time = time();
+        $this->recurcive_backtracking_for_bypass($matches, $status, $setspairs, $time);
         if (count($setspairs)>0) {
             // first is the best
             $arraybestgroupsmatches[] = $setspairs[0];
@@ -1336,7 +1337,7 @@ class block_formal_langs_token_stream {
         }
     }
     
-    public function recurcive_backtracking_for_bypass(&$matches, &$status, &$setspairs) {
+    public function recurcive_backtracking_for_bypass(&$matches, &$status, &$setspairs, $time) {
         $place = -1;
         // empty set
         for ($i=0; $i<count($status); $i++) {
@@ -1347,7 +1348,8 @@ class block_formal_langs_token_stream {
         $place = $place+1;
         $countstatus = count($status);
         for ($i = $place; $i < $countstatus; $i++) {
-            if ($status[$i] == 0) {
+            $currenttime = time() - $time;            
+            if ($status[$i] == 0 && $currenttime - 1 < self::time_limit()) {
                 $status[$i] = 1;
                 // add new pair and bloking
                 $this->bloking_for_bypass($i, $matches, $status);
