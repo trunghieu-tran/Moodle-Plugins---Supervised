@@ -440,7 +440,6 @@ class qtype_preg_fa_leaf extends qtype_preg_fa_node {
 
         // Add a corresponding transition between them.
         $automaton->add_transition(new qtype_preg_fa_transition($start, $this->pregnode, $end));
-
         $stack[] = array('start' => $start, 'end' => $end, 'breakpos' => null);
     }
 }
@@ -1071,11 +1070,9 @@ class qtype_preg_fa_node_assert extends qtype_preg_fa_operator {
 
     public function accept() {
         // TODO; assertions are not supported yet.
-        if ($this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_PLA ||
-            $this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_NLA ||
-            $this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_PLB ||
+        if ($this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_NLA ||
             $this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_NLB) {
-            //return get_string($this->pregnode->subtype, 'qtype_preg');
+            return get_string($this->pregnode->subtype, 'qtype_preg');
         }
         return true;
     }
@@ -1085,7 +1082,12 @@ class qtype_preg_fa_node_assert extends qtype_preg_fa_operator {
         $body = array_pop($stack);
         $intersectedstate = $body['end'];
         $stack[] = $body;
-        $automaton->append_inner_automaton($intersectedstate, $innerautomaton, $this->pregnode->subtype);
+        if ($this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_PLA)
+        {
+            $automaton->append_inner_automaton($intersectedstate, $innerautomaton, 0);
+        } else {
+            $automaton->append_inner_automaton($intersectedstate, $innerautomaton, 1);
+        }
         $this->pregnode->operands = array();
         $this->pregnode->operands[] = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $concat =  new qtype_preg_fa_node_concat($this->pregnode, $this->matcher);
