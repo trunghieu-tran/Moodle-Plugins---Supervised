@@ -105,23 +105,29 @@ class qtype_preg_cross_tests_from_preg_intersection {
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>1, 1=>0, 2=>0),
-                        'length'=>array(0=>2, 1=>0, 2=>0));
+                        'index_first'=>array(0=>0, 1=>-1, 2=>0),
+                        'length'=>array(0=>0, 1=>-1, 2=>0));
 
         $test2 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>1, 1=>0, 2=>0),
-                        'length'=>array(0=>0, 1=>0, 2=>0));
+                        'index_first'=>array(0=>0, 1=>-1, 2=>0),
+                        'length'=>array(0=>0, 1=>-1, 2=>0));
 
         $test3 = array( 'str'=>'',
                         'is_match'=>true,
                         'full'=>true,
+                        'index_first'=>array(0=>0, 1=>-1, 2=>0),
+                        'length'=>array(0=>0, 1=>-1, 2=>0));
+
+        $test4 = array( 'str'=>'bc',
+                        'is_match'=>true,
+                        'full'=>true,
                         'index_first'=>array(0=>0, 1=>0, 2=>0),
-                        'length'=>array(0=>0, 1=>0, 2=>0));
+                        'length'=>array(0=>2, 1=>2, 2=>2));
 
         return array('regex'=>'(?=(bc)?)(bc|)',
-                     'tests'=>array($test1, $test2, $test3),
+                     'tests'=>array($test1, $test2, $test3, $test4),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
