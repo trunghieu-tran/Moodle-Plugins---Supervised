@@ -325,10 +325,10 @@ class qtype_preg_fa_transition {
         } else {
             if (!empty($resultbefore)) {
                 $assert = clone $resultbefore[count($resultbefore) - 1];
-                unset($resultbefore[count($resultbefore) - 1]);
+                //unset($resultbefore[count($resultbefore) - 1]);
             } else if (!empty($resultafter)) {
                 $assert = $resultafter[0];
-                unset($resultafter[0]);
+                //unset($resultafter[0]);
             } else {
                 $pregleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
                 $assert = new qtype_preg_fa_transition(0, $pregleaf, 1);
@@ -2347,7 +2347,9 @@ class qtype_preg_fa {
                         $addtran->from = $state;
                         $addtran->to = $copiedstate;
                         $addtran->redirect_merged_transitions();
-                        $this->add_transition($addtran);
+                        if ($copiedstate !== false) {
+                            $this->add_transition($addtran);
+                        }
                     }
                 }
                 $isend = false;
@@ -2376,7 +2378,9 @@ class qtype_preg_fa {
                         if ($tran->origin == qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND) {
                             $addtran->consumeschars = false;
                         }
-                        $this->add_transition($addtran);
+                        if ($copiedstate !== false) {
+                            $this->add_transition($addtran);
+                        }
                     }
                 }
             }
