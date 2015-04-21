@@ -254,7 +254,7 @@ class qtype_preg_cross_tests_from_preg_intersection {
 
         $test2 = array( 'str'=>'abcd',
                         'is_match'=>true,
-                        'full'=>false,
+                        'full'=>true,
                         'index_first'=>array(0=>0, 1=>1),
                         'length'=>array(0=>1, 1=>0));
 
