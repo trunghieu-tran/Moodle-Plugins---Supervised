@@ -1104,6 +1104,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $stack = array();
         $dstnode->create_automaton($result, $stack, $mergeassertions);
         $body = array_pop($stack);
+        $result->fastartstates = array($body['start']);
+        $result->faendstates = array($body['end']);
         $result->calculate_subexpr_start_and_end_states();
 
         if ($mergeassertions) {

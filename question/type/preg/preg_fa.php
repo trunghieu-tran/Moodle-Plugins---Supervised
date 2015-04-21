@@ -633,6 +633,8 @@ class qtype_preg_fa {
     /** @var array of of int ids of states - end states. */
     public $endstates = array();
 
+    public $fastartstates = array();
+    public $faendstates = array();
     // Regex handler
     protected $handler;
 
@@ -737,6 +739,9 @@ class qtype_preg_fa {
      * Returns the start states for automaton.
      */
     public function start_states($subpattern = 0) {
+        if ($subpattern == 0 && !isset($this->startstates[$subpattern])) {
+            return $this->fastartstates;
+        }
         return isset($this->startstates[$subpattern]) ? $this->startstates[$subpattern] : array();
     }
 
@@ -744,6 +749,9 @@ class qtype_preg_fa {
      * Return the end states of the automaton.
      */
     public function end_states($subpattern = 0) {
+        if ($subpattern == 0 && !isset($this->endstates[$subpattern])) {
+            return $this->faendstates;
+        }
         return isset($this->endstates[$subpattern]) ? $this->endstates[$subpattern] : array();
     }
 
