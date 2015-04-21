@@ -658,7 +658,7 @@ class qtype_preg_fa {
     protected $statelimit;
     protected $transitionlimit;
 
-    protected $innerautomata;
+    public $innerautomata;
 
     public function __construct($handler = null, $subexprrefs = array()) {
         $this->handler = $handler;
@@ -1422,7 +1422,7 @@ class qtype_preg_fa {
         foreach ($realanotherfanumbers as $num1) {
             foreach ($result as $num2) {
                 $resnumbers = explode(',', $num2, 2);
-                if (strpos($resnumbers[1], $num1) === 0) {
+                if (strpos($resnumbers[1], $num1) === 0 || $resnumbers[1] == $num1) {
                     $issuccessful = true;
                 }
             }
@@ -1946,7 +1946,7 @@ class qtype_preg_fa {
             }
             if ($numbers[1] != '') {
                 foreach ($anotherfastates as $num) {
-                    if (strpos($numbers[1], $num) === 0) {
+                    if (strpos($numbers[1], $num) === 0 || $numbers[1] == $num) {
                         $workstate2 = array_search($num, $anotherfastates);
                     }
                 }
@@ -1992,7 +1992,7 @@ class qtype_preg_fa {
 
             if ($numbers[1] != '') {
                 foreach ($anotherfastates as $num) {
-                    if (strpos($numbers[1], $num) === 0) {
+                    if (strpos($numbers[1], $num) === 0 || $numbers[1] == $num) {
                         $workstate2 = array_search($num, $anotherfastates);
                     }
                 }
@@ -2059,7 +2059,7 @@ class qtype_preg_fa {
                 $numbers = explode(',', $resultnumber, 2);
                 $workstate1 = array_search($numbers[0], $this->statenumbers);
                 foreach ($secondnumbers as $num) {
-                    if (strpos($numbers[1], $num) === 0) {
+                    if (strpos($numbers[1], $num) === 0 || $numbers[1] == $num) {
                         $workstate2 = array_search($num, $secondnumbers);
                     }
                 }
@@ -2290,6 +2290,7 @@ class qtype_preg_fa {
         $result = $this->intersect_fa($anotherfa, $number, $isstart);
         $result->remove_unreachable_states();
         $result->lead_to_one_end();
+        $result->handler = $this->handler;
         return $result;
     }
 
@@ -2319,7 +2320,7 @@ class qtype_preg_fa {
                 $workstate1 = array_search($numbers[0], $firstnumbers);
                 if ($numbers[1] != '') {
                     foreach ($secondnumbers as $num) {
-                        if (strpos($numbers[1], $num) === 0) {
+                        if (strpos($numbers[1], $num) === 0 || $numbers[1] == $num) {
                             $workstate2 = array_search($num, $secondnumbers);
                         }
                     }
