@@ -141,8 +141,8 @@ class qtype_preg_cross_tests_from_preg_intersection {
         $test2 = array( 'str'=>'bc',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>0, 2=>0, 3=>1),
-                        'length'=>array(0=>2, 1=>2, 2=>2, 3=>1));
+                        'index_first'=>array(0=>0, 1=>0, 2=>1),
+                        'length'=>array(0=>2, 1=>2, 2=>1));
 
         $test3 = array( 'str'=>'a',
                         'is_match'=>false,
@@ -152,7 +152,7 @@ class qtype_preg_cross_tests_from_preg_intersection {
                         'left'=>array(1),
                         'next'=>'b');
 
-        return array('regex'=>'(?=(bc)?)(b(c|))',
+        return array('regex'=>'(?=bc?)(b(c|))',
                      'tests'=>array($test1, $test2, $test3),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
@@ -167,16 +167,16 @@ class qtype_preg_cross_tests_from_preg_intersection {
         $test2 = array( 'str'=>'ad',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>1),
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>1, 1=>0),
                         'left'=>array(1),
                         'next'=>'b');
 
         $test3 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>1),
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>1, 1=>0),
                         'left'=>array(1),
                         'next'=>'b');
 
@@ -194,11 +194,9 @@ class qtype_preg_cross_tests_from_preg_intersection {
 
         $test2 = array( 'str'=>'abcd',
                         'is_match'=>true,
-                        'full'=>false,
+                        'full'=>true,
                         'index_first'=>array(0=>0, 1=>4),
-                        'length'=>array(0=>4, 1=>0),
-                        'left'=>array(1),
-                        'next'=>'b');
+                        'length'=>array(0=>4, 1=>0));
 
         $test3 = array( 'str'=>'a',
                         'is_match'=>true,
