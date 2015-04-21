@@ -1116,6 +1116,14 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             throw new qtype_preg_empty_fa_exception('', $body['breakpos']);
         }
 
+        // Intersect complex assertions automata.
+        foreach ($result->innerautomata as $state => $inner) {
+            foreach ($inner as $automaton) {
+                $result = $result->intersect($automaton[0], $state, $automaton[1]);
+            }
+        }
+        $result->calculate_subexpr_start_and_end_states();
+        printf($result->fa_to_dot(null, null, true));
         /*global $CFG;
         $CFG->pathtodot = '/usr/bin/dot';
         $namesuffix = $mergeassertions ? "merged" : "original";
