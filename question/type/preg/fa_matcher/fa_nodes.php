@@ -259,12 +259,11 @@ abstract class qtype_preg_fa_node {
                     $tran->redirect_merged_transitions();
                     $automaton->add_transition($tran);
                     $transitionadded = true;
-                    $newkeys[] = $tran->to;
                 } else if ($breakpos === null) {
                     $breakpos = $del->pregleaf->position->compose($tran->pregleaf->position);
                 }
             }
-            $automaton->change_state_for_intersection($del->to, $newkeys);
+            $automaton->change_state_for_intersection($del->to, array($del->from));
         } else {
             foreach ($clonetransitions as &$tran) {
                 $fromstates[] = $tran->from;
