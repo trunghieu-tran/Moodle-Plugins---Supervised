@@ -2182,5 +2182,60 @@ class qtype_preg_cross_tests_from_preg_merging {
                      'tests'=>array($test1, $test2));
     }
 
+    // Execute subpatterns.
+    function data_for_test_asserts_subpatterns_1() {
+        $test1 = array( 'str'=>'cat is cat',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>0),
+                        'length'=>array(0=>10, 1=>3),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 
+        $test2 = array( 'str'=>'cat is cat!',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>0),
+                        'length'=>array(0=>10, 1=>3),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        $test3 = array( 'str'=>'cat is catt',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0, 1=>0),
+                        'length'=>array(0=>10, 1=>3),
+                        'left'=>array(0),
+                        'next'=>'',
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        $test4 = array( 'str'=>'a cat is cat',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>2, 1=>2),
+                        'length'=>array(0=>10, 1=>3),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        return array('regex'=>'(\bcat\b) is (?1)',
+                     'tests'=>array($test1, $test2, $test3, $test4));
+    }
+
+    function data_for_test_asserts_subpatterns_2() {
+        $test1 = array( 'str'=>'b!c&d',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>0, 2=>1),
+                        'length'=>array(0=>5, 1=>1, 2=>1),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        $test2 = array( 'str'=>'b!!bd',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0, 1=>0, 2=>1),
+                        'length'=>array(0=>2, 1=>1, 2=>1),
+                        'left'=>array(3),
+                        'next'=>'c',
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        return array('regex'=>'(\b[b&])(\b[c!])(?2)(?1)\bd',
+                     'tests'=>array($test1, $test2));
+    }
 }
