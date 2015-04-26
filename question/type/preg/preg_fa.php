@@ -1231,6 +1231,7 @@ class qtype_preg_fa {
                 unset($this->endstates[$subpatt][$key]);
             }
         }
+
     }
 
     public function append_inner_automaton($state, $automaton, $direction) {
@@ -1595,14 +1596,14 @@ class qtype_preg_fa {
      * @param direction - direction of coping (0 - forward; 1 - back).
      * @return automata after coping.
      */
-    public function copy_modify_branches($source, $oldfront, $stopcoping, $direction) {
+    public function copy_modify_branches($source, $oldfront, $stopcoping, $direction, $origin = null) {
         $resultstop = null;
         $memoryfront = array();
         $newfront = array();
         $newmemoryfront = array();
         // Getting origin of automata.
         $states = $source->get_states();
-        if (!empty($states)) {
+        if ($origin === null && !empty($states)) {
             $keys = array_keys($states);
             $transitions = $source->get_adjacent_transitions($states[$keys[0]], true);
             $keys = array_keys($transitions);
@@ -2060,11 +2061,13 @@ class qtype_preg_fa {
                 $secondnumbers = $anotherfa->get_state_numbers();
                 $resnumbers = $result->get_state_numbers();
                 $resultnumber = $resnumbers[$curstate];
+
                 $numbers = explode(',', $resultnumber, 2);
                 $workstate1 = array_search($numbers[0], $this->statenumbers);
                 foreach ($secondnumbers as $num) {
                     if (strpos($numbers[1], $num) === 0 || $numbers[1] == $num) {
                         $workstate2 = array_search($num, $secondnumbers);
+
                     }
                 }
                 // Get transitions for ntersection.
