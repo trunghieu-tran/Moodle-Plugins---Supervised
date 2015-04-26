@@ -94,6 +94,7 @@ class qtype_preg_fa_transition {
     /** Array of qtype_preg_fa_transition objects merged to this transition and matched after it. */
     public $mergedafter;
 
+
     public function __toString() {
         return $this->from . ' -> ' . $this->pregleaf->leaf_tohr() . ' -> ' . $this->to;
     }
@@ -520,9 +521,9 @@ class qtype_preg_fa_transition {
         $resultleaf = $this->pregleaf->intersect_leafs($other->pregleaf, $thishastags, $otherhastags);
         if ($resultleaf != null) {
             if (($this->is_eps() || $this->is_unmerged_assert()) && (!$other->is_eps() && !$other->is_unmerged_assert())) {
-                $resulttran = new qtype_preg_fa_transition(0, $resultleaf, 1, $other->origin, $other->consumeschars);
+                $resulttran = null;
             } else if (($other->is_eps() || $other->is_unmerged_assert()) && (!$this->is_eps() && !$this->is_unmerged_assert())) {
-                $resulttran = new qtype_preg_fa_transition(0, $resultleaf, 1, $this->origin, $this->consumeschars);
+                $resulttran = null;
             } else {
                 $resulttran = new qtype_preg_fa_transition(0, $resultleaf, 1, self::ORIGIN_TRANSITION_INTER);
             }
