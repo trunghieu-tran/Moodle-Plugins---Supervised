@@ -2115,6 +2115,7 @@ class qtype_preg_fa {
                         $resulttransitions[$i]->from = $newstate;
                         $resulttransitions[$i]->to = $curstate;
                     }
+                    $resulttransitions[$i]->redirect_merged_transitions();
                     if (!$result->has_same_transition($resulttransitions[$i]))
                     {
                         $result->add_transition($resulttransitions[$i]);
@@ -2156,11 +2157,11 @@ class qtype_preg_fa {
                 }
             }
         }
+
         // Get cycle if it's nessessary.
         $newfront = array();
         $resultnumbers = $result->get_state_numbers();
         if ($withcycle) {
-
             foreach ($possibleend as $state) {
                 $aregone = array();
                 $isfind = false;
@@ -2179,6 +2180,7 @@ class qtype_preg_fa {
                             $divstate = $curstate;
                         }
                         $numbers = explode(',', $resultnumbers[$curstate], 2);
+
                         // State with same number is found.
                         if ($numbers[0] == $numbertofind && $numbers[1] !== '' && strpos($searchnumbers[1], $numbers[1]) !== false) {
                             if ($direction == 0) {
@@ -2186,6 +2188,7 @@ class qtype_preg_fa {
                                 foreach ($transitions as $tran) {
                                     $clonetran = clone($tran);
                                     $clonetran->from = $state;
+                                    $clonetran->redirect_merged_transitions();
                                     if (!$result->has_same_transition($clonetran))
                                     {
                                         $result->add_transition($clonetran);
@@ -2211,6 +2214,7 @@ class qtype_preg_fa {
                                                 // No nessesary of coping.
                                                 $fromtran = clone($tran);
                                                 $fromtran->to = $clonestate;
+                                                $fromtran->redirect_merged_transitions();
                                                 $result->add_transition($fromtran);
                                                 $lastcopied = true;
                                             } else {
@@ -2225,6 +2229,7 @@ class qtype_preg_fa {
                                                 }
                                                 $clonestate = $result->add_state($newnumber);
                                                 $fromtran->from = $clonestate;
+                                                $fromtran->redirect_merged_transitions();
                                                 $result->add_transition($fromtran);
                                                 $frontstate = $tran->from;
                                             }
@@ -2295,6 +2300,7 @@ class qtype_preg_fa {
         $this->remove_unreachable_states();
         $anotherfa->remove_unreachable_states();
         $result = $this->intersect_fa($anotherfa, $number, $isstart);
+
         $result->remove_unreachable_states();
         $result->lead_to_one_end();
         $result->handler = $this->handler;
