@@ -1053,6 +1053,9 @@ class qtype_preg_fa {
             // Current state wasn't passed.
             if (!in_array($curstate, $aregoneforward) || !in_array($curstate, $aregoneback)) {
                 $this->remove_state($curstate);
+                if (array_key_exists($curstate, $this->innerautomata)) {
+                    unset($this->innerautomata[$curstate]);
+                }
             }
         }
     }
