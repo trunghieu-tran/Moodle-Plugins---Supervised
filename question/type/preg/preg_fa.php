@@ -884,6 +884,12 @@ class qtype_preg_fa {
         return array_keys($result);
     }
 
+    private function states_numbers_to_ids() {
+        foreach ($this->statenumbers as $id => $number) {
+            $number = $id;
+        }
+    }
+
     /**
      * Calculates start and end states for subpatterns.
      */
@@ -2304,6 +2310,7 @@ class qtype_preg_fa {
         $result->remove_unreachable_states();
         $result->lead_to_one_end();
         $result->handler = $this->handler;
+        $result->states_numbers_to_ids();
         return $result;
     }
 
