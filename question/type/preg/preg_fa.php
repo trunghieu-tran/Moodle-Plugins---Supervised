@@ -2327,7 +2327,6 @@ class qtype_preg_fa {
                 }
             }
             foreach ($front as $state) {
-                $isend = false;
                 // Get states from first and second automata.
                 $numbers = explode(',', $this->statenumbers[$state], 2);
                 $workstate1 = array_search($numbers[0], $firstnumbers);
@@ -2338,10 +2337,7 @@ class qtype_preg_fa {
                         }
                     }
                 }
-                if ($fa->has_endstate($workstate1)) {
-                    $isend = true;
-                }
-                if (!$isend) {
+                if (!$fa->has_endstate($workstate1)) {
                     $transitions = $fa->get_adjacent_transitions($workstate1, true);
                     foreach ($transitions as $tran) {
                         $oldfront[] = $tran->to;
@@ -2365,16 +2361,12 @@ class qtype_preg_fa {
                         }
                     }
                 }
-                $isend = false;
-                if ($anotherfa->has_endstate($workstate2)) {
-                    $isend = true;
-                }
-                if (!$isend) {
+                if (!$anotherfa->has_endstate($workstate2)) {
                     $transitions = $anotherfa->get_adjacent_transitions($workstate2, true);
                     foreach ($transitions as $tran) {
                         $oldfront[] = $tran->to;
                     }
-                    $this->copy_modify_branches($anotherfa, $oldfront, null, $direction);
+                    $this->copy_modify_branches($anotherfa, $oldfront, null, $direction, qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND);
                     // Connect last state of intersection and copied branch.
                     foreach ($transitions as $tran) {
                         // Get number of copied state.
@@ -2387,10 +2379,9 @@ class qtype_preg_fa {
                         $addtran = clone $tran;
                         $addtran->from = $state;
                         $addtran->to = $copiedstate;
+                        $addtran->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
                         $addtran->redirect_merged_transitions();
-                        if ($tran->origin == qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND) {
-                            $addtran->consumeschars = false;
-                        }
+                        $addtran->consumeschars = false;
                         if ($copiedstate !== false) {
                             $this->add_transition($addtran);
                         }
@@ -2405,7 +2396,6 @@ class qtype_preg_fa {
                 }
             }
             foreach ($front as $state) {
-                $isstart = false;
                 // Get states from first and second automata.
                 $numbers = explode(',', $this->statenumbers[$state], 2);
                 $workstate1 = array_search($numbers[0], $firstnumbers);
@@ -2416,10 +2406,7 @@ class qtype_preg_fa {
                         }
                     }
                 }
-                if ($fa->has_startstate($workstate1)) {
-                    $isstart = true;
-                }
-                if (!$isstart) {
+                if (!$fa->has_startstate($workstate1)) {
                     $transitions = $fa->get_adjacent_transitions($workstate1, false);
                     foreach ($transitions as $tran) {
                         $oldfront[] = $tran->from;
@@ -2441,11 +2428,7 @@ class qtype_preg_fa {
                         $this->add_transition($addtran);
                     }
                 }
-                $isstart = false;
-                if ($anotherfa->has_startstate($workstate2)) {
-                    $isstart = true;
-                }
-                if (!$isstart) {
+                if (!$anotherfa->has_startstate($workstate2)) {
                     $transitions = $anotherfa->get_adjacent_transitions($workstate2, false);
                     foreach ($transitions as $tran) {
                         $oldfront[] = $tran->from;
@@ -2523,8 +2506,10 @@ class qtype_preg_fa {
         } else {
             $this->get_intersection_part($anotherfa, $result, $stop, $isstart, false);
         }
+
         // Set right start and end states for completing branches.
         $result->set_start_end_states_before_coping($this, $anotherfa);
+
         if ($result->has_successful_intersection($this, $anotherfa, $isstart)) {
             // Cleaning end states.
             $result->remove_all_end_states();
