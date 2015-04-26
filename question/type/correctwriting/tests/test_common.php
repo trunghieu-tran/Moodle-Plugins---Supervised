@@ -49,4 +49,31 @@ class qtype_correctwriting_common_test extends PHPUnit_Framework_TestCase {
         $this->assertEquals(get_class($question->matchedresults->mistakes()[1]),'qtype_correctwriting_lexeme_absent_mistake');
         $this->assertEquals(get_class($question->matchedresults->mistakes()[2]),'qtype_correctwriting_lexeme_added_mistake');
     }
+    // опечатки, пропущенные лексемы, лишние лексемы
+    public function test_typo_drop_addition_lexemes_100() {
+        $language = new block_formal_langs_language_simple_english();
+        $question = new qtype_correctwriting_question();
+        $question->usecase = true;
+        $question->lexicalerrorthreshold = 3000;
+        $question->lexicalerrorweight = 0.1;
+        $question->usedlanguage = $language;
+        $question->movedmistakeweight = 0.1;
+        $question->absentmistakeweight = 0.11;
+        $question->addedmistakeweight = 0.12;
+        $question->hintgradeborder = 0.75;
+        $question->maxmistakepercentage = 0.95;
+        $question->qtype = new qtype_correctwriting();
+        $question->islexicalanalyzerenabled = 1;
+        $question->isenumanalyzerenabled = 0;
+        $question->issequenceanalyzerenabled = 0;
+        $question->issyntaxanalyzerenabled = 0;
+        // Input data.
+        $answers = array((object)array('id' => 1, 'answer' => 'a data template', 'fraction' => 1.0));
+        $question->answers = $answers;
+        $state = $question->grade_response(array('answer' => 'r date tenplate function'));
+        $this->assertEquals(count($question->matchedresults->mistakes()),3);
+        $this->assertEquals(get_class($question->matchedresults->mistakes()[0]),'qtype_correctwriting_lexical_mistake');
+        $this->assertEquals(get_class($question->matchedresults->mistakes()[1]),'qtype_correctwriting_lexical_mistake');
+        $this->assertEquals(get_class($question->matchedresults->mistakes()[2]),'qtype_correctwriting_lexical_mistake');
+    }
 }
