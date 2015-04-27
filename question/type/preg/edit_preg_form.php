@@ -270,13 +270,13 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         }
 
         // Check that interactive hint settings doesn't contradict overall hint settings.
-        $langobj = block_formal_langs::lang_object($data['langid']);
         $interactivehints = $data['interactivehint'];
         foreach($interactivehints as $key => $hint) {
             if ($hint == 'hintnextchar' && $data['usecharhint'] != true) {
                 $errors['interactivehint['.$key.']'] = get_string('unallowedhint', 'qtype_preg', get_string('hintnextchar', 'qtype_preg'));
             }
             if ($hint == 'hintnextlexem' && $data['uselexemhint'] != true) {
+                $langobj = block_formal_langs::lang_object($data['langid']);
                 $errors['interactivehint['.$key.']'] = get_string('unallowedhint', 'qtype_preg', get_string('hintnextlexem', 'qtype_preg', $langobj->lexem_name()));
             }
         }
