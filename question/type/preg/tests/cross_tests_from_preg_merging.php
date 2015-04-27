@@ -2238,4 +2238,79 @@ class qtype_preg_cross_tests_from_preg_merging {
         return array('regex'=>'(\b[b&])(\b[c!])(?2)(?1)\bd',
                      'tests'=>array($test1, $test2));
     }
+
+    function data_for_test_asserts_subpatterns_3() {
+        $test1 = array( 'str'=>'a=a',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>0, 2=>2, 3=>1),
+                        'length'=>array(0=>3, 1=>1, 2=>1, 3=>1),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        $test2 = array( 'str'=>' a=a ',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>1, 1=>1, 2=>3, 3=>2),
+                        'length'=>array(0=>3, 1=>1, 2=>1, 3=>1),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        $test3 = array( 'str'=>'a=ab',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0, 1=>0, 2=>2, 3=>1),
+                        'length'=>array(0=>3, 1=>1, 2=>1, 3=>1),
+                        'left'=>array(0),
+                        'next'=>'',
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        $test4 = array( 'str'=>'a!c!b',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>1, 1=>1, 2=>3, 3=>2),
+                        'length'=>array(0=>3, 1=>1, 2=>1, 3=>1),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        return array('regex'=>'(\b(a|!)\b)(c|=)(?1)',
+                     'tests'=>array($test1, $test2, $test3, $test4));
+    }
+
+    function data_for_test_asserts_subpatterns_4() {
+        $test1 = array( 'str'=>'a=a=c',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>0),
+                        'length'=>array(0=>4, 1=>2),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        $test2 = array( 'str'=>'!c',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>0),
+                        'length'=>array(0=>2, 1=>2),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        $test3 = array( 'str'=>'!c!c',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>0),
+                        'length'=>array(0=>4, 1=>2),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        $test4 = array( 'str'=>'a=a=a=a=b',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>0),
+                        'length'=>array(0=>8, 1=>2),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        $test5 = array( 'str'=>'!c!c!c!c',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>0),
+                        'length'=>array(0=>8, 1=>2),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        return array('regex'=>'([a!]\b[c=]\b)(?1)*',
+                     'tests'=>array($test1, $test2, $test3, $test4));
+    }
 }
