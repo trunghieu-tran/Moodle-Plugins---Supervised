@@ -2311,6 +2311,125 @@ class qtype_preg_cross_tests_from_preg_merging {
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 
         return array('regex'=>'([a!]\b[c=]\b)(?1)*',
+                     'tests'=>array($test1, $test2, $test3, $test4, $test5));
+    }
+
+    // Recursion and asserts
+    function data_for_test_asserts_recursion_1() {
+        $test1 = array( 'str'=>'ab?cyz',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>2, 2=>2),
+                        'length'=>array(0=>6, 1=>2, 2=>2),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        $test2 = array( 'str'=>'ab?d?cyz',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>2, 2=>2),
+                        'length'=>array(0=>8, 1=>4, 2=>4),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        $test3 = array( 'str'=>'a!d?cyz',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>2, 2=>2),
+                        'length'=>array(0=>7, 1=>3, 2=>3),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        $test4 = array( 'str'=>'a!d?d?cyz',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>2, 2=>2),
+                        'length'=>array(0=>9, 1=>5, 2=>5),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        return array('regex'=>'a[b!](\b([c=]|[d?](?1)))yz',
                      'tests'=>array($test1, $test2, $test3, $test4));
+    }
+
+    function data_for_test_asserts_recursion_2() {
+        $test1 = array( 'str'=>'ac!d',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1, 2=>1),
+                        'length'=>array(0=>4, 1=>2, 2=>2),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        $test2 = array( 'str'=>'ac=c!d',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1, 2=>1),
+                        'length'=>array(0=>6, 1=>4, 2=>4),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        $test3 = array( 'str'=>'a=b?',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1, 2=>1),
+                        'length'=>array(0=>4, 1=>2, 2=>2),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        $test4 = array( 'str'=>'a=c=b?',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1, 2=>1),
+                        'length'=>array(0=>6, 1=>4, 2=>4),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        return array('regex'=>'a(([b!]|[c=](?1))\b)[d?]',
+                     'tests'=>array($test1, $test2, $test3, $test4));
+    }
+
+    function data_for_test_asserts_recursion_3() {
+        $test1 = array( 'str'=>"a\nk\nbyz",
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>2, 2=>3),
+                        'length'=>array(0=>7, 1=>3, 2=>3),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        $test2 = array( 'str'=>"a\nk\nk\nbyz",
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>2, 2=>2),
+                        'length'=>array(0=>9, 1=>5, 2=>5),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        $test3 = array( 'str'=>"a\nbyz",
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>2, 2=>2),
+                        'length'=>array(0=>5, 1=>1, 2=>1),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        return array('regex'=>'(?m)a[cd\n](^(b|k[e\n](?1)))yz',
+                     'tests'=>array($test1, $test2, $test3));
+    }
+
+    function data_for_test_asserts_recursion_4() {
+        $test1 = array( 'str'=>"aek\nb\nx",
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1, 2=>1),
+                        'length'=>array(0=>7, 1=>4, 2=>4),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        $test2 = array( 'str'=>"aek\nk\nb\nx",
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1, 2=>1),
+                        'length'=>array(0=>9, 1=>6, 2=>6),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        $test3 = array( 'str'=>"a\nb\nx",
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1, 2=>1),
+                        'length'=>array(0=>5, 1=>2, 2=>2),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+
+        return array('regex'=>'(?m)a((\nb|[e\n]k(?1))$)[cd\n]x',
+                     'tests'=>array($test1, $test2, $test3));
     }
 }
