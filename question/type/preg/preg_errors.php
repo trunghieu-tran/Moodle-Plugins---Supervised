@@ -145,3 +145,12 @@ class qtype_preg_empty_fa_error extends qtype_preg_error {
         parent::__construct($errormsg, $regex, $position);
     }
 }
+
+class qtype_preg_mergedassertion_option_error extends qtype_preg_error {
+
+    public function __construct($regex, $position = null) {
+        $errormsg = get_string('mergedassertion_option', 'qtype_preg');
+
+        parent::__construct($errormsg, $regex, $position);
+    }
+}
