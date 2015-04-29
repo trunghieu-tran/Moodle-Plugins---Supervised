@@ -64,7 +64,7 @@ abstract class qtype_preg_syntax_tree_node {
     /**
      * Returns true if this node is supported, rejection string otherwise.
      */
-    public function accept() {
+    public function accept($options) {
         return true; // Accepting anything by default.
     }
 
