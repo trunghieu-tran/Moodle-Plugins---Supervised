@@ -510,7 +510,7 @@ class qtype_preg_regex_handler {
         $enginenodename = $this->get_engine_node_name($pregnode->type, $pregnode->subtype);
         if (class_exists($enginenodename)) {
             $enginenode = new $enginenodename($pregnode, $this);
-            $acceptresult = $enginenode->accept();
+            $acceptresult = $enginenode->accept($this->options);
             if ($acceptresult !== true && !isset($this->errors[$enginenodename])) {
                 // Highlight first occurence of the unaccepted node.
                 $this->errors[$enginenodename] = new qtype_preg_accepting_error($this->regex, $this->name(), $acceptresult, $pregnode);

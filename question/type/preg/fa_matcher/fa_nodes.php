@@ -43,7 +43,7 @@ abstract class qtype_preg_fa_node {
     /**
      * Returns true if this node is supported by the engine, rejection string otherwise.
      */
-    public function accept() {
+    public function accept($options) {
         return true; // Accepting anything by default.
     }
 
@@ -731,7 +731,7 @@ class qtype_preg_fa_node_alt extends qtype_preg_fa_operator {
  */
 abstract class qtype_preg_fa_node_quant extends qtype_preg_fa_operator {
 
-    public function accept() {
+    public function accept($options) {
         if ($this->pregnode->possessive) {
             return get_string('possessivequant', 'qtype_preg');
         }
@@ -981,7 +981,7 @@ class qtype_preg_fa_node_finite_quant extends qtype_preg_fa_node_quant {
  */
 class qtype_preg_fa_node_subexpr extends qtype_preg_fa_operator {
 
-    public function accept() {
+    public function accept($options) {
         if ($this->pregnode->subtype === qtype_preg_node_subexpr::SUBTYPE_ONCEONLY) {
             return get_string($this->pregnode->subtype, 'qtype_preg');
         }
@@ -1048,7 +1048,7 @@ class qtype_preg_fa_node_cond_subexpr extends qtype_preg_fa_operator {
         $this->operands = array($matcher->from_preg_node($grouping));
     }
 
-    public function accept() {
+    public function accept($options) {
         if ($this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR &&
             $this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION &&
             $this->pregnode->subtype != qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE) {
@@ -1067,7 +1067,7 @@ class qtype_preg_fa_node_cond_subexpr extends qtype_preg_fa_operator {
  */
 class qtype_preg_fa_node_assert extends qtype_preg_fa_operator {
 
-    public function accept() {
+    public function accept($options) {
         // TODO; assertions are not supported yet.
         if ($this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_NLA ||
             $this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_NLB) {
