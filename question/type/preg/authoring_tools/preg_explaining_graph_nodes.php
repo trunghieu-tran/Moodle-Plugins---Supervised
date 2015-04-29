@@ -58,7 +58,7 @@ abstract class qtype_preg_explaining_graph_node_abstract {
      * Checks admissibility of node by the engine.
      * @return bool True if this node is supported by the engine.
      */
-    public function accept() {
+    public function accept($options) {
         switch ($this->pregnode->type) {
             case qtype_preg_node::TYPE_LEAF_CONTROL:
                 return get_string($this->pregnode->type, 'qtype_preg');
@@ -648,7 +648,7 @@ class qtype_preg_explaining_graph_node_cond_subexpr extends qtype_preg_explainin
         }
     }
 
-    /*public function accept() {
+    /*public function accept($options) {
         // Failing conditional subexpressions before finding a good way to show each of them.
         // TODO - remove when consensus will emerge.
         return get_string($this->pregnode->type, 'qtype_preg');
