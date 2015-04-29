@@ -1073,6 +1073,9 @@ class qtype_preg_fa_node_assert extends qtype_preg_fa_operator {
             $this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_NLB) {
             return get_string($this->pregnode->subtype, 'qtype_preg');
         }
+        if (!$options->mergeassertions) {
+            throw new qtype_preg_mergedassertion_option_exception('');
+        }
         return true;
     }
 
