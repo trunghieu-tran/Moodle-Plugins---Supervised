@@ -104,7 +104,7 @@ abstract class qtype_preg_description_node {
     /**
      * returns true if engine support the node, rejection string otherwise
      */
-    public function accept() {
+    public function accept($options) {
         return true;
     }
 
