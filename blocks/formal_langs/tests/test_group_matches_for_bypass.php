@@ -65,8 +65,11 @@ class blocks_formal_langs_token_base_group_matches_test extends UnitTestCase {
         array_push($sets_of_pairs, $set_of_pairs1);
         array_push($sets_of_pairs, $set_of_pairs2);
 
-        list($result)=$token_stream->group_matches_for_bypass($matches);
-        $this->assertTrue(count($token_stream->group_matches_for_bypass($matches))==2);
+        $groups = $token_stream->group_matches_for_bypass($matches);
+        $this->assertTrue(count($groups)==1);
+        /** @var block_formal_langs_matches_group $group */
+        $group = $groups[0];
+        $this->assertTrue(count($group->matchedpairs) == 1);
     }
     
     function test_group_matches_4() {
@@ -101,7 +104,11 @@ class blocks_formal_langs_token_base_group_matches_test extends UnitTestCase {
         array_push($sets_of_pairs, $set_of_pairs2);
         array_push($sets_of_pairs, $set_of_pairs3);
         array_push($sets_of_pairs, $set_of_pairs4);
-        list($result)=$token_stream->group_matches_for_bypass($matches);
-        $this->assertTrue(count($token_stream->group_matches_for_bypass($matches))==4);
+
+        $groups = $token_stream->group_matches_for_bypass($matches);
+        $this->assertTrue(count($groups)==1);
+        /** @var block_formal_langs_matches_group $group */
+        $group = $groups[0];
+        $this->assertTrue(count($group->matchedpairs) == 2);
     }
 }

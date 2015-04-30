@@ -98,24 +98,6 @@ class block_formal_langs_token_stream_test extends UnitTestCase {
     }
 
     public function test_look_for_matches_4() {
-        $options=new block_formal_langs_comparing_options();
-        $options->usecase=false;
-        $lexem1=new block_formal_langs_token_base(null, 'type', 'family', null, 0);
-        $lexem2=new block_formal_langs_token_base(null, 'type', 'milk', null, 1);
-        $lexem3=new block_formal_langs_token_base(null, 'type', 'family', null, 2);
-        $lexem4=new block_formal_langs_token_base(null, 'type', 'milk', null, 3);
-        $lexem5=new block_formal_langs_token_base(null, 'type', 'family', null, 0);
-        $lexem6=new block_formal_langs_token_base(null, 'type', 'milk', null, 1);
-        $lexem7=new block_formal_langs_token_base(null, 'type', 'tonus', null, 2);
-        $array_other=array($lexem1, $lexem2, $lexem3);
-        $pair1=new block_formal_langs_matched_tokens_pair(array(1), array(1), 0);
-        $pair2=new block_formal_langs_matched_tokens_pair(array(1), array(3), 0);
-        $array_correct=array($pair1);
-        $this->assertTrue(block_formal_langs_token_stream_test::equal_arrays($lexem6->look_for_matches($array_other, 0.6, true, $options, true), $array_correct));
-        $this->assertTrue(count($lexem7->look_for_matches($array_other, 1, true, $options, false))==0);
-    }
-    
-    public function test_look_for_matches_5() {
         //family
         // family milk family
         $options=new block_formal_langs_comparing_options();
