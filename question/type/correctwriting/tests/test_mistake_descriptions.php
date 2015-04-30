@@ -63,10 +63,10 @@ class qtype_correctwriting_test_mistake_descriptions extends PHPUnit_Framework_T
         $this->language = new block_formal_langs_language_c_language();
         $this->question = new qtype_correctwriting_question();
         $this->question->usecase = true;
-        $this->question->lexicalerrorthreshold = 0.1;
+        $this->question->lexicalerrorthreshold = 0.9;
         $this->question->lexicalerrorweight = 0.1;
         $this->question->usedlanguage = $this->language;
-        $this->question->movedmistakeweight = 0.1;
+        $this->question->movedmistakeweight = 0.2;
         $this->question->absentmistakeweight = 0.11;
         $this->question->addedmistakeweight = 0.12;
         $this->question->hintgradeborder = 0.75;

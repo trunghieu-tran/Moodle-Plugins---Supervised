@@ -65,11 +65,22 @@ class  qtype_correctwriting_sequence_analyzer extends qtype_correctwriting_abstr
         parent::__construct($question, $basepair, $language, $bypass);
     }
 
+    /**
+     * Returns maximal LCS count, which shold be returned
+     *
+     * TODO: Should we do it as setting or not
+     *
+     * @return int
+     */
+    protected function lcs_count_threshold() {
+        return 30000;
+    }
+
     protected function analyze() {
         $answertokens = $this->basestringpair->enum_correct_string()->stream;
         $responsetokens = $this->basestringpair->correctedstring()->stream;
         $options = $this->question->token_comparing_options();
-        $alllcs = qtype_correctwriting_sequence_analyzer::lcs($answertokens, $responsetokens, $options);
+        $alllcs = qtype_correctwriting_sequence_analyzer::lcs($answertokens, $responsetokens, $options, $this->lcs_count_threshold());
 
         $weights = new stdClass;
         $weights->movedweight = $this->question->movedmistakeweight;
@@ -107,9 +118,11 @@ class  qtype_correctwriting_sequence_analyzer extends qtype_correctwriting_abstr
      * @param  block_formal_langs_token_stream $answerstream  array of answer tokens
      * @param  block_formal_langs_token_stream $responsestream array of response tokens
      * @param  block_formal_langs_comparing_options $options options for comparing lexemes
+     * @param  int $threshold maximal count of found LCS (0 - is unbounded). We shold care, because
+     * there could be answers with 70 000+ possible LCS and it can consume a lot of memory
      * @return array array of individual lcs arrays
      */
-    public static function lcs($answerstream, $responsestream, $options) {
+    public static function lcs($answerstream, $responsestream, $options, $threshold = 0) {
         // Extract answer and response array of stream
         $answer = $answerstream->tokens;
         $response = $responsestream->tokens;
@@ -141,41 +154,53 @@ class  qtype_correctwriting_sequence_analyzer extends qtype_correctwriting_abstr
                 }
             }
         }
-        
-        $backtrackall = function($i, $j) use($C, $answer, $response, $options, &$backtrackall) {
+        $cache = array();
+        $backtrackall = function($i, $j) use($C, $answer, $response, $options, &$backtrackall, &$cache, $threshold) {
+            gc_collect_cycles();
+            $globalcachekey = $i . ' . ' . $j;
+            if (array_key_exists($globalcachekey, $cache)) {
+                return $cache[$globalcachekey];
+            }
             if ($i == 0 || $j == 0) {
-                return array();
-            }
-            if ($answer[$i - 1]->is_same($response[$j - 1], $options)) {
-                $newmatch = array( ($i - 1) => ($j - 1) );
-                $matches = $backtrackall($i - 1, $j - 1);
-                if (count($matches)) {
-                    foreach($matches as $key => $match) {
-                        if (count($match)) {
-                            $match = $match + $newmatch;
-                        } else {
-                            $match = $newmatch;
+                $result = array();
+            } else {
+                if ($answer[$i - 1]->is_same($response[$j - 1], $options)) {
+                    $newmatch = array(($i - 1) => ($j - 1));
+                    $result = $backtrackall($i - 1, $j - 1);
+                    if (count($result)) {
+                        foreach ($result as $key => $match) {
+                            if (count($match)) {
+                                $match = $match + $newmatch;
+                            } else {
+                                $match = $newmatch;
+                            }
+                            $result[$key] = $match;
                         }
-                        $matches[$key] = $match;
+                    } else {
+                        $result = array($newmatch);
                     }
+                    return $result;
                 } else {
-                    $matches = array( $newmatch );
-                }
-                return $matches;
-            }
-            
-            $result = array();
-            if ($C[$i][$j - 1] >= $C[$i - 1][$j]) {
-                $result  = $backtrackall($i, $j - 1);
-            }
-            if ($C[$i - 1][$j] >= $C[$i][$j - 1]) {
-                $result2  = $backtrackall($i - 1, $j);
-                if (count($result)) {
-                    $result = array_merge($result, $result2);
-                } else {
-                    $result = $result2;
+                    $result = array();
+                    if ($C[$i][$j - 1] >= $C[$i - 1][$j]) {
+                        $result = $backtrackall($i, $j - 1);
+                    }
+                    if ($C[$i - 1][$j] >= $C[$i][$j - 1]) {
+                        $result2 = $backtrackall($i - 1, $j);
+                        if (count($result)) {
+                            $result = array_merge($result, $result2);
+                        } else {
+                            $result = $result2;
+                        }
+                    }
                 }
             }
+            if ($threshold != 0) {
+                if (count($result) > $threshold) {
+                    $result = array_slice($result, 0, $threshold);
+                }
+            }
+            $cache[$globalcachekey] = $result;
             return $result;
         };
         
