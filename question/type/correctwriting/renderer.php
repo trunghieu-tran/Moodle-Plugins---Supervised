@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 
 require_once($CFG->dirroot . '/question/type/shortanswer/renderer.php');
+require_once($CFG->dirroot . '/question/type/correctwriting/mistakesimage.php');
 require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 /**
  * Generates the output for short answer questions.
@@ -150,10 +151,10 @@ class qtype_correctwriting_renderer extends qtype_shortanswer_renderer {
        $results = $question->matchedresults;
        if ($results!=null) {
            if (count($results->mistakes()) != 0) {
-               $mistakecodeddata = $question->create_image_information($results);
-               $grouping = intval($question->issyntaxanalyzerenabled);
-               $url  = $CFG->wwwroot . '/question/type/correctwriting/mistakesimage.php?data=' . urlencode($mistakecodeddata) . '&group=' . $grouping ;
-               $imagesrc = html_writer::empty_tag('image', array('src' => $url));
+               $image = new qtype_correctwriting_image_generator($results, $question);
+               $imagebinary = $image->produce_image();
+               $imagetext  = 'data:image/png;base64,' . base64_encode($imagebinary);
+               $imagesrc = html_writer::empty_tag('image', array('src' => $imagetext));
                $resulttext = $imagesrc . $resulttext;
            }
        }

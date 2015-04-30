@@ -58,6 +58,15 @@ abstract class  qtype_correctwriting_response_mistake {
     public $source;
 
     /**
+     * Maps current answer string to correct string
+     * @param $answerindex
+     * @return mixed
+     */
+    public function map_from_current_answer_string_to_correct_string($answerindex) {
+        return $answerindex;
+    }
+
+    /**
      * Return a comma-separated list of token desciprions of these tokens, null if there is none.
      * @param bool $andvalue  get strings like "{descr} is {value}"
      * @return string
@@ -65,6 +74,7 @@ abstract class  qtype_correctwriting_response_mistake {
     public function token_descriptions($andvalue = false) {
         $descripts = array();
         foreach ($this->answermistaken as $answerindex) {
+            $answerindex = $this->map_from_current_answer_string_to_correct_string($answerindex);
             // TODO should we check "has_description" or just add quoted value instead?
             if (is_object($this->stringpair->correctstring()) && $this->stringpair->correctstring()->has_description($answerindex)) {
                 $description = $this->stringpair->correctstring()->node_description($answerindex);
@@ -72,10 +82,14 @@ abstract class  qtype_correctwriting_response_mistake {
                     $a = new stdClass;
                     $a->tokendescr = $description;
                     $a->tokenvalue = $this->stringpair->correctstring()->stream->tokens[$answerindex]->value();
+                    $a->inthiscase =  get_string('inthiscase', 'qtype_correctwriting', $a);
                     if (!is_string($a->tokenvalue)) {
                         $a->tokenvalue = $a->tokenvalue->string();
                     }
                     $description = get_string('whatishint', 'qtype_correctwriting', $a);
+                }
+                if (!is_string($description)) {
+                    $description = $description->string();
                 }
                 $descripts[] = $description;
             }

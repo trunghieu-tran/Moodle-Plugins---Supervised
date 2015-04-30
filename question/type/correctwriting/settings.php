@@ -35,4 +35,13 @@ if($ADMIN->fulltree) {
     $settings->add(new block_formal_langs_admin_setting_language('qtype_correctwriting_defaultlang',
                     get_string('defaultlanglabel', 'block_formal_langs'), get_string('defaultlangdescription', 'block_formal_langs', $a), '1', null));
 
+    $settings->add(new admin_setting_configtextarea(
+        'qtype_correctwriting_special_tokens_list',
+        get_string('lexicalanalyzerlistsettingname', 'qtype_correctwriting'),
+        get_string('lexicalanalyzerlistsettingdescription', 'qtype_correctwriting'),
+        "",
+        PARAM_RAW,
+        60,
+        20
+    ));
 }
