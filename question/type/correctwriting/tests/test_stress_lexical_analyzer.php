@@ -100,4 +100,51 @@ class qtype_correctwriting_lexical_analyzer_stress_test extends PHPUnit_Framewor
         $this->assertTrue(count($mistakes) == 0, 'Mistake count is non zero');
         $this->assertTrue(time() - $begin < $CFG->block_formal_langs_maximum_lexical_backracking_execution_time * 1.6, 'Time limit reached');
     }
+
+    public function test_2() {
+        global $CFG;
+        $CFG->block_formal_langs_maximum_lexical_backracking_execution_time = 20;
+        $begin = time();
+        $bestmatchpair = $this->make_pair(
+            'float lengths [ 2 ] [ 3 ]  [  2  ]   =   {   {   { 0,1}, {2,3},{4,5}}, {{6,7}, {8,9},{10,11}}};',
+            'float lengths [2][3][2]={{{0,1},{2,3},{4,5}},{{5,6},{6,7},{7,8}}}'
+        );
+        $analyzer1 = new qtype_correctwriting_lexical_analyzer($this->question, $bestmatchpair, $this->language, false);
+        $pairs = $analyzer1->result_pairs(); // array of resultstringpairs
+        $pair = $pairs[0];
+        $mistakes = $pair->mistakes();
+        $this->assertTrue(count($mistakes) == 0, 'Mistake count is non zero');
+        $this->assertTrue(time() - $begin < $CFG->block_formal_langs_maximum_lexical_backracking_execution_time * 1.6, 'Time limit reached');
+    }
+
+    public function test_3() {
+        global $CFG;
+        $CFG->block_formal_langs_maximum_lexical_backracking_execution_time = 20;
+        $begin = time();
+        $bestmatchpair = $this->make_pair(
+            'double modulos[3][6]={{0,2,4,8,10,12}, {14,16,18,20,22,24},{26,28,30,32,34,36}}',
+            'float modulos[3][6]={{0,2,4,8,10,12},{14,18,20,22,24,28},{30,32,34,38,40,42}};'
+        );
+        $analyzer1 = new qtype_correctwriting_lexical_analyzer($this->question, $bestmatchpair, $this->language, false);
+        $pairs = $analyzer1->result_pairs(); // array of resultstringpairs
+        $pair = $pairs[0];
+        $mistakes = $pair->mistakes();
+        $this->assertTrue(count($mistakes) == 0, 'Mistake count is non zero');
+        $this->assertTrue(time() - $begin < $CFG->block_formal_langs_maximum_lexical_backracking_execution_time * 1.6, 'Time limit reached');
+    }
+    public function test_4() {
+        global $CFG;
+        $CFG->block_formal_langs_maximum_lexical_backracking_execution_time = 20;
+        $begin = time();
+        $bestmatchpair = $this->make_pair(
+            'int i_array[3][3] = { {-1,0,1}, {2,3,4},{5,6,7}};',
+            'int i_array[3][3]={{-1,0,1},{2,3,4,},{5,6,7}};'
+        );
+        $analyzer1 = new qtype_correctwriting_lexical_analyzer($this->question, $bestmatchpair, $this->language, false);
+        $pairs = $analyzer1->result_pairs(); // array of resultstringpairs
+        $pair = $pairs[0];
+        $mistakes = $pair->mistakes();
+        $this->assertTrue(count($mistakes) == 0, 'Mistake count is non zero');
+        $this->assertTrue(time() - $begin < $CFG->block_formal_langs_maximum_lexical_backracking_execution_time * 1.6, 'Time limit reached');
+    }
 }
