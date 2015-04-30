@@ -197,7 +197,7 @@ class block_formal_langs_cpp_parseable_language_test extends PHPUnit_Framework_T
                 $lang = new block_formal_langs_language_cpp_parseable_language();
                 /** @noinspection PhpUndefinedMethodInspection */
                 /** @noinspection PhpUndefinedVariableInspection */
-                $lang->parser()->setNamespaceTree($namespacetree);
+                $lang->parser()->set_namespace_tree($namespacetree);
                 /** @noinspection PhpUndefinedVariableInspection */
                 $result = $lang->create_from_string($string);
                 $newstring = self::print_node_for_external($result->syntaxtree, 0);
