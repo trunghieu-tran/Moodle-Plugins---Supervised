@@ -1116,24 +1116,34 @@ class qtype_preg_fa {
     /**
      * Add the start state of the automaton to given state.
      */
-    public function add_start_state($state) {
+    public function add_start_state($state, $subpattern = 0) {
         if (!array_key_exists($state, $this->adjacencymatrix)) {
             throw new qtype_preg_exception('set_start_state error: No state ' . $state . ' in automaton');
         }
-        if (!in_array($state, $this->start_states())) {
-            $this->startstates[0][] = $state;
+        if (!in_array($state, $this->start_states($subpattern))) {
+            if (isset($this->fastartstates[$subpattern])) {
+                $this->fastartstates[$subpattern][] = $state;
+            } else {
+                $this->fastartstates[$subpattern] = array($state);
+            }
+
         }
     }
 
     /**
      * Add the end state of the automaton to given state.
      */
-    public function add_end_state($state) {
+    public function add_end_state($state, $subpattern) {
         if (!array_key_exists($state, $this->adjacencymatrix)) {
             throw new qtype_preg_exception('set_end_state error: No state ' . $state . ' in automaton');
         }
-        if (!in_array($state, $this->end_states())) {
-            $this->endstates[0][] = $state;
+        if (!in_array($state, $this->end_states($subpattern))) {
+            if (isset($this->faendstates[$subpattern])) {
+                $this->faendstates[$subpattern][] = $state;
+            } else {
+                $this->faendstates[$subpattern] = array($state);
+            }
+
         }
     }
 
