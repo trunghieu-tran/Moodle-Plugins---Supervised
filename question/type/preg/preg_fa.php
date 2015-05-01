@@ -640,7 +640,9 @@ class qtype_preg_fa {
     protected $handler;
 
     // Subexpr references (numbers) existing in the regex.
-    protected $subexpr_ref_numbers;
+    public $subexpr_ref_numbers;
+
+    public $subexpr_recursive_ref_numbers = array();
 
     /** @var boolean is automaton really deterministic - it can be even if it shoudn't.
      * May be used for optimisation when an FA object actually stores a DFA.
@@ -666,6 +668,9 @@ class qtype_preg_fa {
         $this->subexpr_ref_numbers = array();
         foreach ($subexprrefs as $ref) {
             $this->subexpr_ref_numbers[] = $ref->number;
+            if ($ref->type === qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL && $ref->isrecursive) {
+                $this->subexpr_recursive_ref_numbers[] = $ref->number;
+            }
         }
         $this->set_limits();
         $this->innerautomata = array();
@@ -1257,6 +1262,24 @@ class qtype_preg_fa {
             }
 
             unset($this->innerautomata[$oldkey]);
+        }
+    }
+
+    public function change_recursive_start_states($oldkey, $newkeys) {
+        if (array_key_exists($oldkey, $this->fastartstates)) {
+            foreach ($newkeys as $key) {
+                $this->fastartstates[$key] = $this->fastartstates[$oldkey];
+            }
+            unset($this->fastartstates[$oldkey]);
+        }
+    }
+
+    public function change_recursive_end_states($oldkey, $newkeys) {
+        if (array_key_exists($oldkey, $this->faendstates)) {
+            foreach ($newkeys as $key) {
+                $this->faendstates[$key] = $this->faendstates[$oldkey];
+            }
+            unset($this->faendstates[$oldkey]);
         }
     }
 

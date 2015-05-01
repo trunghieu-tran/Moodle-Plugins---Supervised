@@ -1104,8 +1104,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $stack = array();
         $dstnode->create_automaton($result, $stack, $mergeassertions);
         $body = array_pop($stack);
-        $result->fastartstates = array($body['start']);
-        $result->faendstates = array($body['end']);
+        $result->fastartstates[0] = array($body['start']);
+        $result->faendstates[0] = array($body['end']);
         $result->calculate_subexpr_start_and_end_states();
 
         if ($mergeassertions) {
@@ -1124,7 +1124,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                     $result = $result->intersect($automaton[0], $state, $automaton[1]);
                 }
             }
-            $result->calculate_subexpr_start_and_end_states();
+            //$result->calculate_subexpr_start_and_end_states();
         }
 
         /*global $CFG;
