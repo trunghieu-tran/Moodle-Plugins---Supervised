@@ -640,7 +640,7 @@ class qtype_preg_fa {
     protected $handler;
 
     // Subexpr references (numbers) existing in the regex.
-    public $subexpr_ref_numbers;
+    protected $subexpr_ref_numbers;
 
     public $subexpr_recursive_ref_numbers = array();
 
