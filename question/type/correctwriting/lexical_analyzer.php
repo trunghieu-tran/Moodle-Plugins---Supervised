@@ -67,7 +67,7 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
      * Passed responsestring could be null, than object used just to find errors in the answers, token count etc...
      */
     protected function analyze() {
-        if ($this->question->are_lexeme_sequences_equal($this->basestringpair)) {		
+        if ($this->question->are_lexeme_sequences_equal($this->basestringpair)) {
             $this->bypass();
             $this->resultstringpairs[0]->assert_that_strings_are_equal();
             return;
@@ -154,7 +154,7 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
              * @var block_formal_langs_lexical_error $error
              */
             foreach($this->basestringpair->comparedstring()->stream->errors as $index => $error) {
-                $mistake = new qtype_correctwriting_scanning_mistake();
+                $mistake = new qtype_correctwriting_scanning_mistake(null);
 
                 $message =  $error->errormessage;
                 $mistake->languagename = $this->question->get_used_language()->name();
