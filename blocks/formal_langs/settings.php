@@ -43,7 +43,7 @@ if(is_object($ADMIN)) {
             'block_formal_langs_maximum_variations_of_typo_correction',
             get_string('maximumvariationsoftypocorrectionsettingname', 'block_formal_langs'),
             get_string('maximumvariationsoftypocorrectionsettingdescription', 'block_formal_langs'),
-            10,
+            5,
             PARAM_INT,
             20
         ));

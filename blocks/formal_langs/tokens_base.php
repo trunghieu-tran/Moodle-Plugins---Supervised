@@ -1094,10 +1094,11 @@ class block_formal_langs_token_stream {
         //  - group_matches function, with criteria defined by compare_matches_groups function
         if ($bypass == false) {
             $bestgroups = array();
+            $startingtime = time() - 1; // 1 second is precision offset to make sure, that we won't go far from limit
             $allpossiblepairs = $this->look_for_matches($comparedstream, $threshold, $options);
             if (count($allpossiblepairs)>0) {
-                $bestgroups = $this->group_matches($allpossiblepairs);
-            } 
+                $bestgroups = $this->group_matches($allpossiblepairs, $startingtime);
+            }
         } else {
             $bestgroups = array();
             $allpossiblepairs = $this->look_for_matches_for_bypass($comparedstream, $threshold, $options);
@@ -1449,12 +1450,16 @@ class block_formal_langs_token_stream {
      * compared using compare_matches_groups function
      *
      * @param array $matches array of matched_tokens_pair objects representing all possible pairs within threshold
+     * @param int $time starting time for analyzing tokens, should be less than or same as current
      * @return array of block_formal_langs_matches_group objects
      */
-    public function group_matches($matches) {
+    public function group_matches($matches, $time = null) {
+        global $CFG;
         $setspairs = array();
         $arraybestgroupsmatches = array();
-        $time = time();
+        if ($time == null) {
+            $time = time();
+        }
         $tokenindexestomatches = $this->generate_mapping_of_token_indexes_to_matches($matches);
         // Prefix is a set, where matches will be in in any case.
         // Matched pairs will be in any case in set only in one case: if tokens from it's corrected and
@@ -1473,8 +1478,14 @@ class block_formal_langs_token_stream {
             for ($i = 1; $i<count($setspairs); $i++) {
                 // equal
                 if ($this->compare_matches_groups($arraybestgroupsmatches[0], $setspairs[$i]) == 0) {
-                    $arraybestgroupsmatches[] = $setspairs[$i];
-                    // new group
+                    $canadd = intval($CFG->block_formal_langs_maximum_variations_of_typo_correction) < 0;
+                    if (!$canadd) {
+                        $limit = intval($CFG->block_formal_langs_maximum_variations_of_typo_correction);
+                        $canadd = count($arraybestgroupsmatches) < $limit;
+                    }
+                    if ($canadd) {
+                        $arraybestgroupsmatches[] = $setspairs[$i];
+                    }
                 } else {
                     if ($this->compare_matches_groups($arraybestgroupsmatches[0], $setspairs[$i]) < 0) {
                         // clear
@@ -2423,12 +2434,23 @@ class block_formal_langs_string_pair {
         $this->correctedstring=$string;
     }
 
-    public static function best_string_pairs_for_bypass($correctstring, $comparedstring, $threshold, block_formal_langs_comparing_options $options, $classname = 'block_formal_langs_string_pair') {
-        $bestgroups = array();
-        /** @var block_formal_langs_token_stream $correctstream */
-        $correctstream = $correctstring->stream;
-        $comparedstream = $comparedstring->stream;
-        $bestgroups = $correctstream->look_for_token_pairs($comparedstream, $threshold, $options, true);
+    /**
+     * Returns list of string pairs creating them grom groups
+     * @param block_formal_langs_processed_string $correctstring a correct string, entered by teacher
+     * @param block_formal_langs_processed_string $comparedstring a compared string, entered by student
+     * @param string $classname a class name to of new pair
+     * @param array $bestgroups array of best groups
+     * @return array list of new string pairs
+     */
+    protected static  function make_list_of_string_pairs_from_groups(
+        $correctstring,
+        $comparedstring,
+        $classname,
+        &$bestgroups
+    ) {
+        global $CFG;
+        $returnallpairs = intval($CFG->block_formal_langs_maximum_variations_of_typo_correction) <= 0;
+        $limit = intval($CFG->block_formal_langs_maximum_variations_of_typo_correction);
         if(count($bestgroups) == 0) {
             $stringpair = new $classname($correctstring, $comparedstring, array());
             $arraystringpairs = array();
@@ -2436,34 +2458,30 @@ class block_formal_langs_string_pair {
             return $arraystringpairs;
         }
         $arraystringpairs = array();
-        for ($i = 0; $i < count($bestgroups); $i++) {
+        for ($i = 0; ($i < count($bestgroups)) && (($i < $limit) || $returnallpairs); $i++) {
             $stringpair = new $classname($correctstring, $comparedstring, $bestgroups[$i]);
             $arraystringpairs[] = $stringpair;
         }
         return $arraystringpairs;
+    }
+
+    public static function best_string_pairs_for_bypass($correctstring, $comparedstring, $threshold, block_formal_langs_comparing_options $options, $classname = 'block_formal_langs_string_pair') {
+        /** @var block_formal_langs_token_stream $correctstream */
+        $correctstream = $correctstring->stream;
+        $comparedstream = $comparedstring->stream;
+        $bestgroups = $correctstream->look_for_token_pairs($comparedstream, $threshold, $options, true);
+        return self::make_list_of_string_pairs_from_groups($correctstring, $comparedstring, $classname, $bestgroups);
     }
     
     /**
      * Factory method. Returns an array of block_formal_langs_string_pair objects for each best matches group for that pair of strings
      */
     public static function best_string_pairs($correctstring, $comparedstring, $threshold, block_formal_langs_comparing_options $options, $classname = 'block_formal_langs_string_pair') {
-        $bestgroups = array();
         /** @var block_formal_langs_token_stream $correctstream */
         $correctstream = $correctstring->stream;
         $comparedstream = $comparedstring->stream;
         $bestgroups = $correctstream->look_for_token_pairs($comparedstream, $threshold, $options, false);
-        if(count($bestgroups) == 0) {
-            $stringpair = new $classname($correctstring, $comparedstring, array());
-            $arraystringpairs = array();
-            $arraystringpairs[] = $stringpair;
-            return $arraystringpairs;
-        }
-        $arraystringpairs = array();
-        for ($i = 0; $i < count($bestgroups); $i++) {
-            $stringpair = new $classname($correctstring, $comparedstring, $bestgroups[$i]);
-            $arraystringpairs[] = $stringpair;
-        }
-        return $arraystringpairs;
+        return self::make_list_of_string_pairs_from_groups($correctstring, $comparedstring, $classname, $bestgroups);
     }
 
     public function __construct($correct, $compared, $matches) {
