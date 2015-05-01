@@ -1,4 +1,18 @@
 <?php
+// This file is part of Formal Languages block - https://code.google.com/p/oasychev-moodle-plugins/
+//
+// Formal Languages block is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Formal Languages block is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Formal Languages block.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * Defines generic token and node classes.
  *
@@ -232,6 +246,16 @@ class block_formal_langs_ast_node_base {
 }
 
 /**
+ * Class for options, controlling strings comparison process.
+ */
+class block_formal_langs_comparing_options {
+    /**
+     * @var bool true if comparing is case sensitive, false if insensitive
+     */
+    public $usecase;
+}
+
+/**
  * Class for base tokens.
  *
  * Class for storing tokens. Class - token, object of the token class
@@ -310,12 +334,16 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
     /**
      * Calculates and return editing distance from
      * $this to $token
+     * @param $options - comparing options
      */
-    public function editing_distance($token) {
-        if ($this->use_editing_distance()) {//Damerau-Levenshtein distance is default now
-            $distance = block_formal_langs_token_base::damerau_levenshtein($this->value(), $token->value());
-        } else {//Distance not applicable, so return a big number 
-            $distance = strlen($this->value()) + strlen($token->value());
+    public function editing_distance($token, block_formal_langs_comparing_options $options) {
+        if ($this->is_same($token, $options->usecase)) {//If two tokens are identical, return 0.
+            return 0;
+        }
+        if ($this->use_editing_distance()) {//Damerau-Levenshtein distance is default now.
+            $distance = block_formal_langs_token_base::damerau_levenshtein($this->value(), $token->value(), $options);
+        } else {//Distance not applicable, so return a big number.
+            $distance = textlib::strlen($this->value()) + textlib::strlen($token->value());
         }
     }
 
@@ -323,7 +351,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      *
      * @return int Damerau-Levenshtein distance
      */
-    static public function damerau_levenshtein($str1, $str2) {
+    static public function damerau_levenshtein($str1, $str2, block_formal_langs_comparing_options $options) {
         if ($str1 == $str2) 
             return 0;//words identical
         $str1_len = strlen($str1);
@@ -400,10 +428,11 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
      * @param array $other - array of tokens  (other text)
      * @param integer $threshold - lexical mistakes threshold
      * @param boolean $iscorrect - true if type of token is correct and we should perform full search, false for compared text
+     * @param $options - comparing options (like case sensitivity)
      * @return array - array of block_formal_langs_matched_tokens_pair objects with blank
      * $answertokens or $responsetokens field inside (it is filling from outside)
      */
-    public function look_for_matches($other, $threshold, $iscorrect) {
+    public function look_for_matches($other, $threshold, $iscorrect, block_formal_langs_comparing_options $options) {
         $result=strlen($this->value)-strlen($this->value)*$threshold;
         $max=round($result);
         $str='';
@@ -805,7 +834,7 @@ class block_formal_langs_token_stream {
             }
         }
     }
-    
+
     /**
      * Compares two matches groups.
      *
