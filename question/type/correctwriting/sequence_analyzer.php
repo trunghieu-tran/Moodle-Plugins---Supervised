@@ -67,13 +67,14 @@ class  qtype_correctwriting_sequence_analyzer extends qtype_correctwriting_abstr
 
     /**
      * Returns maximal LCS count, which shold be returned
-     *
-     * TODO: Should we do it as setting or not
-     *
      * @return int
      */
     protected function lcs_count_threshold() {
-        return 30000;
+        global $CFG;
+        if (intval($CFG->qtype_correctwriting_max_temp_lcs) <= 0) {
+            return 0;
+        }
+        return intval($CFG->qtype_correctwriting_max_temp_lcs);
     }
 
     protected function analyze() {
@@ -305,7 +306,9 @@ class  qtype_correctwriting_sequence_analyzer extends qtype_correctwriting_abstr
             $result[0] = array( $i );
             $result[1] = array( $i );
         }
-        $pair->tokenmappings[get_class($this)] = $result;
+        if (property_exists($pair, 'tokenmappings')) {
+            $pair->tokenmappings[get_class($this)] = $result;
+        }
     }
     /**
      * Returns an array of mistakes objects for given individual lcs array.
