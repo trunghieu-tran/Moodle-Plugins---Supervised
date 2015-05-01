@@ -1279,7 +1279,7 @@ class qtype_preg_fa {
         foreach ($this->fastartstates as &$subpattern) {
             if (array_search($oldkey, $subpattern) !== false) {
                 $subpattern = array_merge($subpattern, $newkeys);
-                unset($subpattern[array_search($oldkey, $subpattern)]);
+                //unset($subpattern[array_search($oldkey, $subpattern)]);
             }
         }
 
@@ -1289,7 +1289,7 @@ class qtype_preg_fa {
         foreach ($this->faendstates as &$subpattern) {
             if (array_search($oldkey, $subpattern) !== false) {
                 $subpattern = array_merge($subpattern, $newkeys);
-                unset($subpattern[array_search($oldkey, $subpattern)]);
+               // unset($subpattern[array_search($oldkey, $subpattern)]);
             }
         }
     }
