@@ -147,4 +147,109 @@ class qtype_correctwriting_lexical_analyzer_stress_test extends PHPUnit_Framewor
         $this->assertTrue(count($mistakes) == 0, 'Mistake count is non zero');
         $this->assertTrue(time() - $begin < $CFG->block_formal_langs_maximum_lexical_backracking_execution_time * 1.6, 'Time limit reached');
     }
+
+    public function test_5() {
+        global $CFG;
+        $CFG->block_formal_langs_maximum_lexical_backracking_execution_time = 10;
+        $CFG->block_formal_langs_maximum_variations_of_typo_correction = 5;
+        $begin = time();
+        $bestmatchpair = $this->make_pair(
+            'char matrix[2][4]={{-4,-3,-2,-1},{0,1,2,3}};',
+            'char matrix[2][4]= -4,-matrix[0][0],-matrix[0][1],-matrix[0][2],-matrix[0][4],-matrix[1][0],-matrix[1][2] ;'
+        );
+        $analyzer1 = new qtype_correctwriting_lexical_analyzer($this->question, $bestmatchpair, $this->language, false);
+        $pairs = $analyzer1->result_pairs(); // array of resultstringpairs
+        $pair = $pairs[0];
+        $this->assertTrue(time() - $begin < $CFG->block_formal_langs_maximum_lexical_backracking_execution_time * 1.1, 'Time limit reached');
+    }
+
+    public function test_6() {
+        global $CFG;
+        $CFG->block_formal_langs_maximum_lexical_backracking_execution_time = 10;
+        $CFG->block_formal_langs_maximum_variations_of_typo_correction = 10;
+        $begin = time();
+        $bestmatchpair = $this->make_pair(
+            'compare = strstr(string1,string2) - string1 > strlen(string2);',
+            'if( strlen(strstr(string2, string1)) > strlen(string2)){ compare = strlen(strstr(string2, string1)); }'
+        );
+        $analyzer1 = new qtype_correctwriting_lexical_analyzer($this->question, $bestmatchpair, $this->language, false);
+        $pairs = $analyzer1->result_pairs(); // array of resultstringpairs
+        $pair = $pairs[0];
+        $this->assertTrue(time() - $begin < $CFG->block_formal_langs_maximum_lexical_backracking_execution_time * 1.1, 'Time limit reached');
+    }
+
+    public function test_7() {
+        global $CFG;
+        $CFG->block_formal_langs_maximum_lexical_backracking_execution_time = 10;
+        $CFG->block_formal_langs_maximum_variations_of_typo_correction = 10;
+        $begin = time();
+        $bestmatchpair = $this->make_pair(
+            'float lengths[2][3][2]={{{0,1}, {2,3},{4,5}}, {{6,7}, {8,9},{10,11}}};',
+            'float lengths[2][3][2]={(0,0),(0,0),(0,0),(0,0),(0,0),(0,0)};'
+        );
+        $analyzer1 = new qtype_correctwriting_lexical_analyzer($this->question, $bestmatchpair, $this->language, false);
+        $pairs = $analyzer1->result_pairs(); // array of resultstringpairs
+        $pair = $pairs[0];
+        $this->assertTrue(time() - $begin < $CFG->block_formal_langs_maximum_lexical_backracking_execution_time * 1.1, 'Time limit reached');
+    }
+
+    public function test_8() {
+        global $CFG;
+        $CFG->block_formal_langs_maximum_lexical_backracking_execution_time = 10;
+        $CFG->block_formal_langs_maximum_variations_of_typo_correction = 10;
+        $begin = time();
+        $bestmatchpair = $this->make_pair(
+            'scalars[9-i]=scalar_multiply(vectors, i-1, i);',
+            'scalar_multiplications[9-i]=scalar_multiply(int vectors[10][2], int i[i][1], int i[i][2])*scalar_multiply(int vectors[10][2], int i[i+1][1], int i[i+1][2]);'
+        );
+        $analyzer1 = new qtype_correctwriting_lexical_analyzer($this->question, $bestmatchpair, $this->language, false);
+        $pairs = $analyzer1->result_pairs(); // array of resultstringpairs
+        $pair = $pairs[0];
+        $this->assertTrue(time() - $begin < $CFG->block_formal_langs_maximum_lexical_backracking_execution_time * 1.1, 'Time limit reached');
+    }
+
+    public function test_9() {
+        global $CFG;
+        $CFG->block_formal_langs_maximum_lexical_backracking_execution_time = 10;
+        $CFG->block_formal_langs_maximum_variations_of_typo_correction = 10;
+        $begin = time();
+        $bestmatchpair = $this->make_pair(
+            'double modulos[3][6]={{0,2,4,8,10,12}, {14,16,18,20,22,24},{26,28,30,32,34,36}};',
+            'double modulos[3][6] = {{moduls[0][0]=0},{moduls[0][1]=2},{moduls[0][2]=4},{moduls[0][3]=8},{moduls[0][4]=10},{moduls[0][5]=12},{moduls[1][0]=14},{moduls[1][1]=16},{moduls[1][2]=18},{moduls[1][3]=20},{moduls[1][4]=22},{moduls[1][5]=24},{moduls[2][0]=26},{moduls[2][1]=28},{moduls[2][2]=30},{moduls[2][3]=32},{moduls[2][4]=34},{moduls[2][5]=36}};"'
+        );
+        $analyzer1 = new qtype_correctwriting_lexical_analyzer($this->question, $bestmatchpair, $this->language, false);
+        $pairs = $analyzer1->result_pairs(); // array of resultstringpairs
+        $pair = $pairs[0];
+        $this->assertTrue(time() - $begin < $CFG->block_formal_langs_maximum_lexical_backracking_execution_time * 1.1, 'Time limit reached');
+    }
+
+    public function test_10() {
+        global $CFG;
+        $CFG->block_formal_langs_maximum_lexical_backracking_execution_time = 10;
+        $CFG->block_formal_langs_maximum_variations_of_typo_correction = 10;
+        $begin = time();
+        $bestmatchpair = $this->make_pair(
+            'float lengths[2][3][2]={{{0,1}, {2,3},{4,5}}, {{6,7}, {8,9},{10,11}}};',
+            'float lengths[2][3][2]={{{[0,][0][0]}{ [0][0][1],}}};'
+        );
+        $analyzer1 = new qtype_correctwriting_lexical_analyzer($this->question, $bestmatchpair, $this->language, false);
+        $pairs = $analyzer1->result_pairs(); // array of resultstringpairs
+        $pair = $pairs[0];
+        $this->assertTrue(time() - $begin < $CFG->block_formal_langs_maximum_lexical_backracking_execution_time * 1.1, 'Time limit reached');
+    }
+
+    public function test_11() {
+        global $CFG;
+        $CFG->block_formal_langs_maximum_lexical_backracking_execution_time = 10;
+        $CFG->block_formal_langs_maximum_variations_of_typo_correction = 10;
+        $begin = time();
+        $bestmatchpair = $this->make_pair(
+            'strncat(strcat(strcpy(result, str1), " "), strchr(str2, \'x\'),6); ',
+            'strncat(strcpy(result,strncat(str1,\'x\',6)));'
+        );
+        $analyzer1 = new qtype_correctwriting_lexical_analyzer($this->question, $bestmatchpair, $this->language, false);
+        $pairs = $analyzer1->result_pairs(); // array of resultstringpairs
+        $pair = $pairs[0];
+        $this->assertTrue(time() - $begin < $CFG->block_formal_langs_maximum_lexical_backracking_execution_time * 1.1, 'Time limit reached');
+    }
 }
