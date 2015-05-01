@@ -93,8 +93,8 @@ abstract class qtype_preg_fa_node {
 
         $thetransition->opentags[] = $this->pregnode;
         // Add start states for recursive subpattern.
-        if (array_search($this->pregnode->subpattern, $automaton->subexpr_recursive_ref_numbers) !== false) {
-            $automaton->add_end_state($thetransition->from, $this->pregnode->subpattern);
+        if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_SUBEXPR && array_search($this->pregnode->number, $automaton->subexpr_recursive_ref_numbers) !== false) {
+            $automaton->add_start_state($thetransition->from, $this->pregnode->number);
         }
 
         if ($this->pregnode->subpattern !== -2 &&
@@ -131,8 +131,8 @@ abstract class qtype_preg_fa_node {
 
         $thetransition->closetags[] = $this->pregnode;
         // Add end states for recursive subpattern.
-        if (array_search($this->pregnode->subpattern, $automaton->subexpr_recursive_ref_numbers) !== false) {
-            $automaton->add_end_state($thetransition->to, $this->pregnode->subpattern);
+        if ($this->pregnode->type == qtype_preg_node::TYPE_NODE_SUBEXPR && array_search($this->pregnode->number, $automaton->subexpr_recursive_ref_numbers) !== false) {
+            $automaton->add_end_state($thetransition->to, $this->pregnode->number);
         }
     }
 

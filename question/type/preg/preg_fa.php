@@ -1276,20 +1276,21 @@ class qtype_preg_fa {
     }
 
     public function change_recursive_start_states($oldkey, $newkeys) {
-        if (array_key_exists($oldkey, $this->fastartstates)) {
-            foreach ($newkeys as $key) {
-                $this->fastartstates[$key] = $this->fastartstates[$oldkey];
+        foreach ($this->fastartstates as &$subpattern) {
+            if (array_search($oldkey, $subpattern) !== false) {
+                $subpattern = array_merge($subpattern, $newkeys);
+                unset($subpattern[array_search($oldkey, $subpattern)]);
             }
-            unset($this->fastartstates[$oldkey]);
         }
+
     }
 
     public function change_recursive_end_states($oldkey, $newkeys) {
-        if (array_key_exists($oldkey, $this->faendstates)) {
-            foreach ($newkeys as $key) {
-                $this->faendstates[$key] = $this->faendstates[$oldkey];
+        foreach ($this->faendstates as &$subpattern) {
+            if (array_search($oldkey, $subpattern) !== false) {
+                $subpattern = array_merge($subpattern, $newkeys);
+                unset($subpattern[array_search($oldkey, $subpattern)]);
             }
-            unset($this->faendstates[$oldkey]);
         }
     }
 
