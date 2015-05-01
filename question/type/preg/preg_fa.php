@@ -745,20 +745,20 @@ class qtype_preg_fa {
      * Returns the start states for automaton.
      */
     public function start_states($subpattern = 0) {
-        if ($subpattern == 0 && !isset($this->startstates[$subpattern])) {
-            return $this->fastartstates;
+        if (!isset($this->fastartstates[$subpattern])) {
+            return isset($this->startstates[$subpattern]) ? $this->startstates[$subpattern] : array();
         }
-        return isset($this->startstates[$subpattern]) ? $this->startstates[$subpattern] : array();
+        return $this->fastartstates[$subpattern];
     }
 
     /**
      * Return the end states of the automaton.
      */
     public function end_states($subpattern = 0) {
-        if ($subpattern == 0 && !isset($this->endstates[$subpattern])) {
-            return $this->faendstates;
+        if (!isset($this->faendstates[$subpattern])) {
+            return isset($this->endstates[$subpattern]) ? $this->endstates[$subpattern] : array();
         }
-        return isset($this->endstates[$subpattern]) ? $this->endstates[$subpattern] : array();
+        return $this->faendstates[$subpattern];
     }
 
     public function is_empty() {
