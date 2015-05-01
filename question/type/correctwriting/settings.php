@@ -44,4 +44,13 @@ if($ADMIN->fulltree) {
         60,
         20
     ));
+
+    $settings->add(new admin_setting_configtext(
+        'qtype_correctwriting_max_temp_lcs',
+        get_string('maxtemplcssettingname', 'qtype_correctwriting'),
+        get_string('maxtemplcssettingdescription', 'qtype_correctwriting'),
+        30000,
+        PARAM_INT,
+        20
+    ));
 }
