@@ -1,4 +1,18 @@
 <?php
+// This file is part of Formal Languages block - https://code.google.com/p/oasychev-moodle-plugins/
+//
+// Formal Languages block is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Formal Languages block is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Formal Languages block.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * Defines a simple  english language lexer for correctwriting question type.
  *
@@ -59,7 +73,45 @@ class block_formal_langs_c_token_identifier extends block_formal_langs_c_token_b
  */ 
 class block_formal_langs_c_token_numeric extends block_formal_langs_c_token_base
 {
-
+    /**
+     * Returns value of token as a number
+     * @return float
+     */
+    protected function numeric_value() {
+        $v = (string)($this->value());
+        $result = 0;
+        if (textlib::strpos($v, '.')  === false) {
+            if (textlib::strpos($v, 'x') !== false || textlib::strpos($v, 'X') !== false) {
+                $result = hexdec($v);
+            } else {
+                if ($v != '0' && $v[0] == '0') {
+                    $result = octdec($v);
+                } else {
+                    $result = floatval($v);
+                }
+            }
+        } else {
+            $result = floatval($v);
+        }
+        return $result;
+    }
+    /**
+     * Tests, whether other lexeme is the same as this lexeme
+     *
+     * @param block_formal_langs_c_token_base $other other lexeme
+     * @param block_formal_langs_comparing_options $options options for comparing lexmes
+     * @return boolean - if the same lexeme
+     */
+    public function is_same($other, $options ) {
+        if (is_a($other, 'block_formal_langs_c_token_numeric')) {
+            $value1 = $this->numeric_value();
+            $value2 = $other->numeric_value();
+            $result = abs($value1 - $value2) < 1.0E-7;
+        } else {
+            $result = parent::is_same($other, $options);
+        }
+        return $result;
+    }
 }
 
 
