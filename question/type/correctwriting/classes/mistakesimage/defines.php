@@ -51,4 +51,5 @@ define('BIG_STRIKETHROUGH_ADDITIONAL_LENGTH', 2);
 define('MOVE_GROUP_PADDING', 2);
 // A missing separator width
 define('MISSING_SEPARATOR_WIDTH', 4);
-
+// A maximal arc offset for transpose
+define('TRANSPONSE_MAX_ARC_OFFSET', 20);
