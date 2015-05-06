@@ -29,7 +29,20 @@
 
 
 $capabilities = array(
+    'block/bulk_edit_mod:addinstance' => array(
+        'riskbitmask' => RISK_SPAM,
 
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_BLOCK,
+        'archetypes' => array(
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        ),
+
+        'clonepermissionsfrom' => 'moodle/site:manageblocks'
+    )
+
+/*
     'block/bulk_edit_mod:manageownfeeds' => array(
 
         'captype' => 'write',
@@ -51,6 +64,7 @@ $capabilities = array(
             'manager' => CAP_ALLOW
         )
     )
+*/
 
 );
 
