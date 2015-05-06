@@ -35,6 +35,11 @@ abstract class qtype_correctwriting_sequence_mistake extends qtype_correctwritin
      */
     protected $lcs;
     /**
+     * Whether we should map descriptions from corrected string to compared
+     * @var bool
+     */
+    public $mapfromcorrectedtocompared = true;
+    /**
      * Sets an lcs for mistake
      * @param $lcs
      */
@@ -57,20 +62,24 @@ abstract class qtype_correctwriting_sequence_mistake extends qtype_correctwritin
      * Returns empty string if no response mistakes available
      * @return string
      */
-    protected function response_description() {
+    public function response_description() {
         $result = '';
         if (count($this->responsemistaken) == 0) {
             return $result;
         }
 
         $indexes = array();
-        foreach($this->responsemistaken as $index) {
-            $realindexes = $this->stringpair->map_from_corrected_string_to_compared_string($index);
-            if (count($indexes) == 0) {
-                $indexes = $realindexes;
-            } else {
-                $indexes = array_merge($indexes, $realindexes);
+        if ($this->mapfromcorrectedtocompared) {
+            foreach ($this->responsemistaken as $index) {
+                $realindexes = $this->stringpair->map_from_corrected_string_to_compared_string($index);
+                if (count($indexes) == 0) {
+                    $indexes = $realindexes;
+                } else {
+                    $indexes = array_merge($indexes, $realindexes);
+                }
             }
+        } else {
+            $indexes = $this->responsemistaken;
         }
 
         if (count($indexes)) {
@@ -96,7 +105,7 @@ abstract class qtype_correctwriting_sequence_mistake extends qtype_correctwritin
      * Returns an description for node as answer
      * @return string answer description
      */
-    protected function answer_description() {
+    public function answer_description() {
         $a = '';
         /** @var qtype_correctwriting_string_pair $stringpair */
         $stringpair = $this->stringpair;
