@@ -329,7 +329,7 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
         $tree = $correct->syntaxtree;
         $temp = new qtype_correctwriting_enum_catcher($tree);
-        $expected_result = [array()];
+        $expected_result = [array(), array(), array(), array()];
         $expected_result[0][] = array(2,4);
         $expected_result[0][] = array(6,6);
         $expected_result[2][] = array(2,2);
