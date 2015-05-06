@@ -263,6 +263,7 @@ class qtype_correctwriting_lcs_extractor
                $entry = new stdClass();
                $entry->answer = $answerkey;
                $entry->response = $pair->map_from_corrected_string_to_compared_string($responsekey);
+               $entry->error = false;
                $this->lcs[] = $entry;
            }
        }
@@ -306,8 +307,9 @@ class qtype_correctwriting_table
     *  @param array $response array of qtype_correctwriting_lexeme_label, representing a student response
     *  @param qtype_correctwriting_lcs_extractor $lcs lcs data for building lcs result
     *  @param qtype_correctwriting_mistake_container $mistakes a mistake container, used to maintain mistakes
+    *  @param bool $usesimplealignment whether we should simply store answers, without aligning them
     */
-   public function __construct($answer, $response, $lcs, $mistakes) {
+   public function __construct($answer, $response, $lcs, $mistakes, $usesimplealignment = false) {
        $this->lcs = $lcs;
 
        // Create a labels for table
@@ -318,10 +320,14 @@ class qtype_correctwriting_table
        $this->table[] = new qtype_correctwriting_table_cell($answerlabel, $responselabel);
 
        // Build table
-       if (count($lcs->lcs()) != 0) {
-           $this->build_table_using_lcs($answer, $response, $lcs->lcs(), $mistakes);
+       if ($usesimplealignment) {
+            $this->build_simple_table($answer, $response);
        } else {
-           $this->build_table_without_lcs($answer, $response, $mistakes);
+           if (count($lcs->lcs()) != 0) {
+               $this->build_table_using_lcs($answer, $response, $lcs->lcs(), $mistakes);
+           } else {
+               $this->build_table_without_lcs($answer, $response, $mistakes);
+           }
        }
        $maxbaselineanswer = 0;
        $maxbaselineresponse = 0;
@@ -339,6 +345,30 @@ class qtype_correctwriting_table
            $cell->response()->set_baseline_offset($maxbaselineresponse);
        }
    }
+
+    /**
+     * Builds simple table, without any alignment
+     * @param array $answer array of qtype_correctwriting_lexeme_label, representing an answer part of question
+     * @param array $response array of qtype_correctwriting_lexeme_label, representing a student response
+     */
+    private function build_simple_table($answer, $response) {
+        $min = min(count($answer), count($response));
+        for($i = 0; $i < $min; $i++) {
+            $this->table[] = new qtype_correctwriting_table_cell(
+                $answer[$i],
+                $response[$i]
+            );
+            $lastindex = count($this->table) - 1 ;
+            $this->answertable[$i] = $lastindex;
+            $this->responsetable[$i] = $lastindex;
+        }
+        if (count($answer) > $min) {
+            $this->create_cell_range($answer, $min, count($answer), 'create_answer_cell');
+        }
+        if (count($response) > $min) {
+            $this->create_cell_range($response, $min, count($response), 'create_response_cell');
+        }
+    }
     /** Builds a new table, using LCS
      * @param array $answer array of qtype_correctwriting_lexeme_label, representing an answer part of question
      * @param array $response array of qtype_correctwriting_lexeme_label, representing a student response
@@ -407,7 +437,7 @@ class qtype_correctwriting_table
        $cell = $this->table[$this->answertable[$answerindex]];
        return $this->get_connections_from_cell($cell);
    }
-    /** Returns a connection point for lexeme in student answer
+    /** Returns a rectangle for lexeme in student answer
      *  @param int $answerindex index of lexeme in answer
      *  @return stdClass bounding rectangle
      */
@@ -415,6 +445,23 @@ class qtype_correctwriting_table
        /** @var qtype_correctwriting_table_cell $cell */
        $cell = $this->table[$this->answertable[$answerindex]];
        return $cell->get_answer_rect();
+   }
+
+    /** Returns a label rectangle for lexeme in teacher's answer
+     * @param int $answerindex
+     * @return stdClass bounding rectangle
+     * @throws Exception if not a label
+     */
+   public function get_real_rect_for_answer_index($answerindex) {
+       /** @var qtype_correctwriting_table_cell $cell */
+       $cell = $this->table[$this->answertable[$answerindex]];
+       $rect = $cell->get_answer_rect();
+       $label = $cell->answer();
+       /** @var qtype_correctwriting_lexeme_label $label */
+       if (!is_a($label, 'qtype_correctwriting_lexeme_label')) {
+           throw new Exception("Not a qtype_correctwriting_lexeme_label");
+       }
+       return $label->get_label_rect($rect);
    }
    /** Returns a connection point for lexeme in student response
     *  @param int $responseindex index of lexeme in responses
@@ -434,6 +481,23 @@ class qtype_correctwriting_table
        $cell = $this->table[$this->responsetable[$responseindex]];
        return $cell->get_response_rect();
    }
+
+    /** Returns a label rectangle for lexeme in student's response
+     * @param int $responseindex
+     * @return stdClass bounding rectangle
+     * @throws Exception if not a label
+     */
+    public function get_real_rect_for_response_index($responseindex) {
+        /** @var qtype_correctwriting_table_cell $cell */
+        $cell = $this->table[$this->responsetable[$responseindex]];
+        $rect = $cell->get_response_rect();
+        $label = $cell->response();
+        /** @var qtype_correctwriting_lexeme_label $label */
+        if (!is_a($label, 'qtype_correctwriting_lexeme_label')) {
+            throw new Exception("Not a qtype_correctwriting_lexeme_label");
+        }
+        return $label->get_label_rect($rect);
+    }
 
     /**
      * Index
@@ -561,11 +625,21 @@ class qtype_correctwriting_arrow_builder {
     * @var qtype_correctwriting_table built table of lexemes
     */
    private $table;
+   /**
+    * @var qtype_correctwriting_question question
+    */
+   private $question;
+   /**
+    * @var $pair
+    */
+   private $pair;
    /** Creates a new builder with associated data
     * @param qtype_correctwriting_table $table built table of lexemes
+    * @param qtype_correctwriting_question question
     */
-   public function __construct($table) {
+   public function __construct($table, $question) {
        $this->table = $table;
+       $this->question = $question;
    }
 
     public function merge_rects($rects) {
@@ -598,6 +672,9 @@ class qtype_correctwriting_arrow_builder {
        if (array_key_exists('group', $_REQUEST)) {
            $groupmovements = intval($_REQUEST['group']) > 0;
        }
+
+       $simplealignment = $this->question->issequenceanalyzerenabled <= 0
+                       || $this->question->issequenceanalyzerenabled == false;
 
        // Set thickness
        imagesetthickness($im, LINE_WIDTH);
@@ -632,7 +709,17 @@ class qtype_correctwriting_arrow_builder {
 
            } else {
                foreach($this->table->mistakes()->get_absent_lexeme_indexes() as $index) {
-                   $rect = $this->table->get_rect_by_answer_index($index);
+                   $rect = null;
+                   if ($simplealignment) {
+                       /** @var qtype_correctwriting_table_cell $cell */
+                       $rect = $this->table->get_real_rect_for_answer_index($index);
+                       $rect->x -= TINY_SPACE;
+                       $rect->width += 2 * TINY_SPACE;
+                       $rect->y -= TINY_SPACE;
+                       $rect->height += TINY_SPACE;
+                   } else {
+                       $rect = $this->table->get_rect_by_answer_index($index);
+                   }
                    $this->draw_rectangle($im, $palette['red'], $rect);
                }
            }
@@ -687,82 +774,92 @@ class qtype_correctwriting_arrow_builder {
            } else {
                foreach($this->table->mistakes()->get_added_lexeme_indexes() as $index) {
                    $rect = $this->table->get_rect_by_response_index($index);
+                   if ($simplealignment) {
+                       $rect = $this->table->get_real_rect_for_response_index($index);
+                   }
                    if ($this->table->is_response_text_bigger_than($index, 1)) {
                        $baselineoffset = $this->table->get_cell_by_response_index($index)->response()->get_baseline_offset();
                        $rect->y += $baselineoffset;
                        $rect->height -= $baselineoffset;
                        $this->draw_big_strikethrough($im, $palette['red'], $rect);
                    } else {
+                       if ($simplealignment) {
+                           $oldy = $rect->y;
+                           $rect->y = $rect->baseliney;
+                           $rect->height = $rect->baseliney - $oldy;
+                       }
                        $this->draw_strikethrough($im, $palette['red'], $rect);
                    }
                }
            }
        }
        imagesetthickness($im, LINE_WIDTH);
+
+
        // Draw moved lexemes arrows
        if (count($this->table->mistakes()->get_moves()) != 0) {
            if ($groupmovements) {
                $moves = $this->table->mistakes()->get_moves();
                $groups = array();
-               foreach($moves as $entry) {
+               foreach ($moves as $entry) {
                    if (count($groups) == 0) {
-                       $groups[] = array( $entry );
+                       $groups[] = array($entry);
                    } else {
                        $lastgroup = $groups[count($groups) - 1];
                        $lastentry = $lastgroup[count($lastgroup) - 1];
                        if ($entry->answer == $lastentry->answer + 1 && $entry->response == $lastentry->response + 1) {
                            $groups[count($groups) - 1][] = $entry;
                        } else {
-                           $groups[] = array( $entry );
+                           $groups[] = array($entry);
                        }
                    }
                }
 
-               foreach($groups as $group) {
-                    if (count($group) == 1) {
-                        $p1 = $this->table->get_connections_by_answer_index($group[0]->answer)->answer;
-                        $p2 = $this->table->get_connections_by_response_index($group[0]->response)->response;
-                        $this->draw_multi_arrow($im, $palette['red'], $p2, $p1, false);
-                    }   else {
-                        $answerrects = array();
-                        $responserects = array();
-                        foreach($group as $entry) {
-                            $responserects[] = $this->table->get_rect_by_response_index($entry->response);
-                            $answerrects[] =  $this->table->get_rect_by_answer_index($entry->answer);
-                        }
+               foreach ($groups as $group) {
+                   if (count($group) == 1) {
+                       $p1 = $this->table->get_connections_by_answer_index($group[0]->answer)->answer;
+                       $p2 = $this->table->get_connections_by_response_index($group[0]->response)->response;
+                       $this->draw_multi_arrow($im, $palette['red'], $p2, $p1, false);
+                   } else {
+                       $answerrects = array();
+                       $responserects = array();
+                       foreach ($group as $entry) {
+                           $responserects[] = $this->table->get_rect_by_response_index($entry->response);
+                           $answerrects[] = $this->table->get_rect_by_answer_index($entry->answer);
+                       }
 
-                        $answerrect = $this->merge_rects($answerrects);
-                        $responserect = $this->merge_rects($responserects);
+                       $answerrect = $this->merge_rects($answerrects);
+                       $responserect = $this->merge_rects($responserects);
 
-                        $connectionpointresponse = array();
-                        $connectionpointresponse[0] = $responserect->x + $responserect->width / 2;
-                        $connectionpointresponse[1] = $responserect->y + $responserect->height + MOVE_GROUP_PADDING; // 2 is a slight padding
+                       $connectionpointresponse = array();
+                       $connectionpointresponse[0] = $responserect->x + $responserect->width / 2;
+                       $connectionpointresponse[1] = $responserect->y + $responserect->height + MOVE_GROUP_PADDING; // 2 is a slight padding
 
 
-                        $connectionpointanswer = array();
-                        $connectionpointanswer[0] = $answerrect->x + $answerrect->width / 2;
-                        $connectionpointanswer[1] = $answerrect->y - MOVE_GROUP_PADDING; // 2 is a slight padding
+                       $connectionpointanswer = array();
+                       $connectionpointanswer[0] = $answerrect->x + $answerrect->width / 2;
+                       $connectionpointanswer[1] = $answerrect->y - MOVE_GROUP_PADDING; // 2 is a slight padding
 
-                        $this->draw_arrow($im, $palette['red'], $connectionpointresponse, $connectionpointanswer, false);
+                       $this->draw_arrow($im, $palette['red'], $connectionpointresponse, $connectionpointanswer, false);
 
-                        $y = $answerrect->y - MOVE_GROUP_PADDING / 2;
-                        imageline($im, $answerrect->x - MOVE_GROUP_PADDING, $y, $answerrect->x + $answerrect->width + MOVE_GROUP_PADDING,  $y,  $palette['red']);
-                        $x = $answerrect->x - MOVE_GROUP_PADDING;
-                        imageline($im, $x, $y - MOVE_GROUP_PADDING / 2, $x,  $y + MOVE_GROUP_PADDING,  $palette['red']);
-                        $x = $answerrect->x + $answerrect->width + MOVE_GROUP_PADDING;
-                        imageline($im, $x, $y - MOVE_GROUP_PADDING / 2, $x,  $y + MOVE_GROUP_PADDING,  $palette['red']);
+                       $y = $answerrect->y - MOVE_GROUP_PADDING / 2;
+                       imageline($im, $answerrect->x - MOVE_GROUP_PADDING, $y, $answerrect->x + $answerrect->width + MOVE_GROUP_PADDING, $y, $palette['red']);
+                       $x = $answerrect->x - MOVE_GROUP_PADDING;
+                       imageline($im, $x, $y - MOVE_GROUP_PADDING / 2, $x, $y + MOVE_GROUP_PADDING, $palette['red']);
+                       $x = $answerrect->x + $answerrect->width + MOVE_GROUP_PADDING;
+                       imageline($im, $x, $y - MOVE_GROUP_PADDING / 2, $x, $y + MOVE_GROUP_PADDING, $palette['red']);
 
-                        $y = $responserect->y + $responserect->height + MOVE_GROUP_PADDING / 2;
-                        $miny = $responserect->y + $responserect->height - MOVE_GROUP_PADDING;
-                        $minx = $responserect->x - MOVE_GROUP_PADDING;
-                        $maxx = $responserect->x + $responserect->width + MOVE_GROUP_PADDING;
-                        imageline($im, $minx, $y, $maxx,  $y,  $palette['red']);
-                        imageline($im, $minx, $y, $minx,  $miny,  $palette['red']);
-                        imageline($im, $maxx, $y, $maxx,  $miny,  $palette['red']);
-                    }
+                       $y = $responserect->y + $responserect->height + MOVE_GROUP_PADDING / 2;
+                       $miny = $responserect->y + $responserect->height - MOVE_GROUP_PADDING;
+                       $minx = $responserect->x - MOVE_GROUP_PADDING;
+                       $maxx = $responserect->x + $responserect->width + MOVE_GROUP_PADDING;
+                       imageline($im, $minx, $y, $maxx, $y, $palette['red']);
+                       imageline($im, $minx, $y, $minx, $miny, $palette['red']);
+                       imageline($im, $maxx, $y, $maxx, $miny, $palette['red']);
+                   }
                }
            } else {
-               foreach($this->table->mistakes()->get_moves() as $entry) {
+               foreach ($this->table->mistakes()->get_moves() as $entry) {
                    $p1 = $this->table->get_connections_by_answer_index($entry->answer)->answer;
                    $p2 = $this->table->get_connections_by_response_index($entry->response)->response;
                    $this->draw_multi_arrow($im, $palette['red'], $p2, $p1, false);
@@ -771,19 +868,20 @@ class qtype_correctwriting_arrow_builder {
        }
        // Draw LCS
        if (count($this->table->lcs_extractor()->lcs()) != 0) {
-           foreach($this->table->lcs_extractor()->lcs() as $entry) {
+           foreach ($this->table->lcs_extractor()->lcs() as $entry) {
                $p1 = $this->table->get_connections_by_answer_index($entry->answer)->answer;
                $p2 = $this->table->get_connections_by_response_index($entry->response)->response;
                $color = $palette['black'];
-               if (count($p1) > 2 || count($p2) > 2) {
+               if (count($p1) > 2 || count($p2) > 2 || $entry->error) {
                    $color = $palette['red'];
                }
-               if (count($p1) == 2 && count($p2) == 2) {
+               if (count($p1) == 2 && count($p2) == 2 && !$simplealignment) {
                    $p2[0] = $p1[0];
                }
                $this->draw_multi_arrow($im, $color, $p2, $p1, true);
            }
        }
+
    }
 
    /**
@@ -912,9 +1010,13 @@ class qtype_correctwriting_arrow_builder {
 class qtype_correctwriting_image_generator
 {
    /**
-     @var qtype_correctwriting_table built table of lexemes
+    * @var qtype_correctwriting_table built table of lexemes
     */
    private $table;
+   /**
+    * @var qtype_correctwriting_question question
+    */
+   private $question;
 
    /** Constructs a generator, scanning sections
     *  @param qtype_correctwriting_string_pair $pair
@@ -923,7 +1025,7 @@ class qtype_correctwriting_image_generator
    public function __construct($pair, $question) {
        list($answer, $response, $correcttocorrect, $comparedtocompared) = self::pair_to_answer_response_list($pair);
        // $grouping = intval($question->issyntaxanalyzerenabled);
-
+       $this->question = $question;
        $absentlexemes = array();
        $addedlexemes  = array();
        $movedlexemes = array();
@@ -996,29 +1098,42 @@ class qtype_correctwriting_image_generator
        var_dump($movedlexemes);
        echo "</pre>";
        */
+       $oldlcs = null;
+       $issequenceanalyzerdisabled = $this->question->issequenceanalyzerenabled == 0
+                                  || $this->question->issequenceanalyzerenabled == false;
        $lcs = new qtype_correctwriting_lcs_extractor($pair);
-
-       $oldlcs = $lcs->lcs();
-
-       /*
-       echo "<pre>";
-       var_dump($oldlcs);
-       echo "</pre>";
-       */
+       if ($issequenceanalyzerdisabled) {
+           $oldlcs = array();
+           $pairs = $pair->matches()->matchedpairs;
+           for($i = 0; $i < count($pairs); $i++) {
+               /** @var block_formal_langs_matched_tokens_pair $ppair */
+               $ppair = $pairs[$i];
+               for($j = 0; $j < count($ppair->correcttokens); $j++) {
+                   $oldlcs[] = (object)array(
+                       'answer' => $ppair->correcttokens[$j],
+                       'response' => $ppair->comparedtokens,
+                       'error' => $ppair->mistakeweight > 0.001
+                   );
+               }
+           }
+       } else {
+           $oldlcs = $lcs->lcs();
+       }
 
        $newlcs = $this->transform_lcs($oldlcs, $correcttocorrect, $comparedtocompared);
-
-       /*
-       echo "<pre>";
-       var_dump($newlcs);
-       echo "</pre>";
-       */
 
        $lcs->set_lcs($newlcs);
 
        // Create a table
        $mistakes = new qtype_correctwriting_mistake_container($absentlexemes, $addedlexemes, $movedlexemes);
-       $this->table  = new qtype_correctwriting_table($answer, $response, $lcs, $mistakes);
+       $this->table  = new qtype_correctwriting_table(
+           $answer,
+           $response,
+           $lcs,
+           $mistakes,
+           $question->issequenceanalyzerenabled == 0
+           || $question->issequenceanalyzerenabled == false
+       );
    }
 
    /** Maps pair to an array of objects
@@ -1345,17 +1460,25 @@ class qtype_correctwriting_image_generator
         if (count($lcs)) {
             $items = array();
             foreach($lcs as $lcsitem) {
-                $items[] = array($lcsitem->answer, $lcsitem->response);
+                $kitem = array($lcsitem->answer, $lcsitem->response);
+                if (isset($lcsitem->error)) {
+                    $kitem[] = $lcsitem->error;
+                }
+                $items[] = $kitem;
             }
 
             $items = $this->transform_pair_mappings($items, $correcttocorrect, $comparedtocompared);
 
             $lcs = array();
             foreach($items as $item) {
-                $lcs[] = (object)array(
+                $kitem = (object)array(
                     'answer' => $item[0],
                     'response' => $item[1]
                 );
+                if (array_key_exists(2, $item)) {
+                    $kitem->error = $item[2];
+                }
+                $lcs[] = $kitem;
             }
         }
         return $lcs;
@@ -1401,7 +1524,7 @@ class qtype_correctwriting_image_generator
        // Draw a table
        $this->table->paint($im, $palette);
        // Generate image
-       $builder = new qtype_correctwriting_arrow_builder($this->table);
+       $builder = new qtype_correctwriting_arrow_builder($this->table, $this->question);
        $builder->paint($im, $palette);
        // Output image
        ob_start();

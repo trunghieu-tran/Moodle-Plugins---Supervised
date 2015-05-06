@@ -106,7 +106,6 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
     public function insert_letter($letter, $pos) {
         $this->text = substr_replace($this->text, $letter, $pos, 0);
         $inserted = array( 'insert' );
-
         array_splice( $this->operations, $pos, 0, $inserted );
     }
 
@@ -271,6 +270,40 @@ class qtype_correctwriting_lexeme_label extends qtype_correctwriting_abstract_la
             }
         }
         return $results;
+    }
+
+    public function get_label_rect($currentrect) {
+        return (object)array(
+            'x' => $currentrect->x + $currentrect->width/2 - $this->labelsize[0]/2,
+            'width' => $this->labelsize[0],
+            'y' => $currentrect->y,
+            'height' => $currentrect->height,
+            'baseliney' => $currentrect->y + $this->baselineoffset
+        );
+    }
+
+    protected function set_connection_point($currentrect,$bottom) {
+        global $metrics;
+        $this->connection = array();
+        $this->connection[] = $currentrect->x + $currentrect->width/2;
+        // If we must place it on bottom, than place it there (because we are in Decart space).
+        if ($bottom == true) {
+            $operationpairs = $this->combine_operations();
+            $downoffset = 0;
+            for($i = 0; $i < count($operationpairs); $i++) {
+                $operationpair = $operationpairs[$i];
+                if ($operationpair[1] == 'missing_separator') {
+                    $downoffset = max($downoffset, TINY_SPACE);
+                }
+                if ($operationpair[1] == 'transpose') {
+                    $downoffset = max($downoffset, TRANSPONSE_MAX_ARC_OFFSET);
+                }
+            }
+            $this->connection[] = $currentrect->y + $metrics['height'] + $this->baselineoffset + $downoffset;
+        } else {
+            $this->connection[] = $currentrect->y - TINY_SPACE;
+        }
+        $this->rectangle = $currentrect;
     }
 
     /** Paints a label at specific position, specified by rectangle. If it set as fixed, we paint it as red.
