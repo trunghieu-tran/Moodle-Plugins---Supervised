@@ -142,6 +142,10 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
                 }
             }
         }
+        
+        foreach($this->correctstring()->stream->tokens as $token) {
+            $this->indexesintable[$token->token_index()] = $token->token_index();
+        }
     }
 
     public function are_strings_equal() {
@@ -201,6 +205,12 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
     }
 
     /**
+     * Array of real indexes for correct answer in table.
+     * @var array
+     */
+    protected $indexesintable;
+
+    /**
      * Creates a new string as a copy of this with a lcs
      * @param array $lcs LCS
      * @return qtype_correctwriting_string_pair
@@ -221,4 +231,24 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
 
 
 
+    /**
+     * Return object of class
+     */
+   public function __construct($correct, $compared, $matches) {
+        block_formal_langs_string_pair::__construct($correct, $compared, $matches);
+        $this->indexesintable = array();
+        foreach($this->correctstring()->stream->tokens as $token) {
+            $this->indexesintable[$token->token_index()] = $token->token_index();
+        }
+    }
+
+    /**
+    * Set indexes in table  array for correctstring
+    * @param array - array of indexes
+    */
+    public function set_indexes_in_table($newindexes) {
+        $this->indexesintable = $newindexes;
+    }
+    
 }
+
