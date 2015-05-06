@@ -1,0 +1,1 @@
+java JLexPHP.Main ../preg_lexer.lex
