@@ -604,10 +604,14 @@ class  qtype_correctwriting_enum_analyzer extends qtype_correctwriting_abstract_
             }
             $tempstringbegin = $tempstringbegin.$tempstringend;
             // Update correct string.
-            $stringpair->correctstring()->string = new qtype_poasquestion_string($tempstringbegin);
+            $enumstring = clone($stringpair->correctstring());
+            $enumstring->string = new qtype_poasquestion_string($tempstringbegin);
             // Update enumerations descriptions.
             $stringpair->correctstring()->enumerations = $enumerations;
             // Update token indexes.
+            $enumstring->stream = null;
+            $enumstring->stream->tokens;
+            $stringpair->set_enum_correct_string($enumstring);
             $stringpair->correctstring()->stream = null;
             $stringpair->correctstring()->stream->tokens;
         }
@@ -679,10 +683,29 @@ class  qtype_correctwriting_enum_analyzer extends qtype_correctwriting_abstract_
        }  
        // If maximal LCS length is equal zero array of pair must be empty.
        if ($maxlcslength === 0) {
-           $this->resultstringpairs = array();
+           $this->resultstringpairs = array($this->basestringpair);
 		   $this->resultmistakes = array();
        }
     }
+
+		/**
+		* If this analyzer requires some other ones to work, not bypass - return an array of such analyzers names.
+		*/
+		public function require_analyzers() {
+				return array("qtype_correctwriting_sequence_analyzer");
+		}
+
+		/**
+		* Returns if the language is compatible with this analyzer.
+		* @param block_formal_langs_abstract_language $lang a language object from block_formal_langs
+		* @return boolean
+		*/
+		public function is_lang_compatible($lang) {
+				if($lang->name == 'cpp_parseable') {
+					return true;
+				}
+				return false;
+		}
 }
 
 class enum_element {

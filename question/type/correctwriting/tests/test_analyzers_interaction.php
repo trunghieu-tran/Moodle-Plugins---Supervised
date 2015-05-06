@@ -20,7 +20,7 @@ require_once($CFG->dirroot.'/question/type/correctwriting/question.php');
 require_once($CFG->dirroot.'/question/type/correctwriting/questiontype.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/language_simple_english.php');
 
-class qtype_correctwriting_common_test extends PHPUnit_Framework_TestCase {
+class qtype_correctwriting_analyzers_interaction_test extends PHPUnit_Framework_TestCase {
 
     // пропуск, перемещение, добавление лексемы
     public function test_drop_move_addition_lexemes_001() {
