@@ -26,7 +26,11 @@ require_once($CFG->dirroot.'/question/type/poasquestion/poasquestion_string.php'
 
 class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase {
 
-    public function testdefinition() {
+    /**
+     *  Test for find enumerations in definition list.
+     *  Enumeration only in first definition.
+     */
+    public function test_definition() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'int k = j / h + t + o - r ; bool g = kill = live ;';
         $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
@@ -42,7 +46,12 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $this->assertEquals($expected_result[0][2], $temp->getEnums()[0][2], $error_string);
         $this->assertEquals($expected_result, $temp->getEnums(), $error_string);
     }
-    public function testsequence_of_mod() {
+
+    /**
+     *  Test for find enumerations in sequence of mod.
+     *  Enumeration elements from h to r.
+     */
+    public function test_sequence_of_mod() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'k = j % h % t % o % r ;';
         $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
@@ -61,7 +70,12 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $this->assertEquals($expected_result, $temp->getEnums(), $error_string);
 
     }
-    public function testsequence_of_plus_with_multiple() {
+
+    /**
+     *  Test for find enumerations in sequence of plus with multiple.
+     *  Two enumerations, first from sequence of plus, second multiple operation.
+     */
+    public function test_sequence_of_plus_with_multiple() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'k = ( j + h + t + o + r ) * f ;';
         $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
@@ -85,7 +99,12 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $this->assertEquals($expected_result[0][4], $temp->getEnums()[0][4], $error_string);
         $this->assertEquals($expected_result, $temp->getEnums(), $error_string);
     }
-    public function testsequence_of_plus_and_multiple() {
+
+    /**
+     *  Test for find enumerations in sequence of plus add multiple.
+     *  Four enumerations, first from sequence of plus, second, third, fourth from multiple operations.
+     */
+    public function test_sequence_of_plus_and_multiple() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'k = ( j * h + t * o + r ) * f ;';
         $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
@@ -113,7 +132,12 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $this->assertEquals($expected_result[3][1], $temp->getEnums()[3][1], $error_string);
         $this->assertEquals($expected_result, $temp->getEnums(), $error_string);
     }
-    public function testsequence_of_plus_and_multiple_with_type_casting() {
+
+    /**
+     *  Test for find enumerations in sequence of plus add multiple with type casting.
+     *  Four enumerations, first from sequence of plus, second, third, fourth from multiple operations.
+     */
+    public function test_sequence_of_plus_and_multiple_with_type_casting() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'k = (int)( j * h + t * o + r ) * f ;';
         $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
@@ -141,7 +165,13 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $this->assertEquals($expected_result[3][1], $temp->getEnums()[3][1], $error_string);
         $this->assertEquals($expected_result, $temp->getEnums(), $error_string);
     }
-    public function testsequence_of_plus_and_multiple_mod_and_div() {
+
+    /**
+     *  Test for find enumerations in sequence of plus, multiple, division and mod.
+     *  Four enumerations, first from sequence of plus, second from multiple operation,
+     *  third from division sequence, fourth from mod sequence.
+     */
+    public function test_sequence_of_plus_and_multiple_mod_and_div() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'k = ( j * h + t / o / r ) % f % g ;';
         $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
@@ -167,7 +197,12 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $this->assertEquals($expected_result[3][1], $temp->getEnums()[3][1], $error_string);
         $this->assertEquals($expected_result, $temp->getEnums(), $error_string);
     }
-    public function testsequence_of_sub() {
+
+    /**
+     *  Test for find enumerations in sequence of subtraction.
+     *  Enumeration from h to r.
+     */
+    public function test_sequence_of_sub() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'k = j - h - t - o - r ;';
         $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
@@ -185,7 +220,12 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $this->assertEquals($expected_result[0][3], $temp->getEnums()[0][3], $error_string);
         $this->assertEquals($expected_result, $temp->getEnums(), $error_string);
     }
-    public function testsequence_of_div() {
+
+    /**
+     *  Test for find enumerations in sequence of division.
+     *  Enumeration from h to r.
+     */
+    public function test_sequence_of_div() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'k = j / h / t / o / r ;';
         $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
@@ -203,6 +243,11 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $this->assertEquals($expected_result[0][3], $temp->getEnums()[0][3], $error_string);
         $this->assertEquals($expected_result, $temp->getEnums(), $error_string);
     }
+
+    /**
+     *  Test for find enumerations in sequence of plus.
+     *  Enumeration from j to r.
+     */
     public function testsequence_of_plus() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'k = j + h + t + o + r ;';
@@ -223,7 +268,12 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $this->assertEquals($expected_result[0][4], $temp->getEnums()[0][4], $error_string);
         $this->assertEquals($expected_result, $temp->getEnums(), $error_string);
     }
-    public function testsequence_of_mul() {
+
+    /**
+     *  Test for find enumerations in sequence of multiple.
+     *  Enumeration from j to r.
+     */
+    public function test_sequence_of_mul() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'k = j * h * t * o * r ;';
         $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
@@ -243,7 +293,12 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $this->assertEquals($expected_result[0][4], $temp->getEnums()[0][4], $error_string);
         $this->assertEquals($expected_result, $temp->getEnums(), $error_string);
     }
-    public function testsequence_of_assign() {
+
+    /**
+     *  Test for find enumerations in sequence of assign.
+     *  Enumeration from k to o.
+     */
+    public function test_sequence_of_assign() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'k = j = h = t = o = r ;';
         $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
@@ -263,7 +318,12 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $this->assertEquals($expected_result[0][4], $temp->getEnums()[0][4], $error_string);
         $this->assertEquals($expected_result, $temp->getEnums(), $error_string);
     }
-    public function testbit_operations() {
+
+    /**
+     *  Test for find enumerations in bit operations.
+     *  Four enumerations, first form bit or, second from bit and, third from bit and, fourth from bit xor.
+     */
+    public function test_bit_operations() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'k = j & h | t ^ o & r ;';
         $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
@@ -289,7 +349,12 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $this->assertEquals($expected_result[3][1], $temp->getEnums()[3][1], $error_string);
         $this->assertEquals($expected_result, $temp->getEnums(), $error_string);
     }
-    public function testdefinition_variables_and_pointers() {
+
+    /**
+     *  Test for find enumerations in sequence of definitions variables and pointers.
+     *  Enumeration, from first * to h.
+     */
+    public function test_definition_variables_and_pointers() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'int * k , j , *h;';
         $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
@@ -305,7 +370,11 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $this->assertEquals($expected_result[0][2], $temp->getEnums()[0][2], $error_string);
         $this->assertEquals($expected_result, $temp->getEnums(), $error_string);
     }
-    public function testdefinition_variables_and_pointers_1() {
+    /**
+     *  Test for find enumerations in sequence of definitions variables and pointers with assign.
+     *  Enumeration, from first * to e.
+     */
+    public function test_definition_variables_and_pointers_with_assign() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'int * k , j , *h=z=e;';
         $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
@@ -321,7 +390,12 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $this->assertEquals($expected_result[0][2], $temp->getEnums()[0][2], $error_string);
         $this->assertEquals($expected_result, $temp->getEnums(), $error_string);
     }
-    public function testdefinition_variables() {
+
+    /**
+     *  Test for find enumerations in sequence of definitions variables.
+     *  Enumeration, from first k to h.
+     */
+    public function test_definition_variables() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'int k , j , h;';
         $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
@@ -337,7 +411,12 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $this->assertEquals($expected_result[0][2], $temp->getEnums()[0][2], $error_string);
         $this->assertEquals($expected_result, $temp->getEnums(), $error_string);
     }
-    public function testdefinition_variables_with_assign() {
+
+    /**
+     *  Test for find enumerations in sequence of definitions variables with assign.
+     *  Enumeration, from first k to h.
+     */
+    public function test_definition_variables_with_assign() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'int k=2 , j=u , h;';
         $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
@@ -353,7 +432,12 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $this->assertEquals($expected_result[0][2], $temp->getEnums()[0][2], $error_string);
         $this->assertEquals($expected_result, $temp->getEnums(), $error_string);
     }
-    public function testdefinition_variables_with_assign_heavy() {
+
+    /**
+     *  Test for find enumerations in sequence of definitions variables with assign(use dependences).
+     *  Enumeration, from first k to h.
+     */
+    public function test_definition_variables_with_assign_heavy() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'int k=2 , j=k , h;';
         $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
@@ -369,7 +453,12 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $this->assertEquals($expected_result[0][2], $temp->getEnums()[0][2], $error_string);
         $this->assertEquals($expected_result, $temp->getEnums(), $error_string);
     }
-    public function testdefinition_array() {
+
+    /**
+     *  Test for find enumerations in definition of array.
+     *  No enumerations.
+     */
+    public function test_definition_array() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'int k [ 5 ] = { 1 , 2 , 4 , 3 , 0 } ;';
         $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
@@ -379,7 +468,12 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $error_string = 'Error enumeration catcher found!Definition variables with assign, heavy.';
         $this->assertEquals($expected_result, $temp->getEnums(), $error_string);
     }
-    public function testdefinition_enum() {
+
+    /**
+     *  Test for find enumerations in definition of enumeration.
+     *  Enumeration from Int to Float.
+     */
+    public function test_definition_enum() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'enum types { Int , Char , Double , Float } ;';
         $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
@@ -397,7 +491,12 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $this->assertEquals($expected_result[0][3], $temp->getEnums()[0][3], $error_string);
         $this->assertEquals($expected_result, $temp->getEnums(), $error_string);
     }
-    public function testdefinition_enum_with_assign() {
+
+    /**
+     *  Test for find enumerations in definition of enumeration with assign.
+     *  Enumeration from Int to Float.
+     */
+    public function test_definition_enum_with_assign() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'enum suit { diamond = 1 , heart } ;';
         $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
@@ -411,7 +510,12 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $this->assertEquals($expected_result[0][1], $temp->getEnums()[0][1], $error_string);
         $this->assertEquals($expected_result, $temp->getEnums(), $error_string);
     }
-    public function testdefinition_struct() {
+
+    /**
+     *  Test for find enumerations in definition of struct.
+     *  Enumeration from int to prelast ';'.
+     */
+    public function test_definition_struct() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'struct suit { int a ; char * b ; float k ; } ;';
         $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
@@ -427,7 +531,12 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $this->assertEquals($expected_result[0][2], $temp->getEnums()[0][2], $error_string);
         $this->assertEquals($expected_result, $temp->getEnums(), $error_string);
     }
-    public function testlogical_eq_ne_and_or() {
+
+    /**
+     *  Test for find enumerations in logical operators.
+     *  Four enumerations, first from logical or, second from logical and, third from logical equal, fourth from logical not equal.
+     */
+    public function test_logical_operators() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'k = j == h && t != o && r  || f ;';
         $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
@@ -455,7 +564,13 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $this->assertEquals($expected_result[3][1], $temp->getEnums()[3][1], $error_string);
         $this->assertEquals($expected_result, $temp->getEnums(), $error_string);
     }
-    public function testlogical_eq_ne_and_or_bracket() {
+
+    /**
+     *  Test for find enumerations in logical operators with brackets.
+     *  Five enumerations, first from logical or, second from logical and, third from logical and, fourth from logical equal,
+     *  fifth from logical not equal.
+     */
+    public function test_logical_operators_and_brackets() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'k = j == h && (t != o && r  || f );';
         $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
@@ -485,6 +600,11 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $this->assertEquals($expected_result[4][1], $temp->getEnums()[4][1], $error_string);
         $this->assertEquals($expected_result, $temp->getEnums(), $error_string);
     }
+
+    /**
+     *  Test for find enumerations in math operators and plus short form.
+     *  Three enumerations, first from plus, second from next plus, third from multiple.
+     */
     public function test_use_shortform_plus() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'k += j + h - (3 - o + r  * f );';
@@ -507,6 +627,11 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $this->assertEquals($expected_result[2][1], $temp->getEnums()[2][1], $error_string);
         $this->assertEquals($expected_result, $temp->getEnums(), $error_string);
     }
+
+    /**
+     *  Test for find enumerations in math operators and subtraction short form.
+     *  Three enumerations, first from plus, second from next plus, third from multiple.
+     */
     public function test_use_shortform_sub() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'k -= j + h - (3 - o + r  * f );';
@@ -529,6 +654,11 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $this->assertEquals($expected_result[2][1], $temp->getEnums()[2][1], $error_string);
         $this->assertEquals($expected_result, $temp->getEnums(), $error_string);
     }
+
+    /**
+     *  Test for find enumerations in math operators and multiple short form.
+     *  Three enumerations, first from plus, second from next plus, third from multiple.
+     */
     public function test_use_shortform_mul() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'k *= j + h - (3 - o + r  * f );';
@@ -551,6 +681,11 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $this->assertEquals($expected_result[2][1], $temp->getEnums()[2][1], $error_string);
         $this->assertEquals($expected_result, $temp->getEnums(), $error_string);
     }
+
+    /**
+     *  Test for find enumerations in math operators and division short form.
+     *  Three enumerations, first from plus, second from next plus, third from multiple.
+     */
     public function test_use_shortform_div() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'k /= j + h - (3 - o + r  * f );';
@@ -573,6 +708,11 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $this->assertEquals($expected_result[2][1], $temp->getEnums()[2][1], $error_string);
         $this->assertEquals($expected_result, $temp->getEnums(), $error_string);
     }
+
+    /**
+     *  Test for find enumerations in math operators and two forms of increment.
+     *  Three enumerations, first from plus, second from next plus, third from multiple.
+     */
     public function test_use_shortform_inc() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'k = j + h++ - (3 - ++o + r  * f );';
@@ -595,6 +735,11 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
         $this->assertEquals($expected_result[2][1], $temp->getEnums()[2][1], $error_string);
         $this->assertEquals($expected_result, $temp->getEnums(), $error_string);
     }
+
+    /**
+     *  Test for find enumerations in math operators and two forms of decrement.
+     *  Three enumerations, first from plus, second from next plus, third from multiple.
+     */
     public function test_use_shortform_dec() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
         $string = 'k = j + h-- - (3 - --o + r  * f );';
