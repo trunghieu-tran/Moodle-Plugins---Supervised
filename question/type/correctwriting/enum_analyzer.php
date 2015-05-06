@@ -604,10 +604,14 @@ class  qtype_correctwriting_enum_analyzer extends qtype_correctwriting_abstract_
             }
             $tempstringbegin = $tempstringbegin.$tempstringend;
             // Update correct string.
-            $stringpair->correctstring()->string = new qtype_poasquestion_string($tempstringbegin);
+            $enumstring = clone($stringpair->correctstring());
+            $enumstring->string = new qtype_poasquestion_string($tempstringbegin);
             // Update enumerations descriptions.
             $stringpair->correctstring()->enumerations = $enumerations;
             // Update token indexes.
+            $enumstring->stream = null;
+            $enumstring->stream->tokens;
+            $stringpair->set_enum_correct_string($enumstring);
             $stringpair->correctstring()->stream = null;
             $stringpair->correctstring()->stream->tokens;
         }
@@ -679,7 +683,7 @@ class  qtype_correctwriting_enum_analyzer extends qtype_correctwriting_abstract_
        }  
        // If maximal LCS length is equal zero array of pair must be empty.
        if ($maxlcslength === 0) {
-           $this->resultstringpairs = array();
+           $this->resultstringpairs = array($this->basestringpair);
 		   $this->resultmistakes = array();
        }
     }
