@@ -142,6 +142,10 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
                 }
             }
         }
+        
+        foreach($this->correctstring()->stream->tokens as $token) {
+            $this->indexesintable[$token->token_index()] = $token->token_index();
+        }
     }
 
     public function are_strings_equal() {
@@ -245,18 +249,6 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
     public function set_indexes_in_table($newindexes) {
         $this->indexesintable = $newindexes;
     }
-
-    /**
-    * Create complete copy of current pair without common references
-    * @return object of qtype_correctwriting_string_pair $pair copy of current pair 
-    */
-    public function __clone() {
-        // Clone answers.
-        $this->correctstring = clone($this->correctstring());
-        $this->correctedstring = clone($this->correctedstring());
-        foreach($this->correctstring()->stream->tokens as $token) {
-            $this->indexesintable[$token->token_index()] = $token->token_index();
-        }
-    }
+    
 }
 
