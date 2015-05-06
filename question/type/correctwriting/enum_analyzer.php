@@ -683,6 +683,25 @@ class  qtype_correctwriting_enum_analyzer extends qtype_correctwriting_abstract_
 		   $this->resultmistakes = array();
        }
     }
+
+		/**
+		* If this analyzer requires some other ones to work, not bypass - return an array of such analyzers names.
+		*/
+		public function require_analyzers() {
+				return array("qtype_correctwriting_sequence_analyzer");
+		}
+
+		/**
+		* Returns if the language is compatible with this analyzer.
+		* @param block_formal_langs_abstract_language $lang a language object from block_formal_langs
+		* @return boolean
+		*/
+		public function is_lang_compatible($lang) {
+				if($lang->name == 'cpp_parseable') {
+					return true;
+				}
+				return false;
+		}
 }
 
 class enum_element {
