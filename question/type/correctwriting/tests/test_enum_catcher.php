@@ -498,7 +498,7 @@ class qtype_correctwriting_enum_catcher_test extends PHPUnit_Framework_TestCase 
      */
     public function test_definition_enum_with_assign() {
         $lang = new block_formal_langs_language_cpp_parseable_language();
-        $string = 'enum suit { diamond = 1 , heart } ;';
+        $string = 'enum suit { Int = 1 , Float } ;';
         $correct = $lang->create_from_string(new qtype_poasquestion_string($string), 'qtype_correctwriting_proccesedstring');
         $tree = $correct->syntaxtree;
         $temp = new qtype_correctwriting_enum_catcher($tree);
