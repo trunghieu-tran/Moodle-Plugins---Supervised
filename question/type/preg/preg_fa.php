@@ -2378,8 +2378,8 @@ class qtype_preg_fa {
         }
 
         // Prepare automata for intersection.
-        $this->remove_unreachable_states();
-        $anotherfa->remove_unreachable_states();
+        /*$this->remove_unreachable_states();
+        $anotherfa->remove_unreachable_states();*/
         $result = $this->intersect_fa($anotherfa, $numbers, $isstart);
 
         $result->remove_unreachable_states();
@@ -2572,19 +2572,96 @@ class qtype_preg_fa {
         }
         // Copy branches.
         $stop = $result->copy_modify_branches($this, $oldfront, $stopcoping, $isstart);
+        $transitions = array();
+        $startstates = $this->start_states();
+        $endstates = $this->end_states();
         // Change state first from intersection.
         $secondnumbers = $anotherfa->get_state_numbers();
+        $firstnumbers = $this->get_state_numbers();
+        $resnumbers = $result->get_state_numbers();
+        $newstop = array();
+        // Skip uncapturing transitions.
+        foreach ($stateindex as $number) {
+            if ($isstart == 0 && in_array($number, $startstates)) {
+                $transitions = $this->get_adjacent_transitions($number, true);
+                foreach ($transitions as $transition) {
+                    if ($transition->is_start_anchor() || $transition->is_eps()) {
+                        foreach ($stop as $stopindex) {
+                            $tran = clone $transition;
+                            $tran->from = $stopindex;
+                            $addednumber = $result->get_inter_state($firstnumbers[$transition->to], $resnumbers[$stopindex]);
+                            $addednumber = trim($addednumber, ",");
+                            $addedstate = $result->add_state($addednumber);
+                            $tran->to = $addedstate;
+                            $result->add_transition($tran);
+                            $newstop[] = $addedstate;
+                        }
+                    }
+                }
+            } else if ($isstart == 1 && in_array($number, $startstates)) {
+                $transitions = $this->get_adjacent_transitions($number, false);
+                foreach ($transitions as $transition) {
+                    if ($transition->is_end_anchor() || $transition->is_eps()) {
+                        foreach ($stop as $stopindex) {
+                            $tran = clone $transition;
+                            $tran->to = $stopindex;
+                            $addednumber = $result->get_inter_state($firstnumbers[$transition->from],$resnumbers[$stopindex]);
+                            $addednumber = trim($addednumber, ",");
+                            $addedstate = $result->add_state($addednumber);
+                            $tran->from = $addedstate;
+                            $result->add_transition($tran);
+                            $newstop[] = $addedstate;
+                        }
+                    }
+                }
+            }
+        }
+
         if ($isstart == 0) {
             $states = $anotherfa->start_states();
+            foreach ($states as $state) {
+                $transitions = $anotherfa->get_adjacent_transitions($state, true);
+                foreach ($transitions as $transition) {
+                    if ($transition->is_start_anchor() || $transition->is_eps()) {
+                        foreach ($stop as $stopindex) {
+                            $tran = clone $transition;
+                            $tran->from = $stopindex;
+                            $addednumber = $result->get_inter_state($resnumbers[$stopindex], $secondnumbers[$transition->to]);
+                            $addedstate = $result->add_state($addednumber);
+                            $tran->to = $addedstate;
+                            $result->add_transition($tran);
+                            $newstop[] = $addedstate;
+                        }
+                    }
+                }
+            }
+
         } else {
             $states = $anotherfa->end_states();
+            foreach ($states as $state) {
+                $transitions = $anotherfa->get_adjacent_transitions($state, false);
+                foreach ($transitions as $transition) {
+                    if ($transition->is_end_anchor() || $transition->is_eps()) {
+                        foreach ($stop as $stopindex) {
+                            $tran = clone $transition;
+                            $tran->to = $stopindex;
+                            $addednumber = $result->get_inter_state($resnumbers[$stopindex], $secondnumbers[$transition->from]);
+                            $addedstate = $result->add_state($addednumber);
+                            $tran->from = $addedstate;
+                            $result->add_transition($tran);
+                            $newstop[] = $addedstate;
+                        }
+                    }
+                }
+            }
         }
         $secforinter = $secondnumbers[$states[0]];
-        $resnumbers = $result->get_state_numbers();
+
         foreach ($stop as $stopnumber) {
             $state = $result->get_inter_state($resnumbers[$stopnumber], $secforinter);
             $result->change_real_number($stopnumber, $state);
         }
+        $stop = array_merge($stop, $newstop);
 
         // Find intersection part.
         if (!$anotherfa->has_cycle() && $this->has_cycle()) {
