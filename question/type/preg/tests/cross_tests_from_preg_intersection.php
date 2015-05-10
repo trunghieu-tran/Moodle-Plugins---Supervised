@@ -621,7 +621,7 @@ class qtype_preg_cross_tests_from_preg_intersection {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
-                        'length'=>array(0=>3));
+                        'length'=>array(0=>1));
 
         $test2 = array( 'str'=>'da',
                         'is_match'=>true,
