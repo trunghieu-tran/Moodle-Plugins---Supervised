@@ -649,6 +649,18 @@ class qtype_preg_cross_tests_from_preg_intersection {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
+    function data_for_test_assertions_lookahead_29() {
+        $test1 = array( 'str'=>'ab',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1));
+
+        return array('regex'=>'a(?=b)',
+                     'tests'=>array($test1),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
     function data_for_test_assertions_lookbehind_1() {
         $test1 = array( 'str'=>'abef',
                         'is_match'=>true,
