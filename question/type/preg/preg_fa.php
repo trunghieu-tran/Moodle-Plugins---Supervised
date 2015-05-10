@@ -481,6 +481,7 @@ class qtype_preg_fa_transition {
      * @param other another transition for intersection.
      */
     public function intersect($other) {
+
         $thishastags = $this->has_tags();
         $otherhastags = $other->has_tags();
         $resulttran = null;
@@ -520,10 +521,11 @@ class qtype_preg_fa_transition {
             $resulttran->loopsback = $this->loopsback || $other->loopsback;
             return $resulttran;
         }
-        if ($this->is_unmerged_assert() && $this->consumeschars == false && (!$other->is_eps() && !$other->is_unmerged_assert())
-            || $other->is_unmerged_assert() && $other->consumeschars == false && (!$this->is_eps() && !$this->is_unmerged_assert())) {
+        if ($this->is_unmerged_assert()  && (!$other->is_eps() && !$other->is_unmerged_assert())
+            || $other->is_unmerged_assert() && (!$this->is_eps() && !$this->is_unmerged_assert())) {
             // We can intersect asserts only with \n.
             $intersection = null;
+
             if ($this->is_unmerged_assert()) {
                 $intersection = $other->intersect($righttran);
                 $resulttran = clone $other;
@@ -532,11 +534,13 @@ class qtype_preg_fa_transition {
                 $resulttran = clone $this;
             }
             if ($intersection != null) {
-                $this->unite_tags($other, $resulttran);
                 $resulttran->pregleaf = $intersection->pregleaf;
                 $assert = $this->intersect_asserts($other);
                 $resulttran->mergedbefore = $assert->mergedbefore;
                 $resulttran->mergedafter = $assert->mergedafter;
+                if ($this->is_unmerged_assert()) {
+                    $resulttran->consumeschars = false;
+                }
                 $resulttran->loopsback = $this->loopsback || $other->loopsback;
                 return $resulttran;
             }
