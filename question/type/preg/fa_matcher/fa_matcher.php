@@ -1121,7 +1121,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             // Intersect complex assertions automata.
             foreach ($result->innerautomata as $state => $inner) {
                 foreach ($inner as $automaton) {
-                    $result = $result->intersect($automaton[0], $state, $automaton[1]);
+                    //$result->fa_to_dot('svg', "/home/elena/fa_1.svg");
+                    $result = $result->intersect($automaton[0], array($state), $automaton[1]);
                 }
             }
             //$result->calculate_subexpr_start_and_end_states();
