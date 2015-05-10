@@ -1133,7 +1133,7 @@ class qtype_preg_fa {
     /**
      * Add the end state of the automaton to given state.
      */
-    public function add_end_state($state, $subpattern) {
+    public function add_end_state($state, $subpattern = 0) {
         if (!array_key_exists($state, $this->adjacencymatrix)) {
             throw new qtype_preg_exception('set_end_state error: No state ' . $state . ' in automaton');
         }
@@ -1151,30 +1151,30 @@ class qtype_preg_fa {
      * Remove the end state of the automaton.
      */
     public function remove_end_state($state) {
-        unset($this->endstates[0][array_search($state, $this->endstates[0])]);
-        $this->endstates[0] = array_values($this->endstates[0]);
+        unset($this->faendstates[0][array_search($state, $this->faendstates[0])]);
+        $this->faendstates[0] = array_values($this->faendstates[0]);
     }
 
     /**
      * Remove the start state of the automaton.
      */
     public function remove_start_state($state) {
-        unset($this->startstates[0][array_search($state, $this->startstates[0])]);
-        $this->startstates[0] = array_values($this->startstates[0]);
+        unset($this->fastartstates[0][array_search($state, $this->fastartstates[0])]);
+        $this->fastartstates[0] = array_values($this->fastartstates[0]);
     }
 
     /**
      * Remove all end states of the automaton.
      */
     public function remove_all_end_states() {
-        $this->endstates = array();
+        $this->faendstates = array();
     }
 
     /**
      * Remove all start states of the automaton.
      */
     public function remove_all_start_states() {
-        $this->startstates = array();
+        $this->fastartstates = array();
     }
 
     /**
@@ -1240,16 +1240,16 @@ class qtype_preg_fa {
         $this->statecount--;
 
         // Remove from start and end states.
-        foreach ($this->startstates as $subpatt => $states) {
+        foreach ($this->fastartstates as $subpatt => $states) {
             $key = array_search($stateid, $states);
             if ($key !== false) {
-                unset($this->startstates[$subpatt][$key]);
+                unset($this->fastartstates[$subpatt][$key]);
             }
         }
-        foreach ($this->endstates as $subpatt => $states) {
+        foreach ($this->faendstates as $subpatt => $states) {
             $key = array_search($stateid, $states);
             if ($key !== false) {
-                unset($this->endstates[$subpatt][$key]);
+                unset($this->faendstates[$subpatt][$key]);
             }
         }
 
@@ -2306,11 +2306,11 @@ class qtype_preg_fa {
         $newleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $i = count($this->end_states()) - 1;
         if ($i > 0) {
-            $to = $this->endstates[0][0];
+            $to = $this->faendstates[0][0];
         }
         // Connect end states with first while automata has only one end state.
         while ($i > 0) {
-            $exendstate = $this->endstates[0][$i];
+            $exendstate = $this->faendstates[0][$i];
             $transitions = $this->get_adjacent_transitions($exendstate, false);
             $epstran = new qtype_preg_fa_transition ($exendstate, $newleaf, $to, current($transitions)->origin, current($transitions)->consumeschars);
             $this->add_transition($epstran);
