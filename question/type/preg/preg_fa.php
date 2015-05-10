@@ -2381,7 +2381,6 @@ class qtype_preg_fa {
         /*$this->remove_unreachable_states();
         $anotherfa->remove_unreachable_states();*/
         $result = $this->intersect_fa($anotherfa, $numbers, $isstart);
-
         $result->remove_unreachable_states();
         $result->lead_to_one_end();
         $result->handler = $this->handler;
@@ -2585,11 +2584,11 @@ class qtype_preg_fa {
             if ($isstart == 0 && in_array($number, $startstates)) {
                 $transitions = $this->get_adjacent_transitions($number, true);
                 foreach ($transitions as $transition) {
-                    if ($transition->is_start_anchor() || $transition->is_eps()) {
+                    if ($transition->is_start_anchor() || $transition->is_eps())  {
                         foreach ($stop as $stopindex) {
                             $tran = clone $transition;
                             $tran->from = $stopindex;
-                            $addednumber = $result->get_inter_state($firstnumbers[$transition->to], $resnumbers[$stopindex]);
+                            $addednumber = $result->get_inter_state($firstnumbers[$transition->to], $resnumbers[$anotherfa->start_states()[0]]);
                             $addednumber = trim($addednumber, ",");
                             $addedstate = $result->add_state($addednumber);
                             $tran->to = $addedstate;
@@ -2605,7 +2604,7 @@ class qtype_preg_fa {
                         foreach ($stop as $stopindex) {
                             $tran = clone $transition;
                             $tran->to = $stopindex;
-                            $addednumber = $result->get_inter_state($firstnumbers[$transition->from],$resnumbers[$stopindex]);
+                            $addednumber = $result->get_inter_state($firstnumbers[$transition->from],$resnumbers[$anotherfa->end_states()[0]]);
                             $addednumber = trim($addednumber, ",");
                             $addedstate = $result->add_state($addednumber);
                             $tran->from = $addedstate;
@@ -2656,7 +2655,6 @@ class qtype_preg_fa {
             }
         }
         $secforinter = $secondnumbers[$states[0]];
-
         foreach ($stop as $stopnumber) {
             $state = $result->get_inter_state($resnumbers[$stopnumber], $secforinter);
             $result->change_real_number($stopnumber, $state);
