@@ -484,6 +484,12 @@ class qtype_preg_fa_transition {
         $thishastags = $this->has_tags();
         $otherhastags = $other->has_tags();
         $resulttran = null;
+        $flag = new qtype_preg_charset_flag();
+        $flag->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string("\n"));
+        $charset = new qtype_preg_leaf_charset();
+        $charset->flags = array(array($flag));
+        $charset->userinscription = array(new qtype_preg_userinscription("\n"));
+        $righttran = new qtype_preg_fa_transition(0, $charset, 1);
         // Consider that eps and transition which doesn't consume characters always intersect
         if ($this->is_eps() && $other->consumeschars == false) {
             $resulttran = new qtype_preg_fa_transition(0, $other->pregleaf, 1, self::ORIGIN_TRANSITION_INTER, $other->consumeschars);
@@ -516,6 +522,24 @@ class qtype_preg_fa_transition {
         }
         if ($this->is_unmerged_assert() && $this->consumeschars == false && (!$other->is_eps() && !$other->is_unmerged_assert())
             || $other->is_unmerged_assert() && $other->consumeschars == false && (!$this->is_eps() && !$this->is_unmerged_assert())) {
+            // We can intersect asserts only with \n.
+            $intersection = null;
+            if ($this->is_unmerged_assert()) {
+                $intersection = $other->intersect($righttran);
+                $resulttran = clone $other;
+            } else if ($other->is_unmerged_assert()) {
+                $intersection = $this->intersect($righttran);
+                $resulttran = clone $this;
+            }
+            if ($intersection != null) {
+                $this->unite_tags($other, $resulttran);
+                $resulttran->pregleaf = $intersection->pregleaf;
+                $assert = $this->intersect_asserts($other);
+                $resulttran->mergedbefore = $assert->mergedbefore;
+                $resulttran->mergedafter = $assert->mergedafter;
+                $resulttran->loopsback = $this->loopsback || $other->loopsback;
+                return $resulttran;
+            }
             return null;
         }
         $resultleaf = $this->pregleaf->intersect_leafs($other->pregleaf, $thishastags, $otherhastags);
