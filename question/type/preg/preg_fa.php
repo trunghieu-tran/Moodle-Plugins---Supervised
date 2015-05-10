@@ -1656,12 +1656,12 @@ class qtype_preg_fa {
      *
      * @param source - automata-source for coping.
      * @param oldfront - states from which coping starts.
-     * @param stopcoping - state to which automata will be copied.
+     * @param stopcoping - array of states to which automata will be copied.
      * @param direction - direction of coping (0 - forward; 1 - back).
      * @return automata after coping.
      */
     public function copy_modify_branches($source, $oldfront, $stopcoping, $direction, $origin = null) {
-        $resultstop = null;
+        $resultstop = array();
         $memoryfront = array();
         $newfront = array();
         $newmemoryfront = array();
@@ -1701,11 +1701,11 @@ class qtype_preg_fa {
                         $this->copy_transitions($stateswere, $curstate, $workstate, $memoryfront, $source, $direction);
 
                         // Check end of coping.
-                        if ($stopcoping !== null && $curstate == $stopcoping) {
+                        if ($stopcoping !== null && array_search($curstate, $stopcoping) !== false) {
                             if ($direction == 0) {
                                 $this->add_end_state($workstate);
                             }
-                            $resultstop = $workstate;
+                            $resultstop[] = $workstate;
                         } else {
                             $newmemoryfront[] = $workstate;
                             // Adding connected states.
@@ -1753,8 +1753,8 @@ class qtype_preg_fa {
             $newend = array_search($this->modify_state($realnumber, $origin), $this->statenumbers);
             if ($newend !== false) {
                 // Get last copied state.
-                if ($resultstop === null) {
-                    $resultstop = $newend;
+                if (empty($resultstop)) {
+                    $resultstop[] = $newend;
                 }
                 $this->add_end_state($newend);
             }
@@ -2107,7 +2107,7 @@ class qtype_preg_fa {
      *
      * @param anotherfa object automaton to intersect.
      * @param result object automaton to write intersection part.
-     * @param start state of $this automaton with which to start intersection.
+     * @param start array of states of $this automaton with which to start intersection.
      * @param direction boolean intersect by superpose start or end state of anotherfa with stateindex state.
      * @param withcycle boolean intersect in case of forming right cycle.
      * @return result automata.
@@ -2116,8 +2116,9 @@ class qtype_preg_fa {
         $oldfront = array();
         $newfront = array();
         $clones = array();
+        $possibleend = array();
 
-        $oldfront[] = $start;
+        $oldfront = $start;
         // Work with each state.
         while (!empty($oldfront)) {
             foreach ($oldfront as $curstate) {
@@ -2195,6 +2196,7 @@ class qtype_preg_fa {
             $oldfront = $newfront;
             $newfront = array();
         }
+
         // Set right start and end states.
         if ($direction == 0) {
             // Cleaning end states.
@@ -2347,7 +2349,7 @@ class qtype_preg_fa {
      * Intersect automaton with another one.
      *
      * @param anotherfa object automaton to intersect.
-     * @param stateindex string with real number of state of $this automaton with which to start intersection.
+     * @param stateindex array of string with real number of state of $this automaton with which to start intersection.
      * @param isstart boolean intersect by superpose start or end state of anotherfa with stateindex state.
      * @return result automata.
      */
@@ -2356,14 +2358,19 @@ class qtype_preg_fa {
         if ($isstart != 0 && $isstart !=1) {
             throw new qtype_preg_exception('intersect error: Wrong direction');
         }
-        $number = array_search($stateindex, $this->statenumbers);
-        if ($number === false) {
-            throw new qtype_preg_exception('intersect error: No state with number' . $stateindex . '.');
+        $numbers = array();
+        foreach ($stateindex as $index) {
+            $number = array_search($index, $this->statenumbers);
+            if ($number === false) {
+                throw new qtype_preg_exception('intersect error: No state with number' . $index . '.');
+            }
+            $numbers[] = $number;
         }
+
         // Prepare automata for intersection.
         $this->remove_unreachable_states();
         $anotherfa->remove_unreachable_states();
-        $result = $this->intersect_fa($anotherfa, $number, $isstart);
+        $result = $this->intersect_fa($anotherfa, $numbers, $isstart);
 
         $result->remove_unreachable_states();
         $result->lead_to_one_end();
@@ -2539,7 +2546,7 @@ class qtype_preg_fa {
      * Intersect automaton with another one.
      *
      * @param anotherfa object automaton to intersect.
-     * @param stateindex integer index of state of $this automaton with which to start intersection.
+     * @param stateindex array of integer indexes of states of $this automaton with which to start intersection.
      * @param isstart boolean intersect by superpose start or end state of anotherfa with stateindex state.
      * @return result automata without blind states with one end state and with merged asserts.
      */
@@ -2563,8 +2570,11 @@ class qtype_preg_fa {
         }
         $secforinter = $secondnumbers[$states[0]];
         $resnumbers = $result->get_state_numbers();
-        $state = $result->get_inter_state($resnumbers[$stop], $secforinter);
-        $result->change_real_number($stop, $state);
+        foreach ($stop as $stopnumber) {
+            $state = $result->get_inter_state($resnumbers[$stopnumber], $secforinter);
+            $result->change_real_number($stopnumber, $state);
+        }
+
         // Find intersection part.
         if (!$anotherfa->has_cycle() && $this->has_cycle()) {
             $this->get_intersection_part($anotherfa, $result, $stop, $isstart, true);
