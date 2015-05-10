@@ -1710,6 +1710,12 @@ class qtype_preg_fa {
                                 $this->add_end_state($workstate);
                             }
                             $resultstop[] = $workstate;
+                            if (count($resultstop) !== count($stopcoping)) {
+                                $newmemoryfront[] = $workstate;
+                                // Adding connected states.
+                                $connectedstates = $source->get_connected_states($curstate, $direction);
+                                $newfront = array_merge($newfront, $connectedstates);
+                            }
                         } else {
                             $newmemoryfront[] = $workstate;
                             // Adding connected states.
@@ -2413,6 +2419,7 @@ class qtype_preg_fa {
                         }
                     }
                 }
+                $oldfront = array();
                 if (!$fa->has_endstate($workstate1)) {
                     $transitions = $fa->get_adjacent_transitions($workstate1, true);
                     foreach ($transitions as $tran) {
@@ -2509,7 +2516,7 @@ class qtype_preg_fa {
                     foreach ($transitions as $tran) {
                         $oldfront[] = $tran->from;
                     }
-                    $this->copy_modify_branches($anotherfa, $oldfront, null, $direction);
+                    $this->copy_modify_branches($anotherfa, $oldfront, null, $direction, qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND);
                     // Connect last state of intersection and copied branch.
                     foreach ($transitions as $tran) {
                         // Get number of copied state.
