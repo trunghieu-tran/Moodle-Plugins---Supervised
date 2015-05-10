@@ -1422,7 +1422,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $source = qtype_preg_fa::read_fa($sourcedescription);
         $direct = new qtype_preg_fa();
         $numbers = $source->get_state_numbers();
-        $stopcoping = array_search('1', $numbers);
+        $stopcoping = array(array_search('1', $numbers));
         $oldfront = array(array_search('0', $numbers));
         $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
         $search = '
@@ -1457,7 +1457,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $source = qtype_preg_fa::read_fa($sourcedescription);
         $direct = new qtype_preg_fa();
         $numbers = $source->get_state_numbers();
-        $stopcoping = array_search('1', $numbers);
+        $stopcoping = array(array_search('1', $numbers));
         $oldfront = array(array_search('0', $numbers));
         $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
         $search = '
@@ -1486,7 +1486,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $source = qtype_preg_fa::read_fa($sourcedescription);
         $direct = new qtype_preg_fa();
         $numbers = $source->get_state_numbers();
-        $stopcoping = array_search('1', $numbers);
+        $stopcoping = array(array_search('1', $numbers));
         $oldfront = array(array_search('0', $numbers));
         $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
         $search = '
@@ -1527,7 +1527,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $source = qtype_preg_fa::read_fa($sourcedescription);
         $direct = qtype_preg_fa::read_fa($directdescription);
         $numbers = $source->get_state_numbers();
-        $stopcoping = array_search('4', $numbers);
+        $stopcoping = array(array_search('4', $numbers));
         $oldfront = array(array_search('2', $numbers));
         $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
         $search = '
@@ -1563,7 +1563,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $source = qtype_preg_fa::read_fa($sourcedescription);
         $direct = qtype_preg_fa::read_fa($directdescription);
         $numbers = $source->get_state_numbers();
-        $stopcoping = array_search('1', $numbers);
+        $stopcoping = array(array_search('1', $numbers));
         $oldfront = array(array_search('2', $numbers));
         $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
         $search = '
@@ -1601,7 +1601,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $source = qtype_preg_fa::read_fa($sourcedescription);
         $direct = qtype_preg_fa::read_fa($directdescription);
         $numbers = $source->get_state_numbers();
-        $stopcoping = array_search('0', $numbers);
+        $stopcoping = array(array_search('0', $numbers));
         $oldfront = array(array_search('2', $numbers));
         $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
         $search = '
@@ -1636,7 +1636,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $source = qtype_preg_fa::read_fa($sourcedescription);
         $direct = new qtype_preg_fa();
         $numbers = $source->get_state_numbers();
-        $stopcoping = array_search('0', $numbers);
+        $stopcoping = array(array_search('0', $numbers));
         $oldfront = array(array_search('4', $numbers));
         $direct->copy_modify_branches($source, $oldfront, $stopcoping, 1);
         $search = '
@@ -1672,7 +1672,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $source = qtype_preg_fa::read_fa($sourcedescription);
         $direct = $direct = new qtype_preg_fa();;
         $numbers = $source->get_state_numbers();
-        $stopcoping = array_search('1', $numbers);
+        $stopcoping = array(array_search('1', $numbers));
         $oldfront = array(array_search('0', $numbers));
         $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
         $search = '
@@ -1708,7 +1708,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $source = qtype_preg_fa::read_fa($sourcedescription);
         $direct = $direct = new qtype_preg_fa();
         $numbers = $source->get_state_numbers();
-        $stopcoping = array_search('1', $numbers);
+        $stopcoping = array(array_search('1', $numbers));
         $oldfront = array(array_search('0', $numbers));
         $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
         $search = '
@@ -1749,7 +1749,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $source = qtype_preg_fa::read_fa($sourcedescription);
         $direct = qtype_preg_fa::read_fa($directdescription);
         $numbers = $source->get_state_numbers();
-        $stopcoping = array_search('4', $numbers);
+        $stopcoping = array(array_search('4', $numbers));
         $oldfront = array(array_search('2', $numbers));
         $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
         $search = '
@@ -1788,7 +1788,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $source = qtype_preg_fa::read_fa($sourcedescription);
         $direct = qtype_preg_fa::read_fa($directdescription);
         $numbers = $source->get_state_numbers();
-        $stopcoping = array_search('0', $numbers);
+        $stopcoping = array(array_search('0', $numbers));
         $oldfront = array(array_search('2', $numbers));
         $direct->copy_modify_branches($source, $oldfront, $stopcoping, 0);
         $search = '
@@ -2396,7 +2396,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $direct = qtype_preg_fa::read_fa($dotdirect);
         $resultautomata = new qtype_preg_fa();
         $realnumbers = $direct->get_state_numbers();
-        $startstate = array_search('2,3', $realnumbers);
+        $startstate = array(array_search('2,3', $realnumbers));
         $resultautomata = $firstautomata->get_intersection_part($secondautomata, $direct, $startstate, 1, false);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $search = '
@@ -2446,7 +2446,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $direct = qtype_preg_fa::read_fa($dotdirect);
         $resultautomata = new qtype_preg_fa();
         $realnumbers = $direct->get_state_numbers();
-        $startstate = array_search('1,0', $realnumbers);
+        $startstate = array(array_search('1,0', $realnumbers));
         $resultautomata = $firstautomata->get_intersection_part($secondautomata, $direct, $startstate, 0, false);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $search = '
@@ -2498,7 +2498,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $direct = qtype_preg_fa::read_fa($dotdirect);
         $resultautomata = new qtype_preg_fa();
         $realnumbers = $direct->get_state_numbers();
-        $startstate = array_search('1,0', $realnumbers);
+        $startstate = array(array_search('1,0', $realnumbers));
         $resultautomata = $firstautomata->get_intersection_part($secondautomata, $direct, $startstate, 0, false);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $search = '
@@ -2538,7 +2538,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $direct = qtype_preg_fa::read_fa($dotdirect);
         $resultautomata = new qtype_preg_fa();
         $realnumbers = $direct->get_state_numbers();
-        $startstate = array_search('2,2', $realnumbers);
+        $startstate = array(array_search('2,2', $realnumbers));
         $resultautomata = $firstautomata->get_intersection_part($secondautomata, $direct, $startstate, 1, false);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $search = '
@@ -2578,7 +2578,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $direct = qtype_preg_fa::read_fa($dotdirect);
         $resultautomata = new qtype_preg_fa();
         $realnumbers = $direct->get_state_numbers();
-        $startstate = array_search('2,2', $realnumbers);
+        $startstate = array(array_search('2,2', $realnumbers));
         $resultautomata = $firstautomata->get_intersection_part($secondautomata, $direct, $startstate, 1, false);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $search = '
@@ -2616,7 +2616,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $direct = qtype_preg_fa::read_fa($dotdirect);
         $resultautomata = new qtype_preg_fa();
         $realnumbers = $direct->get_state_numbers();
-        $startstate = array_search('0,2', $realnumbers);
+        $startstate = array(array_search('0,2', $realnumbers));
         $resultautomata = $firstautomata->get_intersection_part($secondautomata, $direct, $startstate, 1, false);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $search = '
@@ -2667,7 +2667,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $direct = qtype_preg_fa::read_fa($dotdirect);
         $resultautomata = new qtype_preg_fa();
         $realnumbers = $direct->get_state_numbers();
-        $startstate = array_search('1,0', $realnumbers);
+        $startstate = array(array_search('1,0', $realnumbers));
         $resultautomata = $firstautomata->get_intersection_part($secondautomata, $direct, $startstate, 0, false);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $search = '
@@ -2716,7 +2716,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $direct = qtype_preg_fa::read_fa($dotdirect);
         $resultautomata = new qtype_preg_fa();
         $realnumbers = $direct->get_state_numbers();
-        $startstate = array_search('1,0', $realnumbers);
+        $startstate = array(array_search('1,0', $realnumbers));
         $resultautomata = $firstautomata->get_intersection_part($secondautomata, $direct, $startstate, 0, false);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $search = '
@@ -2755,7 +2755,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $resultautomata = new qtype_preg_fa();
         $realnumbers = $firstautomata->get_state_numbers();
         $stateforinter = array_search('0', $realnumbers);
-        $resultautomata = $firstautomata->intersect_fa($secondautomata, $stateforinter, 0);
+        $resultautomata = $firstautomata->intersect_fa($secondautomata, array($stateforinter), 0);
         $result = new qtype_preg_fa();
         $this->assertEquals($resultautomata, $result, 'Result automata is not equal to expected');
     }
@@ -2798,7 +2798,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $resultautomata = new qtype_preg_fa();
         $realnumbers = $firstautomata->get_state_numbers();
         $stateforinter = array_search('2', $realnumbers);
-        $resultautomata = $firstautomata->intersect_fa($secondautomata, $stateforinter, 1);
+        $resultautomata = $firstautomata->intersect_fa($secondautomata, array($stateforinter), 1);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $search = '
                     ';
@@ -2842,7 +2842,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $resultautomata = new qtype_preg_fa();
         $realnumbers = $firstautomata->get_state_numbers();
         $stateforinter = array_search('1', $realnumbers);
-        $resultautomata = $firstautomata->intersect_fa($secondautomata, $stateforinter, 0);
+        $resultautomata = $firstautomata->intersect_fa($secondautomata, array($stateforinter), 0);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $search = '
                     ';
@@ -2887,7 +2887,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $resultautomata = new qtype_preg_fa();
         $realnumbers = $firstautomata->get_state_numbers();
         $stateforinter = array_search('1', $realnumbers);
-        $resultautomata = $firstautomata->intersect_fa($secondautomata, $stateforinter, 0);
+        $resultautomata = $firstautomata->intersect_fa($secondautomata, array($stateforinter), 0);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $search = '
                     ';
@@ -2920,7 +2920,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $resultautomata = new qtype_preg_fa();
         $realnumbers = $firstautomata->get_state_numbers();
         $stateforinter = array_search('1', $realnumbers);
-        $resultautomata = $firstautomata->intersect_fa($secondautomata, $stateforinter, 0);
+        $resultautomata = $firstautomata->intersect_fa($secondautomata, array($stateforinter), 0);
         $result = new qtype_preg_fa();
         $this->assertEquals($resultautomata, $result, 'Result automata is not equal to expected');
     }
@@ -2949,7 +2949,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $resultautomata = new qtype_preg_fa();
         $realnumbers = $firstautomata->get_state_numbers();
         $stateforinter = array_search('3', $realnumbers);
-        $resultautomata = $firstautomata->intersect_fa($secondautomata, $stateforinter, 1);
+        $resultautomata = $firstautomata->intersect_fa($secondautomata, array($stateforinter), 1);
         $result = new qtype_preg_fa();
         $this->assertEquals($resultautomata, $result, 'Result automata is not equal to expected');
     }
@@ -2981,7 +2981,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $resultautomata = new qtype_preg_fa();
         $realnumbers = $firstautomata->get_state_numbers();
         $stateforinter = array_search('1', $realnumbers);
-        $resultautomata = $firstautomata->intersect_fa($secondautomata, $stateforinter, 0);
+        $resultautomata = $firstautomata->intersect_fa($secondautomata, array($stateforinter), 0);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $search = '
                     ';
@@ -3030,7 +3030,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $resultautomata = new qtype_preg_fa();
         $realnumbers = $firstautomata->get_state_numbers();
         $stateforinter = array_search('2', $realnumbers);
-        $resultautomata = $firstautomata->intersect_fa($secondautomata, $stateforinter, 1);
+        $resultautomata = $firstautomata->intersect_fa($secondautomata, array($stateforinter), 1);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $search = '
                     ';
@@ -3080,7 +3080,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $resultautomata = new qtype_preg_fa();
         $realnumbers = $firstautomata->get_state_numbers();
         $stateforinter = array_search('2', $realnumbers);
-        $resultautomata = $firstautomata->intersect_fa($secondautomata, $stateforinter, 0);
+        $resultautomata = $firstautomata->intersect_fa($secondautomata, array($stateforinter), 0);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $search = '
                     ';
@@ -3136,7 +3136,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $resultautomata = new qtype_preg_fa();
         $realnumbers = $firstautomata->get_state_numbers();
         $stateforinter = array_search('1', $realnumbers);
-        $resultautomata = $firstautomata->intersect_fa($secondautomata, $stateforinter, 1);
+        $resultautomata = $firstautomata->intersect_fa($secondautomata, array($stateforinter), 1);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $search = '
                     ';
@@ -3194,7 +3194,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, '2', 0);
+        $resultautomata = $firstautomata->intersect($secondautomata, array('2'), 0);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -3239,7 +3239,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, '2', 1);
+        $resultautomata = $firstautomata->intersect($secondautomata, array('2'), 1);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -3315,7 +3315,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, '3', 0);
+        $resultautomata = $firstautomata->intersect($secondautomata, array('3'), 0);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -3354,7 +3354,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, '1', 0);
+        $resultautomata = $firstautomata->intersect($secondautomata, array('1'), 0);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -3392,7 +3392,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, '0', 0);
+        $resultautomata = $firstautomata->intersect($secondautomata, array('0'), 0);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -3427,7 +3427,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, '0', 0);
+        $resultautomata = $firstautomata->intersect($secondautomata, array('0'), 0);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -3462,7 +3462,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, '0', 0);
+        $resultautomata = $firstautomata->intersect($secondautomata, array('0'), 0);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -3506,7 +3506,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, '0', 0);
+        $resultautomata = $firstautomata->intersect($secondautomata, array('0'), 0);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -3569,7 +3569,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, '4', 1);
+        $resultautomata = $firstautomata->intersect($secondautomata, array('4'), 1);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -3624,7 +3624,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, '5', 1);
+        $resultautomata = $firstautomata->intersect($secondautomata, array('5'), 1);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -3652,7 +3652,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, '2', 0);
+        $resultautomata = $firstautomata->intersect($secondautomata, array('2'), 0);
         $result = new qtype_preg_fa();
         $this->assertEquals($result, $resultautomata, 'Result automata is not equal to expected');
     }
@@ -3698,7 +3698,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, '2', 0);
+        $resultautomata = $firstautomata->intersect($secondautomata, array('2'), 0);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -3750,7 +3750,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, '0', 0);
+        $resultautomata = $firstautomata->intersect($secondautomata, array('0'), 0);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -3799,7 +3799,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, '4', 1);
+        $resultautomata = $firstautomata->intersect($secondautomata, array('4'), 1);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -3854,7 +3854,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, '2', 0);
+        $resultautomata = $firstautomata->intersect($secondautomata, array('2'), 0);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -3911,7 +3911,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, '6', 1);
+        $resultautomata = $firstautomata->intersect($secondautomata, array('6'), 1);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -3965,7 +3965,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, '6', 1);
+        $resultautomata = $firstautomata->intersect($secondautomata, array('6'), 1);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -4020,7 +4020,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, '0', 0);
+        $resultautomata = $firstautomata->intersect($secondautomata, array('0'), 0);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -4080,7 +4080,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, 4, 1);
+        $resultautomata = $firstautomata->intersect($secondautomata, array(4), 1);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -4130,7 +4130,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, 1, 0);
+        $resultautomata = $firstautomata->intersect($secondautomata, array(1), 0);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -4180,7 +4180,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, 5, 1);
+        $resultautomata = $firstautomata->intersect($secondautomata, array(5), 1);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -4263,7 +4263,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, 2, 0);
+        $resultautomata = $firstautomata->intersect($secondautomata, array(2), 0);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -4309,7 +4309,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, 7, 1);
+        $resultautomata = $firstautomata->intersect($secondautomata, array(7), 1);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -4363,7 +4363,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, 6, 1);
+        $resultautomata = $firstautomata->intersect($secondautomata, array(6), 1);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -4439,7 +4439,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, 7, 1);
+        $resultautomata = $firstautomata->intersect($secondautomata, array(7), 1);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -4555,7 +4555,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, 5, 1);
+        $resultautomata = $firstautomata->intersect($secondautomata, array(5), 1);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -4599,7 +4599,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, '2', 0);
+        $resultautomata = $firstautomata->intersect($secondautomata, array('2'), 0);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -4674,7 +4674,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, 1, 0);
+        $resultautomata = $firstautomata->intersect($secondautomata, array(1), 0);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -4721,7 +4721,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, 1, 0);
+        $resultautomata = $firstautomata->intersect($secondautomata, array(1), 0);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -4779,7 +4779,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, 2, 0);
+        $resultautomata = $firstautomata->intersect($secondautomata, array(2), 0);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -4840,7 +4840,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, 4, 1);
+        $resultautomata = $firstautomata->intersect($secondautomata, array(4), 1);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -4937,7 +4937,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, 2, 0);
+        $resultautomata = $firstautomata->intersect($secondautomata, array(2), 0);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -4991,7 +4991,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, 4, 1);
+        $resultautomata = $firstautomata->intersect($secondautomata, array(4), 1);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -5052,7 +5052,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, 4, 1);
+        $resultautomata = $firstautomata->intersect($secondautomata, array(4), 1);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -5279,7 +5279,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, '5', 0);
+        $resultautomata = $firstautomata->intersect($secondautomata, array('5'), 0);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
@@ -5564,7 +5564,7 @@ class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
         $secondautomata = qtype_preg_fa::read_fa($dotdescription2);
         $resultautomata = new qtype_preg_fa();
 
-        $resultautomata = $firstautomata->intersect($secondautomata, '5', 1);
+        $resultautomata = $firstautomata->intersect($secondautomata, array('5'), 1);
         $result = $resultautomata->fa_to_dot(null, null, true);
         $dotresult = str_replace($search, $replace, $dotresult);
         $this->assertEquals($dotresult, $result, 'Result automata is not equal to expected');
