@@ -686,15 +686,15 @@ class qtype_preg_cross_tests_from_preg_intersection {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0, 1=>2, 2=>1),
-                        'length'=>array(0=>3, 1=>1, 2=>1));
+                        'length'=>array(0=>3, 1=>1, 2=>2));
 
         $test2 = array( 'str'=>'abd',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0, 1=>2, 2=>3),
-                        'length'=>array(0=>1, 1=>1, 2=>0));
+                        'length'=>array(0=>3, 1=>1, 2=>0));
 
-        return array('regex'=>'ab(c|d)(?<=(bc|)',
+        return array('regex'=>'ab(c|d)(?<=(bc|))',
                      'tests'=>array($test1, $test2),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }

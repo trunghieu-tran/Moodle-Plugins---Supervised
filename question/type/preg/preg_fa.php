@@ -1686,6 +1686,7 @@ class qtype_preg_fa {
         while (!empty($oldfront)) {
             foreach ($oldfront as $curstate) {
                 if (!$source->is_copied_state($curstate)) {
+
                     // Modify states.
                     $changedstate = $source->statenumbers[$curstate];
                     $changedstate = $this->modify_state($changedstate, $origin);
@@ -1719,6 +1720,7 @@ class qtype_preg_fa {
                         } else {
                             $newmemoryfront[] = $workstate;
                             // Adding connected states.
+
                             $connectedstates = $source->get_connected_states($curstate, $direction);
                             $newfront = array_merge($newfront, $connectedstates);
                         }
@@ -2378,8 +2380,8 @@ class qtype_preg_fa {
         }
 
         // Prepare automata for intersection.
-        /*$this->remove_unreachable_states();
-        $anotherfa->remove_unreachable_states();*/
+        $this->remove_unreachable_states();
+        /*$anotherfa->remove_unreachable_states();*/
         $result = $this->intersect_fa($anotherfa, $numbers, $isstart);
         $result->remove_unreachable_states();
         $result->lead_to_one_end();
@@ -2479,15 +2481,17 @@ class qtype_preg_fa {
             }
             foreach ($front as $state) {
                 // Get states from first and second automata.
+
                 $numbers = explode(',', $this->statenumbers[$state], 2);
                 $workstate1 = array_search($numbers[0], $firstnumbers);
                 if ($numbers[1] != '') {
                     foreach ($secondnumbers as $num) {
-                        if (strpos($numbers[1], $num) === 0) {
+                        if (strpos($numbers[1], $num) === 0 || $num == $numbers[1]) {
                             $workstate2 = array_search($num, $secondnumbers);
                         }
                     }
                 }
+
                 if (!$fa->has_startstate($workstate1)) {
                     $transitions = $fa->get_adjacent_transitions($workstate1, false);
                     foreach ($transitions as $tran) {
@@ -2512,6 +2516,7 @@ class qtype_preg_fa {
                 }
                 if (!$anotherfa->has_startstate($workstate2)) {
                     $transitions = $anotherfa->get_adjacent_transitions($workstate2, false);
+                    $oldfront = array();
                     foreach ($transitions as $tran) {
                         $oldfront[] = $tran->from;
                     }
@@ -2629,6 +2634,7 @@ class qtype_preg_fa {
                             $addedstate = $result->add_state($addednumber);
                             $tran->to = $addedstate;
                             $result->add_transition($tran);
+                            $tran->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
                             $newstop[] = $addedstate;
                         }
                     }
@@ -2647,6 +2653,7 @@ class qtype_preg_fa {
                             $addednumber = $result->get_inter_state($resnumbers[$stopindex], $secondnumbers[$transition->from]);
                             $addedstate = $result->add_state($addednumber);
                             $tran->from = $addedstate;
+                            $tran->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
                             $result->add_transition($tran);
                             $newstop[] = $addedstate;
                         }
