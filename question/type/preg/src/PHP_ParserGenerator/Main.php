@@ -4107,7 +4107,3 @@ class LemonParser
         return $a;
     }
 }
-$a = new Lemon;
-$_SERVER['argv'] = array('lemon', '-s', '../preg_parser.y');
-//$_SERVER['argv'] = array('lemon', '-s', '/development/File_ChessPGN/ChessPGN/Parser.y');
-$a->main();
