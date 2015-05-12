@@ -510,7 +510,13 @@ class qtype_preg_regex_handler {
         $enginenodename = $this->get_engine_node_name($pregnode->type, $pregnode->subtype);
         if (class_exists($enginenodename)) {
             $enginenode = new $enginenodename($pregnode, $this);
-            $acceptresult = $enginenode->accept($this->options);
+            try {
+                $acceptresult = $enginenode->accept($this->options);
+
+            } catch (qtype_preg_mergedassertion_option_exception $e) {
+                $this->errors[$enginenodename] = new qtype_preg_mergedassertion_option_error($this->regex);
+                return;
+            }
             if ($acceptresult !== true && !isset($this->errors[$enginenodename])) {
                 // Highlight first occurence of the unaccepted node.
                 $this->errors[$enginenodename] = new qtype_preg_accepting_error($this->regex, $this->name(), $acceptresult, $pregnode);

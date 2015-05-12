@@ -486,7 +486,7 @@ str: aÀ’bcd
                        'length'=>array(0=>2));
 
         return array('regex'=>"(?<=aXb)cd",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -498,7 +498,7 @@ str: aÀ’bcd
                        'length'=>array(0=>2));
 
         return array('regex'=>"(?<=a\\x{100}b)cd",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -510,7 +510,7 @@ str: aÀ’bcd
                        'length'=>array(0=>2));
 
         return array('regex'=>"(?<=a\\x{100000}b)cd",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -594,7 +594,7 @@ str: aÀ’bcd
                        'length'=>array());
 
         return array('regex'=>"(?<=(.))X",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -857,7 +857,7 @@ str: aÀ’bcd
                        'length'=>array(0=>1));
 
         return array('regex'=>"(?<=a\\x{100}{2}b)X",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1));
     }
 
@@ -1865,7 +1865,7 @@ str: aÀ’bcd
                        'length'=>array());
 
         return array('regex'=>"(?<=[\\x{100}\\x{200}])X",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 
@@ -1901,7 +1901,7 @@ str: aÀ’bcd
                        'length'=>array());
 
         return array('regex'=>"(?<=[Q\\x{100}\\x{200}])X",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4, $test5));
     }
 
@@ -1931,7 +1931,7 @@ str: aÀ’bcd
                        'length'=>array());
 
         return array('regex'=>"(?<=[\\x{100}\\x{200}]{3})X",
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_PCRE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
                      'tests'=>array($test1, $test2, $test3, $test4));
     }
 

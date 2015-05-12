@@ -1104,6 +1104,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $stack = array();
         $dstnode->create_automaton($result, $stack, $mergeassertions);
         $body = array_pop($stack);
+        $result->fastartstates[0] = array($body['start']);
+        $result->faendstates[0] = array($body['end']);
         $result->calculate_subexpr_start_and_end_states();
 
         if ($mergeassertions) {
@@ -1113,6 +1115,20 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         if ($body['breakpos'] !== null || empty($result->adjacencymatrix)) {
             throw new qtype_preg_empty_fa_exception('', $body['breakpos']);
         }
+        $this->merge_end_transitions($result);
+        global $CFG;
+        $CFG->pathtodot = '/usr/bin/dot';
+        if ($mergeassertions)
+        {
+            // Intersect complex assertions automata.
+            foreach ($result->innerautomata as $state => $inner) {
+                foreach ($inner as $automaton) {
+                    //$result->fa_to_dot('svg', "/home/elena/fa_1.svg");
+                    $result = $result->intersect($automaton[0], array($state), $automaton[1]);
+                }
+            }
+            //$result->calculate_subexpr_start_and_end_states();
+        }
 
         /*global $CFG;
         $CFG->pathtodot = '/usr/bin/dot';
@@ -1120,6 +1136,48 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $result->fa_to_dot('svg', "/home/user/fa_$namesuffix.svg");*/
 
         return $result;
+    }
+
+    private function merge_end_transitions($result) {
+        foreach ($result->end_states() as $end) {
+            $endtransitions = $result->get_adjacent_transitions($end, false);
+            foreach ($endtransitions as $endtran) {
+                if ($endtran->is_eps() && $endtran->from != $endtran->to && empty($endtran->mergedbefore)) {
+                    $wasadded = false;
+                    $canmerge = true;
+                    $transitions = $result->get_adjacent_transitions($endtran->from, false);
+                    foreach ($transitions as $tran) {
+                        if ($tran->from === $tran->to) {
+                            $canmerge = false;
+                        }
+                    }
+                    if ($canmerge) {
+                        foreach ($transitions as $tran) {
+                            if ($tran->from !== $tran->to) {
+                                $clonetran = clone $tran;
+                                $delclone = clone $endtran;
+                                $clonetran->loopsback = $tran->loopsback || $endtran->loopsback;
+                                $clonetran->greediness = qtype_preg_fa_transition::min_greediness($tran->greediness, $delclone->greediness);
+                                $merged = array_merge($delclone->mergedbefore, array($delclone), $delclone->mergedafter);
+                                // Work with tags.
+                                $merged = array_merge($merged, $clonetran->mergedafter);
+                                $clonetran->mergedafter = $merged;
+                                $clonetran->to = $endtran->to;
+                                $clonetran->redirect_merged_transitions();
+                                $result->add_transition($clonetran);
+                                $wasadded = true;
+                            }
+                        }
+                        if ($wasadded) {
+                            $result->change_state_for_intersection($endtran->from, array($endtran->to));
+                            $result->remove_transition($endtran);
+
+                        }
+                    }
+                }
+
+            }
+        }
     }
 
     protected function check_for_infinite_recursion() {
