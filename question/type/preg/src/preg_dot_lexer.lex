@@ -9,7 +9,6 @@ require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 %function nextToken
 %line
 %char
-%unicode
 %state STARTSTATES
 %state ENDSTATES
 %state TRANSITION

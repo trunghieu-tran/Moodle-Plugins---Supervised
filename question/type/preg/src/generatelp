@@ -9,13 +9,17 @@ DIR_TARGET=$(dirname $DIR_SOURCE)
 echo "Generating lexer..."
 cd "$DIR_JLEX"
 java JLexPHP.Main ../preg_lexer.lex
+java JLexPHP.Main ../preg_dot_lexer.lex
 
 echo "Generating parser..."
 cd "$DIR_LEMON"
-php Main.php
+php preg_parser.php
+php preg_dot_parser.php
 
 echo "Copying files..."
 cd "$DIR_SOURCE"
-mv preg_lexer.lex.php $DIR_TARGET
-mv preg_parser.php $DIR_TARGET
+mv *.php $DIR_TARGET
+
+echo "Removing temp files..."
+rm *.out
 echo "Done!"
