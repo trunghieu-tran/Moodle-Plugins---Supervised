@@ -66,7 +66,7 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
      */
     protected function is_parsing_needed() {
         // We need parsing if option is set for capture subexpressions.
-        return $this->options->capturesubexpressions;
+        return $this->options->capturesubexpressions || $this->options->parsetemplates;
     }
 
     protected function is_preg_node_acceptable($pregnode) {
