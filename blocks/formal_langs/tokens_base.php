@@ -1867,7 +1867,7 @@ class block_formal_langs_processed_string {
      * @param block_formal_langs_processed_string $string other string
      */
     public function copy_state_from($string) {
-        $refclass = new ReflectionClass(get_class($this));
+        $refclass = new ReflectionClass(get_class());
         $props = $refclass->getProperties();
         foreach($props as $prop) {
             /** @var ReflectionProperty $prop */
