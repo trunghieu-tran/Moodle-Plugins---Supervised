@@ -1861,6 +1861,20 @@ class block_formal_langs_processed_string {
     public function __construct($lang) {
         $this->language = $lang;
     }
+    
+    /**
+     * Copies state from other string
+     * @param block_formal_langs_processed_string $string other string
+     */
+    public function copy_state_from($string) {
+        $refclass = new ReflectionClass(get_class($this));
+        $props = $refclass->getProperties();
+        foreach($props as $prop) {
+            /** @var ReflectionProperty $prop */
+            $name = $prop->getName();
+            $this->$name = $string->$name;
+        }
+    }
 
     /**
      * Called, when user assigns field to a class
