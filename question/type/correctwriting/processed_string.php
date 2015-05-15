@@ -23,8 +23,11 @@ class qtype_correctwriting_proccesed_string extends block_formal_langs_processed
     protected $enums_description = null;
 
     public function __set($name, $value) {
-        $settertable = array('string' => 'set_string', 'stream' => 'set_stream', 'syntaxtree' => 'set_syntax_tree');
-        $settertable['descriptions'] = 'set_descriptions';
+        $isset = parent::__isset($name);
+        if ($isset) {
+            return parent::__set($name, $value);
+        }
+        $settertable = array();
         $settertable['enumerations'] = 'set_enums_descriptions';
 
         if (array_key_exists($name, $settertable)) {
