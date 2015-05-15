@@ -120,6 +120,9 @@ class qtype_preg_fa_transition {
 
     public function __clone() {
         $this->pregleaf = clone $this->pregleaf;
+        if ($this->minopentag !== null) {
+            $this->minopentag = clone $this->minopentag;
+        }
         foreach ($this->mergedbefore as $key => $merged) {
             $this->mergedbefore[$key] = clone $merged;
         }
@@ -519,6 +522,7 @@ class qtype_preg_fa_transition {
                 $resulttran->mergedbefore = $assert->mergedbefore;
             }
             $resulttran->loopsback = $this->loopsback || $other->loopsback;
+            $resulttran->count_min_open_tag();
             return $resulttran;
         }
         if ($this->is_unmerged_assert()  && (!$other->is_eps() && !$other->is_unmerged_assert())
@@ -535,6 +539,7 @@ class qtype_preg_fa_transition {
             }
             if ($intersection != null) {
                 $resulttran->pregleaf = $intersection->pregleaf;
+                $resulttran->count_min_open_tag();
                 $assert = $this->intersect_asserts($other);
                 $resulttran->mergedbefore = $assert->mergedbefore;
                 $resulttran->mergedafter = $assert->mergedafter;
@@ -558,12 +563,27 @@ class qtype_preg_fa_transition {
         }
         if ($resulttran !== null ) {
             $this->unite_tags($other, $resulttran);
+            $resulttran->count_min_open_tag();
             $assert = $this->intersect_asserts($other);
             $resulttran->mergedbefore = $assert->mergedbefore;
             $resulttran->mergedafter = $assert->mergedafter;
             $resulttran->loopsback = $this->loopsback || $other->loopsback;
         }
         return $resulttran;
+    }
+
+
+    private function count_min_open_tag() {
+        $minopentag;
+        if (!empty($this->opentags)) {
+            $minopentag = $this->opentags[0];
+            foreach ($this->opentags as $tag) {
+                if ($tag->subpattern < $minopentag->subpattern) {
+                    $minopentag = $tag;
+                }
+            }
+            $this->minopentag = $minopentag;
+        }
     }
 
     /**
@@ -2445,6 +2465,7 @@ class qtype_preg_fa {
                         }
                     }
                 }
+                $oldfront = array();
                 if (!$anotherfa->has_endstate($workstate2)) {
                     $transitions = $anotherfa->get_adjacent_transitions($workstate2, true);
                     foreach ($transitions as $tran) {
@@ -2491,7 +2512,7 @@ class qtype_preg_fa {
                         }
                     }
                 }
-
+                $oldfront = array();
                 if (!$fa->has_startstate($workstate1)) {
                     $transitions = $fa->get_adjacent_transitions($workstate1, false);
                     foreach ($transitions as $tran) {
@@ -2514,6 +2535,7 @@ class qtype_preg_fa {
                         $this->add_transition($addtran);
                     }
                 }
+                $oldfront = array();
                 if (!$anotherfa->has_startstate($workstate2)) {
                     $transitions = $anotherfa->get_adjacent_transitions($workstate2, false);
                     $oldfront = array();
