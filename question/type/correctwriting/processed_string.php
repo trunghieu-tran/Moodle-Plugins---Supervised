@@ -59,7 +59,11 @@ class qtype_correctwriting_proccesed_string extends block_formal_langs_processed
     }
 
     public function __isset($name) {
-        $getters = array('string', 'stream', 'syntaxtree', 'descriptions', 'enumeration');
+        $result = parent::__isset($name);
+        if ($result) {
+            return $result;
+        }   
+        $getters = array('enumerations');
         return in_array($name, $getters);
     }
 
