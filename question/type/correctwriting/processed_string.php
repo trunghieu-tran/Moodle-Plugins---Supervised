@@ -77,15 +77,6 @@ class qtype_correctwriting_proccesed_string extends block_formal_langs_processed
         return $this->enums_description;
     }
 
-    /**
-     *  Returns a stream of tokens.
-     *  @return stream of tokens
-     */
-    private function get_stream() {
-        if ($this->tokenstream == null)
-            $this->language->scan($this);
-        return $this->tokenstream;
-    }
     public function __clone() {	
         $this->tokenstream = clone $this->tokenstream;
         if($this->enums_description!=null) {
