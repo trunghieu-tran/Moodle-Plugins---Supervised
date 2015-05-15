@@ -41,9 +41,13 @@ class qtype_correctwriting_proccesed_string extends block_formal_langs_processed
     }
 
     public function __get($name) {
-        $gettertable = array('string' => 'get_string', 'stream' => 'get_stream', 'syntaxtree' => 'get_syntax_tree');
-        $gettertable['descriptions'] = 'node_descriptions_list';
+        $isset = parent::__isset($name);
+        if ($isset) {
+            return parent::__get($name);
+        }
+        $gettertable = array();
         $gettertable['enumerations'] = 'node_enums_descriptions';
+
         if (array_key_exists($name, $gettertable)) {
             $method = $gettertable[$name];
             return $this->$method();
