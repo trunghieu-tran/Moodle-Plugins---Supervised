@@ -938,7 +938,7 @@ class qtype_preg_fa {
     }
 
     private function states_numbers_to_ids() {
-        foreach ($this->statenumbers as $id => $number) {
+        foreach ($this->statenumbers as $id => &$number) {
             $number = $id;
         }
     }
@@ -2401,13 +2401,14 @@ class qtype_preg_fa {
 
         // Prepare automata for intersection.
         $this->remove_unreachable_states();
-        /*$anotherfa->remove_unreachable_states();*/
+        $anotherfa->remove_unreachable_states();
         $this->to_origin(qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST);
         $anotherfa->to_origin(qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND);
         $result = $this->intersect_fa($anotherfa, $numbers, $isstart);
         $result->remove_unreachable_states();
         $result->lead_to_one_end();
         $result->handler = $this->handler;
+        $result->update_intersection_states($this);
         $result->states_numbers_to_ids();
         return $result;
     }
@@ -2420,6 +2421,22 @@ class qtype_preg_fa {
                 }
             }
         }
+    }
+
+    private function update_intersection_states($sourcefa) {
+        $newstates = $this->get_state_numbers();
+        foreach ($sourcefa->innerautomata as $state => $inner) {
+            foreach ($newstates as $newstate) {
+                $numbers = explode(',', $newstate, 2);
+                if ($numbers[0] !== '' && $numbers[0] == $state) {
+                    $this->innerautomata[$this->get_id_by_state_number($newstate)] = $inner;
+                }
+            }
+        }
+    }
+
+    private function get_id_by_state_number($number) {
+        return array_search($number, $this->statenumbers);
     }
 
     /**

@@ -1126,7 +1126,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 foreach ($inner as $automaton) {
                     if (!in_array($automaton, $intersected)) {
                         $states = array();
-                        $states[] = $state;
+                        if (array_key_exists($state, $result->innerautomata)) {
+                            $states[] = $state;
+                        }
                         foreach ($result->innerautomata as $anotherstate => &$anotherinner) {
                             foreach ($anotherinner as &$anotherautomaton) {
                                 if ($automaton == $anotherautomaton && $state !== $anotherstate) {
