@@ -1099,7 +1099,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
     public function build_fa($dstnode, $mergeassertions = false) {
         $result = new qtype_preg_fa($this, $this->get_nodes_with_subexpr_refs());
 
-        //$mergeassertions = true;
+        $mergeassertions = true;
 
         $stack = array();
         $dstnode->create_automaton($result, $stack, $mergeassertions);
@@ -1118,13 +1118,28 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $this->merge_end_transitions($result);
         global $CFG;
         $CFG->pathtodot = '/usr/bin/dot';
+        $intersected = array();
         if ($mergeassertions)
         {
             // Intersect complex assertions automata.
             foreach ($result->innerautomata as $state => $inner) {
                 foreach ($inner as $automaton) {
-                    //$result->fa_to_dot('svg', "/home/elena/fa_1.svg");
-                    $result = $result->intersect($automaton[0], array($state), $automaton[1]);
+                    if (!in_array($automaton, $intersected)) {
+                        $states = array();
+                        $states[] = $state;
+                        foreach ($result->innerautomata as $anotherstate => &$anotherinner) {
+                            foreach ($anotherinner as &$anotherautomaton) {
+                                if ($automaton == $anotherautomaton && $state !== $anotherstate) {
+                                    $states[] = $anotherstate;
+                                    $intersected[] = $automaton;
+                                }
+                            }
+                        }
+                        //$result->fa_to_dot('svg', "/home/elena/fa_2.svg");
+                        //$automaton[0]->fa_to_dot('svg', "/home/elena/fa_3.svg");
+                        $result = $result->intersect($automaton[0], $states, $automaton[1]);
+                        // $result->fa_to_dot('svg', "/home/elena/fa_1.svg", true);
+                    }
                 }
             }
             //$result->calculate_subexpr_start_and_end_states();
