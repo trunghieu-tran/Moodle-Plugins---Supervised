@@ -492,9 +492,9 @@ class qtype_preg_cross_tests_from_preg_intersection {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>1),
                         'left'=>array(1),
-                        'next'=>'\W');
+                        'next'=>'\w');
 
-        return array('regex'=>'a\B(?=\W).',
+        return array('regex'=>'a\B(?=\w).',
                      'tests'=>array($test1, $test2),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
@@ -1025,8 +1025,8 @@ class qtype_preg_cross_tests_from_preg_intersection {
         $test3 = array( 'str'=>'bca',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0, 1=>1),
-                        'length'=>array(0=>2, 1=>1),
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2),
                         'left'=>array(0),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
@@ -1039,19 +1039,19 @@ class qtype_preg_cross_tests_from_preg_intersection {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>0),
+                        'index_first'=>array(0=>2, 1=>2),
                         'length'=>array(0=>0, 1=>0));
 
         $test2 = array( 'str'=>'cb',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>0),
+                        'index_first'=>array(0=>2, 1=>2),
                         'length'=>array(0=>0, 1=>0));
 
         $test3 = array( 'str'=>'dab',
-                        'is_match'=>false,
-                        'full'=>false,
-                        'index_first'=>array(0=>0, 1=>0),
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>3, 1=>3),
                         'length'=>array(0=>0, 1=>0));
 
         return array('regex'=>'()(?<=[ac]b)',
@@ -1077,8 +1077,8 @@ class qtype_preg_cross_tests_from_preg_intersection {
         $test1 = array( 'str'=>"a\nd",
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>3));
+                        'index_first'=>array(0=>2),
+                        'length'=>array(0=>1));
 
         $test2 = array( 'str'=>'ad',
                         'is_match'=>true,
