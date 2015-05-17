@@ -1586,7 +1586,14 @@ class qtype_preg_fa {
             $keys = array_keys($states);
             $transitions = $source->get_adjacent_transitions($states[$keys[0]], true);
             $keys = array_keys($transitions);
-            $origin = $transitions[$keys[0]]->origin;
+            if (!empty($keys)) {
+                $origin = $transitions[$keys[0]]->origin;
+            } else {
+                $keys = array_keys($states);
+                $transitions = $source->get_adjacent_transitions($states[$keys[0]], false);
+                $keys = array_keys($transitions);
+                $origin = $transitions[$keys[0]]->origin;
+            }
         }
         // Get transition for analysis.
         if ($direction == 0) {
@@ -1695,7 +1702,14 @@ class qtype_preg_fa {
             $keys = array_keys($states);
             $transitions = $source->get_adjacent_transitions($states[$keys[0]], true);
             $keys = array_keys($transitions);
-            $origin = $transitions[$keys[0]]->origin;
+            if (!empty($keys)) {
+                $origin = $transitions[$keys[0]]->origin;
+            } else {
+                $keys = array_keys($states);
+                $transitions = $source->get_adjacent_transitions($states[$keys[0]], false);
+                $keys = array_keys($transitions);
+                $origin = $transitions[$keys[0]]->origin;
+            }
         }
         // Getting all states which are in automata for coping.
         $stateswere = $this->get_state_numbers();
@@ -2246,6 +2260,7 @@ class qtype_preg_fa {
             }
             // Add new start states.
             $state = $result->get_inter_state(0, 0);
+            $resnumbers = $result->get_state_numbers();
             $state = array_search($state, $resnumbers);
             if ($state) {
                 $result->add_start_state($state);
