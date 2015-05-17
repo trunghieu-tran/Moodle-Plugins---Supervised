@@ -1322,7 +1322,7 @@ class qtype_preg_fa {
                 }
             }
 
-            unset($this->innerautomata[$oldkey]);
+            //unset($this->innerautomata[$oldkey]);
         }
     }
 
@@ -1862,7 +1862,7 @@ class qtype_preg_fa {
                     }
                     $addnumber = $numbertofind . ',' . $addnum . '   ' . $numbers[1];
                     foreach ($secnumbers as $num) {
-                        if (strpos($numbers[1], $num) === 0) {
+                        if (strpos($numbers[1], $num) === 0 || $numbers[1] == $num) {
                             $statefromsecond = array_search($num, $secnumbers);
                         }
                     }
@@ -2144,7 +2144,7 @@ class qtype_preg_fa {
         $realsecond = explode(',', $realnum, 2);
         $realsecond = $realsecond[1];
         foreach ($anotherfanumbers as $curnum) {
-            if (strpos($realsecond, $curnum) !== false) {
+            if (strpos($realsecond, $curnum) !== false || $realsecond == $curnum) {
                 $count++;
             }
         }
@@ -2293,8 +2293,9 @@ class qtype_preg_fa {
                         $curnumberscount = $result->get_second_numbers_count($anotherfa, $curstate);
                         if (!$divfind && $secondnumberscount != $curnumberscount) {
                             $divfind = true;
-                            $divstate = $curstate;
+                            //$divstate = $curstate;
                         }
+                        $divstate = $curstate;
                         $numbers = explode(',', $resultnumbers[$curstate], 2);
 
                         // State with same number is found.
@@ -2411,10 +2412,10 @@ class qtype_preg_fa {
         $numbers = array();
         foreach ($stateindex as $index) {
             $number = array_search($index, $this->statenumbers);
-            if ($number === false) {
-                throw new qtype_preg_exception('intersect error: No state with number' . $index . '.');
+            if ($number !== false) {
+                $numbers[] = $number;
             }
-            $numbers[] = $number;
+            //$numbers[] = $number;
         }
 
         // Prepare automata for intersection.
