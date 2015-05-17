@@ -562,12 +562,15 @@ class qtype_preg_fa_transition {
             }
         }
         if ($resulttran !== null ) {
-            $this->unite_tags($other, $resulttran);
-            $resulttran->count_min_open_tag();
             $assert = $this->intersect_asserts($other);
             $resulttran->mergedbefore = $assert->mergedbefore;
             $resulttran->mergedafter = $assert->mergedafter;
+            if (!$this->is_eps()) {
+                $this->unite_tags($other, $resulttran);
+            }
             $resulttran->loopsback = $this->loopsback || $other->loopsback;
+
+            $resulttran->count_min_open_tag();
         }
         return $resulttran;
     }

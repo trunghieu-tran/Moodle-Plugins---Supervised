@@ -878,8 +878,8 @@ class qtype_preg_cross_tests_from_preg_intersection {
         $test2 = array( 'str'=>'ababcd',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>1),
-                        'length'=>array(0=>2));
+                        'index_first'=>array(0=>2, 1=>2),
+                        'length'=>array(0=>4, 1=>2));
 
         return array('regex'=>'ab(?<=(ab)+)cd',
                      'tests'=>array($test1, $test2),
