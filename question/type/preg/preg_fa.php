@@ -2425,6 +2425,7 @@ class qtype_preg_fa {
         $anotherfa->to_origin(qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND);
         $result = $this->intersect_fa($anotherfa, $numbers, $isstart);
         $result->remove_unreachable_states();
+        $result->remove_wrong_end_states();
         $result->lead_to_one_end();
         $result->handler = $this->handler;
         $result->update_intersection_states($this);
@@ -2438,6 +2439,34 @@ class qtype_preg_fa {
                 foreach ($to as $transition) {
                     $transition->origin = $origin;
                 }
+            }
+        }
+    }
+
+    private function remove_wrong_end_states() {
+        $endstates = array_values($this->end_states());
+
+        $reached = array();
+        foreach ($endstates as $end) {
+            $iswrong = true;
+            $front = array($end);
+            while (!empty($front)) {
+                $curstate = array_pop($front);
+                if (in_array($curstate, $reached)) {
+                    continue;
+                }
+                $reached[] = $curstate;
+                $transitions = $this->get_adjacent_transitions($curstate, false);
+                foreach ($transitions as $transition) {
+                    $front[] = $transition->from;
+                    if ($transition->origin !== qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND) {
+                        $iswrong = false;
+                    }
+                }
+
+            }
+            if ($iswrong) {
+                $this->remove_end_state($end);
             }
         }
     }
