@@ -2402,12 +2402,24 @@ class qtype_preg_fa {
         // Prepare automata for intersection.
         $this->remove_unreachable_states();
         /*$anotherfa->remove_unreachable_states();*/
+        $this->to_origin(qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST);
+        $anotherfa->to_origin(qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND);
         $result = $this->intersect_fa($anotherfa, $numbers, $isstart);
         $result->remove_unreachable_states();
         $result->lead_to_one_end();
         $result->handler = $this->handler;
         $result->states_numbers_to_ids();
         return $result;
+    }
+
+    private function to_origin($origin) {
+        foreach ($this->adjacencymatrix as $from) {
+            foreach ($from as $to) {
+                foreach ($to as $transition) {
+                    $transition->origin = $origin;
+                }
+            }
+        }
     }
 
     /**
