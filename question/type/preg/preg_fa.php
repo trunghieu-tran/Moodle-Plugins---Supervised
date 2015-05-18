@@ -1605,7 +1605,6 @@ class qtype_preg_fa {
             $transitions = $source->get_adjacent_transitions($statefromsource, true);
         }
         $numbers = $source->get_state_numbers();
-
         // Search transition among states were.
         foreach ($stateswere as $state) {
             // Get real number of source state.
@@ -1614,7 +1613,7 @@ class qtype_preg_fa {
             } else {
                 $number = ltrim($state, ',');
             }
-            if (in_array($number, $numbers)) {
+            if (in_array($number, $numbers) && $source->is_copied_state($numbers[array_search($number, $numbers)])) {
                 foreach ($transitions as $tran) {
                     if ($direction == 0) {
                         $sourcenum = trim($numbers[$tran->from], '()');
@@ -1741,7 +1740,6 @@ class qtype_preg_fa {
                         $this->add_state($changedstate);
                         $workstate = array_search($changedstate, $this->statenumbers);
                         $this->copy_transitions($stateswere, $curstate, $workstate, $memoryfront, $source, $direction);
-
                         // Check end of coping.
                         if ($stopcoping !== null && array_search($curstate, $stopcoping) !== false) {
                             if ($direction == 0) {
@@ -1771,6 +1769,7 @@ class qtype_preg_fa {
                             $connectedstates = $source->get_connected_states($curstate, $direction);
                             $newfront = array_merge($newfront, $connectedstates);
                         }
+
                     } else {
                         $this->copy_transitions($stateswere, $curstate, $workstate, $memoryfront, $source, $direction);
                         $newmemoryfront[] = $workstate;
@@ -1783,7 +1782,9 @@ class qtype_preg_fa {
                     $changedstate = trim($changedstate, '()');
                     $changedstate = $this->modify_state($changedstate, $origin);
                     $workstate = array_search($changedstate, $this->statenumbers);
-                    $this->copy_transitions($stateswere, $curstate, $workstate, $memoryfront, $source, $direction);
+                    if ($stopcoping === null || !in_array($workstate, $stopcoping)) {
+                        $this->copy_transitions($stateswere, $curstate, $workstate, $memoryfront, $source, $direction);
+                    }
                 }
             }
             $oldfront = $newfront;
@@ -2558,6 +2559,7 @@ class qtype_preg_fa {
                         $oldfront[] = $tran->to;
                     }
                     $this->copy_modify_branches($anotherfa, $oldfront, null, $direction, qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND);
+
                     // Connect last state of intersection and copied branch.
                     foreach ($transitions as $tran) {
                         // Get number of copied state.
@@ -2770,6 +2772,7 @@ class qtype_preg_fa {
             }
         }
         $secforinter = $secondnumbers[$states[0]];
+
         foreach ($stop as $stopnumber) {
             $state = $result->get_inter_state($resnumbers[$stopnumber], $secforinter);
             $result->change_real_number($stopnumber, $state);
