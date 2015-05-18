@@ -132,7 +132,7 @@ class qtype_preg_fa_transition {
     }
 
     public function equal($other) {
-        return $this->from == $other->from && $this->to == $other->to && $this->pregleaf == $other->pregleaf;
+        return $this->from == $other->from && $this->to == $other->to && $this->pregleaf == $other->pregleaf && count($this->mergedbefore) == count($other->mergedbefore) && count($this->mergedafter) == count($other->mergedafter);
     }
 
     /**
@@ -1747,11 +1747,21 @@ class qtype_preg_fa {
                             if ($direction == 0) {
                                 $this->add_end_state($workstate);
                             }
-                            $resultstop[] = $workstate;
-                            if (count($resultstop) !== count($stopcoping)) {
+                            if (!in_array($workstate, $resultstop)) {
+                                $resultstop[] = $workstate;
+                            }
+                            $connectedstates = $source->get_connected_states($curstate, $direction);
+                            $connectedstopstates = array();
+                            foreach ($connectedstates as $connected) {
+                                if (in_array($connected, $stopcoping)) {
+                                    $connectedstopstates[] = $connected;
+                                }
+                            }
+                            if (count($connectedstopstates) + 1 == count($stopcoping)) {
+                                $connectedstates = $connectedstopstates;
                                 $newmemoryfront[] = $workstate;
                                 // Adding connected states.
-                                $connectedstates = $source->get_connected_states($curstate, $direction);
+
                                 $newfront = array_merge($newfront, $connectedstates);
                             }
                         } else {
@@ -2409,18 +2419,17 @@ class qtype_preg_fa {
         if ($isstart != 0 && $isstart !=1) {
             throw new qtype_preg_exception('intersect error: Wrong direction');
         }
+        // Prepare automata for intersection.
+        $this->remove_unreachable_states();
+        $anotherfa->remove_unreachable_states();
         $numbers = array();
         foreach ($stateindex as $index) {
             $number = array_search($index, $this->statenumbers);
-            if ($number !== false) {
+            if ($number !== false && !in_array($number, $numbers)) {
                 $numbers[] = $number;
             }
             //$numbers[] = $number;
         }
-
-        // Prepare automata for intersection.
-        $this->remove_unreachable_states();
-        $anotherfa->remove_unreachable_states();
         $this->to_origin(qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST);
         $anotherfa->to_origin(qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND);
         $result = $this->intersect_fa($anotherfa, $numbers, $isstart);
@@ -2766,7 +2775,6 @@ class qtype_preg_fa {
             $result->change_real_number($stopnumber, $state);
         }
         $stop = array_merge($stop, $newstop);
-
         // Find intersection part.
         if (!$anotherfa->has_cycle() && $this->has_cycle()) {
             $this->get_intersection_part($anotherfa, $result, $stop, $isstart, true);

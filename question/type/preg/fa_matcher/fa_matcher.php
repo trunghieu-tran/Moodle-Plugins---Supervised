@@ -1159,7 +1159,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         foreach ($result->end_states() as $end) {
             $endtransitions = $result->get_adjacent_transitions($end, false);
             foreach ($endtransitions as $endtran) {
-                if ($endtran->is_eps() && $endtran->from != $endtran->to && empty($endtran->mergedbefore)) {
+                if ($endtran->is_eps() && $endtran->from != $endtran->to) {
                     $wasadded = false;
                     $canmerge = true;
                     $transitions = $result->get_adjacent_transitions($endtran->from, false);
