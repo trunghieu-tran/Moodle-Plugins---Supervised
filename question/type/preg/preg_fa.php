@@ -2090,7 +2090,7 @@ class qtype_preg_fa {
             // Set end states.
             $isfirstend = $numbers[0] !== '' && in_array($workstate1, $faends);
             $issecend = $numbers[1] !== '' && in_array($workstate2, $anotherfaends);
-            if (($isfirstend || $issecend) && count($this->get_adjacent_transitions($state, true)) == 0) {
+            if (($isfirstend || $issecend) /*&& count($this->get_adjacent_transitions($state, true)) == 0*/) {
                 $this->add_end_state(array_search($statenum, $this->statenumbers));
             }
         }
@@ -2197,6 +2197,11 @@ class qtype_preg_fa {
                 }
                 // Get transitions for ntersection.
                 $intertransitions1 = $this->get_transitions_for_intersection($workstate1, $direction);
+                foreach ($intertransitions1 as &$tran) {
+                    if ($tran->is_eps() && $tran->origin === qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND) {
+                        unset($tran);
+                    }
+                }
                 $intertransitions2 = $anotherfa->get_transitions_for_intersection($workstate2, $direction);
                 // Intersect all possible transitions.
                 $resulttransitions = array();
@@ -2434,6 +2439,7 @@ class qtype_preg_fa {
         $this->to_origin(qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST);
         $anotherfa->to_origin(qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND);
         $result = $this->intersect_fa($anotherfa, $numbers, $isstart);
+
         $result->remove_unreachable_states();
         $result->remove_wrong_end_states();
         $result->lead_to_one_end();
@@ -2456,8 +2462,8 @@ class qtype_preg_fa {
     private function remove_wrong_end_states() {
         $endstates = array_values($this->end_states());
 
-        $reached = array();
         foreach ($endstates as $end) {
+            $reached = array();
             $iswrong = true;
             $front = array($end);
             while (!empty($front)) {
@@ -2801,6 +2807,7 @@ class qtype_preg_fa {
             // Cleaning start states.
             $result->remove_all_start_states();
             $result->set_start_end_states_after_intersect($this, $anotherfa);
+
         } else {
             $result = new qtype_preg_fa();
         }
