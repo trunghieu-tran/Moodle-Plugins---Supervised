@@ -569,11 +569,6 @@ class  qtype_correctwriting_enum_analyzer extends qtype_correctwriting_abstract_
                 array_pop($enumschangecorrectstring);
             }
         }
-        // Change table indexes for tokens in correct answer.
-        foreach ($tokens as $token) {
-            $indexesintable[] = $token->token_index();
-        }
-        $stringpair->set_indexes_in_table($indexesintable);
         // Change correctstring.
         $stringpair->correctstring()->stream->tokens = $tokens;
         foreach ($enumschangecorrectstring as $i) {
@@ -604,6 +599,8 @@ class  qtype_correctwriting_enum_analyzer extends qtype_correctwriting_abstract_
                 $tempstringbegin = $tempstringbegin.' ';
             }
             $tempstringbegin = $tempstringbegin.$tempstringend;
+
+
             // Update correct string.
             $enumstring = clone($stringpair->correctstring());
             $enumstring->string = new qtype_poasquestion_string($tempstringbegin);
@@ -668,7 +665,7 @@ class  qtype_correctwriting_enum_analyzer extends qtype_correctwriting_abstract_
 			$currentstringpair = clone $this->basestringpair;
 			$this->change_enum_order($currentstringpair, $enumchangeorder, $includedenums, $currentorder);
             // Find LCS of correct and corrected answers.
-            $currentcorrectstream = $currentstringpair->correctstring()->stream;
+            $currentcorrectstream = $currentstringpair->enum_correct_string()->stream;
             $lcsarray = qtype_correctwriting_sequence_analyzer::lcs($currentcorrectstream, $correctedstream, $options);
             // If lcs exist keep it's length...
             // Else length is zero.
