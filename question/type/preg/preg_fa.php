@@ -124,9 +124,12 @@ class qtype_preg_fa_transition {
             $this->minopentag = clone $this->minopentag;
         }
         foreach ($this->mergedbefore as $key => $merged) {
+            $this->mergedbefore[$key]->mergedafter = array();
             $this->mergedbefore[$key] = clone $merged;
         }
+
         foreach ($this->mergedafter as $key => $merged) {
+            $this->mergedafter[$key]->mergedafter = array();
             $this->mergedafter[$key] = clone $merged;
         }
     }
@@ -637,10 +640,12 @@ class qtype_preg_fa_transition {
             $merged->from = $this->from;
             $merged->to = $this->to;
         }
+        unset($merged);
         foreach ($this->mergedafter as &$merged) {
             $merged->from = $this->from;
             $merged->to = $this->to;
         }
+        unset($merged);
     }
 
     private function this_tags_tohr($open, $close) {

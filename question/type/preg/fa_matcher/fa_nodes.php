@@ -223,9 +223,12 @@ abstract class qtype_preg_fa_node {
             if (!($transition->from === $transition->to && ($transition->is_unmerged_assert() || $transition->is_eps()))) {
                 $tran = clone $transition;
                 $delclone = clone $del;
+                $delclone->mergedafter = array();
+                $delclone->mergedbefore = array();
+                $delclonemerged = clone $del;
                 $tran->loopsback = $transition->loopsback || $del->loopsback;
                 $tran->greediness = qtype_preg_fa_transition::min_greediness($tran->greediness, $del->greediness);
-                $merged = array_merge($delclone->mergedbefore, array($delclone), $delclone->mergedafter);
+                $merged = array_merge($delclonemerged->mergedbefore, array($delclone), $delclonemerged->mergedafter);
                 // Work with tags.
                 if (!$tran->consumeschars && $del->is_eps() && $del->from !== $del->to) {
                     if ($back) {
@@ -272,6 +275,7 @@ abstract class qtype_preg_fa_node {
                     $breakpos = $del->pregleaf->position->compose($tran->pregleaf->position);
                 }
             }
+            unset($tran);
             $automaton->change_state_for_intersection($del->to, array($del->from));
             $automaton->change_recursive_start_states($del->to, array($del->from));
             $automaton->change_recursive_end_states($del->to, $newkeys);
@@ -296,6 +300,7 @@ abstract class qtype_preg_fa_node {
                     $breakpos = $tran->pregleaf->position->compose($del->pregleaf->position);
                 }
             }
+            unset($tran);
             $automaton->change_state_for_intersection($del->from, array($del->to));
             $automaton->change_recursive_end_states($del->from, array($del->to));
             $automaton->change_recursive_start_states($del->from, $newkeys);
