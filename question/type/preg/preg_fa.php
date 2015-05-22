@@ -1824,6 +1824,51 @@ class qtype_preg_fa {
         return $resultstop;
     }
 
+    public function merge_end_transitions() {
+        foreach ($this->end_states() as $end) {
+            $endtransitions = $this->get_adjacent_transitions($end, false);
+            foreach ($endtransitions as $endtran) {
+                if ($endtran->is_eps() && $endtran->from != $endtran->to) {
+                    $wasadded = false;
+                    $canmerge = true;
+                    $transitions = $this->get_adjacent_transitions($endtran->from, false);
+                    foreach ($transitions as $tran) {
+                        if ($tran->from === $tran->to) {
+                            $canmerge = false;
+                        }
+                    }
+                    if ($canmerge) {
+                        foreach ($transitions as $tran) {
+                            if ($tran->from !== $tran->to) {
+                                $clonetran = clone $tran;
+                                $delclone = clone $endtran;
+                                $delclone->mergedafter = array();
+                                $delclone->mergedbefore = array();
+                                $delclonemerged = clone $endtran;
+                                $clonetran->loopsback = $tran->loopsback || $endtran->loopsback;
+                                $clonetran->greediness = qtype_preg_fa_transition::min_greediness($tran->greediness, $delclone->greediness);
+                                $merged = array_merge($delclonemerged->mergedbefore, array($delclone), $delclonemerged->mergedafter);
+                                // Work with tags.
+                                $merged = array_merge($merged, $clonetran->mergedafter);
+                                $clonetran->mergedafter = $merged;
+                                $clonetran->to = $endtran->to;
+                                $clonetran->redirect_merged_transitions();
+                                $this->add_transition($clonetran);
+                                $wasadded = true;
+                            }
+                        }
+                        if ($wasadded) {
+                            $this->change_state_for_intersection($endtran->from, array($endtran->to));
+                            $this->remove_transition($endtran);
+
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
     /**
      * Check if there is such state in intersection part and add modified version of it.
      *
