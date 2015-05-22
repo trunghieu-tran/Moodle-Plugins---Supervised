@@ -1115,7 +1115,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         if ($body['breakpos'] !== null || empty($result->adjacencymatrix)) {
             throw new qtype_preg_empty_fa_exception('', $body['breakpos']);
         }
-        $this->merge_end_transitions($result);
+        $result->merge_end_transitions();
         global $CFG;
         $CFG->pathtodot = '/usr/bin/dot';
         $intersected = array();
@@ -1155,47 +1155,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         return $result;
     }
 
-    private function merge_end_transitions($result) {
-        foreach ($result->end_states() as $end) {
-            $endtransitions = $result->get_adjacent_transitions($end, false);
-            foreach ($endtransitions as $endtran) {
-                if ($endtran->is_eps() && $endtran->from != $endtran->to) {
-                    $wasadded = false;
-                    $canmerge = true;
-                    $transitions = $result->get_adjacent_transitions($endtran->from, false);
-                    foreach ($transitions as $tran) {
-                        if ($tran->from === $tran->to) {
-                            $canmerge = false;
-                        }
-                    }
-                    if ($canmerge) {
-                        foreach ($transitions as $tran) {
-                            if ($tran->from !== $tran->to) {
-                                $clonetran = clone $tran;
-                                $delclone = clone $endtran;
-                                $clonetran->loopsback = $tran->loopsback || $endtran->loopsback;
-                                $clonetran->greediness = qtype_preg_fa_transition::min_greediness($tran->greediness, $delclone->greediness);
-                                $merged = array_merge($delclone->mergedbefore, array($delclone), $delclone->mergedafter);
-                                // Work with tags.
-                                $merged = array_merge($merged, $clonetran->mergedafter);
-                                $clonetran->mergedafter = $merged;
-                                $clonetran->to = $endtran->to;
-                                $clonetran->redirect_merged_transitions();
-                                $result->add_transition($clonetran);
-                                $wasadded = true;
-                            }
-                        }
-                        if ($wasadded) {
-                            $result->change_state_for_intersection($endtran->from, array($endtran->to));
-                            $result->remove_transition($endtran);
 
-                        }
-                    }
-                }
-
-            }
-        }
-    }
 
     protected function check_for_infinite_recursion() {
         $end = $this->automaton->end_states();
