@@ -1756,13 +1756,14 @@ class qtype_preg_fa {
                             $connectedstates = $source->get_connected_states($curstate, $direction);
                             $connectedstopstates = array();
                             foreach ($connectedstates as $connected) {
-                                if (in_array($connected, $stopcoping)) {
+                                if (in_array($connected, $stopcoping) && !in_array($connected, $connectedstopstates)) {
                                     $connectedstopstates[] = $connected;
                                 }
                             }
+                            $newmemoryfront[] = $workstate;
                             if (count($connectedstopstates) + 1 == count($stopcoping)) {
                                 $connectedstates = $connectedstopstates;
-                                $newmemoryfront[] = $workstate;
+
                                 // Adding connected states.
 
                                 $newfront = array_merge($newfront, $connectedstates);
@@ -1787,7 +1788,7 @@ class qtype_preg_fa {
                     $changedstate = trim($changedstate, '()');
                     $changedstate = $this->modify_state($changedstate, $origin);
                     $workstate = array_search($changedstate, $this->statenumbers);
-                    if ($stopcoping === null || !in_array($workstate, $stopcoping)) {
+                    if ($stopcoping === null || !in_array($workstate, $stopcoping) || (in_array($workstate, $stopcoping) && in_array($workstate, $memoryfront))) {
                         $this->copy_transitions($stateswere, $curstate, $workstate, $memoryfront, $source, $direction);
                     }
                 }
@@ -2493,6 +2494,7 @@ class qtype_preg_fa {
         $result->remove_unreachable_states();
         $result->remove_wrong_end_states();
         $result->lead_to_one_end();
+        $result->merge_end_transitions();
         $result->handler = $this->handler;
         $result->update_intersection_states($this);
         $result->states_numbers_to_ids();
