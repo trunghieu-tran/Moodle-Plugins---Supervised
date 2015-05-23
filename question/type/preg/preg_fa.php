@@ -1722,7 +1722,6 @@ class qtype_preg_fa {
         $stateswere = $this->get_state_numbers();
         // Cleaning end states.
         $this->remove_all_end_states();
-
         // Coping.
         while (!empty($oldfront)) {
             foreach ($oldfront as $curstate) {
@@ -2509,6 +2508,164 @@ class qtype_preg_fa {
                 }
             }
         }
+    }
+
+    /**
+     * Merging transitions without merging states.
+     *
+     * @param del - uncapturing transition for deleting.
+     */
+    public function merge_transitions($del, &$stackitem, $back = null) {
+        $clonetransitions = array();
+        $tagsets = array();
+        $fromstates = array();
+        $tostates = array();
+        $oppositetransitions = array();
+        $intersection = null;
+        $transitionadded = false;
+        $flag = new qtype_preg_charset_flag();
+        $flag->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string("\n"));
+        $charset = new qtype_preg_leaf_charset();
+        $charset->flags = array(array($flag));
+        $charset->userinscription = array(new qtype_preg_userinscription("\n"));
+        $righttran = new qtype_preg_fa_transition(0, $charset, 1);
+        $outtransitions = $this->get_adjacent_transitions($del->to, true);
+        $endstates = array($stackitem['end']);
+
+        // Cycled last states.
+        if ((in_array($del->to, $endstates) && $del->is_eps()) || !$del->consumeschars) {
+            return false;
+        }
+
+        if ($back === null) {
+
+            // Get transitions for merging back.
+            if (($del->is_unmerged_assert() && $del->is_start_anchor()) || ($del->is_eps() && in_array($del->to, $endstates))) {
+                $transitions = $this->get_adjacent_transitions($del->from, false);
+                $tostates[] = $del->to;
+                $back = true;
+            } else {
+                // Get transitions for merging forward.
+                $transitions = $this->get_adjacent_transitions($del->to, true);
+                $fromstates[] = $del->from;
+                $back = false;
+            }
+        } else {
+
+            if ($back) {
+                $transitions = $this->get_adjacent_transitions($del->from, false);
+            } else {
+                $transitions = $this->get_adjacent_transitions($del->to, true);
+            }
+        }
+
+        // Changing leafs in case of merging.
+        foreach ($transitions as $transition) {
+            if (!($transition->from === $transition->to && ($transition->is_unmerged_assert() || $transition->is_eps()))) {
+                $tran = clone $transition;
+                $delclone = clone $del;
+                $delclone->mergedafter = array();
+                $delclone->mergedbefore = array();
+                $delclonemerged = clone $del;
+                $tran->loopsback = $transition->loopsback || $del->loopsback;
+                $tran->greediness = qtype_preg_fa_transition::min_greediness($tran->greediness, $del->greediness);
+                $merged = array_merge($delclonemerged->mergedbefore, array($delclone), $delclonemerged->mergedafter);
+                // Work with tags.
+                if (!$tran->consumeschars && $del->is_eps() && $del->from !== $del->to) {
+                    if ($back) {
+                        $tran->mergedbefore = array_merge($tran->mergedbefore, $merged);
+                    } else {
+                        $tran->mergedafter = array_merge($merged, $tran->mergedafter);
+                    }
+                } else if ($back) {
+                    $tran->mergedafter = array_merge($tran->mergedafter, $merged);
+                } else {
+                    $tran->mergedbefore = array_merge($merged, $tran->mergedbefore);
+                }
+
+                $clonetransitions[] = $tran;
+            }
+
+        }
+        // Has deleting or changing transitions.
+        if (empty($transitions)) {
+            return false;
+        }
+
+        $breakpos = null;
+        $newkeys = array();
+        if (!$back) {
+            foreach ($clonetransitions as &$tran) {
+                $tostates[] = $tran->to;
+                if ($del->is_end_anchor() && !$tran->is_unmerged_assert() && !$tran->is_eps()) {
+                    $righttran->pregleaf->position = $tran->pregleaf->position;
+                    $intersection = $tran->intersect($righttran);
+                    if ($intersection !== null) {
+                        $tran->pregleaf = $intersection->pregleaf;
+                    }
+                }
+
+                if (($del->pregleaf->subtype !== qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z && $intersection !== null) ||
+                    !$del->is_end_anchor() || $tran->is_unmerged_assert() || $tran->is_eps()) {
+                    $tran->from = $del->from;
+                    $tran->redirect_merged_transitions();
+                    $this->add_transition($tran);
+                    $newkeys[] = $tran->to;
+                    $transitionadded = true;
+                } else if ($breakpos === null) {
+                    $breakpos = $del->pregleaf->position->compose($tran->pregleaf->position);
+                }
+            }
+            unset($tran);
+            $this->change_state_for_intersection($del->to, array($del->from));
+            $this->change_recursive_start_states($del->to, array($del->from));
+            $this->change_recursive_end_states($del->to, $newkeys);
+        } else {
+            foreach ($clonetransitions as &$tran) {
+                $fromstates[] = $tran->from;
+                if ($del->is_start_anchor() && !$tran->is_unmerged_assert() && !$tran->is_eps()) {
+                    $righttran->pregleaf->position = $tran->pregleaf->position;
+                    $intersection = $tran->intersect($righttran);
+                    if ($intersection !== null) {
+                        $tran->pregleaf = $intersection->pregleaf;
+                    }
+                }
+                if (($del->pregleaf->subtype !== qtype_preg_leaf_assert::SUBTYPE_ESC_A && $intersection !== null) ||
+                    !$del->is_start_anchor() || $tran->is_unmerged_assert() || $tran->is_eps()) {
+                    $tran->to = $del->to;
+                    $tran->redirect_merged_transitions();
+                    $newkeys[] = $tran->from;
+                    $this->add_transition($tran);
+                    $transitionadded = true;
+                } else if ($breakpos === null) {
+                    $breakpos = $tran->pregleaf->position->compose($del->pregleaf->position);
+                }
+            }
+            unset($tran);
+            $this->change_state_for_intersection($del->from, array($del->to));
+            $this->change_recursive_end_states($del->from, array($del->to));
+            $this->change_recursive_start_states($del->from, $newkeys);
+        }
+
+        if (!($del->is_end_anchor() && in_array($del->to, $endstates)) && !($transition->from === $transition->to && ($transition->is_unmerged_assert() || $transition->is_eps()))) {
+            $this->remove_transition($del);
+        }
+
+        $hastransitions = $this->check_connection($fromstates, $tostates);
+        $stackitem['breakpos'] = ($transitionadded || $hastransitions) ? null : $breakpos;
+
+        return true;
+    }
+
+    public function check_connection($fromstates, $tostates) {
+        foreach ($fromstates as $from) {
+            foreach ($tostates as $to) {
+                if ($this->has_transition($from, $to)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private function remove_wrong_end_states() {
