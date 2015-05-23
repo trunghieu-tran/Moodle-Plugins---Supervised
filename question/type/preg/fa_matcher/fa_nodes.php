@@ -158,163 +158,9 @@ abstract class qtype_preg_fa_node {
         $stack[] = $body;
     }
 
-    protected static function check_connection($automaton, $fromstates, $tostates) {
-        foreach ($fromstates as $from) {
-            foreach ($tostates as $to) {
-                if ($automaton->has_transition($from, $to)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 
-    /**
-     * Merging transitions without merging states.
-     *
-     * @param del - uncapturing transition for deleting.
-     */
-    static public function merge_transitions($automaton, $del, &$stackitem, $back = null) {
-        $clonetransitions = array();
-        $tagsets = array();
-        $fromstates = array();
-        $tostates = array();
-        $oppositetransitions = array();
-        $intersection = null;
-        $transitionadded = false;
-        $flag = new qtype_preg_charset_flag();
-        $flag->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string("\n"));
-        $charset = new qtype_preg_leaf_charset();
-        $charset->flags = array(array($flag));
-        $charset->userinscription = array(new qtype_preg_userinscription("\n"));
-        $righttran = new qtype_preg_fa_transition(0, $charset, 1);
-        $outtransitions = $automaton->get_adjacent_transitions($del->to, true);
-        $endstates = array($stackitem['end']);
 
-        // Cycled last states.
-        if ((in_array($del->to, $endstates) && $del->is_eps()) || !$del->consumeschars) {
-            return false;
-        }
 
-        if ($back === null) {
-
-            // Get transitions for merging back.
-            if (($del->is_unmerged_assert() && $del->is_start_anchor()) || ($del->is_eps() && in_array($del->to, $endstates))) {
-                $transitions = $automaton->get_adjacent_transitions($del->from, false);
-                $tostates[] = $del->to;
-                $back = true;
-            } else {
-                // Get transitions for merging forward.
-                $transitions = $automaton->get_adjacent_transitions($del->to, true);
-                $fromstates[] = $del->from;
-                $back = false;
-            }
-        } else {
-
-            if ($back) {
-                $transitions = $automaton->get_adjacent_transitions($del->from, false);
-            } else {
-                $transitions = $automaton->get_adjacent_transitions($del->to, true);
-            }
-        }
-
-        // Changing leafs in case of merging.
-        foreach ($transitions as $transition) {
-            if (!($transition->from === $transition->to && ($transition->is_unmerged_assert() || $transition->is_eps()))) {
-                $tran = clone $transition;
-                $delclone = clone $del;
-                $delclone->mergedafter = array();
-                $delclone->mergedbefore = array();
-                $delclonemerged = clone $del;
-                $tran->loopsback = $transition->loopsback || $del->loopsback;
-                $tran->greediness = qtype_preg_fa_transition::min_greediness($tran->greediness, $del->greediness);
-                $merged = array_merge($delclonemerged->mergedbefore, array($delclone), $delclonemerged->mergedafter);
-                // Work with tags.
-                if (!$tran->consumeschars && $del->is_eps() && $del->from !== $del->to) {
-                    if ($back) {
-                        $tran->mergedbefore = array_merge($tran->mergedbefore, $merged);
-                    } else {
-                        $tran->mergedafter = array_merge($merged, $tran->mergedafter);
-                    }
-                } else if ($back) {
-                    $tran->mergedafter = array_merge($tran->mergedafter, $merged);
-                } else {
-                    $tran->mergedbefore = array_merge($merged, $tran->mergedbefore);
-                }
-
-                $clonetransitions[] = $tran;
-            }
-
-        }
-        // Has deleting or changing transitions.
-        if (empty($transitions)) {
-            return false;
-        }
-
-        $breakpos = null;
-        $newkeys = array();
-        if (!$back) {
-            foreach ($clonetransitions as &$tran) {
-                $tostates[] = $tran->to;
-                if ($del->is_end_anchor() && !$tran->is_unmerged_assert() && !$tran->is_eps()) {
-                    $righttran->pregleaf->position = $tran->pregleaf->position;
-                    $intersection = $tran->intersect($righttran);
-                    if ($intersection !== null) {
-                        $tran->pregleaf = $intersection->pregleaf;
-                    }
-                }
-
-                if (($del->pregleaf->subtype !== qtype_preg_leaf_assert::SUBTYPE_SMALL_ESC_Z && $intersection !== null) ||
-                    !$del->is_end_anchor() || $tran->is_unmerged_assert() || $tran->is_eps()) {
-                    $tran->from = $del->from;
-                    $tran->redirect_merged_transitions();
-                    $automaton->add_transition($tran);
-                    $newkeys[] = $tran->to;
-                    $transitionadded = true;
-                } else if ($breakpos === null) {
-                    $breakpos = $del->pregleaf->position->compose($tran->pregleaf->position);
-                }
-            }
-            unset($tran);
-            $automaton->change_state_for_intersection($del->to, array($del->from));
-            $automaton->change_recursive_start_states($del->to, array($del->from));
-            $automaton->change_recursive_end_states($del->to, $newkeys);
-        } else {
-            foreach ($clonetransitions as &$tran) {
-                $fromstates[] = $tran->from;
-                if ($del->is_start_anchor() && !$tran->is_unmerged_assert() && !$tran->is_eps()) {
-                    $righttran->pregleaf->position = $tran->pregleaf->position;
-                    $intersection = $tran->intersect($righttran);
-                    if ($intersection !== null) {
-                        $tran->pregleaf = $intersection->pregleaf;
-                    }
-                }
-                if (($del->pregleaf->subtype !== qtype_preg_leaf_assert::SUBTYPE_ESC_A && $intersection !== null) ||
-                    !$del->is_start_anchor() || $tran->is_unmerged_assert() || $tran->is_eps()) {
-                    $tran->to = $del->to;
-                    $tran->redirect_merged_transitions();
-                    $newkeys[] = $tran->from;
-                    $automaton->add_transition($tran);
-                    $transitionadded = true;
-                } else if ($breakpos === null) {
-                    $breakpos = $tran->pregleaf->position->compose($del->pregleaf->position);
-                }
-            }
-            unset($tran);
-            $automaton->change_state_for_intersection($del->from, array($del->to));
-            $automaton->change_recursive_end_states($del->from, array($del->to));
-            $automaton->change_recursive_start_states($del->from, $newkeys);
-        }
-
-        if (!($del->is_end_anchor() && in_array($del->to, $endstates)) && !($transition->from === $transition->to && ($transition->is_unmerged_assert() || $transition->is_eps()))) {
-            $automaton->remove_transition($del);
-        }
-
-        $hastransitions = self::check_connection($automaton, $fromstates, $tostates);
-        $stackitem['breakpos'] = ($transitionadded || $hastransitions) ? null : $breakpos;
-
-        return true;
-    }
 
 
     public static function get_wordbreaks_transitions($pregleaf, $isinto) {
@@ -498,7 +344,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
             foreach ($incoming as $transition) {
                 $transition->set_transition_type();
                 if ($transition->is_eps()) {
-                    qtype_preg_fa_node::merge_transitions($automaton, $transition, $stack_item);
+                    $automaton->merge_transitions($transition, $stack_item);
                 }
             }
         }
@@ -508,7 +354,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
         $incoming = $automaton->get_adjacent_transitions($borderstate, false);
         foreach ($incoming as $transition) {
             if ($transition->is_eps() && $transition->from != $stack_item['start']) {
-                qtype_preg_fa_node::merge_transitions($automaton, $transition, $stack_item, true);
+                $automaton->merge_transitions($transition, $stack_item, true);
             }
         }
     }
@@ -544,7 +390,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
         foreach ($incoming as $transition) {
             $transition->set_transition_type();
             if ($transition->is_eps() || $transition->is_unmerged_assert()) {
-                qtype_preg_fa_node::merge_transitions($automaton, $transition, $stack_item);
+                $automaton->merge_transitions($transition, $stack_item);
             }
 
         }
@@ -552,7 +398,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
         foreach ($outgoing as $transition) {
             $transition->set_transition_type();
             if ($transition->is_eps() || $transition->is_unmerged_assert()) {
-                qtype_preg_fa_node::merge_transitions($automaton, $transition, $stack_item);
+                $automaton->merge_transitions($transition, $stack_item);
             }
 
         }
@@ -616,7 +462,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                 $automaton->change_state_for_intersection($intran->to, $newkeys);
                 $automaton->change_recursive_start_states($intran->to, $newkeys);
             }
-            $hastransitions = qtype_preg_fa_node::check_connection($automaton, $fromstates, $tostates);
+            $hastransitions = $automaton->check_connection($fromstates, $tostates);
             if (!$hasintersect && $breakpos !== null && !$hastransitions) {
                 $stackitem['breakpos'] = $breakpos;
             }
@@ -669,7 +515,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                 }
                 $automaton->change_recursive_start_states($tran->to, array($tran->from));
             }
-            $hastransitions = qtype_preg_fa_node::check_connection($automaton, $fromstates, $tostates);
+            $hastransitions = $automaton->check_connection($fromstates, $tostates);
             if (!$hasintersect && $breakpos !== null && !$hastransitions) {
                 $stackitem['breakpos'] = $breakpos;
             }
@@ -816,7 +662,7 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
             $automaton->add_transition($newtransition);
             $redirectedtransitions[] = $transition;
             if ($transform && ($newtransition->is_eps() || $newtransition->is_unmerged_assert())) {
-                qtype_preg_fa_node::merge_transitions($automaton, $newtransition, $body);
+                $automaton->merge_transitions($newtransition, $body);
             }
         }
 
@@ -827,7 +673,7 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
         foreach ($prevtrans as $transition) {
             $transition->set_transition_type();
             if ($transform && ($transition->is_eps() || $transition->is_unmerged_assert())) {
-                qtype_preg_fa_node::merge_transitions($automaton, $transition,  $body);
+                $automaton->merge_transitions($transition,  $body);
             }
         }
 
@@ -878,7 +724,7 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
                         qtype_preg_fa_node::merge_wordbreaks($newtransition, $automaton, $cur, false);
                     }
                     if ($transform && ($newtransition->is_eps() || $newtransition->is_unmerged_assert())) {
-                        qtype_preg_fa_node::merge_transitions($automaton, $newtransition, $cur);
+                        $automaton->merge_transitions($newtransition, $cur);
 
                     }
                 }
@@ -893,7 +739,7 @@ class qtype_preg_fa_node_infinite_quant extends qtype_preg_fa_node_quant {
                         qtype_preg_fa_node::merge_wordbreaks($newtransition, $automaton, $cur, false);
                     }
                     if ($transform && ($transition->is_eps() || $transition->is_unmerged_assert())) {
-                        qtype_preg_fa_node::merge_transitions($automaton, $transition, $cur);
+                        $automaton->merge_transitions($transition, $cur);
                         if ($transition->is_end_anchor()) {
                             $cur['breakpos'] = null;
                         }
@@ -983,7 +829,7 @@ class qtype_preg_fa_node_finite_quant extends qtype_preg_fa_node_quant {
             $automaton->add_transition($transition);
             $transition->set_transition_type();
             if ($transform && ($transition->is_eps() || $transition->is_unmerged_assert())) {
-                qtype_preg_fa_node::merge_transitions($automaton, $transition, $cur);
+                $automaton->merge_transitions($transition, $cur);
             }
             $quantified[] = $cur;
         }
