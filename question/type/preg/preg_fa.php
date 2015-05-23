@@ -1638,7 +1638,7 @@ class qtype_preg_fa {
                             $transition->to = $memstate;
                             $transition->from = $workstate;
                         }
-                        if ($tran->origin == qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND) {
+                        if ($tran->origin == qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND && !($tran->is_eps())) {
                             $transition->consumeschars = false;
                         }
                         $transition->redirect_merged_transitions();
@@ -1675,7 +1675,7 @@ class qtype_preg_fa {
                         $transition->to = $state;
                         $transition->from = $workstate;
                     }
-                    if ($tran->origin == qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND) {
+                    if ($tran->origin == qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND && !($tran->is_eps())) {
                         $transition->consumeschars = false;
                     }
                     $transition->redirect_merged_transitions();
@@ -2493,7 +2493,8 @@ class qtype_preg_fa {
         $result->remove_unreachable_states();
         $result->remove_wrong_end_states();
         $result->lead_to_one_end();
-        $result->merge_end_transitions();
+        $result->merge_after_intersection();
+        //$result->merge_end_transitions();
         $result->handler = $this->handler;
         $result->update_intersection_states($this);
         $result->states_numbers_to_ids();
@@ -2507,6 +2508,36 @@ class qtype_preg_fa {
                     $transition->origin = $origin;
                 }
             }
+        }
+    }
+
+    private function merge_after_intersection() {
+        $startstates = $this->start_states();
+        $front = $startstates;
+        $stackitem = array();
+        $success = false;
+        $newfront = array();
+        $states = array();
+        while (!empty($front)) {
+            foreach ($front as $state) {
+                if (!in_array($state, $states)) {
+                    $transitions = $this->get_adjacent_transitions($state, true);
+                    foreach ($transitions as $transition) {
+                        if (($transition->is_start_anchor() || $transition->is_end_anchor() || $transition->is_eps())) {
+                            $stackitem['end'] = $this->end_states();
+                            $success = $this->merge_transitions($transition, $stackitem) || $success;
+                        }
+                        $newfront[] = $transition->to;
+                    }
+                    $states[] = $state;
+                }
+            }
+
+            $front = $newfront;
+            $newfront = array();
+        }
+        if ($success) {
+            $this->merge_after_intersection();
         }
     }
 
@@ -2530,7 +2561,11 @@ class qtype_preg_fa {
         $charset->userinscription = array(new qtype_preg_userinscription("\n"));
         $righttran = new qtype_preg_fa_transition(0, $charset, 1);
         $outtransitions = $this->get_adjacent_transitions($del->to, true);
-        $endstates = array($stackitem['end']);
+        if (!is_array($stackitem['end'])) {
+            $endstates = array($stackitem['end']);
+        } else {
+            $endstates = $stackitem['end'];
+        }
 
         // Cycled last states.
         if ((in_array($del->to, $endstates) && $del->is_eps()) || !$del->consumeschars) {
@@ -2571,7 +2606,7 @@ class qtype_preg_fa {
                 $tran->greediness = qtype_preg_fa_transition::min_greediness($tran->greediness, $del->greediness);
                 $merged = array_merge($delclonemerged->mergedbefore, array($delclone), $delclonemerged->mergedafter);
                 // Work with tags.
-                if (!$tran->consumeschars && $del->is_eps() && $del->from !== $del->to) {
+                if (!$tran->consumeschars && $del->is_eps() && $del->from !== $del->to && $tran->origin !== qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND) {
                     if ($back) {
                         $tran->mergedbefore = array_merge($tran->mergedbefore, $merged);
                     } else {
