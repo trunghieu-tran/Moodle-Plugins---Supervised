@@ -69,6 +69,12 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
      */
     public $analyzersequence = array();
 
+    
+    protected function convert_to_own_string($string) {
+        $result = new qtype_correctwriting_proccesedstring($string->language);
+        $result->copy_state_from($string);
+        return $result;
+    }
 
     /**
      * Returns mapped index from correct string to enum correct string
@@ -235,11 +241,23 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
      * Return object of class
      */
    public function __construct($correct, $compared, $matches) {
+        global $CFG;
         block_formal_langs_string_pair::__construct($correct, $compared, $matches);
+        if (file_exists(dirname(__FILE__) . '/processed_string.php') && !class_exists('qtype_correctwriting_proccesedstring')) {
+            require_once(dirname(__FILE__) . '/processed_string.php');
+        }
+        if (class_exists('qtype_correctwriting_proccesedstring')) {
+            $this->correctstring = $this->convert_to_own_string($correct);
+            $this->comparedstring = $this->convert_to_own_string($compared);
+            $this->matches = $matches;
+            $this->correctedstring = $this->convert_to_own_string($this->correct_mistakes());
+        } 
+        
         $this->indexesintable = array();
         foreach($this->correctstring()->stream->tokens as $token) {
             $this->indexesintable[$token->token_index()] = $token->token_index();
         }
+
     }
 
     /**

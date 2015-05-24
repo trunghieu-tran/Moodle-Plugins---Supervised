@@ -102,7 +102,7 @@ class qtype_correctwriting extends qtype_shortanswer implements qtype_correctwri
     public function analyzers() {
         global $CFG;
         $analyzers =  array(   0x100 => 'lexical_analyzer',
-                        /*0x200 => 'enum_analyzer',*/
+                        0x200 => 'enum_analyzer',
                         0x300 => 'sequence_analyzer',
                         0x400 => 'syntax_analyzer'
                     );
