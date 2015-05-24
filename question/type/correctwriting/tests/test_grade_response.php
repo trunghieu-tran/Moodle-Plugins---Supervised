@@ -45,7 +45,7 @@ require_once($CFG->dirroot.'/blocks/formal_langs/language_simple_english.php');
        $language = new block_formal_langs_language_simple_english();
        $this->question = new qtype_correctwriting_question();
        $this->question->usecase = true;
-       $this->question->lexicalerrorthreshold = 3000;
+       $this->question->lexicalerrorthreshold = 0.1;
        $this->question->lexicalerrorweight = 0.1;
        $this->question->usedlanguage = $language;
        $this->question->movedmistakeweight = 0.1;

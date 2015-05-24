@@ -224,7 +224,7 @@ class qtype_correctwriting_sequence_analyzer_test extends PHPUnit_Framework_Test
         $this->language = new block_formal_langs_language_c_language();
         $this->question = new qtype_correctwriting_question();
         $this->question->usecase = true;
-        $this->question->lexicalerrorthreshold = 3000;
+        $this->question->lexicalerrorthreshold = 0.5;
         $this->question->lexicalerrorweight = 0.1;
         $this->question->usedlanguage = $this->language;
         $this->question->movedmistakeweight = 0.1;

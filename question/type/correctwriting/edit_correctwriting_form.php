@@ -54,8 +54,9 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
     private $hintfloatfields = array('whatishintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2),       // "What is" hint penalty.
                                      'wheretxthintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2),     // "Where" text hint penalty.
                                      'absenthintpenaltyfactor' => array('default' => 1.0, 'advanced' => true, 'min' => 0, 'max' => 100),// Absent token mistake hint penalty factor.
-                                     'wherepichintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2)      // "Where" picture hint penalty.
-                                     );
+                                     'wherepichintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2),     // "Where" picture hint penalty.
+                                     'howtofixpichintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2)   // "How to fix" picture hint penalty.
+                                    );
 
     private $analyzers = null;
     /** Contains list of answer ids, that should be hidden
@@ -577,9 +578,46 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
     }
 
     public function validation($data, $files) {
-
         $errors = parent::validation($data, $files);
 
+        $islexicalanalyzerenabled = false;
+        if (array_key_exists('islexicalanalyzerenabled', $data)) {
+            $islexicalanalyzerenabled = intval($data['islexicalanalyzerenabled']);
+        }
+
+        $issequenceanalyzerenabled = false;
+        if (array_key_exists('issequenceanalyzerenabled', $data)) {
+            $issequenceanalyzerenabled = intval($data['issequenceanalyzerenabled']);
+        }
+
+        $issyntaxanalyzerenabled = false;
+        if (array_key_exists('issyntaxanalyzerenabled', $data)) {
+            $issyntaxanalyzerenabled = intval($data['issyntaxanalyzerenabled']);
+        }
+
+        $isenumanalyzerenabled = false;
+        if (array_key_exists('isenumanalyzerenabled', $data)) {
+            $isenumanalyzerenabled = intval($data['isenumanalyzerenabled']);
+        }
+
+        if (!$issequenceanalyzerenabled && $issyntaxanalyzerenabled) {
+            $errors['issyntaxanalyzerenabled'] = get_string('syntaxanalyzerrequiresequence','qtype_correctwriting');
+        }
+        if (!$issequenceanalyzerenabled && $isenumanalyzerenabled) {
+            $errors['isenumanalyzerenabled'] = get_string('enumanalyzerrequiresequence','qtype_correctwriting');
+        }
+        if (!$islexicalanalyzerenabled
+            && !$issequenceanalyzerenabled
+            && !$isenumanalyzerenabled
+            && !$issyntaxanalyzerenabled) {
+            $errors['islexicalanalyzerenabled'] = get_string('analyzersaredisabled','qtype_correctwriting');
+        }
+
+        // TODO: Remove, when nice version of syntax analyzer will be implemented
+        if ($issyntaxanalyzerenabled) {
+            $errors['issyntaxanalyzerenabled'] = get_string('syntaxanalyzerisdisabled','qtype_correctwriting');
+        }
+        
         // Validate floating fields for min/max borders.
         foreach ($this->floatfields as $name => $params) {
             if ($data[$name] < $params['min']) {
