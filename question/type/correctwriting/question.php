@@ -120,7 +120,7 @@ class qtype_correctwriting_question extends question_graded_automatically
      * Whether enum analyzer is enabled
      * @var int
      */
-    public $isenumanalyzerenabled = 1;
+    public $isenumanalyzerenabled = 0;
 
     /**
      * Whether sequence analyzer is enabled

@@ -23,6 +23,10 @@ class qtype_correctwriting_proccesedstring extends block_formal_langs_processed_
     protected $enums_description = null;
 
     public function __set($name, $value) {
+        $isset = parent::__isset($name);
+        if ($isset) {
+            return parent::__set($name, $value);
+        }
         $settertable = array('string' => 'set_string', 'stream' => 'set_stream', 'syntaxtree' => 'set_syntax_tree');
         $settertable['descriptions'] = 'set_descriptions';
         $settertable['enumerations'] = 'set_enums_descriptions';
@@ -38,6 +42,10 @@ class qtype_correctwriting_proccesedstring extends block_formal_langs_processed_
     }
 
     public function __get($name) {
+        $isset = parent::__isset($name);
+        if ($isset) {
+            return parent::__get($name);
+        }
         $gettertable = array('string' => 'get_string', 'stream' => 'get_stream', 'syntaxtree' => 'get_syntax_tree');
         $gettertable['descriptions'] = 'node_descriptions_list';
         $gettertable['enumerations'] = 'node_enums_descriptions';
@@ -52,6 +60,10 @@ class qtype_correctwriting_proccesedstring extends block_formal_langs_processed_
     }
 
     public function __isset($name) {
+        $result = parent::__isset($name);
+        if ($result) {
+            return $result;
+        }   
         $getters = array('string', 'stream', 'syntaxtree', 'descriptions', 'enumeration');
         return in_array($name, $getters);
     }
