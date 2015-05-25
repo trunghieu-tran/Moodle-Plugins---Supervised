@@ -600,12 +600,54 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             $isenumanalyzerenabled = intval($data['isenumanalyzerenabled']);
         }
 
-        if (!$issequenceanalyzerenabled && $issyntaxanalyzerenabled) {
-            $errors['issyntaxanalyzerenabled'] = get_string('syntaxanalyzerrequiresequence','qtype_correctwriting');
+        question_bank::load_question_definition_classes($this->qtype());
+        $qtypeclass = 'qtype_'.$this->qtype();
+        /** @var qtype_correctwriting $qtype */
+        $qtype = new $qtypeclass;
+        $this->analyzers = $qtype->analyzers();
+        foreach ($this->analyzers as $name) {
+            $analyzername = str_replace('_', '', $name);
+            $variablename = 'is' . $analyzername . 'enabled';
+            $isanalyzerenabled = $$variablename;
+            if ($isanalyzerenabled) {
+                $classname = 'qtype_correctwriting_' . $name;
+                /** @var qtype_correctwriting_abstract_analyzer $analyzer */
+                $analyzer = new $classname;
+                $requiredanalyzers = $analyzer->require_analyzers();
+                $alreadyerror = false;
+                if (count($requiredanalyzers)) {
+                    foreach($requiredanalyzers as $requiredanalyzerbasename) {
+                        $requiredanalyzerbasename = str_replace('qtype_correctwriting_', '', $requiredanalyzerbasename);
+                        $requiredanalyzerbasename = str_replace('_', '', $requiredanalyzerbasename);
+                        $isrequiredanalyzerenabled = ${'is' . $requiredanalyzerbasename . 'enabled'};
+                        if (!$isrequiredanalyzerenabled) {
+                            $errors[$variablename] = get_string(
+                                $analyzername . 'require' . $requiredanalyzerbasename,
+                                'qtype_correctwriting'
+                            );
+                            $alreadyerror = true;
+                        }
+                    }
+                }
+                if (!$alreadyerror) {
+                    if (array_key_exists('langid', $data)) {
+                        if (is_number($data['langid'])) {
+                            $langid = intval($data['langid']);
+                            $lang = block_formal_langs::lang_object($langid);
+                            if (is_object($lang)) {
+                                if ($analyzer->is_lang_compatible($lang) == false) {
+                                    $errors[$variablename] = get_string(
+                                        $analyzername . 'isincompatiblewithlang',
+                                        'qtype_correctwriting'
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
-        if (!$issequenceanalyzerenabled && $isenumanalyzerenabled) {
-            $errors['isenumanalyzerenabled'] = get_string('enumanalyzerrequiresequence','qtype_correctwriting');
-        }
+        
         if (!$islexicalanalyzerenabled
             && !$issequenceanalyzerenabled
             && !$isenumanalyzerenabled

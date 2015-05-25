@@ -708,7 +708,7 @@ class  qtype_correctwriting_enum_analyzer extends qtype_correctwriting_abstract_
 		* @return boolean
 		*/
 		public function is_lang_compatible($lang) {
-				if($lang->name == 'cpp_parseable') {
+				if($lang->name() == 'cpp_parseable') {
 					return true;
 				}
 				return false;
