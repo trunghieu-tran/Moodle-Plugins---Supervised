@@ -17,7 +17,7 @@
 
 require_once($CFG->dirroot.'/blocks/formal_langs/tokens_base.php');
 
-class qtype_correctwriting_proccesed_string extends block_formal_langs_processed_string {
+class qtype_correctwriting_processed_string extends block_formal_langs_processed_string {
 
     // Enumerations description in correct answer.
     protected $enums_description = null;
