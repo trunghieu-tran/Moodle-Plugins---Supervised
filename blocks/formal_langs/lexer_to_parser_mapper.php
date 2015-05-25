@@ -105,6 +105,8 @@ abstract class block_formal_langs_lexer_to_parser_mapper {
      */
     public function parse($processedstring, $iscorrect)  {
         // TODO: What should we do with $iscorrect ?
+        // Nullify stateful effects
+        $oldstate = get_object_vars($this);
         if (count($processedstring->stream->errors) == 0)
         {
             $parser = $this->make_parser();
@@ -151,6 +153,12 @@ abstract class block_formal_langs_lexer_to_parser_mapper {
                     $result = $root;
                 }
                 $processedstring->set_syntax_tree($result);
+            }
+        }
+        // Nullify stateful effects
+        if (count($oldstate)) {
+            foreach($oldstate as $key => $value) {
+                $this->$key = $value;
             }
         }
     }
