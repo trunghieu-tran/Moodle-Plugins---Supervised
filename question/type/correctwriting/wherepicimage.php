@@ -1,4 +1,4 @@
-<?
+<?php
 // This file is part of CorrectWriting question type - https://code.google.com/p/oasychev-moodle-plugins/
 //
 // CorrectWriting question type is free software: you can redistribute it and/or modify
@@ -68,6 +68,8 @@ define('MOVED_LEXEME_TINYSPACE_Y', 2);
 define('MOVED_LEXEME_TOP_MARK_WIDTH', 4);
 // Defines a moved lexeme top mark height
 define('MOVED_LEXEME_TOP_MARK_HEIGHT', 5);
+// A tiny space between arrow connector and label
+define('TINY_SPACE', 2);
 /**
  * This style of require_once is used intentionally, due to non-availability of Moodle here
  */
@@ -318,23 +320,36 @@ class qtype_correctwriting_image {
      * @param array $palette
      */
     public function draw_moved_mistake(&$im, $palette) {
+        $minx = -1;
+        $maxx = -1;
+        $width = -1;
+        $sourcelabel = null;
+        foreach($this->data['source_position'] as $index) {
+            $sourcelabel = $this->labels[$index];
+            if ($minx == -1) {
+                $minx = $sourcelabel->rect()->x;
+            } else {
+                $minx =  min($minx, $sourcelabel->rect()->x);
+            }
+            $maxx = max($maxx, $sourcelabel->rect()->x + $sourcelabel->rect()->width);
+        }
+        $width = $maxx - $minx;
         /**
          * @var qtype_correctwriting_label $sourcelabel
          */
-        $sourcelabel = $this->labels[$this->data['source_position']];
-        $sourcex = $sourcelabel->rect()->x + $sourcelabel->rect()->width / 2;
+        $sourcex = $minx + $width / 2;
         $sourcey = $sourcelabel->rect()->y - ARROW_TOP_PADDING;
         $topy = FRAME_LABEL_PADDING;
         $smally =  FRAME_LABEL_PADDING  + MOVING_LINE_HEIGHT;
-        $endx = $sourcelabel->rect()->x + $sourcelabel->rect()->width;
-        $upperarrowbeginx = $sourcelabel->rect()->x;
+        $endx = $maxx;
+        $upperarrowbeginx = $minx;
         $upperarrowendx = $endx;
         // If we can draw a moustaches, draw it
-        if ($sourcelabel->rect()->width > MOVED_LEXEME_TOP_MARK_WIDTH) {
+        if ($width > MOVED_LEXEME_TOP_MARK_WIDTH) {
             $upperarrowbeginx = $sourcex - MOVED_LEXEME_TOP_MARK_WIDTH / 2;
             $upperarrowendx = $sourcex + MOVED_LEXEME_TOP_MARK_WIDTH / 2;
             // A top line upon lexeme
-            $toplinestartx = $sourcelabel->rect()->x - MOVED_LEXEME_TINYSPACE_X;
+            $toplinestartx = $minx - MOVED_LEXEME_TINYSPACE_X;
             $toplineendx =   $endx + MOVED_LEXEME_TINYSPACE_X;
 
             imageline($im,  $toplinestartx, $sourcey, $upperarrowbeginx, $sourcey, $palette['red'] );
@@ -439,7 +454,7 @@ class qtype_correctwriting_wherepic_data_decoder {
                     if ($data[0] == 'moved') {
                         $success = true;
                         $result['type'] = $data[0];
-                        $result['source_position'] = $data[1];
+                        $result['source_position'] = explode('|', $data[1]);
                         $result['insert_position'] = $data[2];
                         $result['insert_relative'] = $data[3];
                         $result['response'] = array_map('base64_decode', explode('|', $data[4]));
