@@ -274,12 +274,12 @@ class qtype_preg_matching_results {
             // Find out extenstion start comparing two strings.
             $str1 = $this->str;
             $str2 = $this->extendedmatch->str;
-            for ($i = 0; $i <= $this->length[0]; $i++) {
+
+            for ($i = 0; $i <= $str1->length(); $i++) {
                 // One of the string ended or characters are different.
-                if ($this->extendedmatch->indexfirst[0] + $i >= core_text::strlen($str2) ||
-                        $this->indexfirst[0] + $i >= $str1->length() || $str1[$this->indexfirst[0] + $i] != $str2[$this->extendedmatch->indexfirst[0] + $i]) {
-                    $this->extensionstart = $this->indexfirst[0] + $i;
-                    $this->extendedmatch->extensionstart = $this->extendedmatch->indexfirst[0] + $i;
+                if ($i >= core_text::strlen($str2) || $i >= $str1->length() || $str1[$i] != $str2[$i]) {
+                    $this->extensionstart = $i;
+                    $this->extendedmatch->extensionstart = $i;
                     break;
                 }
             }
@@ -548,14 +548,9 @@ class qtype_preg_matcher extends qtype_preg_regex_handler {
             // Set all string as incorrect if there were no matching.
             if (!$this->matchresults->is_match()) {
                 $this->matchresults->invalidate_match();
-                // Fill extension start as start of the match in extended string if it was generated.
-                if (is_object($this->matchresults->extendedmatch)) {
-                    $this->matchresults->extendedmatch->extensionstart = $this->matchresults->extendedmatch->indexfirst[0];
-                }
-            } else {
-                // Do some sanity checks and calculate necessary fields.
-                $this->matchresults->validate();
             }
+            // Do some sanity checks and calculate necessary fields.
+            $this->matchresults->validate();
 
             // Save results to the cache.
             $this->resultcache[$str->string()] = $this->matchresults;
