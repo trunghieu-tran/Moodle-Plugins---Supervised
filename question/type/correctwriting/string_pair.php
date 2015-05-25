@@ -71,7 +71,7 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
 
     
     protected function convert_to_own_string($string) {
-        $result = new qtype_correctwriting_proccesedstring($string->language);
+        $result = new qtype_correctwriting_processed_string($string->language);
         $result->copy_state_from($string);
         return $result;
     }
@@ -243,10 +243,10 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
    public function __construct($correct, $compared, $matches) {
         global $CFG;
         block_formal_langs_string_pair::__construct($correct, $compared, $matches);
-        if (file_exists(dirname(__FILE__) . '/processed_string.php') && !class_exists('qtype_correctwriting_proccesedstring')) {
+        if (file_exists(dirname(__FILE__) . '/processed_string.php') && !class_exists('qtype_correctwriting_processed_string')) {
             require_once(dirname(__FILE__) . '/processed_string.php');
         }
-        if (class_exists('qtype_correctwriting_proccesedstring')) {
+        if (class_exists('qtype_correctwriting_processed_string')) {
             $this->correctstring = $this->convert_to_own_string($correct);
             $this->comparedstring = $this->convert_to_own_string($compared);
             $this->matches = $matches;

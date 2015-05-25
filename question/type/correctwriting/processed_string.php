@@ -25,7 +25,8 @@ class qtype_correctwriting_processed_string extends block_formal_langs_processed
     public function __set($name, $value) {
         $isset = parent::__isset($name);
         if ($isset) {
-            return parent::__set($name, $value);
+            parent::__set($name, $value);
+            return;
         }
         $settertable = array();
         $settertable['enumerations'] = 'set_enums_descriptions';
