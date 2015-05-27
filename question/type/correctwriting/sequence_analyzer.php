@@ -80,6 +80,18 @@ class  qtype_correctwriting_sequence_analyzer extends qtype_correctwriting_abstr
     protected function analyze() {
         $answertokens = $this->basestringpair->enum_correct_string()->stream;
         $responsetokens = $this->basestringpair->correctedstring()->stream;
+        /*echo "<pre>";
+        echo "===================\n";
+        echo "enumcorrectstring: ";
+        foreach($answertokens->tokens as $token) {
+            echo $token->value() . " ";
+        }
+        echo "\n";
+        echo "correctedstring:   ";
+        foreach($responsetokens->tokens as $token) {
+            echo $token->value() . " ";
+        }
+        echo "\n";*/
         $options = $this->question->token_comparing_options();
         $alllcs = qtype_correctwriting_sequence_analyzer::lcs($answertokens, $responsetokens, $options, $this->lcs_count_threshold());
 
@@ -101,6 +113,15 @@ class  qtype_correctwriting_sequence_analyzer extends qtype_correctwriting_abstr
             $this->fill_matches($pair);
             $pair->append_mistakes($this->matches_to_mistakes($pair, $weights));
         }
+        /*foreach($this->resultstringpairs as $pair) {
+            echo "pair:            \n";
+            foreach($pair->mistakes() as $mistake) {
+                echo str_replace(array('qtype_correctwriting_', '_mistake'), array('', ''), get_class($mistake)) . " ";
+            }
+            echo "\n";
+        }
+        echo "===================\n";
+        echo "</pre>";*/
     }
 
     /**
@@ -318,7 +339,7 @@ class  qtype_correctwriting_sequence_analyzer extends qtype_correctwriting_abstr
      * @return array array of mistake objects
      */
     public function matches_to_mistakes($pair,$weights) {
-        $answer = &$this->basestringpair->correctstring()->stream->tokens;
+        $answer = &$this->basestringpair->enum_correct_string()->stream->tokens;
         $response = &$this->basestringpair->correctedstring()->stream->tokens;
         $pair->addedlexemesindexes = array();
         $pair->skippedlexemesindexes = array();
