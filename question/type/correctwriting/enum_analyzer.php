@@ -569,6 +569,12 @@ class  qtype_correctwriting_enum_analyzer extends qtype_correctwriting_abstract_
                 array_pop($enumschangecorrectstring);
             }
         }
+        // Change table indexes for tokens in correct answer.       
+        $indexesintable = array();
+        foreach ($tokens as $token) {       
+            $indexesintable[] = $token->token_index();      
+        }       
+        $stringpair->set_enum_correct_to_correct($indexesintable);
         // Change correctstring.
         $stringpair->correctstring()->stream->tokens = $tokens;
         foreach ($enumschangecorrectstring as $i) {
