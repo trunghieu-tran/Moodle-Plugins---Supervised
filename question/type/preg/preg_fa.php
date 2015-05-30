@@ -2921,26 +2921,7 @@ class qtype_preg_fa {
         }
     }
 
-    /**
-     * Intersect automaton with another one.
-     *
-     * @param anotherfa object automaton to intersect.
-     * @param stateindex array of integer indexes of states of $this automaton with which to start intersection.
-     * @param isstart boolean intersect by superpose start or end state of anotherfa with stateindex state.
-     * @return result automata without blind states with one end state and with merged asserts.
-     */
-    public function intersect_fa($anotherfa, $stateindex, $isstart) {
-        $result = new qtype_preg_fa();
-        $stopcoping = $stateindex;
-        // Get states for starting coping.
-        if ($isstart == 0) {
-            $oldfront = $this->start_states();
-        } else {
-            $oldfront = $this->end_states();
-        }
-        // Copy branches.
-        $stop = $result->copy_modify_branches($this, $oldfront, $stopcoping, $isstart);
-        $transitions = array();
+    private function skip_uncapturing_transitions($anotherfa, $stateindex, $isstart, $result, $stop) {
         $startstates = $this->start_states();
         $endstates = $this->end_states();
         // Change state first from intersection.
@@ -2948,7 +2929,6 @@ class qtype_preg_fa {
         $firstnumbers = $this->get_state_numbers();
         $resnumbers = $result->get_state_numbers();
         $newstop = array();
-        // Skip uncapturing transitions.
         foreach ($stateindex as $number) {
             if ($isstart == 0 && in_array($number, $startstates)) {
                 $transitions = $this->get_adjacent_transitions($number, true);
@@ -3025,6 +3005,43 @@ class qtype_preg_fa {
                 }
             }
         }
+        return $newstop;
+    }
+
+    /**
+     * Intersect automaton with another one.
+     *
+     * @param anotherfa object automaton to intersect.
+     * @param stateindex array of integer indexes of states of $this automaton with which to start intersection.
+     * @param isstart boolean intersect by superpose start or end state of anotherfa with stateindex state.
+     * @return result automata without blind states with one end state and with merged asserts.
+     */
+    public function intersect_fa($anotherfa, $stateindex, $isstart) {
+        $result = new qtype_preg_fa();
+        $stopcoping = $stateindex;
+        // Get states for starting coping.
+        if ($isstart == 0) {
+            $oldfront = $this->start_states();
+        } else {
+            $oldfront = $this->end_states();
+        }
+        // Copy branches.
+        $stop = $result->copy_modify_branches($this, $oldfront, $stopcoping, $isstart);
+        $transitions = array();
+        $startstates = $this->start_states();
+        $endstates = $this->end_states();
+        // Change state first from intersection.
+        $secondnumbers = $anotherfa->get_state_numbers();
+        $firstnumbers = $this->get_state_numbers();
+        $resnumbers = $result->get_state_numbers();
+        $newstop = array();
+        // Skip uncapturing transitions.
+        if ($isstart == 0) {
+            $states = $anotherfa->start_states();
+        } else {
+            $states = $anotherfa->end_states();
+        }
+        $newstop = $this->skip_uncapturing_transitions($anotherfa, $stateindex, $isstart, $result, $stop);
         $secforinter = $secondnumbers[$states[0]];
 
         foreach ($stop as $stopnumber) {
