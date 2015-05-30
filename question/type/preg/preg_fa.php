@@ -1833,7 +1833,11 @@ class qtype_preg_fa {
         foreach ($this->end_states() as $end) {
             $endtransitions = $this->get_adjacent_transitions($end, false);
             foreach ($endtransitions as $endtran) {
-                if ($endtran->is_eps() && $endtran->from != $endtran->to) {
+                $beforeeps = true;
+                foreach ($endtran->mergedbefore as $before) {
+                    $beforeeps = $beforeeps && !$before->is_end_anchor();
+                }
+                if ($endtran->is_eps() && $endtran->from != $endtran->to && $beforeeps) {
                     $wasadded = false;
                     $canmerge = true;
                     $transitions = $this->get_adjacent_transitions($endtran->from, false);
