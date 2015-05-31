@@ -2953,6 +2953,147 @@ class qtype_preg_fa {
         }
     }
 
+    private function intersect_uncapturing_in_another_direction($anotherfa, $isstart, $result, $stop) {
+        $uncapturingclone = new qtype_preg_fa();
+        $hasuncapturing = false;
+        $copedstates = array();
+        $newfront = array();
+        $newstop = array();
+        if ($isstart == 0) {
+            $states = $anotherfa->start_states();
+            $oldfront = $states;
+            $assotiatedstates = array();
+            // Get automaton only with uncapturing transitions.
+            while (!empty($oldfront)) {
+                foreach ($oldfront as $state) {
+                    if (!in_array($state, $copedstates)) {
+                        if (!array_key_exists($state, $assotiatedstates)) {
+                            $from = $uncapturingclone->add_state($state);
+                            $assotiatedstates[$state] = $from;
+                        } else {
+                            $from = $assotiatedstates[$state];
+                        }
+                        if (in_array($state, $states)) {
+                            $uncapturingclone->add_start_state($from);
+                        }
+                        $transitions = $anotherfa->get_adjacent_transitions($state, true);
+                        foreach ($transitions as $transition) {
+                            if (!$transition->consumeschars) {
+                                $hasuncapturing = true;
+                                if (!array_key_exists($transition->to, $assotiatedstates)) {
+                                    $to = $uncapturingclone->add_state($transition->to);
+                                    $assotiatedstates[$state] = $to;
+                                } else {
+                                    $to = $assotiatedstates[$transition->to];
+                                }
+                                $clonetran = clone $transition;
+                                $clonetran->from = $from;
+                                $clonetran->to = $to;
+                                $clonetran->redirect_merged_transitions();
+                                $clonetran->consumeschars = true;
+                                $uncapturingclone->add_transition($clonetran);
+                                $anotherfa->remove_transition($transition);
+                                $copedstates[] = $state;
+                                $newfront[] = $transition->to;
+                            }
+                        }
+                    }
+                }
+                $oldfront = $newfront;
+                $newfront = array();
+            }
+            if ($hasuncapturing) {
+                // Set its end states.
+                $states = $uncapturingclone->get_states();
+                foreach ($states as $state) {
+                    $transitions = $uncapturingclone->get_adjacent_transitions($state, true);
+                    // Check if there are only loopsback transitions.
+                    $loopsback = true;
+                    foreach ($transitions as $transition) {
+                        if (!$transition->loopsback) {
+                            $loopsback = false;
+                        }
+                    }
+                    if ($loopsback) {
+                        $uncapturingclone->add_end_state($state);
+                    }
+                }
+
+                // Intersect it in another direction.
+                $resultpart = $result->intersect_fa($uncapturingclone, $stop, !$isstart);
+                // Add this automaton as branch of result automaton.
+                $resultpart->remove_all_end_states();
+                $states = $resultpart->get_states();
+                foreach ($states as $state) {
+                    $transitions = $resultpart->get_adjacent_transitions($state, true);
+                    // Check if there are only loopsback transitions.
+                    $loopsback = true;
+                    foreach ($transitions as $transition) {
+                        if (!$transition->loopsback) {
+                            $loopsback = false;
+                        }
+                    }
+                    if ($loopsback) {
+                        $resultpart->add_end_state($state);
+                    }
+                }
+                $resultpart->remove_unreachable_states();
+                $oldfront = $resultpart->start_states();
+                $copedstates = array();
+                $newfront = array();
+                $assotiatedstates = array();
+                while (!empty($oldfront)) {
+                    foreach ($oldfront as $state) {
+
+                        if (!in_array($state, $copedstates)) {
+                            if (!array_key_exists($state, $assotiatedstates)) {
+                                $from = $result->add_state($resultpart->get_state_numbers()[$state]);
+                                $assotiatedstates[$state] = $from;
+                            } else {
+                                $from = $assotiatedstates[$state];
+                            }
+                            $copedstates[] = $state;
+                            $transitions = $resultpart->get_adjacent_transitions($state, true);
+                            foreach ($transitions as $transition) {
+                                if (!array_key_exists($transition->to, $assotiatedstates)) {
+                                    $to = $result->add_state($resultpart->get_state_numbers()[$transition->to]);
+                                    $assotiatedstates[$transition->to] = $to;
+                                } else {
+                                    $to = $assotiatedstates[$transition->to];
+                                }
+                                $clonetran = clone $transition;
+                                $clonetran->from = $from;
+                                $clonetran->to = $to;
+                                $clonetran->redirect_merged_transitions();
+                                $result->add_transition($clonetran);
+                                $newfront[] = $transition->to;
+                            }
+                        }
+                    }
+                    $oldfront = $newfront;
+                    $newfront = array();
+                }
+                // Redirect start states of getting part to real start state.
+                /*$resultstart = $result->start_states()[0];
+                $startstates = $resultpart->start_states();
+                foreach ($startstates as $start) {
+                    if (!in_array($assotiatedstates[$start], $result->start_states())) {
+                        $result->redirect_transitions($assotiatedstates[$start], $resultstart);
+                    }
+                }*/
+                // Form new stop states.
+                // Set its end states.
+
+                $endstates = $resultpart->end_states();
+                foreach ($endstates as $end) {
+                    $newstop[] = $assotiatedstates[$end];
+                }
+            }
+        }
+        printf($result->fa_to_dot(null, null, true));
+        return $newstop;
+    }
+
     private function skip_uncapturing_transitions($anotherfa, $stateindex, $isstart, $result, $stop) {
         $startstates = $this->start_states();
         $endstates = $this->end_states();
@@ -2998,7 +3139,9 @@ class qtype_preg_fa {
                 }
             }
         }
-
+        $intersectedstop = $this->intersect_uncapturing_in_another_direction($anotherfa, $isstart, $result, $stop);
+        $newstop = array_merge($newstop, $intersectedstop);
+        // Skip transitions from second automaton.
         if ($isstart == 0) {
             $states = $anotherfa->start_states();
             // If eps - copy it to result automaton.
