@@ -3224,12 +3224,35 @@ class qtype_preg_fa {
         }
         $newstop = $this->skip_uncapturing_transitions($anotherfa, $stateindex, $isstart, $result, $stop);
         $secforinter = $secondnumbers[$states[0]];
-
+        $addedstop = array();
         foreach ($stop as $stopnumber) {
             $state = $result->get_inter_state($resnumbers[$stopnumber], $secforinter);
             $result->change_real_number($stopnumber, $state);
+            $i = count($states) - 1;
+            while ($i > 0) {
+                $state = $result->get_inter_state($resnumbers[$stopnumber], $secondnumbers[$states[$i]]);
+                $added = $result->add_state($state);
+                $addedstop[] = $added;
+                $transitions = $result->get_adjacent_transitions($stopnumber, true);
+                foreach ($transitions as $transition) {
+                    $clone = clone $transition;
+                    $clone->from = $added;
+                    $clone->redirect_merged_transitions();
+                    $result->add_transition($clone);
+                }
+                $transitions = $result->get_adjacent_transitions($stopnumber, false);
+                foreach ($transitions as $transition) {
+                    $clone = clone $transition;
+                    $clone->to = $added;
+                    $clone->redirect_merged_transitions();
+                    $result->add_transition($clone);
+                }
+                $i--;
+            }
+
         }
-        $stop = array_merge($stop, $newstop);
+        printf ($result->fa_to_dot(null,null, true));
+        $stop = array_merge($stop, $addedstop, $newstop);
         // Find intersection part.
         if (!$anotherfa->has_cycle() && $this->has_cycle()) {
             $this->get_intersection_part($anotherfa, $result, $stop, $isstart, true);
