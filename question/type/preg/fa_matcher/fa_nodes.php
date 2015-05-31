@@ -223,6 +223,8 @@ abstract class qtype_preg_fa_node {
         $fromdel = true;
         $todel = true;
         $wasmerged = false;
+        $changedstate = null;
+        $changedstateend = null;
         $outtransitions = $automaton->get_adjacent_transitions($tran->to, true);
         $intotransitions = $automaton->get_adjacent_transitions($tran->from, false);
 
@@ -234,6 +236,7 @@ abstract class qtype_preg_fa_node {
             $outtransitions[] = $transition;
             $todel = false;
             if ($changeend) {
+                $changedstateend = $tran->to;
                 $stack_item['end'] = $state;
             }
         }
@@ -243,6 +246,7 @@ abstract class qtype_preg_fa_node {
             $transition = new qtype_preg_fa_transition($state, $pregleaf, $tran->from, $tran->origin, $tran->consumeschars);
             $intotransitions[] = $transition;
             $fromdel = false;
+            $changedstate = $tran->from;
             $stack_item['start'] = $state;
         }
 
@@ -272,6 +276,9 @@ abstract class qtype_preg_fa_node {
                 if ($resultinto !== null) {
                     foreach ($outtransitions as $outtran) {
                         $clone = clone $resultinto;
+                        if ($changedstate !== null) {
+                            $automaton->redirect_transitions($changedstate, $intotran->from);
+                        }
                         $resultout = $wordbreakout[$i]->intersect($outtran);
                         if ($resultout !== null) {
                             $state = $automaton->add_state();
@@ -283,6 +290,9 @@ abstract class qtype_preg_fa_node {
                             $resultout->to = $outtran->to;
                             $end[] = $outtran->to;
                             $clone->redirect_merged_transitions();
+                            if ($changedstateend !== null) {
+                                $automaton->redirect_transitions($changedstateend, $outtran->to);
+                            }
                             $resultout->redirect_merged_transitions();
                             $automaton->add_transition(clone $clone);
                             $automaton->add_transition(clone $resultout);
@@ -291,6 +301,7 @@ abstract class qtype_preg_fa_node {
                 }
             }
         }
+
         $automaton->change_state_for_intersection($tran->from, $newkeys);
         $automaton->change_state_for_intersection($tran->to, $newkeys);
         $automaton->change_recursive_start_states($tran->from, $start);
