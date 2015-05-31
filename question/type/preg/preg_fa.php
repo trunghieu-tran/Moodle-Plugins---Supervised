@@ -2223,6 +2223,17 @@ class qtype_preg_fa {
         return $count;
     }
 
+    private function find_state($state) {
+        foreach ($this->statenumbers as $key => $curstate) {
+            $statenumber = rtrim($curstate, ',');
+            $statenumber = ltrim($statenumber, ',');
+            if ($statenumber == $state) {
+                return $key;
+            }
+        }
+        return false;
+    }
+
     /**
      * Find intersection part of automaton in case of intersection it with another one.
      *
@@ -2249,7 +2260,7 @@ class qtype_preg_fa {
                 $resultnumber = $resnumbers[$curstate];
 
                 $numbers = explode(',', $resultnumber, 2);
-                $workstate1 = array_search($numbers[0], $this->statenumbers);
+                $workstate1 = $this->find_state($numbers[0]);
                 foreach ($secondnumbers as $num) {
                     if (strpos($numbers[1], $num) === 0 || $numbers[1] == $num) {
                         $workstate2 = array_search($num, $secondnumbers);
@@ -2780,7 +2791,7 @@ class qtype_preg_fa {
             foreach ($front as $state) {
                 // Get states from first and second automata.
                 $numbers = explode(',', $this->statenumbers[$state], 2);
-                $workstate1 = array_search($numbers[0], $firstnumbers);
+                $workstate1 = $fa->find_state($numbers[0]);
                 if ($numbers[1] != '') {
                     foreach ($secondnumbers as $num) {
                         if (strpos($numbers[1], $num) === 0 || $numbers[1] == $num) {
@@ -2853,7 +2864,7 @@ class qtype_preg_fa {
                 // Get states from first and second automata.
 
                 $numbers = explode(',', $this->statenumbers[$state], 2);
-                $workstate1 = array_search($numbers[0], $firstnumbers);
+                $workstate1 = $fa->find_state($numbers[0]);
                 if ($numbers[1] != '') {
                     foreach ($secondnumbers as $num) {
                         if (strpos($numbers[1], $num) === 0 || $num == $numbers[1]) {
