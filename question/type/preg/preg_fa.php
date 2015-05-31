@@ -1558,10 +1558,17 @@ class qtype_preg_fa {
      * @param origin - origin of automata with this state.
      */
     public function modify_state($changedstate, $origin) {
+        $resultstate = $changedstate;
         if ($origin == qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST) {
-            $resultstate = $changedstate . ',';
+            $last = substr($changedstate, -1);
+            if ($last != ',') {
+                $resultstate = $changedstate . ',';
+            }
         } else {
-            $resultstate = ',' . $changedstate;
+            $first = substr($changedstate, 1);
+            if ($first != ',') {
+                $resultstate = ',' . $changedstate;
+            }
         }
         return $resultstate;
     }
