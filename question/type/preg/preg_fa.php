@@ -2476,8 +2476,7 @@ class qtype_preg_fa {
         // Connect end states with first while automata has only one end state.
         while ($i > 0) {
             $exendstate = $this->faendstates[0][$i];
-            $transitions = $this->get_adjacent_transitions($exendstate, false);
-            $epstran = new qtype_preg_fa_transition ($exendstate, $newleaf, $to, current($transitions)->origin, current($transitions)->consumeschars);
+            $epstran = new qtype_preg_fa_transition ($exendstate, $newleaf, $to);
             $this->add_transition($epstran);
             $i--;
             $this->remove_end_state($exendstate);
@@ -2884,7 +2883,10 @@ class qtype_preg_fa {
                         // Get number of copied state.
                         $number = $firstnumbers[$tran->from];
                         $number = trim($number, '()');
-                        $number = $number . ',';
+                        $last = substr($number, -1);
+                        if ($last != ',') {
+                            $number = $number . ',';
+                        }
                         $copiedstate = array_search($number, $this->statenumbers);
                         // Add transition.
                         //$addtran = new qtype_preg_fa_transition($copiedstate, $tran->pregleaf, $state);
@@ -2947,7 +2949,9 @@ class qtype_preg_fa {
         $firstnumbers = $this->get_state_numbers();
         $resnumbers = $result->get_state_numbers();
         $newstop = array();
+        // Skip transitions from first automaton.
         foreach ($stateindex as $number) {
+            // If eps - copy it to result automaton.
             if ($isstart == 0 && in_array($number, $startstates)) {
                 $transitions = $this->get_adjacent_transitions($number, true);
                 foreach ($transitions as $transition) {
@@ -2985,6 +2989,7 @@ class qtype_preg_fa {
 
         if ($isstart == 0) {
             $states = $anotherfa->start_states();
+            // If eps - copy it to result automaton.
             foreach ($states as $state) {
                 $transitions = $anotherfa->get_adjacent_transitions($state, true);
                 foreach ($transitions as $transition) {
@@ -2999,6 +3004,7 @@ class qtype_preg_fa {
                             $tran->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
                             $newstop[] = $addedstate;
                         }
+                        //$anotherfa->remove_transition($transition);
                     }
                 }
             }
@@ -3019,6 +3025,7 @@ class qtype_preg_fa {
                             $result->add_transition($tran);
                             $newstop[] = $addedstate;
                         }
+                        //$anotherfa->remove_transition($transition);
                     }
                 }
             }
@@ -3045,6 +3052,7 @@ class qtype_preg_fa {
         }
         // Copy branches.
         $stop = $result->copy_modify_branches($this, $oldfront, $stopcoping, $isstart);
+
         $transitions = array();
         $startstates = $this->start_states();
         $endstates = $this->end_states();
