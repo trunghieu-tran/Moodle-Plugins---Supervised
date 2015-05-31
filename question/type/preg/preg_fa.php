@@ -2811,7 +2811,7 @@ class qtype_preg_fa {
                     }
                 }
                 $oldfront = array();
-                if (!$fa->has_endstate($workstate1)) {
+                if (!$fa->has_endstate($workstate1) && $anotherfa->has_endstate($workstate2)) {
                     $transitions = $fa->get_adjacent_transitions($workstate1, true);
                     foreach ($transitions as $tran) {
                         $oldfront[] = $tran->to;
@@ -2836,7 +2836,7 @@ class qtype_preg_fa {
                     }
                 }
                 $oldfront = array();
-                if (!$anotherfa->has_endstate($workstate2)) {
+                if (!$anotherfa->has_endstate($workstate2) && $fa->has_endstate($workstate1)) {
                     $transitions = $anotherfa->get_adjacent_transitions($workstate2, true);
                     foreach ($transitions as $tran) {
                         $oldfront[] = $tran->to;
@@ -2884,7 +2884,7 @@ class qtype_preg_fa {
                     }
                 }
                 $oldfront = array();
-                if (!$fa->has_startstate($workstate1)) {
+                if (!$fa->has_startstate($workstate1) && $anotherfa->has_startstate($workstate2)) {
                     $transitions = $fa->get_adjacent_transitions($workstate1, false);
                     foreach ($transitions as $tran) {
                         $oldfront[] = $tran->from;
@@ -2910,7 +2910,7 @@ class qtype_preg_fa {
                     }
                 }
                 $oldfront = array();
-                if (!$anotherfa->has_startstate($workstate2)) {
+                if (!$anotherfa->has_startstate($workstate2) && $fa->has_startstate($workstate1)) {
                     $transitions = $anotherfa->get_adjacent_transitions($workstate2, false);
                     $oldfront = array();
                     foreach ($transitions as $tran) {
