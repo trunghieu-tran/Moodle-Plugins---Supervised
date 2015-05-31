@@ -2481,6 +2481,18 @@ class qtype_preg_fa {
             $i--;
             $this->remove_end_state($exendstate);
         }
+        /*$i = count($this->start_states()) - 1;
+        if ($i > 0) {
+            $from = $this->fastartstates[0][0];
+        }
+        // Connect end states with first while automata has only one end state.
+        while ($i > 0) {
+            $exendstate = $this->fastartstates[0][$i];
+            $epstran = new qtype_preg_fa_transition ($from, $newleaf, $exendstate);
+            $this->add_transition($epstran);
+            $i--;
+            $this->remove_start_state($exendstate);
+        }*/
     }
 
     /**
