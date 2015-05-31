@@ -1223,14 +1223,14 @@ class qtype_preg_fa {
      * Remove all end states of the automaton.
      */
     public function remove_all_end_states() {
-        $this->faendstates = array();
+        $this->faendstates[0] = array();
     }
 
     /**
      * Remove all start states of the automaton.
      */
     public function remove_all_start_states() {
-        $this->fastartstates = array();
+        $this->fastartstates[0] = array();
     }
 
     /**
