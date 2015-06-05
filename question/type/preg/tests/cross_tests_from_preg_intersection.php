@@ -784,7 +784,7 @@ class qtype_preg_cross_tests_from_preg_intersection {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0, 1=>3, 2=>3),
-                        'length'=>array(0=>3, 1=>1, 2=>1));
+                        'length'=>array(0=>4, 1=>1, 2=>1));
 
         return array('regex'=>'a(?=b[!e](\b|.))be(=|t)',
                      'tests'=>array($test1, $test2, $test3),
@@ -797,14 +797,14 @@ class qtype_preg_cross_tests_from_preg_intersection {
                         'full'=>false,
                         'index_first'=>array(0=>0, 1=>1),
                         'length'=>array(0=>2, 1=>1),
-                        'left'=>array(2),
+                        'left'=>array(3),
                         'next'=>'c');
 
-        $test2 = array( 'str'=>'a=cd',
+        $test2 = array( 'str'=>'a=cdd',
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0, 1=>1, 2=>2),
-                        'length'=>array(0=>4, 1=>1, 2=>0));
+                        'length'=>array(0=>5, 1=>1, 2=>0));
 
         $test3 = array( 'str'=>'abccd',
                         'is_match'=>true,
@@ -817,7 +817,7 @@ class qtype_preg_cross_tests_from_preg_intersection {
                         'full'=>false,
                         'index_first'=>array(0=>0, 1=>1),
                         'length'=>array(0=>2, 1=>1),
-                        'left'=>array(2),
+                        'left'=>array(3),
                         'next'=>'c');
 
         return array('regex'=>'a(b|=)(?=(\b|.)[!c]d)c[cd]d',
@@ -1380,8 +1380,8 @@ class qtype_preg_cross_tests_from_preg_intersection {
         $test1 = array( 'str'=>'ab!d',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0, 1=>1),
-                        'length'=>array(0=>2, 1=>1),
+                        'index_first'=>array(0=>0, 1=>1, 2=>1),
+                        'length'=>array(0=>2, 1=>1, 2=>1),
                         'left'=>array(2),
                         'next'=>'c');
 
@@ -1400,8 +1400,8 @@ class qtype_preg_cross_tests_from_preg_intersection {
         $test4 = array( 'str'=>'a=!d',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0, 1=>1),
-                        'length'=>array(0=>2, 1=>1),
+                        'index_first'=>array(0=>0, 1=>1, 2=>1),
+                        'length'=>array(0=>2, 1=>1, 2=>1),
                         'left'=>array(2),
                         'next'=>'c');
 
