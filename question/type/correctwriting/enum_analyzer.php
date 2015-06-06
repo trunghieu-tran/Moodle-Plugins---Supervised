@@ -583,6 +583,7 @@ class  qtype_correctwriting_enum_analyzer extends qtype_correctwriting_abstract_
         $stringpair->set_enum_correct_to_correct($indexesintable);
         // Change correctstring.
         $stringpair->correctstring()->stream->tokens = $tokens;
+        $enumstring = clone($stringpair->correctstring());
         foreach ($enumschangecorrectstring as $i) {
             $tempstringbegin = '';
             $tempstringend = '';
@@ -590,8 +591,8 @@ class  qtype_correctwriting_enum_analyzer extends qtype_correctwriting_abstract_
             $position = $enumerations[$i][$position]->begin;
             if ($position !== 0) {
                 $position--;
-                $position = $stringpair->correctstring()->stream->tokens[$position]->position()->colend();
-                $tempstringbegin = $stringpair->correctstring()->string->substring(0, $position + 1);
+                $position = $stringpair->enum_correct_string()->stream->tokens[$position]->position()->colend();
+                $tempstringbegin = $stringpair->enum_correct_string()->string->substring(0, $position + 1);
                 $tempstringbegin = $tempstringbegin.' ';
             } else {
                 $tempstringbegin = '';
@@ -600,8 +601,8 @@ class  qtype_correctwriting_enum_analyzer extends qtype_correctwriting_abstract_
             $position = $enumerations[$i][$position]->end;
             if ($position !== count($tokens) - 1) {
                 $position++;
-                $position= $stringpair->correctstring()->stream->tokens[$position]->position()->colstart();
-                $tempstringend = $stringpair->correctstring()->string->substring($position);
+                $position= $stringpair->enum_correct_string()->stream->tokens[$position]->position()->colstart();
+                $tempstringend = $stringpair->enum_correct_string()->string->substring($position);
             } else {
                 $tempstringend = '';
             }
@@ -614,10 +615,9 @@ class  qtype_correctwriting_enum_analyzer extends qtype_correctwriting_abstract_
 
 
             // Update correct string.
-            $enumstring = clone($stringpair->correctstring());
             $enumstring->string = new qtype_poasquestion_string($tempstringbegin);
             // Update enumerations descriptions.
-            $stringpair->correctstring()->enumerations = $enumerations;
+            $stringpair->enum_correct_string()->enumerations = $enumerations;
             // Update token indexes.
             $enumstring->stream = null;
             $enumstring->stream->tokens;
@@ -642,7 +642,7 @@ class  qtype_correctwriting_enum_analyzer extends qtype_correctwriting_abstract_
         $includedenums = array(); // Included enumerations indexes for all enumerations.
         $forstd = 0; // Variable for function,which return std Class objects.
         $correcttokens = $this->basestringpair->correctstring()->stream->tokens; // Correct answer tokens array;
-        $correctedtokens = $this->basestringpair->correctedstring()->stream->tokens; // Corrected student answer tokens array;
+        $correctedtokens = $this->basestringpairenum_correct_string()ng()->stream->tokens; // Corrected student answer tokens array;
         $enumdescription = $this->basestringpair->correctstring()->enumerations; // Correct answer enumerations descriptions.
         $currentorder = array(); // Current order of enumerations elements.
         $currentstringpair = 0; // Current string pair with current order of enumeration.
@@ -675,6 +675,7 @@ class  qtype_correctwriting_enum_analyzer extends qtype_correctwriting_abstract_
         	// Change enumeration elements order.
             $currentstringpair = null;
 			$currentstringpair = clone $this->basestringpair;
+            $currentstringpair->set_enum_correct_string(clone $currentstringpair->correctstring());
 			$this->change_enum_order($currentstringpair, $enumchangeorder, $includedenums, $currentorder);
             // Find LCS of correct and corrected answers.
             $currentcorrectstream = $currentstringpair->enum_correct_string()->stream;
