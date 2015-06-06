@@ -285,7 +285,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
      * Updates all fields in the newstate after a transition match.
      */
     protected function after_transition_passed($newstate, $transition, $curpos, $length, $addbacktracks = true) {
-        $endstates = $this->automaton->end_states($newstate->subexpr());
+        $endstates = $this->automaton->get_end_states($newstate->subexpr());
 
         $newstate->set_state($transition->to);
         $newstate->set_full(in_array($newstate->state(), $endstates));
@@ -373,7 +373,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             return $resumestate;
         }
 
-        $endstates = $this->automaton->end_states($laststate->subexpr());
+        $endstates = $this->automaton->get_end_states($laststate->subexpr());
 
         // There was no match at all, or the last transition was fully-matched.
         $curpos = $laststate->startpos + $laststate->length;
@@ -407,7 +407,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
      * @return object of qtype_preg_fa_exec_state.
      */
     protected function generate_extension_brute_force($str, $laststate) {
-        $endstates = $this->automaton->end_states($laststate->subexpr());
+        $endstates = $this->automaton->get_end_states($laststate->subexpr());
         $resumestate = $this->get_resume_state($str, $laststate);
         if (in_array($resumestate->state(), $endstates)) {
             return $resumestate;
@@ -476,7 +476,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
      * @return object of qtype_preg_fa_exec_state.
      */
     protected function generate_extension_fast($str, $laststate) {
-        $endstates = $this->automaton->end_states($laststate->subexpr());
+        $endstates = $this->automaton->get_end_states($laststate->subexpr());
         $resumestate = $this->get_resume_state($str, $laststate);
         if (in_array($resumestate->state(), $endstates)) {
             return $resumestate;
@@ -592,7 +592,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $curstates = array();    // States which the automaton is in at the current wave front.
         $lazystates = array();   // States reached lazily.
 
-        foreach ($this->automaton->start_states(0) as $state) {
+        foreach ($this->automaton->get_start_states(0) as $state) {
             $curstates[] = $this->create_initial_state($state, $str, $startpos);
         }
 
@@ -623,7 +623,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                         // Handle a recursive transition
                         $newstate = $this->match_recursive_transition_begin($curstate, $transition, $str, $curpos, $length, $full, true);
                         if ($full) {
-                            $startstates = $this->automaton->start_states($transition->pregleaf->number);
+                            $startstates = $this->automaton->get_start_states($transition->pregleaf->number);
                             foreach ($startstates as $state) {
                                 $newnewstate = clone $newstate;
                                 $newnewstate->stack[] = $this->create_fa_exec_stack_item($transition->pregleaf->number, $state, $curpos);
@@ -733,7 +733,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $lazystates = array();         // States (objects!) reached lazily.
         $partialmatches = array();     // Possible partial matches.
 
-        $startstates = $this->automaton->start_states(0);
+        $startstates = $this->automaton->get_start_states(0);
 
         $endstatereached = false;
 
@@ -796,7 +796,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                         // Handle a recursive transition
                         $newstate = $this->match_recursive_transition_begin($curstate, $transition, $str, $curpos, $length, $full, true);
                         if ($full) {
-                            $startstates = $this->automaton->start_states($transition->pregleaf->number);
+                            $startstates = $this->automaton->get_start_states($transition->pregleaf->number);
                             foreach ($startstates as $state) {
                                 $newnewstate = clone $newstate;
                                 $newnewstate->stack[] = $this->create_fa_exec_stack_item($transition->pregleaf->number, $state, $curpos);
@@ -892,7 +892,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
         // Return array of all possible matches.
         $result = array();
-        foreach ($this->automaton->end_states(0) as $endstate) {
+        foreach ($this->automaton->get_end_states(0) as $endstate) {
             if ($states['0'][$endstate] !== null) {
                 $result[] = $states['0'][$endstate];
             }
@@ -1158,8 +1158,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
 
     protected function check_for_infinite_recursion() {
-        $end = $this->automaton->end_states();
-        $front = $this->automaton->start_states();
+        $end = $this->automaton->get_end_states();
+        $front = $this->automaton->get_start_states();
         $endstatereached = false;
         while (!$endstatereached && !empty($front)) {
             $curstate = array_pop($front);

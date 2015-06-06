@@ -800,7 +800,7 @@ class qtype_preg_fa {
     /**
      * Returns the start states for automaton.
      */
-    public function start_states($subpattern = 0) {
+    public function get_start_states($subpattern = 0) {
         if (!isset($this->fastartstates[$subpattern])) {
             return isset($this->startstates[$subpattern]) ? $this->startstates[$subpattern] : array();
         }
@@ -810,7 +810,7 @@ class qtype_preg_fa {
     /**
      * Return the end states of the automaton.
      */
-    public function end_states($subpattern = 0) {
+    public function get_end_states($subpattern = 0) {
         if (!isset($this->faendstates[$subpattern])) {
             return isset($this->endstates[$subpattern]) ? $this->endstates[$subpattern] : array();
         }
@@ -1085,8 +1085,8 @@ class qtype_preg_fa {
     public function reachable_states($backwards = false) {
         // Initialization wavefront.
         $front = $backwards
-               ? array_values($this->end_states())
-               : array_values($this->start_states());
+               ? array_values($this->get_end_states())
+               : array_values($this->get_start_states());
 
         $reached = array();
 
@@ -1144,9 +1144,9 @@ class qtype_preg_fa {
                             ? $this->statenumbers[$id]
                             : $id;
                 $tmp = '"' . $realnumber . '"';
-                if (in_array($id, $this->start_states())) {
+                if (in_array($id, $this->get_start_states())) {
                     $start .= "{$tmp}[shape=rarrow];\n";
-                } else if (in_array($id, $this->end_states())) {
+                } else if (in_array($id, $this->get_end_states())) {
                     $end .= "{$tmp}[shape=doublecircle];\n";
                 }
 
@@ -1176,7 +1176,7 @@ class qtype_preg_fa {
         if (!array_key_exists($state, $this->adjacencymatrix)) {
             throw new qtype_preg_exception('set_start_state error: No state ' . $state . ' in automaton');
         }
-        if (!in_array($state, $this->start_states($subpattern))) {
+        if (!in_array($state, $this->get_start_states($subpattern))) {
             if (isset($this->fastartstates[$subpattern])) {
                 $this->fastartstates[$subpattern][] = $state;
             } else {
@@ -1193,7 +1193,7 @@ class qtype_preg_fa {
         if (!array_key_exists($state, $this->adjacencymatrix)) {
             throw new qtype_preg_exception('set_end_state error: No state ' . $state . ' in automaton');
         }
-        if (!in_array($state, $this->end_states($subpattern))) {
+        if (!in_array($state, $this->get_end_states($subpattern))) {
             if (isset($this->faendstates[$subpattern])) {
                 $this->faendstates[$subpattern][] = $state;
             } else {
@@ -1439,14 +1439,14 @@ class qtype_preg_fa {
      * Check if such state is in array of start states.
      */
     public function has_startstate($state) {
-        return in_array($state, $this->start_states());
+        return in_array($state, $this->get_start_states());
     }
 
     /**
      * Check if such state is in array of end states.
      */
     public function has_endstate($state) {
-        return in_array($state, $this->end_states());
+        return in_array($state, $this->get_end_states());
     }
 
     /**
@@ -1486,14 +1486,14 @@ class qtype_preg_fa {
         // Analysis of result intersection.
         if ($direction == 0) {
             // Analysis if the end state of intersection includes one of end states of given automata.
-            $fastates = $fa->end_states();
-            $anotherfastates = $anotherfa->end_states();
-            $states = $this->end_states();
+            $fastates = $fa->get_end_states();
+            $anotherfastates = $anotherfa->get_end_states();
+            $states = $this->get_end_states();
         } else {
             // Analysis if the start state of intersection includes one of start states of given automata.
-            $fastates = $fa->start_states();
-            $anotherfastates = $anotherfa->start_states();
-            $states = $this->start_states();
+            $fastates = $fa->get_start_states();
+            $anotherfastates = $anotherfa->get_start_states();
+            $states = $this->get_start_states();
         }
         // Get real numbers.
         $numbers = $fa->get_state_numbers();
@@ -1816,8 +1816,8 @@ class qtype_preg_fa {
         }
         $sourcenumbers = $source->get_state_numbers();
         // Add start states if fa has no one.
-        if (count($this->start_states()) == 0) {
-            $sourcestart = $source->start_states();
+        if (count($this->get_start_states()) == 0) {
+            $sourcestart = $source->get_start_states();
             foreach ($sourcestart as $start) {
                 $realnumber = $sourcenumbers[$start];
                 $realnumber = trim($realnumber, '()');
@@ -1828,7 +1828,7 @@ class qtype_preg_fa {
             }
         }
 
-        $sourceend = $source->end_states();
+        $sourceend = $source->get_end_states();
         foreach ($sourceend as $end) {
             $realnumber = $sourcenumbers[$end];
             $realnumber = trim($realnumber, '()');
@@ -1847,7 +1847,7 @@ class qtype_preg_fa {
     }
 
     public function merge_end_transitions() {
-        foreach ($this->end_states() as $end) {
+        foreach ($this->get_end_states() as $end) {
             $endtransitions = $this->get_adjacent_transitions($end, false);
             foreach ($endtransitions as $endtran) {
                 $beforeeps = true;
@@ -2093,7 +2093,7 @@ class qtype_preg_fa {
         $hascycle = false;
         $states = $this->get_state_numbers();
         // Add start states to wave front.
-        $oldfront = $this->start_states();
+        $oldfront = $this->get_start_states();
 
         // Analysis sattes from wave front.
         while (count($oldfront) != 0) {
@@ -2130,10 +2130,10 @@ class qtype_preg_fa {
      */
     public function set_start_end_states_before_coping($fa, $anotherfa) {
         // Get nessesary data.
-        $faends = $fa->end_states();
-        $anotherfaends = $anotherfa->end_states();
-        $fastarts = $fa->start_states();
-        $anotherfastarts = $anotherfa->start_states();
+        $faends = $fa->get_end_states();
+        $anotherfaends = $anotherfa->get_end_states();
+        $fastarts = $fa->get_start_states();
+        $anotherfastarts = $anotherfa->get_start_states();
         $fastates = $fa->get_state_numbers();
         $anotherfastates = $anotherfa->get_state_numbers();
         $states = $this->get_state_numbers();
@@ -2175,10 +2175,10 @@ class qtype_preg_fa {
      */
     public function set_start_end_states_after_intersect($fa, $anotherfa) {
         // Get nessesary data.
-        $faends = $fa->end_states();
-        $anotherfaends = $anotherfa->end_states();
-        $fastarts = $fa->start_states();
-        $anotherfastarts = $anotherfa->start_states();
+        $faends = $fa->get_end_states();
+        $anotherfaends = $anotherfa->get_end_states();
+        $fastarts = $fa->get_start_states();
+        $anotherfastarts = $anotherfa->get_start_states();
         $fastates = $fa->get_state_numbers();
         $anotherfastates = $anotherfa->get_state_numbers();
         $states = $this->get_state_numbers();
@@ -2353,7 +2353,7 @@ class qtype_preg_fa {
             }
         } else {
             // Cleaning start states.
-            $startstates = $result->start_states();
+            $startstates = $result->get_start_states();
             foreach ($startstates as $startstate) {
                 if ($result->is_full_intersect_state($startstate)) {
                     $result->remove_start_state($startstate);
@@ -2479,7 +2479,7 @@ class qtype_preg_fa {
      */
     public function lead_to_one_end() {
         $newleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
-        $i = count($this->end_states()) - 1;
+        $i = count($this->get_end_states()) - 1;
         if ($i > 0) {
             $to = $this->faendstates[0][0];
         }
@@ -2491,7 +2491,7 @@ class qtype_preg_fa {
             $i--;
             $this->remove_end_state($exendstate);
         }
-        /*$i = count($this->start_states()) - 1;
+        /*$i = count($this->get_start_states()) - 1;
         if ($i > 0) {
             $from = $this->fastartstates[0][0];
         }
@@ -2529,6 +2529,7 @@ class qtype_preg_fa {
             }
             //$numbers[] = $number;
         }
+        //var_dump($numbers);
         $this->to_origin(qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST);
         $anotherfa->to_origin(qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND);
         $result = $this->intersect_fa($anotherfa, $numbers, $isstart);
@@ -2555,7 +2556,7 @@ class qtype_preg_fa {
     }
 
     private function merge_after_intersection() {
-        $startstates = $this->start_states();
+        $startstates = $this->get_start_states();
         $front = $startstates;
         $stackitem = array();
         $success = false;
@@ -2567,7 +2568,7 @@ class qtype_preg_fa {
                     $transitions = $this->get_adjacent_transitions($state, true);
                     foreach ($transitions as $transition) {
                         if (($transition->is_start_anchor() || $transition->is_end_anchor() || $transition->is_eps())) {
-                            $stackitem['end'] = $this->end_states();
+                            $stackitem['end'] = $this->get_end_states();
                             $success = $this->merge_transitions($transition, $stackitem) || $success;
                         }
                         $newfront[] = $transition->to;
@@ -2747,7 +2748,7 @@ class qtype_preg_fa {
     }
 
     private function remove_wrong_end_states() {
-        $endstates = array_values($this->end_states());
+        $endstates = array_values($this->get_end_states());
 
         foreach ($endstates as $end) {
             $reached = array();
@@ -2804,7 +2805,7 @@ class qtype_preg_fa {
         $firstnumbers = $fa->get_state_numbers();
         // Find uncompleted branches.
         if ($direction == 0) {
-            $states = $this->end_states();
+            $states = $this->get_end_states();
             foreach ($states as $state) {
                 if ($this->is_full_intersect_state($state)) {
                     $front[] = $state;
@@ -2876,7 +2877,7 @@ class qtype_preg_fa {
                 }
             }
         } else {
-            $states = $this->start_states();
+            $states = $this->get_start_states();
             foreach ($states as $state) {
                 if ($this->is_full_intersect_state($state)) {
                     $front[] = $state;
@@ -2970,9 +2971,9 @@ class qtype_preg_fa {
         $newfront = array();
         $newstop = array();
         if ($isstart == 0) {
-            $states = $anotherfa->start_states();
+            $states = $anotherfa->get_start_states();
         } else {
-            $states = $anotherfa->end_states();
+            $states = $anotherfa->get_end_states();
         }
 
         $oldfront = $states;
@@ -3127,9 +3128,9 @@ class qtype_preg_fa {
 
             $resultpart->remove_unreachable_states();
             if ($isstart == 0) {
-                $oldfront = $resultpart->start_states();
+                $oldfront = $resultpart->get_start_states();
             } else {
-                $oldfront = $resultpart->end_states();
+                $oldfront = $resultpart->get_end_states();
             }
             $copedstates = array();
             $newfront = array();
@@ -3188,22 +3189,22 @@ class qtype_preg_fa {
                 $newfront = array();
             }
                 // Redirect start states of getting part to real start state.
-               /* $resultstart = $result->start_states()[0];
-                $startstates = $resultpart->start_states();
+               /* $resultstart = $result->get_start_states()[0];
+                $startstates = $resultpart->get_start_states();
                 foreach ($startstates as $start) {
-                    if (!in_array($assotiatedstates[$start], $result->start_states())) {
+                    if (!in_array($assotiatedstates[$start], $result->get_start_states())) {
                         $result->redirect_transitions($assotiatedstates[$start], $resultstart);
                     }
                 }*/
                 // Form new stop states.
                 // Set its end states.
             if ($isstart == 0) {
-                $endstates = $resultpart->end_states();
+                $endstates = $resultpart->get_end_states();
                 foreach ($endstates as $end) {
                     $newstop[] = $assotiatedstates[$end];
                 }
             } else {
-                $startstates = $resultpart->start_states();
+                $startstates = $resultpart->get_start_states();
                 foreach ($startstates as $start) {
                     $newstop[] = $assotiatedstates[$start];
                 }
@@ -3213,8 +3214,8 @@ class qtype_preg_fa {
     }
 
     private function skip_uncapturing_transitions($anotherfa, $stateindex, $isstart, $result, $stop) {
-        $startstates = $this->start_states();
-        $endstates = $this->end_states();
+        $startstates = $this->get_start_states();
+        $endstates = $this->get_end_states();
         // Change state first from intersection.
         $secondnumbers = $anotherfa->get_state_numbers();
         $firstnumbers = $this->get_state_numbers();
@@ -3230,7 +3231,7 @@ class qtype_preg_fa {
                         foreach ($stop as $stopindex) {
                             $tran = clone $transition;
                             $tran->from = $stopindex;
-                            $addednumber = $result->get_inter_state($firstnumbers[$transition->to], $resnumbers[$anotherfa->start_states()[0]]);
+                            $addednumber = $result->get_inter_state($firstnumbers[$transition->to], $resnumbers[$anotherfa->get_start_states()[0]]);
                             $addednumber = trim($addednumber, ",");
                             $addedstate = $result->add_state($addednumber);
                             $tran->to = $addedstate;
@@ -3246,7 +3247,7 @@ class qtype_preg_fa {
                         foreach ($stop as $stopindex) {
                             $tran = clone $transition;
                             $tran->to = $stopindex;
-                            $addednumber = $result->get_inter_state($firstnumbers[$transition->from],$resnumbers[$anotherfa->end_states()[0]]);
+                            $addednumber = $result->get_inter_state($firstnumbers[$transition->from],$resnumbers[$anotherfa->get_end_states()[0]]);
                             $addednumber = trim($addednumber, ",");
                             $addedstate = $result->add_state($addednumber);
                             $tran->from = $addedstate;
@@ -3261,7 +3262,7 @@ class qtype_preg_fa {
         $newstop = array_merge($newstop, $intersectedstop);
         // Skip transitions from second automaton.
         if ($isstart == 0) {
-            $states = $anotherfa->start_states();
+            $states = $anotherfa->get_start_states();
             // If eps - copy it to result automaton.
             foreach ($states as $state) {
                 $transitions = $anotherfa->get_adjacent_transitions($state, true);
@@ -3283,7 +3284,7 @@ class qtype_preg_fa {
             }
 
         } else {
-            $states = $anotherfa->end_states();
+            $states = $anotherfa->get_end_states();
             foreach ($states as $state) {
                 $transitions = $anotherfa->get_adjacent_transitions($state, false);
                 foreach ($transitions as $transition) {
@@ -3319,15 +3320,15 @@ class qtype_preg_fa {
         $stopcoping = $stateindex;
         // Get states for starting coping.
         if ($isstart == 0) {
-            $oldfront = $this->start_states();
+            $oldfront = $this->get_start_states();
         } else {
-            $oldfront = $this->end_states();
+            $oldfront = $this->get_end_states();
         }
         // Copy branches.
         $stop = $result->copy_modify_branches($this, $oldfront, $stopcoping, $isstart);
         $transitions = array();
-        $startstates = $this->start_states();
-        $endstates = $this->end_states();
+        $startstates = $this->get_start_states();
+        $endstates = $this->get_end_states();
         // Change state first from intersection.
         $secondnumbers = $anotherfa->get_state_numbers();
         $firstnumbers = $this->get_state_numbers();
@@ -3335,9 +3336,9 @@ class qtype_preg_fa {
         $newstop = array();
         // Skip uncapturing transitions.
         if ($isstart == 0) {
-            $states = $anotherfa->start_states();
+            $states = $anotherfa->get_start_states();
         } else {
-            $states = $anotherfa->end_states();
+            $states = $anotherfa->get_end_states();
         }
         $newstop = $this->skip_uncapturing_transitions($anotherfa, $stateindex, $isstart, $result, $stop);
 
