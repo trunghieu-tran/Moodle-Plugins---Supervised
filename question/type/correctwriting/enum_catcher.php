@@ -249,7 +249,7 @@ class qtype_correctwriting_enum_catcher {
             $key2 = 0;
             if ($key >= $count) {
                 foreach ($enum as $key1=>$element) {
-                    if (reset($enum[$key2]) >= reset($enum[$key1])) {
+                    if (reset($enum[$key2]) <= reset($enum[$key1])) {
                         $key2 = $key1;
                     }
                 }
