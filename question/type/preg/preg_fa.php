@@ -2818,7 +2818,7 @@ class qtype_preg_fa {
                 if ($numbers[1] != '') {
                     foreach ($secondnumbers as $num) {
                         if (strpos($numbers[1], $num) === 0 || $numbers[1] == $num) {
-                            $workstate2 = array_search($num, $secondnumbers);
+                            $workstate2 = $anotherfa->find_state($num);
                         }
                     }
                 }
@@ -2834,7 +2834,10 @@ class qtype_preg_fa {
                         // Get number of copied state.
                         $number = $firstnumbers[$tran->to];
                         $number = trim($number, '()');
-                        $number = $number . ',';
+                        $last = substr($number, -1);
+                        if ($last != ',') {
+                            $number = $number . ',';
+                        }
                         $copiedstate = array_search($number, $this->statenumbers);
                         // Add transition.
                         //$addtran = new qtype_preg_fa_transition($state, $tran->pregleaf, $copiedstate, $tran->origin, $tran->consumeschars);
@@ -2860,7 +2863,10 @@ class qtype_preg_fa {
                         // Get number of copied state.
                         $number = $secondnumbers[$tran->to];
                         $number = trim($number, '()');
-                        $number = ',' . $number;
+                        $first = substr($number, 1);
+                        if ($first != ',') {
+                            $number = ',' . $number;
+                        }
                         $copiedstate = array_search($number, $this->statenumbers);
                         // Add transition.
                         //$addtran = new qtype_preg_fa_transition($state, $tran->pregleaf, $copiedstate, $tran->origin, $tran->consumeschars);
@@ -2890,7 +2896,7 @@ class qtype_preg_fa {
                 if ($numbers[1] != '') {
                     foreach ($secondnumbers as $num) {
                         if (strpos($numbers[1], $num) === 0 || $num == $numbers[1]) {
-                            $workstate2 = array_search($num, $secondnumbers);
+                            $workstate2 = $anotherfa->find_state($num);
                         }
                     }
                 }
@@ -2933,7 +2939,10 @@ class qtype_preg_fa {
                         // Get number of copied state.
                         $number = $secondnumbers[$tran->from];
                         $number = trim($number, '()');
-                        $number = ',' . $number;
+                        $first = substr($number, 1);
+                        if ($first != ',') {
+                            $number = ',' . $number;
+                        }
                         $copiedstate = array_search($number, $this->statenumbers);
                         // Add transition.
                         //$addtran = new qtype_preg_fa_transition($copiedstate, $tran->pregleaf, $state, $tran->origin, $tran->consumeschars);
@@ -3368,7 +3377,6 @@ class qtype_preg_fa {
                 }
                 $i--;
             }
-
         }
         $stop = array_merge($stop, $addedstop, $newstop);
         // Find intersection part.
