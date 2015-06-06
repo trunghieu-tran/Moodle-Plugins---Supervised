@@ -1512,6 +1512,7 @@ class qtype_preg_fa {
         }
         // Compare real numbers
         foreach ($realfanumbers as $num1) {
+            $num1 = rtrim($num1, ",");
             foreach ($result as $num2) {
                 $resnumbers = explode(',', $num2, 2);
                 if ($num1 == $resnumbers[0]) {
@@ -1521,6 +1522,7 @@ class qtype_preg_fa {
         }
 
         foreach ($realanotherfanumbers as $num1) {
+            $num1 = ltrim($num1, ",");
             foreach ($result as $num2) {
                 $resnumbers = explode(',', $num2, 2);
                 if (strpos($resnumbers[1], $num1) === 0 || $resnumbers[1] == $num1) {
@@ -1607,7 +1609,11 @@ class qtype_preg_fa {
                 $keys = array_keys($states);
                 $transitions = $source->get_adjacent_transitions($states[$keys[0]], false);
                 $keys = array_keys($transitions);
-                $origin = $transitions[$keys[0]]->origin;
+                if (empty($keys)) {
+                    $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+                } else {
+                    $origin = $transitions[$keys[0]]->origin;
+                }
             }
         }
         // Get transition for analysis.
@@ -1722,7 +1728,11 @@ class qtype_preg_fa {
                 $keys = array_keys($states);
                 $transitions = $source->get_adjacent_transitions($states[$keys[0]], false);
                 $keys = array_keys($transitions);
-                $origin = $transitions[$keys[0]]->origin;
+                if (empty($keys)) {
+                    $origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST;
+                } else {
+                    $origin = $transitions[$keys[0]]->origin;
+                }
             }
         }
         // Getting all states which are in automata for coping.
@@ -3060,21 +3070,30 @@ class qtype_preg_fa {
             // Set start states for coped automaton.
             $states = $result->get_states();
             foreach ($states as $state) {
-                $transitions = $result->get_adjacent_transitions($state, false);
-
+                $transitionsinto = $result->get_adjacent_transitions($state, false);
+                $transitionsout = $result->get_adjacent_transitions($state, true);
                 // Check if there are only loopsback transitions.
-                $loopsback = true;
-                foreach ($transitions as $transition) {
+                $loopsbackinto = true;
+                foreach ($transitionsinto as $transition) {
                     if (!$transition->loopsback) {
-                        $loopsback = false;
+                        $loopsbackinto = false;
                     }
                 }
-                if ($loopsback) {
+                $loopsbackout = true;
+                foreach ($transitionsout as $transition) {
+                    if (!$transition->loopsback) {
+                        $loopsbackout = false;
+                    }
+                }
 
-                        $result->add_start_state($state);
-
+                if ($loopsbackinto) {
+                    $result->add_start_state($state);
+                }
+                if ($loopsbackout) {
+                    $result->add_end_state($state);
                 }
             }
+
             // Intersect it in another direction.
             $resultpart = $result->intersect_fa($uncapturingclone, $stop, !$isstart);
 
@@ -3169,7 +3188,7 @@ class qtype_preg_fa {
                 $newfront = array();
             }
                 // Redirect start states of getting part to real start state.
-                /*$resultstart = $result->start_states()[0];
+               /* $resultstart = $result->start_states()[0];
                 $startstates = $resultpart->start_states();
                 foreach ($startstates as $start) {
                     if (!in_array($assotiatedstates[$start], $result->start_states())) {
@@ -3190,7 +3209,6 @@ class qtype_preg_fa {
                 }
             }
         }
-
         return $newstop;
     }
 
@@ -3358,7 +3376,6 @@ class qtype_preg_fa {
         } else {
             $this->get_intersection_part($anotherfa, $result, $stop, $isstart, false);
         }
-
         // Set right start and end states for completing branches.
         $result->set_start_end_states_before_coping($this, $anotherfa);
 
@@ -3375,7 +3392,6 @@ class qtype_preg_fa {
             // Cleaning start states.
             $result->remove_all_start_states();
             $result->set_start_end_states_after_intersect($this, $anotherfa);
-
         } else {
             $result = new qtype_preg_fa();
         }
