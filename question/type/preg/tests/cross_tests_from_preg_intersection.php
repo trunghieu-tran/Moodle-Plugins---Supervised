@@ -770,7 +770,7 @@ class qtype_preg_cross_tests_from_preg_intersection {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0, 1=>3, 2=>3),
-                        'length'=>array(0=>4, 1=>0, 2=>1));
+                        'length'=>array(0=>4, 1=>1, 2=>1));
 
         $test2 = array( 'str'=>'ab!t',
                         'is_match'=>true,
@@ -1368,7 +1368,7 @@ class qtype_preg_cross_tests_from_preg_intersection {
         $test3 = array( 'str'=>'abet',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>3, 2=>3),
+                        'index_first'=>array(0=>0, 1=>2, 2=>3),
                         'length'=>array(0=>4, 1=>1, 2=>1));
 
         return array('regex'=>'abe(?<=[ab][!be](\b|.))(=|t)',
@@ -1388,8 +1388,8 @@ class qtype_preg_cross_tests_from_preg_intersection {
         $test2 = array( 'str'=>'a=cd',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>1, 2=>2),
-                        'length'=>array(0=>4, 1=>1, 2=>0));
+                        'index_first'=>array(0=>0, 1=>1, 2=>1),
+                        'length'=>array(0=>4, 1=>1, 2=>1));
 
         $test3 = array( 'str'=>'abcd',
                         'is_match'=>true,
@@ -1705,7 +1705,7 @@ class qtype_preg_cross_tests_from_preg_intersection {
                         'left'=>array(2),
                         'next'=>'\t');
 
-        $test2 = array( 'str'=>'a\t',
+        $test2 = array( 'str'=>"a\t",
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
@@ -1713,7 +1713,7 @@ class qtype_preg_cross_tests_from_preg_intersection {
                         'left'=>array(1),
                         'next'=>'\w');
 
-        $test3 = array( 'str'=>'a\nc',
+        $test3 = array( 'str'=>"a\tc",
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
