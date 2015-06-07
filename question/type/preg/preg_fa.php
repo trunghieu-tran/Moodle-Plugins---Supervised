@@ -507,7 +507,7 @@ class qtype_preg_fa_transition {
             } else {
                 $resulttran->mergedafter = $assert->mergedafter;
             }
-            $resulttran->loopsback = $this->loopsback || $other->loopsback;
+            $resulttran->loopsback = $this->loopsback && $other->loopsback;
             //$this->unite_tags($other, $resulttran);
             return $resulttran;
         }
@@ -524,7 +524,7 @@ class qtype_preg_fa_transition {
             } else {
                 $resulttran->mergedbefore = $assert->mergedbefore;
             }
-            $resulttran->loopsback = $this->loopsback || $other->loopsback;
+            $resulttran->loopsback = $this->loopsback && $other->loopsback;
             $resulttran->count_min_open_tag();
             return $resulttran;
         }
@@ -549,7 +549,7 @@ class qtype_preg_fa_transition {
                 if ($this->is_unmerged_assert()) {
                     $resulttran->consumeschars = false;
                 }
-                $resulttran->loopsback = $this->loopsback || $other->loopsback;
+                $resulttran->loopsback = $this->loopsback && $other->loopsback;
                 return $resulttran;
             }
             return null;
@@ -571,7 +571,7 @@ class qtype_preg_fa_transition {
             if (!$this->is_eps()) {
                 $this->unite_tags($other, $resulttran);
             }
-            $resulttran->loopsback = $this->loopsback || $other->loopsback;
+            $resulttran->loopsback = $this->loopsback && $other->loopsback;
 
             $resulttran->count_min_open_tag();
         }
