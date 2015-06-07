@@ -3486,11 +3486,9 @@ class qtype_preg_fa {
         }
         $stop = array_merge($stop, $addedstop, $newstop);
         // Find intersection part.
-        if (!$anotherfa->has_cycle() && $this->has_cycle()) {
-            $this->get_intersection_part($anotherfa, $result, $stop, $isstart, true);
-        } else {
-            $this->get_intersection_part($anotherfa, $result, $stop, $isstart, false);
-        }
+
+
+        $this->get_intersection_part($anotherfa, $result, $stop, $isstart, false);
         // Set right start and end states for completing branches.
         $result->set_start_end_states_before_coping($this, $anotherfa);
 
