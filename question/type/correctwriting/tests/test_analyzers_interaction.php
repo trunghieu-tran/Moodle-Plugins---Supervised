@@ -53,8 +53,8 @@ class qtype_correctwriting_analyzers_interaction_test extends advanced_testcase 
         $this->assertEquals('qtype_correctwriting_lexeme_absent_mistake', get_class($question->matchedresults->mistakes()[1]));
         $this->assertEquals('qtype_correctwriting_lexeme_added_mistake', get_class($question->matchedresults->mistakes()[2]));
     }
-    // опечатки, пропущенные лексемы, лишние лексемы
-    public function test_typo_drop_addition_lexemes_100() {
+    // Test typo, move and additional lexemes. Only lexical analyzer.
+    public function test_typo_drop_addition_lexemes_lexical() {
         $language = new block_formal_langs_language_simple_english();
         $question = new qtype_correctwriting_question();
         $question->usecase = true;
@@ -71,14 +71,14 @@ class qtype_correctwriting_analyzers_interaction_test extends advanced_testcase 
         $question->isenumanalyzerenabled = 0;
         $question->issequenceanalyzerenabled = 0;
         $question->issyntaxanalyzerenabled = 0;
-        // Input data.
         $answers = array((object)array('id' => 1, 'answer' => 'a data template', 'fraction' => 1.0));
         $question->answers = $answers;
         $state = $question->grade_response(array('answer' => 'r date tenplate function'));
-        $this->assertEquals(count($question->matchedresults->mistakes()),3);
-        $this->assertEquals(get_class($question->matchedresults->mistakes()[0]),'qtype_correctwriting_lexical_mistake');
-        $this->assertEquals(get_class($question->matchedresults->mistakes()[1]),'qtype_correctwriting_lexical_mistake');
-        $this->assertEquals(get_class($question->matchedresults->mistakes()[2]),'qtype_correctwriting_lexical_mistake');
+        $this->assertEquals(4, count($question->matchedresults->mistakes()));
+        $this->assertEquals('qtype_correctwriting_lexeme_added_mistake', get_class($question->matchedresults->mistakes()[0]));
+        $this->assertEquals('qtype_correctwriting_lexical_mistake', get_class($question->matchedresults->mistakes()[1]));
+        $this->assertEquals('qtype_correctwriting_lexical_mistake', get_class($question->matchedresults->mistakes()[2]));
+        $this->assertEquals('qtype_correctwriting_lexical_mistake', get_class($question->matchedresults->mistakes()[3]));
     }
     // опечатки, пропуск лексемы, перемещение лексемы, лишняя лексема
     public function test_typo_drop_moved_addition_lexemes_101() {
