@@ -2833,9 +2833,11 @@ class qtype_preg_cross_tests_from_preg_intersection {
 
         $test2 = array( 'str'=>'cab',
                         'is_match'=>true,
-                        'full'=>true,
+                        'full'=>false,
                         'index_first'=>array(0=>0, 1=>0, 2=>1, 3=>0, 4=>1),
-                        'length'=>array(0=>3, 1=>1, 2=>1, 3=>1, 4=>1));
+                        'length'=>array(0=>1, 1=>1, 2=>0, 3=>1, 4=>0),
+                        'left'=>array(1),
+                        'next'=>'b');
 
         $test3 = array( 'str'=>'cb',
                         'is_match'=>true,
@@ -2843,7 +2845,7 @@ class qtype_preg_cross_tests_from_preg_intersection {
                         'index_first'=>array(0=>0, 1=>0, 2=>1, 3=>0, 4=>1),
                         'length'=>array(0=>2, 1=>1, 2=>0, 3=>1, 4=>0));
 
-        return array('regex'=>'(c|d)(?=(|a)(?<=(c|da)b))(a|)b',
+        return array('regex'=>'(c|d)(?=(|a)b(?<=(c|da)b))(a|)b',
                      'tests'=>array($test1, $test2, $test3),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
@@ -2868,7 +2870,7 @@ class qtype_preg_cross_tests_from_preg_intersection {
                         'length'=>array(0=>2, 1=>1, 2=>3, 3=>4, 4=>3, 5=>-1, 6=>1));
 
         return array('regex'=>'([a-z])*(?=(|efk)g(?<=((abd)+c|efk)g))(g|[a-f])',
-                     'tests'=>array($test1, $test2),
+                     'tests'=>array($test1, $test2, $test3),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
