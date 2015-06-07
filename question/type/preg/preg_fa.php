@@ -2881,6 +2881,59 @@ class qtype_preg_fa {
                         }
                     }
                 }
+                // Copy cycled transitions.
+                if ($anotherfa->has_endstate($workstate2) && $fa->has_endstate($workstate1)) {
+                    $transitions = $anotherfa->get_adjacent_transitions($workstate2, true);
+                    foreach ($transitions as $transition) {
+                        if ($transition->from === $transition->to) {
+                            // Get number of copied state.
+                            $number = $firstnumbers[$transition->to];
+                            $number = trim($number, '()');
+                            $last = substr($number, -1);
+                            if ($last != ',') {
+                                $number = $number . ',';
+                            }
+                            $copiedstate = array_search($number, $this->statenumbers);
+                            if ($copiedstate === false) {
+                                $copiedstate = $this->add_state($number);
+                                $clonetran = clone $transition;
+                                $clonetran->from = $state;
+                                $clonetran->to = $copiedstate;
+                                $clonetran->consumeschars = false;
+                                $this->add_transition($clonetran);
+                            }
+                            $trancycle = clone $transition;
+                            $trancycle->consumeschars = false;
+                            $trancycle->from = $copiedstate;
+                            $trancycle->to = $copiedstate;
+                            $this->add_transition($trancycle);
+                        }
+                    }
+                    $transitions = $fa->get_adjacent_transitions($workstate1, true);
+                    foreach ($transitions as $transition) {
+                        if ($transition->from === $transition->to) {
+                            // Get number of copied state.
+                            $number = $secondnumbers[$transition->to];
+                            $number = trim($number, '()');
+                            $first = substr($number, 1);
+                            if ($first != ',') {
+                                $number = ',' . $number;
+                            }
+                            $copiedstate = array_search($number, $this->statenumbers);
+                            if ($copiedstate === false) {
+                                $copiedstate = $this->add_state($number);
+                                $clonetran = clone $transition;
+                                $clonetran->from = $state;
+                                $clonetran->to = $copiedstate;
+                                $this->add_transition($clonetran);
+                            }
+                            $trancycle = clone $transition;
+                            $trancycle->from = $copiedstate;
+                            $trancycle->to = $copiedstate;
+                            $this->add_transition($trancycle);
+                        }
+                    }
+                }
             }
         } else {
             $states = $this->get_start_states();
@@ -2954,6 +3007,59 @@ class qtype_preg_fa {
                             $addtran->consumeschars = false;
                         }
                         $this->add_transition($addtran);
+                    }
+                }
+                // Copy cycled transitions.
+                if ($anotherfa->has_startstate($workstate2) && $fa->has_startstate($workstate1)) {
+                    $transitions = $anotherfa->get_adjacent_transitions($workstate2, false);
+                    foreach ($transitions as $transition) {
+                        if ($transition->from === $transition->to) {
+                            // Get number of copied state.
+                            $number = $firstnumbers[$transition->to];
+                            $number = trim($number, '()');
+                            $last = substr($number, -1);
+                            if ($last != ',') {
+                                $number = $number . ',';
+                            }
+                            $copiedstate = array_search($number, $this->statenumbers);
+                            if ($copiedstate === false) {
+                                $copiedstate = $this->add_state($number);
+                                $clonetran = clone $transition;
+                                $clonetran->to = $state;
+                                $clonetran->from = $copiedstate;
+                                $clonetran->consumeschars = false;
+                                $this->add_transition($clonetran);
+                            }
+                            $trancycle = clone $transition;
+                            $trancycle->consumeschars = false;
+                            $trancycle->from = $copiedstate;
+                            $trancycle->to = $copiedstate;
+                            $this->add_transition($trancycle);
+                        }
+                    }
+                    $transitions = $fa->get_adjacent_transitions($workstate1, false);
+                    foreach ($transitions as $transition) {
+                        if ($transition->from === $transition->to) {
+                            // Get number of copied state.
+                            $number = $secondnumbers[$transition->to];
+                            $number = trim($number, '()');
+                            $first = substr($number, 1);
+                            if ($first != ',') {
+                                $number = ',' . $number;
+                            }
+                            $copiedstate = array_search($number, $this->statenumbers);
+                            if ($copiedstate === false) {
+                                $copiedstate = $this->add_state($number);
+                                $clonetran = clone $transition;
+                                $clonetran->to = $state;
+                                $clonetran->from = $copiedstate;
+                                $this->add_transition($clonetran);
+                            }
+                            $trancycle = clone $transition;
+                            $trancycle->from = $copiedstate;
+                            $trancycle->to = $copiedstate;
+                            $this->add_transition($trancycle);
+                        }
                     }
                 }
             }
