@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of CorrectWriting question type - https://code.google.com/p/oasychev-moodle-plugins/
 //
 // CorrectWriting question type is free software: you can redistribute it and/or modify
@@ -15,12 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with CorrectWriting.  If not, see <http://www.gnu.org/licenses/>.
 
+require_once(dirname(__FILE__) . '/../../../../config.php'); 
 global $CFG;
+require_once($CFG->libdir.'/moodlelib.php');
 require_once($CFG->dirroot.'/question/type/correctwriting/question.php');
+require_once($CFG->dirroot.'/question/type/edit_question_form.php');
+require_once($CFG->dirroot.'/question/engine/tests/helpers.php');
+require_once($CFG->dirroot.'/question/type/correctwriting/edit_correctwriting_form.php');
 require_once($CFG->dirroot.'/question/type/correctwriting/questiontype.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/language_simple_english.php');
+require_once($CFG->dirroot.'/blocks/formal_langs/language_cpp_parseable_language.php');
 
-class qtype_correctwriting_analyzers_interaction_test extends PHPUnit_Framework_TestCase {
+class qtype_correctwriting_analyzers_interaction_test extends advanced_testcase {
 
     // пропуск, перемещение, добавление лексемы
     public function test_drop_move_addition_lexemes_001() {
