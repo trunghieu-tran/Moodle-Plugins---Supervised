@@ -3346,7 +3346,7 @@ class qtype_preg_fa {
                         foreach ($stop as $stopindex) {
                             $tran = clone $transition;
                             $tran->from = $stopindex;
-                            $addednumber = $result->get_inter_state($firstnumbers[$transition->to], $resnumbers[$anotherfa->get_start_states()[0]]);
+                            $addednumber = $result->get_inter_state($firstnumbers[$transition->to], $secondnumbers[$anotherfa->get_start_states()[0]]);
                             $addednumber = trim($addednumber, ",");
                             $addedstate = $result->add_state($addednumber);
                             $tran->to = $addedstate;
@@ -3362,7 +3362,7 @@ class qtype_preg_fa {
                         foreach ($stop as $stopindex) {
                             $tran = clone $transition;
                             $tran->to = $stopindex;
-                            $addednumber = $result->get_inter_state($firstnumbers[$transition->from],$resnumbers[$anotherfa->get_end_states()[0]]);
+                            $addednumber = $result->get_inter_state($firstnumbers[$transition->from],$secondnumbers[$anotherfa->get_end_states()[0]]);
                             $addednumber = trim($addednumber, ",");
                             $addedstate = $result->add_state($addednumber);
                             $tran->from = $addedstate;
