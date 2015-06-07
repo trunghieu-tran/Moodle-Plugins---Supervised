@@ -2371,9 +2371,289 @@ class qtype_preg_cross_tests_from_preg_intersection {
                         'left'=>array(3),
                         'next'=>'c');
 
-
         return array('regex'=>'(?<=[a-k][a-z])(?<=[a-d][c-x])[d-y][x-z]',
                      'tests'=>array($test1, $test2, $test3),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
+
+    function data_for_test_inner_assertions_1() {
+        $test1 = array( 'str'=>'cabcd',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>5));
+
+        $test2 = array( 'str'=>'cablf',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>3),
+                        'left'=>array(2),
+                        'next'=>'c');
+
+        return array('regex'=>'c(?=ab(?=cd)[a-l][a-f])[a-x]{3}',
+                     'tests'=>array($test1, $test2),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
+    function data_for_test_inner_assertions_2() {
+        $test1 = array( 'str'=>'cablf',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>4));
+
+        $test2 = array( 'str'=>'cabll',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>4),
+                        'left'=>array(0),
+                        'next'=>'[a-f]');
+
+        $test3 = array( 'str'=>'dablf',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'left'=>array(4),
+                        'next'=>'c');
+
+        $test4 = array( 'str'=>'cablaf',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>4));
+
+        $test5 = array( 'str'=>'cabl',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>4),
+                        'left'=>array(0),
+                        'next'=>'[a-f]');
+
+        return array('regex'=>'[cd](?=ab(?<=cab)[a-l][a-f])[a-x]{3}',
+                     'tests'=>array($test1, $test2, $test3, $test4, $test5),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
+    function data_for_test_inner_assertions_3() {
+        $test1 = array( 'str'=>'',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>0));
+
+        $test2 = array( 'str'=>'aaaa',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>0));
+
+        return array('regex'=>'(?=(?=))',
+                     'tests'=>array($test1, $test2),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
+    function data_for_test_inner_assertions_4() {
+        $test1 = array( 'str'=>'',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>0));
+
+        $test2 = array( 'str'=>'aaaa',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>0));
+
+        return array('regex'=>'(?=(?<=))',
+                     'tests'=>array($test1, $test2),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
+    function data_for_test_inner_assertions_5() {
+        $test1 = array( 'str'=>'abc',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>3, 1=>1));
+
+        $test2 = array( 'str'=>'acc',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>3, 1=>0));
+
+        $test3 = array( 'str'=>'adcab',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>5, 1=>0));
+
+        $test4 = array( 'str'=>'akc',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>1, 1=>0),
+                        'left'=>array(2),
+                        'next'=>'[a-f]');
+
+        return array('regex'=>'(?=(?=a(b|))a[a-z]c)a[a-f]+',
+                     'tests'=>array($test1, $test2, $test3, $test4),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
+    function data_for_test_inner_assertions_6() {
+        $test1 = array( 'str'=>'bas',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>3, 1=>1));
+
+        $test2 = array( 'str'=>'bxs',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1),
+                        'left'=>array(2),
+                        'next'=>'a');
+
+        $test3 = array( 'str'=>'baz',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2),
+                        'left'=>array(1),
+                        'next'=>'s');
+
+        return array('regex'=>'b(?=[ax]s(?<=(a|)[s-z]))[a-k][s-z]',
+                     'tests'=>array($test1, $test2, $test3),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
+    function data_for_test_inner_assertions_7() {
+        $test1 = array( 'str'=>'abcd',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>0, 2=>0, 3=>2, 4=>0),
+                        'length'=>array(0=>4, 1=>4, 2=>2, 3=>0, 4=>2));
+
+        $test2 = array( 'str'=>'',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'left'=>array(4),
+                        'next'=>'a');
+
+        $test3 = array( 'str'=>'acd',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1),
+                        'left'=>array(3),
+                        'next'=>'b');
+
+        return array('regex'=>'(abcd|)(?<=(ab(c|))(?<=(ab)|)cd)',
+                     'tests'=>array($test1, $test2, $test3),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
+    function data_for_test_inner_assertions_8() {
+        $test1 = array( 'str'=>'kabc',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>2, 2=>0),
+                        'length'=>array(0=>4, 1=>1, 2=>1));
+
+        $test2 = array( 'str'=>'kac',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0, 2=>0),
+                        'length'=>array(0=>2, 1=>1),
+                        'left'=>array(2),
+                        'next'=>'b');
+
+        $test3 = array( 'str'=>'zabc',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>2, 2=>1),
+                        'length'=>array(0=>4, 1=>1, 2=>0));
+
+        return array('regex'=>'[k-z](?=(?=a(b|))abc(?<=(k|)abc))abc',
+                     'tests'=>array($test1, $test2, $test3),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
+    function data_for_test_inner_assertions_9() {
+        $test1 = array( 'str'=>'abcbcde',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>3, 2=>3),
+                        'length'=>array(0=>7, 1=>2, 2=>2));
+
+        $test2 = array( 'str'=>'abcbcbcde',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0, 1=>3, 2=>3),
+                        'length'=>array(0=>5, 1=>2, 2=>2),
+                        'left'=>array(2),
+                        'next'=>'d');
+
+        return array('regex'=>'abcbcd(?<=a(bc){0,3}(?<=a(bc)+)d)e',
+                     'tests'=>array($test1, $test2),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
+    function data_for_test_inner_assertions_10() {
+        $test1 = array( 'str'=>'dab',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>0, 2=>1, 3=>0, 4=>1),
+                        'length'=>array(0=>3, 1=>1, 2=>1, 3=>2, 4=>1));
+
+        $test2 = array( 'str'=>'cab',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>0, 2=>1, 3=>0, 4=>1),
+                        'length'=>array(0=>3, 1=>1, 2=>1, 3=>1, 4=>1));
+
+        $test3 = array( 'str'=>'cb',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>0, 2=>1, 3=>0, 4=>1),
+                        'length'=>array(0=>2, 1=>1, 2=>0, 3=>1, 4=>0));
+
+        return array('regex'=>'(c|d)(?=(|a)(?<=(c|da)b))(a|)b',
+                     'tests'=>array($test1, $test2, $test3),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
+    function data_for_test_inner_assertions_11() {
+        $test1 = array( 'str'=>'abdcg',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>2, 2=>3, 3=>0, 4=>0, 5=>0, 6=>4),
+                        'length'=>array(0=>5, 1=>1, 2=>0, 3=>5, 4=>4, 5=>3, 6=>1));
+
+        $test2 = array( 'str'=>'abdabdcg',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(0=>0, 1=>5, 2=>5, 3=>3, 4=>3, 5=>3, 6=>7),
+                        'length'=>array(0=>8, 1=>1, 2=>0, 3=>5, 4=>4, 5=>3, 6=>1));
+
+        $test3 = array( 'str'=>'aefkg',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(0=>0, 1=>1, 2=>1, 3=>1, 4=>2, 5=>-1, 6=>4),
+                        'length'=>array(0=>2, 1=>1, 2=>3, 3=>4, 4=>3, 5=>-1, 6=>1));
+
+        return array('regex'=>'([a-z])*(?=(|efk)g(?<=((abd)+c|efk)g))(g|[a-f])',
+                     'tests'=>array($test1, $test2),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
 }
