@@ -236,4 +236,194 @@ class qtype_correctwriting_analyzers_interaction_test extends advanced_testcase 
         $this->assertEquals('qtype_correctwriting_lexeme_absent_mistake', get_class($question->matchedresults->mistakes()[12]));
         $this->assertEquals('qtype_correctwriting_lexeme_absent_mistake', get_class($question->matchedresults->mistakes()[13]));
     }
+    // Test move lexemes. Enumeration and sequence analyzers. Enumeration catcher struct definition rule test.
+    public function test_moved_lexemes_with_enumerations_enum_sequence_catcher_struct() {
+        $language = new block_formal_langs_language_cpp_parseable_language();
+        $question = new qtype_correctwriting_question();
+        $question->usecase = true;
+        $question->lexicalerrorthreshold = 3000;
+        $question->lexicalerrorweight = 0.1;
+        $question->usedlanguage = $language;
+        $question->movedmistakeweight = 0.1;
+        $question->absentmistakeweight = 0.11;
+        $question->addedmistakeweight = 0.12;
+        $question->hintgradeborder = 0.75;
+        $question->maxmistakepercentage = 0.95;
+        $question->qtype = new qtype_correctwriting();
+        $question->islexicalanalyzerenabled = 0;
+        $question->isenumanalyzerenabled = 1;
+        $question->issequenceanalyzerenabled = 1;
+        $question->issyntaxanalyzerenabled = 0;
+        $answers = array((object)array('id' => 1, 'answer' => 'struct  MyNiceStructure { int  FirstField;  long Padding;  char  SmallPart; } DefaultValue;', 'fraction' => 1.0));
+        $question->answers = $answers;
+        $state = $question->grade_response(array('answer' => 'struct  MyNiceStructure { long Padding;  int char  SmallPart; FirstField;} DefaultValue;'));
+        $this->assertEquals(1, count($question->matchedresults->mistakes()));
+        $this->assertEquals('qtype_correctwriting_lexeme_moved_mistake', get_class($question->matchedresults->mistakes()[0]));
+    }
+    // Test move lexemes. Enumeration and sequence analyzers. Enumeration catcher enumeration definition rule test.
+    public function test_moved_lexemes_with_enumerations_enum_sequence_catcher_enum() {
+        $language = new block_formal_langs_language_cpp_parseable_language();
+        $question = new qtype_correctwriting_question();
+        $question->usecase = true;
+        $question->lexicalerrorthreshold = 3000;
+        $question->lexicalerrorweight = 0.1;
+        $question->usedlanguage = $language;
+        $question->movedmistakeweight = 0.1;
+        $question->absentmistakeweight = 0.11;
+        $question->addedmistakeweight = 0.12;
+        $question->hintgradeborder = 0.75;
+        $question->maxmistakepercentage = 0.95;
+        $question->qtype = new qtype_correctwriting();
+        $question->islexicalanalyzerenabled = 0;
+        $question->isenumanalyzerenabled = 1;
+        $question->issequenceanalyzerenabled = 1;
+        $question->issyntaxanalyzerenabled = 0;
+        $answers = array((object)array('id' => 1, 'answer' => 'enum MyNiceEnumeration { FirstField,  Padding = 1,SmallPart};', 'fraction' => 1.0));
+        $question->answers = $answers;
+        $state = $question->grade_response(array('answer' => 'enum MyNiceEnumeration { Padding, SmallPart = 1, FirstField};'));
+        $this->assertEquals(2, count($question->matchedresults->mistakes()),2);
+        $this->assertEquals('qtype_correctwriting_lexeme_moved_mistake', get_class($question->matchedresults->mistakes()[0]));
+        $this->assertEquals('qtype_correctwriting_lexeme_moved_mistake', get_class($question->matchedresults->mistakes()[1]));
+    }
+    // Test move lexemes. Enumeration and sequence analyzers. Enumeration catcher arithmetic operations rules test.
+    public function test_moved_lexemes_with_enumerations_enum_sequence_catcher_arithmetic() {
+        $language = new block_formal_langs_language_cpp_parseable_language();
+        $question = new qtype_correctwriting_question();
+        $question->usecase = true;
+        $question->lexicalerrorthreshold = 3000;
+        $question->lexicalerrorweight = 0.1;
+        $question->usedlanguage = $language;
+        $question->movedmistakeweight = 0.1;
+        $question->absentmistakeweight = 0.11;
+        $question->addedmistakeweight = 0.12;
+        $question->hintgradeborder = 0.75;
+        $question->maxmistakepercentage = 0.95;
+        $question->qtype = new qtype_correctwriting();
+        $question->islexicalanalyzerenabled = 0;
+        $question->isenumanalyzerenabled = 1;
+        $question->issequenceanalyzerenabled = 1;
+        $question->issyntaxanalyzerenabled = 0;
+        $answers = array((object)array('id' => 1, 'answer' => 'float k = ( a * b + c / d / e - f - g ) % t % m ;', 'fraction' => 1.0));
+        $question->answers = $answers;
+        $state = $question->grade_response(array('answer' => 'float k = ( c / e / d +  b * a - g - f ) % m % t ;'));
+        $this->assertEquals(0, count($question->matchedresults->mistakes()));
+    }
+    // Test move lexemes. Enumeration and sequence analyzers. Enumeration catcher logi operations rules test.
+    public function test_moved_lexemes_with_enumerations_enum_sequence_catcher_logic() {
+        $language = new block_formal_langs_language_cpp_parseable_language();
+        $question = new qtype_correctwriting_question();
+        $question->usecase = true;
+        $question->lexicalerrorthreshold = 3000;
+        $question->lexicalerrorweight = 0.1;
+        $question->usedlanguage = $language;
+        $question->movedmistakeweight = 0.1;
+        $question->absentmistakeweight = 0.11;
+        $question->addedmistakeweight = 0.12;
+        $question->hintgradeborder = 0.75;
+        $question->maxmistakepercentage = 0.95;
+        $question->qtype = new qtype_correctwriting();
+        $question->islexicalanalyzerenabled = 0;
+        $question->isenumanalyzerenabled = 1;
+        $question->issequenceanalyzerenabled = 1;
+        $question->issyntaxanalyzerenabled = 0;
+        $answers = array((object)array('id' => 1, 'answer' => 't == a && b || c && k != true;', 'fraction' => 1.0));
+        $question->answers = $answers;
+        $state = $question->grade_response(array('answer' => 'k != true && c || b && a == t;'));
+        $this->assertEquals(0, count($question->matchedresults->mistakes()));
+    }
+    // Test move lexemes. Enumeration and sequence analyzers. Enumeration catcher binary operations rules test.
+    public function test_moved_lexemes_with_enumerations_enum_sequence_catcher_binary() {
+        $language = new block_formal_langs_language_cpp_parseable_language();
+        $question = new qtype_correctwriting_question();
+        $question->usecase = true;
+        $question->lexicalerrorthreshold = 3000;
+        $question->lexicalerrorweight = 0.1;
+        $question->usedlanguage = $language;
+        $question->movedmistakeweight = 0.1;
+        $question->absentmistakeweight = 0.11;
+        $question->addedmistakeweight = 0.12;
+        $question->hintgradeborder = 0.75;
+        $question->maxmistakepercentage = 0.95;
+        $question->qtype = new qtype_correctwriting();
+        $question->islexicalanalyzerenabled = 0;
+        $question->isenumanalyzerenabled = 1;
+        $question->issequenceanalyzerenabled = 1;
+        $question->issyntaxanalyzerenabled = 0;
+        $answers = array((object)array('id' => 1, 'answer' => 't & a & b | c & k ^ r;', 'fraction' => 1.0));
+        $question->answers = $answers;
+        $state = $question->grade_response(array('answer' => 'r ^ k & c | b & a &  t;'));
+        $this->assertEquals(0, count($question->matchedresults->mistakes()));
+    }
+    // Test move lexemes. Enumeration and sequence analyzers. Enumeration catcher assign list rule test.
+    public function test_moved_lexemes_with_enumerations_enum_sequence_catcher_assign() {
+        $language = new block_formal_langs_language_cpp_parseable_language();
+        $question = new qtype_correctwriting_question();
+        $question->usecase = true;
+        $question->lexicalerrorthreshold = 3000;
+        $question->lexicalerrorweight = 0.1;
+        $question->usedlanguage = $language;
+        $question->movedmistakeweight = 0.1;
+        $question->absentmistakeweight = 0.11;
+        $question->addedmistakeweight = 0.12;
+        $question->hintgradeborder = 0.75;
+        $question->maxmistakepercentage = 0.95;
+        $question->qtype = new qtype_correctwriting();
+        $question->islexicalanalyzerenabled = 0;
+        $question->isenumanalyzerenabled = 1;
+        $question->issequenceanalyzerenabled = 1;
+        $question->issyntaxanalyzerenabled = 0;
+        $answers = array((object)array('id' => 1, 'answer' => 'int t = a = b = c = k = 5 ;', 'fraction' => 1.0));
+        $question->answers = $answers;
+        $state = $question->grade_response(array('answer' => 'int t = b = c = k = a = 5 ;'));
+        $this->assertEquals(0, count($question->matchedresults->mistakes()));
+    }
+    // Test move lexemes. Enumeration and sequence analyzers. Enumeration catcher array definition test.
+    public function test_moved_lexemes_with_enumerations_enum_sequence_catcher_array() {
+        $language = new block_formal_langs_language_cpp_parseable_language();
+        $question = new qtype_correctwriting_question();
+        $question->usecase = true;
+        $question->lexicalerrorthreshold = 3000;
+        $question->lexicalerrorweight = 0.1;
+        $question->usedlanguage = $language;
+        $question->movedmistakeweight = 0.1;
+        $question->absentmistakeweight = 0.11;
+        $question->addedmistakeweight = 0.12;
+        $question->hintgradeborder = 0.75;
+        $question->maxmistakepercentage = 0.95;
+        $question->qtype = new qtype_correctwriting();
+        $question->islexicalanalyzerenabled = 0;
+        $question->isenumanalyzerenabled = 1;
+        $question->issequenceanalyzerenabled = 1;
+        $question->issyntaxanalyzerenabled = 0;
+        $answers = array((object)array('id' => 1, 'answer' => 'int t[3] = { 1 , 2 , 4 } ;', 'fraction' => 1.0));
+        $question->answers = $answers;
+        $state = $question->grade_response(array('answer' => 'int t[3] = { 2 , 4 , 1 } ;'));
+        $this->assertEquals(2, count($question->matchedresults->mistakes()));
+        $this->assertEquals('qtype_correctwriting_lexeme_moved_mistake', get_class($question->matchedresults->mistakes()[0]));
+        $this->assertEquals('qtype_correctwriting_lexeme_moved_mistake', get_class($question->matchedresults->mistakes()[1]));
+    }
+    // Test move lexemes. Enumeration and sequence analyzers. Enumeration catcher definition list rules test.
+    public function test_moved_lexemes_with_enumerations_enum_sequence_catcher_defenition() {
+        $language = new block_formal_langs_language_cpp_parseable_language();
+        $question = new qtype_correctwriting_question();
+        $question->usecase = true;
+        $question->lexicalerrorthreshold = 3000;
+        $question->lexicalerrorweight = 0.1;
+        $question->usedlanguage = $language;
+        $question->movedmistakeweight = 0.1;
+        $question->absentmistakeweight = 0.11;
+        $question->addedmistakeweight = 0.12;
+        $question->hintgradeborder = 0.75;
+        $question->maxmistakepercentage = 0.95;
+        $question->qtype = new qtype_correctwriting();
+        $question->islexicalanalyzerenabled = 0;
+        $question->isenumanalyzerenabled = 1;
+        $question->issequenceanalyzerenabled = 1;
+        $question->issyntaxanalyzerenabled = 0;
+        $answers = array((object)array('id' => 1, 'answer' => 'int t, *h , k ;', 'fraction' => 1.0));
+        $question->answers = $answers;
+        $state = $question->grade_response(array('answer' => 'int * t, k , h ;'));
+        $this->assertEquals(1, count($question->matchedresults->mistakes()));
+        $this->assertEquals('qtype_correctwriting_lexeme_moved_mistake', get_class($question->matchedresults->mistakes()[0]));
+    }
 }
