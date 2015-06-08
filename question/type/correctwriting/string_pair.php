@@ -54,7 +54,7 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
      * and values, are indexes from correct string
      * @var array
      */
-    protected $enumcorrectcorrect = array();
+    protected $enumcorrecttocorrect = array();
 
     /**
      * A mistake set for arrays
@@ -69,6 +69,12 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
      */
     public $analyzersequence = array();
 
+    
+    protected function convert_to_own_string($string) {
+        $result = new qtype_correctwriting_processed_string($string->language);
+        $result->copy_state_from($string);
+        return $result;
+    }
 
     /**
      * Returns mapped index from correct string to enum correct string
@@ -76,7 +82,7 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
      * @return int resulting index
      */
     public function map_from_correct_string_to_enum_correct_string($index) {
-        return $this->map($index, $this->enumcorrectcorrect, true, $index);
+        return $this->map($index, $this->enumcorrecttocorrect, true, $index);
     }
 
     /**
@@ -85,7 +91,7 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
      * @return int
      */
     public function map_from_enum_correct_string_to_correct_string($index) {
-        return $this->map($index, $this->enumcorrectcorrect, false, $index);
+        return $this->map($index, $this->enumcorrecttocorrect, false, $index);
     }
 
 
@@ -94,7 +100,7 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
      * @return arrray|null
      */
     public function enum_correct_to_correct() {
-        return $this->enumcorrectcorrect;
+        return $this->enumcorrecttocorrect;
     }
 
     /**
@@ -102,7 +108,7 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
      * @param array $matches
      */
     public function set_enum_correct_to_correct($matches) {
-        $this->enumcorrectcorrect = $matches;
+        $this->enumcorrecttocorrect = $matches;
     }
 
     /**
@@ -141,6 +147,10 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
                     }
                 }
             }
+        }
+        
+        foreach($this->correctstring()->stream->tokens as $token) {
+            $this->indexesintable[$token->token_index()] = $token->token_index();
         }
     }
 
@@ -231,11 +241,23 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
      * Return object of class
      */
    public function __construct($correct, $compared, $matches) {
+        global $CFG;
         block_formal_langs_string_pair::__construct($correct, $compared, $matches);
+        if (file_exists(dirname(__FILE__) . '/processed_string.php') && !class_exists('qtype_correctwriting_processed_string')) {
+            require_once(dirname(__FILE__) . '/processed_string.php');
+        }
+        if (class_exists('qtype_correctwriting_processed_string')) {
+            $this->correctstring = $this->convert_to_own_string($correct);
+            $this->comparedstring = $this->convert_to_own_string($compared);
+            $this->matches = $matches;
+            $this->correctedstring = $this->convert_to_own_string($this->correct_mistakes());
+        } 
+        
         $this->indexesintable = array();
         foreach($this->correctstring()->stream->tokens as $token) {
             $this->indexesintable[$token->token_index()] = $token->token_index();
         }
+
     }
 
     /**
@@ -245,18 +267,6 @@ class qtype_correctwriting_string_pair extends block_formal_langs_string_pair {
     public function set_indexes_in_table($newindexes) {
         $this->indexesintable = $newindexes;
     }
-
-    /**
-    * Create complete copy of current pair without common references
-    * @return object of qtype_correctwriting_string_pair $pair copy of current pair 
-    */
-    public function __clone() {
-        // Clone answers.
-        $this->correctstring = clone($this->correctstring());
-        $this->correctedstring = clone($this->correctedstring());
-        foreach($this->correctstring()->stream->tokens as $token) {
-            $this->indexesintable[$token->token_index()] = $token->token_index();
-        }
-    }
+    
 }
 
