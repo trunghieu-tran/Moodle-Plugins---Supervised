@@ -571,7 +571,11 @@ class qtype_preg_fa_transition {
             if (!$this->is_eps()) {
                 $this->unite_tags($other, $resulttran);
             }
-            $resulttran->loopsback = $this->loopsback && $other->loopsback;
+            if ($this->consumeschars && $other->consumeschars) {
+                $resulttran->loopsback = $this->loopsback && $other->loopsback;
+            } else {
+                $resulttran->loopsback = $this->loopsback || $other->loopsback;
+            }
 
             $resulttran->count_min_open_tag();
         }
