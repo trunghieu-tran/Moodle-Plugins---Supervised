@@ -1064,14 +1064,21 @@ class qtype_preg_fa_node_assert extends qtype_preg_fa_operator {
 
     public function accept($options) {
         // TODO; assertions are not supported yet.
-        if ($this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_NLA ||
+        if ($this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_PLA ||
+            $this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_NLA ||
+            $this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_PLB ||
+            $this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_NLB) {
+            return get_string($this->pregnode->subtype, 'qtype_preg');
+        }
+        return true;
+        /*if ($this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_NLA ||
             $this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_NLB) {
             return get_string($this->pregnode->subtype, 'qtype_preg');
         }
         if (!$options->mergeassertions) {
             throw new qtype_preg_mergedassertion_option_exception('');
         }
-        return true;
+        return true;*/
     }
 
     protected function create_automaton_inner(&$automaton, &$stack, $transform) {
