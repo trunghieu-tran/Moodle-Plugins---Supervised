@@ -2039,6 +2039,144 @@ class qtype_preg_cross_tests_from_preg_merging {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
+    function data_for_test_assertions_wordboundary_56() {
+        $test1 = array( 'str'=>"a\t",
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2));
+
+        $test2 = array( 'str'=>'ab',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1),
+                        'left'=>array(1),
+                        'next'=>'\t');
+
+        return array('regex'=>'a\b\b\t',
+                     'tests'=>array($test1, $test2),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
+    function data_for_test_assertions_wordboundary_57() {
+        $test1 = array( 'str'=>"a\t",
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2));
+
+        $test2 = array( 'str'=>'ab',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1),
+                        'left'=>array(1),
+                        'next'=>'\t');
+
+        return array('regex'=>'a\b\b\b\b\t',
+                     'tests'=>array($test1, $test2),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
+    function data_for_test_assertions_wordboundary_58() {
+        $test1 = array( 'str'=>'ab',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2));
+
+        $test2 = array( 'str'=>"a\t",
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1),
+                        'left'=>array(1),
+                        'next'=>'b');
+
+        return array('regex'=>'a\B\Bb',
+                     'tests'=>array($test1, $test2),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
+    function data_for_test_assertions_wordboundary_59() {
+        $test1 = array( 'str'=>"a\t",
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>2, 1=>0));
+
+        $test2 = array( 'str'=>'ab',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>1, 1=>0),
+                        'left'=>array(1),
+                        'next'=>'\t');
+
+        $test3 = array( 'str'=>"a \t",
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>3, 1=>1));
+
+        return array('regex'=>'a\b( |\b)\t',
+                     'tests'=>array($test1, $test2, $test3),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
+    function data_for_test_assertions_wordboundary_60() {
+        $test1 = array( 'str'=>"a\t",
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>2, 1=>0));
+
+        $test2 = array( 'str'=>'ab',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>2, 1=>1),
+                        'left'=>array(1),
+                        'next'=>'\t');
+
+        $test3 = array( 'str'=>"ab\t",
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>3, 1=>1));
+
+        return array('regex'=>'a(b|\b)\b\t',
+                     'tests'=>array($test1, $test2, $test3),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
+    function data_for_test_assertions_wordboundary_61() {
+        $test1 = array( 'str'=>'c b b',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>3),
+                        'length'=>array(0=>5, 1=>2));
+
+        $test2 = array( 'str'=>'c ba',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>3, 1=>2),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        $test3 = array( 'str'=>"\tab b b",
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>5),
+                        'length'=>array(0=>7, 1=>2));
+
+        return array('regex'=>'[c\t](\b[a ]b\b)+',
+                     'tests'=>array($test1, $test2, $test3),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
     // Asserts with tags.
     function data_for_test_assertions_tags_1() {
         $test1 = array( 'str'=>"a\nb",
