@@ -642,7 +642,7 @@ class  qtype_correctwriting_enum_analyzer extends qtype_correctwriting_abstract_
         $includedenums = array(); // Included enumerations indexes for all enumerations.
         $forstd = 0; // Variable for function,which return std Class objects.
         $correcttokens = $this->basestringpair->correctstring()->stream->tokens; // Correct answer tokens array;
-        $correctedtokens = $this->basestringpairenum_correct_string()ng()->stream->tokens; // Corrected student answer tokens array;
+        $correctedtokens = $this->basestringpair->correctedstring()->stream->tokens; // Corrected student answer tokens array;
         $enumdescription = $this->basestringpair->correctstring()->enumerations; // Correct answer enumerations descriptions.
         $currentorder = array(); // Current order of enumerations elements.
         $currentstringpair = 0; // Current string pair with current order of enumeration.
