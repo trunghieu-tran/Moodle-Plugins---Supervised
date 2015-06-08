@@ -225,9 +225,9 @@ abstract class qtype_preg_fa_node {
         $wasmerged = false;
         $changedstate = null;
         $changedstateend = null;
+        $addedinto = false;
         $outtransitions = $automaton->get_adjacent_transitions($tran->to, true);
         $intotransitions = $automaton->get_adjacent_transitions($tran->from, false);
-
         // Add empty transitions if ot's nessesaary.
         if (empty($outtransitions)) {
             $state = $automaton->add_state();
@@ -241,6 +241,7 @@ abstract class qtype_preg_fa_node {
             }
         }
         if (empty($intotransitions)) {
+            $addedinto = true;
             $state = $automaton->add_state();
             $pregleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             $transition = new qtype_preg_fa_transition($state, $pregleaf, $tran->from, $tran->origin, $tran->consumeschars);
@@ -272,30 +273,113 @@ abstract class qtype_preg_fa_node {
         // Intersect transitions.
         for ($i = 0; $i < count($wordbreakinto); $i++) {
             foreach ($intotransitions as $intotran) {
-                $resultinto = $intotran->intersect($wordbreakinto[$i]);
-                if ($resultinto !== null) {
-                    foreach ($outtransitions as $outtran) {
-                        $clone = clone $resultinto;
-                        if ($changedstate !== null) {
-                            $automaton->redirect_transitions($changedstate, $intotran->from);
-                        }
-                        $resultout = $wordbreakout[$i]->intersect($outtran);
-                        if ($resultout !== null) {
-                            $state = $automaton->add_state();
-                            $newkeys[] = $state;
-                            $clone->from = $intotran->from;
-                            $start[] = $intotran->from;
-                            $clone->to = $state;
-                            $resultout->from = $state;
-                            $resultout->to = $outtran->to;
-                            $end[] = $outtran->to;
-                            $clone->redirect_merged_transitions();
-                            if ($changedstateend !== null) {
-                                $automaton->redirect_transitions($changedstateend, $outtran->to);
+                if ($intotran->consumeschars) {
+                    $resultinto = $intotran->intersect($wordbreakinto[$i]);
+                    if ($resultinto !== null) {
+                        foreach ($outtransitions as $outtran) {
+
+                            if ($outtran->consumeschars) {
+                                $clone = clone $resultinto;
+                                if ($changedstate !== null) {
+                                    $automaton->redirect_transitions($changedstate, $intotran->from);
+                                }
+                                $resultout = $wordbreakout[$i]->intersect($outtran);
+                                if ($resultout !== null) {
+                                    $state = $automaton->add_state();
+                                    $newkeys[] = $state;
+                                    $clone->from = $intotran->from;
+                                    $start[] = $intotran->from;
+                                    $clone->to = $state;
+                                    $resultout->from = $state;
+                                    $resultout->to = $outtran->to;
+                                    $end[] = $outtran->to;
+                                    $clone->redirect_merged_transitions();
+                                    if ($changedstateend !== null) {
+                                        $automaton->redirect_transitions($changedstateend, $outtran->to);
+                                    }
+                                    $resultout->redirect_merged_transitions();
+                                    $automaton->add_transition(clone $clone);
+                                    $automaton->add_transition(clone $resultout);
+                                }
+                            } else {
+                                $beforetransitions = $automaton->get_adjacent_transitions($outtran->to, false);
+                                $aftertransitions = $automaton->get_adjacent_transitions($outtran->to, true);
+                                foreach ($beforetransitions as $before) {
+                                    $intoresult = $before->intersect($wordbreakinto[$i]);
+                                    if ($intoresult !== null) {
+                                        foreach ($aftertransitions as $after) {
+                                            $clone = clone $intoresult;
+                                            if ($changedstate !== null) {
+                                                if ($addedinto) {
+                                                    $automaton->redirect_transitions($changedstate, $stack_item['start']);
+                                                } else {
+                                                    $automaton->redirect_transitions($changedstate, $before->from);
+                                                }
+                                            }
+                                            $resultout = $wordbreakout[$i]->intersect($after);
+                                            if ($resultout !== null) {
+                                                $state = $automaton->add_state();
+                                                $newkeys[] = $state;
+                                                $clone->from = $before->from;
+                                                if ($addedinto) {
+                                                    $clone->from = $stack_item['start'];
+                                                    $start[] = $stack_item['start'];
+                                                } else {
+                                                    $clone->from = $before->from;
+                                                    $start[] = $before->from;
+                                                }
+
+                                                $clone->to = $state;
+                                                $resultout->from = $state;
+                                                $resultout->to = $after->to;
+                                                $end[] = $outtran->to;
+                                                $clone->redirect_merged_transitions();
+                                                if ($changedstateend !== null) {
+                                                    $automaton->redirect_transitions($changedstateend, $after->to);
+                                                }
+                                                $resultout->redirect_merged_transitions();
+                                                $clone->consumeschars = false;
+                                                $automaton->add_transition(clone $clone);
+                                                $automaton->add_transition(clone $resultout);
+                                                //$automaton->remove_transition($before);
+                                            }
+                                        }
+                                    }
+                                }
                             }
-                            $resultout->redirect_merged_transitions();
-                            $automaton->add_transition(clone $clone);
-                            $automaton->add_transition(clone $resultout);
+
+                        }
+                    }
+                } else {
+                    $beforetransitions = $automaton->get_adjacent_transitions($intotran->from, false);
+                    $aftertransitions = $automaton->get_adjacent_transitions($intotran->from, true);
+                    foreach ($beforetransitions as $before) {
+                        $intoresult = $before->intersect($wordbreakinto[$i]);
+                        if ($intoresult !== null) {
+                            foreach ($aftertransitions as $outtran) {
+                                $clone = clone $intoresult;
+                                if ($changedstate !== null) {
+                                    $automaton->redirect_transitions($changedstate, $before->from);
+                                }
+                                $resultout = $wordbreakout[$i]->intersect($outtran);
+                                if ($resultout !== null) {
+                                    $state = $automaton->add_state();
+                                    $newkeys[] = $state;
+                                    $clone->from = $before->from;
+                                    $start[] = $before->from;
+                                    $clone->to = $state;
+                                    $resultout->from = $state;
+                                    $resultout->to = $outtran->to;
+                                    $end[] = $outtran->to;
+                                    $clone->redirect_merged_transitions();
+                                    if ($changedstateend !== null) {
+                                        $automaton->redirect_transitions($changedstateend, $outtran->to);
+                                    }
+                                    $resultout->redirect_merged_transitions();
+                                    $automaton->add_transition(clone $clone);
+                                    $automaton->add_transition(clone $resultout);
+                                }
+                            }
                         }
                     }
                 }
@@ -468,6 +552,22 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
                     }
                     if (count($outgoing) === count($uncapturing)) {
                         $automaton->remove_transition($intran);
+                    }
+                } else {
+                    foreach ($uncapturing as $tran) {
+                        $newintrans = $automaton->get_adjacent_transitions($intran->from, false);
+
+                        foreach ($newintrans as $tran) {
+                            foreach ($outgoing as $out) {
+                                $resultout = $tran->intersect($out);
+                                if ($resultout !== null) {
+                                    $resultout->from = $tran->from;
+                                    $resultout->to = $out->to;
+                                    $automaton->add_transition($resultout);
+                                }
+                            }
+                        }
+
                     }
                 }
                 $automaton->change_state_for_intersection($intran->to, $newkeys);
