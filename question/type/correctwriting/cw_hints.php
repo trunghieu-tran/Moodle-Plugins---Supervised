@@ -182,18 +182,23 @@ class qtype_correctwriting_hintwheretxt extends qtype_poasquestion\hint {
     public function render_hint($renderer, question_attempt $qa, question_display_options $options, $response = null) {
         $hinttext = '';
         if ($this->mistake !== null) {
+            $sourcetokenindex = $this->mistake->answermistaken[0];
             $tokenindex = $this->mistake->map_from_current_answer_string_to_correct_string($this->mistake->answermistaken[0]);
             $a = new stdClass;
             $a->token = $this->token;
             if ($tokenindex == 0) {// First token.
-                $a->before = $this->mistake->token_description(1);
+                $indexnext = $this->mistake->map_from_current_answer_string_to_correct_string(1);
+                $a->before = $this->mistake->token_description($indexnext);
                 $hinttext = get_string('wheretxtbefore', 'qtype_correctwriting', $a);
             } else if ($tokenindex == count($this->mistake->stringpair->correctstring()->stream->tokens) - 1) {// Last token.
-                $a->after = $this->mistake->token_description($tokenindex - 1);
+                $indexprev = $this->mistake->map_from_current_answer_string_to_correct_string($sourcetokenindex - 1);
+                $a->after = $this->mistake->token_description($indexprev);
                 $hinttext = get_string('wheretxtafter', 'qtype_correctwriting', $a);
             } else {// Middle token.
-                $a->after = $this->mistake->token_description($tokenindex - 1);
-                $a->before = $this->mistake->token_description($tokenindex + 1);
+                $indexprev = $this->mistake->map_from_current_answer_string_to_correct_string($sourcetokenindex - 1);
+                $indexnext = $this->mistake->map_from_current_answer_string_to_correct_string($sourcetokenindex + 1);
+                $a->after = $this->mistake->token_description($indexprev);
+                $a->before = $this->mistake->token_description($indexnext);
                 $hinttext = get_string('wheretxtbetween', 'qtype_correctwriting', $a);
             }
             // Capitalize first letter.
