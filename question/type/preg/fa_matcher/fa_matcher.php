@@ -1099,7 +1099,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
     public function build_fa($dstnode, $mergeassertions = false) {
         $result = new qtype_preg_fa($this, $this->get_nodes_with_subexpr_refs());
 
-        $mergeassertions = true;
+        //$mergeassertions = true;
 
         $stack = array();
         $dstnode->create_automaton($result, $stack, $mergeassertions);
@@ -1115,9 +1115,11 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         if ($body['breakpos'] !== null || empty($result->adjacencymatrix)) {
             throw new qtype_preg_empty_fa_exception('', $body['breakpos']);
         }
-        $result->merge_end_transitions();
-        global $CFG;
-        $CFG->pathtodot = '/usr/bin/dot';
+        if ($mergeassertions) {
+            $result->merge_end_transitions();
+        }
+        /*global $CFG;
+        $CFG->pathtodot = '/usr/bin/dot';*/
         $intersected = array();
         if ($mergeassertions)
         {
