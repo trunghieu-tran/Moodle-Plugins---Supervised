@@ -1211,6 +1211,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         } catch (qtype_preg_empty_fa_exception $e) {
             $this->errors[] = new qtype_preg_empty_fa_error($regex, $e->a);
             return;
+        } catch (qtype_preg_backref_intersection_exception $e) {
+            $this->errors[] = new qtype_preg_backref_intersection_error($regex, $e->a);
+            return;
         }
 
         $this->check_for_infinite_recursion();

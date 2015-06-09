@@ -218,6 +218,7 @@ $string['fa_simulation_state_limit'] = 'Automata simulation limit: states';
 $string['fa_simulation_state_limit_description'] = 'When matching a string with a regex containing backreferences or recurion, one FA state can be reached using different paths. This means that there are several "simulation states" created for one "structural state". This settings lets you control the overall count of such simulation states.';
 $string['too_large_fa'] = 'Regular expression is too complex to be matched by {$a->engine} due to the time and/or memory limits. Please try another matching engine, ask your administrator to <a href="{$a->link}">increase time and memory limits</a> or simplify you regular expression.';
 $string['empty_fa'] = 'No string can be matched by this regular expression (finite automaton is empty).';
+$string['backref_intersection'] = 'Using backreferences with assertions isn\'t supported yet.';
 $string['mergedassertion_option'] = 'You need to set full assertion support mode for using complex positive assertions.';
 
 /********** Strings for authoring tools form**********************/
