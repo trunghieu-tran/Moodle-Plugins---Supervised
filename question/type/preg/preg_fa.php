@@ -1305,11 +1305,17 @@ class qtype_preg_fa {
             if ($key !== false) {
                 unset($this->fastartstates[$subpatt][$key]);
             }
+            if (empty($this->fastartstates[$subpatt])) {
+                unset($this->fastartstates[$subpatt]);
+            }
         }
         foreach ($this->faendstates as $subpatt => $states) {
             $key = array_search($stateid, $states);
             if ($key !== false) {
                 unset($this->faendstates[$subpatt][$key]);
+            }
+            if (empty($this->faendstates[$subpatt])) {
+                unset($this->faendstates[$subpatt]);
             }
         }
 
