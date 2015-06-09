@@ -497,6 +497,12 @@ class qtype_preg_fa_transition {
         $charset->flags = array(array($flag));
         $charset->userinscription = array(new qtype_preg_userinscription("\n"));
         $righttran = new qtype_preg_fa_transition(0, $charset, 1);
+        if ($this->pregleaf->type === qtype_preg_node::TYPE_LEAF_BACKREF) {
+            throw new qtype_preg_backref_intersection_exception('', $this->pregleaf->position);
+        }
+        if ($other->pregleaf->type === qtype_preg_node::TYPE_LEAF_BACKREF) {
+            throw new qtype_preg_backref_intersection_exception('', $other->pregleaf->position);
+        }
         // Consider that eps and transition which doesn't consume characters always intersect
         if ($this->is_eps() && $other->consumeschars == false) {
             $resulttran = new qtype_preg_fa_transition(0, $other->pregleaf, 1, self::ORIGIN_TRANSITION_INTER, $other->consumeschars);
