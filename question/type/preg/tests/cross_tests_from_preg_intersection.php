@@ -201,16 +201,16 @@ class qtype_preg_cross_tests_from_preg_intersection {
         $test3 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>1),
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>1, 1=>0),
                         'left'=>array(1),
                         'next'=>'b');
 
         $test4 = array( 'str'=>'ad',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>1),
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>1, 1=>0),
                         'left'=>array(1),
                         'next'=>'b');
 
@@ -1404,7 +1404,7 @@ class qtype_preg_cross_tests_from_preg_intersection {
                         'is_match'=>true,
                         'full'=>true,
                         'index_first'=>array(0=>0),
-                        'length'=>array(0=>2));
+                        'length'=>array(0=>0));
 
         return array('regex'=>'^|a(?<=\b)cd',
                      'tests'=>array($test1),
@@ -2053,16 +2053,16 @@ class qtype_preg_cross_tests_from_preg_intersection {
         $test3 = array( 'str'=>'az',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>1),
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>1, 1=>0),
                         'left'=>array(1),
                         'next'=>'b');
 
         $test4 = array( 'str'=>'a',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>1),
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>1, 1=>0),
                         'left'=>array(1),
                         'next'=>'b');
 
