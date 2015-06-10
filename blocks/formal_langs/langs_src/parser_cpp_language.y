@@ -1153,39 +1153,52 @@ expr_prec_10(R) ::= expr_prec_9(A) . {
 
 /* EXPRESSIONS OF NINTH PRECEDENCE */
 
-expr_prec_9(R) ::= expr_prec_9(A) logicaland(B) expr_binary_ops(C) . {
-	$this->currentrule = new block_formal_langs_description_rule("операция \"логического И\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция логического И", "%ur(именительный)"));
-	R = $this->create_node('expr_logical_and', array( A, B, C ));
-}
-
-expr_prec_9(R) ::= expr_prec_9(A) logicalor(B) expr_binary_ops(C) . {
+expr_prec_9(R) ::= expr_prec_9(A) logicalor(B) expr_logical_and(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"логического ИЛИ\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция логического ИЛИ", "%ur(именительный)"));
 	R = $this->create_node('expr_logical_or', array( A, B, C ));
 }
 
-expr_prec_9(R) ::= expr_binary_ops(A) . {
+expr_prec_9(R) ::= expr_logical_and(A) . {
 	R  = A;
 }
 
-expr_binary_ops(R) ::= expr_binary_ops(A) binaryxor(B) expr_or_equal(C) . {
-	$this->currentrule = new block_formal_langs_description_rule("операция \"исключающего ИЛИ\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция исключающего ИЛИ", "%ur(именительный)"));
-	R = $this->create_node('expr_binary_xor', array( A, B, C ));
+expr_logical_and(R) ::= expr_logical_and(A) logicaland(B) expr_binary_ops(C) . {
+	$this->currentrule = new block_formal_langs_description_rule("операция \"логического И\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция логического И", "%ur(именительный)"));
+	R = $this->create_node('expr_logical_and', array( A, B, C ));
 }
 
-expr_binary_ops(R) ::= expr_binary_ops(A) binaryor(B) expr_or_equal(C) . {
+expr_logical_and(R) ::= expr_binary_ops(A) . {
+	R  = A;
+}
+
+expr_binary_ops(R) ::= expr_binary_ops(A) binaryor(B) expr_xor(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"побитового ИЛИ\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция логического ИЛИ", "%ur(именительный)"));
 	R = $this->create_node('expr_binary_or', array( A, B, C ));
 }
 
-expr_binary_ops(R) ::= expr_binary_ops(A) ampersand(B) expr_or_equal(C) . {
+expr_binary_ops(R) ::= expr_xor(A) . {
+	R  = A;
+}
+
+expr_xor(R) ::= expr_xor(A) binaryxor(B) expr_ampersand(C) . {
+	$this->currentrule = new block_formal_langs_description_rule("операция \"исключающего ИЛИ\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция исключающего ИЛИ", "%ur(именительный)"));
+	R = $this->create_node('expr_binary_xor', array( A, B, C ));
+}
+
+expr_xor(R) ::= expr_ampersand(A) . {
+	R  = A;
+}
+
+expr_ampersand(R) ::= expr_ampersand(A) ampersand(B) expr_or_equal(C) . {
 	// Well, that's what you get when you mix binary and and adress taking
 	$this->currentrule = new block_formal_langs_description_rule("операция \"побитового И\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция побитового И", "%ur(именительный)"));
 	R = $this->create_node('expr_binary_and', array( A, B, C ));
 }
 
-expr_binary_ops(R) ::= expr_or_equal(A) . {
-	R  = A;
+expr_ampersand(R) ::= expr_or_equal(A).  {
+	R = A ;
 }
+
 
 expr_or_equal(R) ::= expr_or_equal(A) not_equal(B) expr_prec_8(C) . {
 	$this->currentrule = new block_formal_langs_description_rule("операция \"не равно\"  на выражениях \"%1(именительный)\" и \"%3(именительный)\"", array("%ur(именительный)", "операция не равно", "%ur(именительный)"));
