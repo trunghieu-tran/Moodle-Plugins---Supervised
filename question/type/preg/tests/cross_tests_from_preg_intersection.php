@@ -1126,6 +1126,334 @@ class qtype_preg_cross_tests_from_preg_intersection {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
+    function data_for_test_assertions_lookahead_47() {
+        $test1 = array( 'str'=>'abc',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2));
+
+        $test2 = array( 'str'=>'abcde',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>2),
+                        'length'=>array(0=>5, 1=>3));
+
+        $test3 = array( 'str'=>'abcdecde',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>5),
+                        'length'=>array(0=>8, 1=>3));
+
+        $test4 = array( 'str'=>'ab',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2),
+                        'left'=>array(1),
+                        'next'=>'c');
+
+        return array('regex'=>'a(?=bc)b(cde)*',
+                     'tests'=>array($test1, $test2, $test3, $test4),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
+    function data_for_test_assertions_lookahead_48() {
+        $test1 = array( 'str'=>'abc',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>2, 1=>1));
+
+        $test2 = array( 'str'=>'abcde',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1, 2=>2),
+                        'length'=>array(0=>5, 1=>4, 2=>3));
+
+        $test3 = array( 'str'=>'abcdecde',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1, 2=>5),
+                        'length'=>array(0=>8, 1=>7, 2=>3));
+
+        $test4 = array( 'str'=>'ab',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>2, 1=>1),
+                        'left'=>array(1),
+                        'next'=>'c');
+
+        $test5 = array( 'str'=>'abck',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>4, 1=>3));
+
+        return array('regex'=>'a(?=bc)(b(cde)*|[b-z]{2}k)',
+                     'tests'=>array($test1, $test2, $test3, $test4, $test5),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
+    function data_for_test_assertions_lookahead_49() {
+        $test1 = array( 'str'=>'abc',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>1, 1=>2));
+
+        $test2 = array( 'str'=>'abcde',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1, 2=>1),
+                        'length'=>array(0=>5, 1=>2, 2=>4));
+
+        $test3 = array( 'str'=>'abcdebcde',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1, 2=>5),
+                        'length'=>array(0=>9, 1=>2, 2=>4));
+
+        $test4 = array( 'str'=>'ab',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1),
+                        'left'=>array(1),
+                        'next'=>'c');
+
+        return array('regex'=>'a(?=(bc))(bcde)*',
+                     'tests'=>array($test1, $test2, $test3, $test4),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
+    function data_for_test_assertions_lookahead_50() {
+        $test1 = array( 'str'=>'abc',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1, 2=>1),
+                        'length'=>array(0=>1, 1=>2, 2=>0));
+
+        $test2 = array( 'str'=>'abcde',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1, 2=>1, 3=>1),
+                        'length'=>array(0=>5, 1=>2, 2=>4, 3=>4));
+
+        $test3 = array( 'str'=>'abcdebcde',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1, 2=>1, 3=>5),
+                        'length'=>array(0=>9, 1=>2, 2=>8, 3=>4));
+
+        $test4 = array( 'str'=>'ab',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0, 2=>1),
+                        'length'=>array(0=>1, 2=>0),
+                        'left'=>array(1),
+                        'next'=>'c');
+
+        $test5 = array( 'str'=>'abck',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1, 2=>1),
+                        'length'=>array(0=>4, 1=>2, 2=>3));
+
+        return array('regex'=>'a(?=(bc))((bcde)*|[a-z][a-c]k)',
+                     'tests'=>array($test1, $test2, $test3, $test4, $test5),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
+    function data_for_test_assertions_lookahead_51() {
+        $test1 = array( 'str'=>'a',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1));
+
+        $test2 = array( 'str'=>'abcde',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1, 2=>3),
+                        'length'=>array(0=>5, 1=>4, 2=>2));
+
+        $test3 = array( 'str'=>'abcdebcde',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>5, 2=>7),
+                        'length'=>array(0=>9, 1=>4, 2=>2));
+
+        return array('regex'=>'a(bc(?=(de))de)*',
+                     'tests'=>array($test1, $test2, $test3),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
+    function data_for_test_assertions_lookahead_52() {
+        $test1 = array( 'str'=>'a',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1));
+
+        $test2 = array( 'str'=>'abcde',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1, 2=>3, 3=>3),
+                        'length'=>array(0=>5, 1=>4, 2=>2, 3=>2));
+
+        $test3 = array( 'str'=>'abcdebcde',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>5, 2=>7, 3=>7),
+                        'length'=>array(0=>9, 1=>4, 2=>2, 3=>2));
+
+        $test4 = array( 'str'=>'abc',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1, 2=>3),
+                        'length'=>array(0=>3, 1=>2, 2=>0));
+
+        return array('regex'=>'a(bc((?=(de))de|))*',
+                     'tests'=>array($test1, $test2, $test3, $test4),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
+    function data_for_test_assertions_lookahead_53() {
+        $test1 = array( 'str'=>'abcde',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>5, 1=>4));
+
+        $test2 = array( 'str'=>'abcdebcde',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>5),
+                        'length'=>array(0=>9, 1=>4));
+
+        $test3 = array( 'str'=>'ab',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2),
+                        'left'=>array(3),
+                        'next'=>'c');
+
+        return array('regex'=>'a(b(?=cd)cde)+',
+                     'tests'=>array($test1, $test2, $test3),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
+    function data_for_test_assertions_lookahead_54() {
+        $test1 = array( 'str'=>'abcde',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1, 2=>2),
+                        'length'=>array(0=>5, 1=>4, 2=>2));
+
+        $test2 = array( 'str'=>'abcdebcde',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>5, 2=>6),
+                        'length'=>array(0=>9, 1=>4, 2=>2));
+
+        $test3 = array( 'str'=>'abe',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1, 2=>2),
+                        'length'=>array(0=>3, 1=>2, 2=>0));
+
+        $test4 = array( 'str'=>'abcdebe',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>5, 2=>6),
+                        'length'=>array(0=>7, 1=>2, 2=>0));
+
+        $test5 = array( 'str'=>'ab',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2),
+                        'left'=>array(3),
+                        'next'=>'[ck]');
+
+        return array('regex'=>'a(b((?=cd)cd|)e)+',
+                     'tests'=>array($test1, $test2, $test3, $test4, $test5),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
+    function data_for_test_assertions_lookahead_55() {
+        $test1 = array( 'str'=>'abcdefg',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>7, 1=>4));
+
+        $test2 = array( 'str'=>'abcdebcdefg',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>5, 1=>4),
+                        'left'=>array(2),
+                        'next'=>'f');
+
+        return array('regex'=>'a(bcd(?=efg)e)+fg',
+                     'tests'=>array($test1, $test2),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
+    function data_for_test_assertions_lookahead_56() {
+        $test1 = array( 'str'=>'abcdc',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>3, 1=>2));
+
+        $test2 = array( 'str'=>'abcdcdc',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>3),
+                        'length'=>array(0=>5, 1=>2));
+
+        $test3 = array( 'str'=>'abcde',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>3, 1=>2),
+                        'left'=>array(1),
+                        'next'=>'c');
+
+        return array('regex'=>'a([bd](?=cdc)[ce])+',
+                     'tests'=>array($test1, $test2, $test3),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
+    function data_for_test_assertions_lookahead_57() {
+        $test1 = array( 'str'=>'abcdk',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1, 2=>3),
+                        'length'=>array(0=>4, 1=>3, 2=>2));
+
+        $test2 = array( 'str'=>'abcdbcd',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1, 2=>5),
+                        'length'=>array(0=>4, 1=>3, 5=>2));
+
+        $test3 = array( 'str'=>'abcdbcda',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>4, 2=>6),
+                        'length'=>array(0=>7, 1=>3, 2=>2));
+
+        return array('regex'=>'a(bc(?=([a-z][a-k])+)d)+',
+                     'tests'=>array($test1, $test2, $test3),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
     function data_for_test_assertions_lookbehind_1() {
         $test1 = array( 'str'=>'abef',
                         'is_match'=>true,
