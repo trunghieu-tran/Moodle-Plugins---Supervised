@@ -221,6 +221,7 @@ class  qtype_correctwriting_enum_analyzer extends qtype_correctwriting_abstract_
                 $j++;
             }
         }
+        $elementsincorrectedanswer = array_values($elementsincorrectedanswer);
         // Add to array number of element, which do not contains in corrected student answer.
         for ($i = 0; $i < count($enumdescription[$number]); $i++) {
             // Check that contains current element in order or not.
@@ -235,6 +236,7 @@ class  qtype_correctwriting_enum_analyzer extends qtype_correctwriting_abstract_
                 }
             }
         }
+        $elementsincorrectedanswer = array_values($elementsincorrectedanswer);
         // Create orders array based on array of elements numbers which are ordered like in corrected student answer.
         for($i = 0; $i < count($elementsincorrectedanswer) - 1; $i++) {
             if($elementsincorrectedanswer[$i] === $elementsincorrectedanswer[$i+1]) {
