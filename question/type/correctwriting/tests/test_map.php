@@ -46,7 +46,7 @@ class qtype_correctwriting_test_map extends PHPUnit_Framework_TestCase {
 
         $question = new qtype_correctwriting_question();
         $question->usecase = true;
-        $question->lexicalerrorthreshold = 0.5;
+        $question->lexicalerrorthreshold = 0.7;
         $question->lexicalerrorweight = 0.1;
         $question->usedlanguage = $this->lang;
         $question->movedmistakeweight = 0.1;
@@ -107,7 +107,7 @@ class qtype_correctwriting_test_map extends PHPUnit_Framework_TestCase {
      */
     public function test_corrected_to_compared_bypass() {
         $bestmatchpair = $this->make_pair('abc cde', 'cae abo sizeo');
-        $this->question->lexicalerrorthreshold = 0.01;
+        $this->question->lexicalerrorthreshold = 0.99;
         $this->question->lexicalerrorweight = 0.1;
         $analyzer = new qtype_correctwriting_lexical_analyzer($this->question, $bestmatchpair, $this->lang, true);
         $result = $analyzer->result_pairs();
@@ -133,7 +133,7 @@ class qtype_correctwriting_test_map extends PHPUnit_Framework_TestCase {
      */
     public function test_corrected_to_compared_typo() {
         $bestmatchpair = $this->make_pair('abc cde', 'cae abo sizeo');
-        $this->question->lexicalerrorthreshold = 0.01;
+        $this->question->lexicalerrorthreshold = 0.99;
         $this->question->lexicalerrorweight = 0.1;
         $analyzer = new qtype_correctwriting_lexical_analyzer($this->question, $bestmatchpair, $this->lang, false);
         $result = $analyzer->result_pairs();
@@ -159,7 +159,7 @@ class qtype_correctwriting_test_map extends PHPUnit_Framework_TestCase {
      */
     public function test_corrected_to_compared_odd_separator() {
         $bestmatchpair = $this->make_pair('multicanal', 'is multi canal receiver');
-        $this->question->lexicalerrorthreshold = 0.01;
+        $this->question->lexicalerrorthreshold = 0.99;
         $this->question->lexicalerrorweight = 0.1;
         $analyzer = new qtype_correctwriting_lexical_analyzer($this->question, $bestmatchpair, $this->lang, false);
         $result = $analyzer->result_pairs();
@@ -185,7 +185,7 @@ class qtype_correctwriting_test_map extends PHPUnit_Framework_TestCase {
      */
     public function test_corrected_to_compared_absent_separator() {
         $bestmatchpair = $this->make_pair('hyper bowl is', 'is hyperbowl');
-        $this->question->lexicalerrorthreshold = 0.01;
+        $this->question->lexicalerrorthreshold = 0.99;
         $this->question->lexicalerrorweight = 0.1;
         $analyzer = new qtype_correctwriting_lexical_analyzer($this->question, $bestmatchpair, $this->lang, false);
         $result = $analyzer->result_pairs();
@@ -212,7 +212,7 @@ class qtype_correctwriting_test_map extends PHPUnit_Framework_TestCase {
      */
     public function test_corrected_to_compared_odd_absent_with_typos() {
         $bestmatchpair = $this->make_pair('are there a typos', 'ther mistakes');
-        $this->question->lexicalerrorthreshold = 0.01;
+        $this->question->lexicalerrorthreshold = 0.99;
         $this->question->lexicalerrorweight = 0.1;
         $analyzer = new qtype_correctwriting_lexical_analyzer($this->question, $bestmatchpair, $this->lang, false);
         $result = $analyzer->result_pairs();

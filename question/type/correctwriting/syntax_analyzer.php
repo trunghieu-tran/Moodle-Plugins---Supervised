@@ -290,5 +290,11 @@ class qtype_correctwriting_syntax_analyzer extends qtype_correctwriting_abstract
         return array('qtype_correctwriting_sequence_mistake');
     }
 
+    /**
+     * If this analyzer requires some other ones to work, not bypass - return an array of such analyzers names.
+     */
+    public function require_analyzers() {
+        return array("qtype_correctwriting_sequence_analyzer");
+    }
 }
 ?>
