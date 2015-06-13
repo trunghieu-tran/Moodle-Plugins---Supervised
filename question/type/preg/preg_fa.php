@@ -1367,6 +1367,9 @@ class qtype_preg_fa {
     }
 
     public function add_intersected_transitions($newkey, $transitions) {
+        foreach ($transitions as $intertran) {
+            $intertran->isforintersection = true;
+        }
         if (array_key_exists($newkey, $this->intersectedtransitions)) {
             $this->intersectedtransitions[$newkey] = array_merge($this->intersectedtransitions[$newkey], $transitions);
         } else {
@@ -2034,11 +2037,9 @@ class qtype_preg_fa {
                                 if (array_key_exists($endtran->from, $this->intersectedtransitions)) {
                                     if (in_array($tran, $this->intersectedtransitions[$endtran->from])) {
                                         $intersectedtransitions[] = $clonetran;
-                                        $clonetran->isforintersection = true;
                                     }
                                 } else {
                                     $intersectedtransitions[] = $clonetran;
-                                    $clonetran->isforintersection = true;
                                 }
                                 $this->add_transition($clonetran);
                                 $wasadded = true;
@@ -2046,7 +2047,12 @@ class qtype_preg_fa {
                         }
                         if ($wasadded) {
                             $this->change_state_for_intersection($endtran->from, array($endtran->to));
-                            $this->add_intersected_transitions($endtran->to, $intersectedtransitions);
+                            /*if  (array_key_exists($endtran->from, $this->innerautomata)) {
+                                unset($this->innerautomata[$endtran->from]);
+                            }*/
+                            if  (array_key_exists($endtran->to, $this->innerautomata)) {
+                                $this->add_intersected_transitions($endtran->to, $intersectedtransitions);
+                            }
                             $this->remove_transition($endtran);
                         }
                     }
@@ -2176,6 +2182,9 @@ class qtype_preg_fa {
                 if ($tran->isforintersection) {
                     $result[] = $tran;
                 }
+            }
+            if (empty($result)) {
+                $result = $transitions;
             }
         } else {
             $result = $transitions;
@@ -2551,12 +2560,13 @@ class qtype_preg_fa {
     public function lead_to_one_end() {
         $newleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $i = count($this->get_end_states()) - 1;
+        $endstates = array_values($this->get_end_states());
         if ($i > 0) {
-            $to = $this->faendstates[0][0];
+            $to = $endstates[0];
         }
         // Connect end states with first while automata has only one end state.
         while ($i > 0) {
-            $exendstate = $this->faendstates[0][$i];
+            $exendstate = $endstates[$i];
             $epstran = new qtype_preg_fa_transition ($exendstate, $newleaf, $to);
             $this->add_transition($epstran);
             $i--;
@@ -2600,7 +2610,8 @@ class qtype_preg_fa {
             }
             //$numbers[] = $number;
         }
-        //var_dump($numbers);
+        /*var_dump($numbers);
+        var_dump($this->intersectedtransitions);*/
         $this->to_origin(qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST);
         $anotherfa->to_origin(qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND);
         $result = $this->intersect_fa($anotherfa, $numbers, $isstart);
@@ -2765,11 +2776,9 @@ class qtype_preg_fa {
                     if (array_key_exists($del->to, $this->intersectedtransitions)) {
                         if (in_array($realtransitions[array_search($tran, $clonetransitions)], $this->intersectedtransitions[$del->to])) {
                            $intersectedtransitions[] = $tran;
-                           $tran->isforintersection = true;
                         }
                     } else {
                         $intersectedtransitions[] = $tran;
-                        $tran->isforintersection = true;
                     }
                     $newkeys[] = $tran->to;
                     $transitionadded = true;
@@ -2779,7 +2788,10 @@ class qtype_preg_fa {
             }
             unset($tran);
             $this->change_state_for_intersection($del->to, array($del->from));
-            $this->add_intersected_transitions($del->from, $intersectedtransitions);
+            if  (array_key_exists($del->from, $this->innerautomata)) {
+
+                $this->add_intersected_transitions($del->from, $intersectedtransitions);
+            }
             $this->change_recursive_start_states($del->to, array($del->from));
             $this->change_recursive_end_states($del->to, $newkeys);
         } else {
@@ -2801,11 +2813,9 @@ class qtype_preg_fa {
                     if (array_key_exists($del->from, $this->intersectedtransitions)) {
                         if (in_array($realtransitions[array_search($tran, $clonetransitions)], $this->intersectedtransitions[$del->from])) {
                            $intersectedtransitions[] = $tran;
-                           $tran->isforintersection = true;
                         }
                     } else {
                         $intersectedtransitions[] = $tran;
-                        $tran->isforintersection = true;
                     }
                     $this->add_transition($tran);
                     $transitionadded = true;
@@ -2814,8 +2824,11 @@ class qtype_preg_fa {
                 }
             }
             unset($tran);
+
             $this->change_state_for_intersection($del->from, array($del->to));
-            $this->add_intersected_transitions($del->to, $intersectedtransitions);
+            if  (array_key_exists($del->to, $this->innerautomata)) {
+                $this->add_intersected_transitions($del->to, $intersectedtransitions);
+            }
             $this->change_recursive_end_states($del->from, array($del->to));
             $this->change_recursive_start_states($del->from, $newkeys);
         }
