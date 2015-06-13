@@ -1663,7 +1663,7 @@ class qtype_preg_fa {
             } else {
                 $number = ltrim($state, ',');
             }
-            if (in_array($number, $numbers) && $source->is_copied_state($numbers[array_search($number, $numbers)])) {
+            if (in_array($number, $numbers, true) && $source->is_copied_state($numbers[array_search($number, $numbers)])) {
                 foreach ($transitions as $tran) {
                     if ($direction == 0) {
                         $sourcenum = trim($numbers[$tran->from], '()');
@@ -2037,7 +2037,6 @@ class qtype_preg_fa {
                             $this->change_state_for_intersection($endtran->from, array($endtran->to));
                             $this->add_intersected_transitions($endtran->to, $intersectedtransitions);
                             $this->remove_transition($endtran);
-
                         }
                     }
                 }
@@ -3061,7 +3060,7 @@ class qtype_preg_fa {
                     foreach ($transitions as $transition) {
                         if ($transition->from === $transition->to) {
                             // Get number of copied state.
-                            $number = $firstnumbers[$transition->to];
+                            $number = $secondnumbers[$transition->to];
                             $number = trim($number, '()');
                             $last = substr($number, -1);
                             if ($last != ',') {
@@ -3087,7 +3086,7 @@ class qtype_preg_fa {
                     foreach ($transitions as $transition) {
                         if ($transition->from === $transition->to) {
                             // Get number of copied state.
-                            $number = $secondnumbers[$transition->to];
+                            $number = $firstnumbers[$transition->to];
                             $number = trim($number, '()');
                             $first = substr($number, 1);
                             if ($first != ',') {
@@ -3120,6 +3119,7 @@ class qtype_preg_fa {
                 // Get states from first and second automata.
                 $numbers = explode(',', $this->statenumbers[$state], 2);
                 $workstate1 = $fa->find_state($numbers[0]);
+                $workstate2 = null;
                 if ($numbers[1] != '') {
                     foreach ($secondnumbers as $num) {
                         if (strpos($numbers[1], $num) === 0 || $num == $numbers[1]) {
@@ -3128,7 +3128,7 @@ class qtype_preg_fa {
                     }
                 }
                 $oldfront = array();
-                if (!$fa->has_startstate($workstate1) && $anotherfa->has_startstate($workstate2)) {
+                if (!$fa->has_startstate($workstate1) && $workstate2 !== null && $anotherfa->has_startstate($workstate2)) {
                     $transitions = $fa->get_adjacent_transitions($workstate1, false);
                     foreach ($transitions as $tran) {
                         $oldfront[] = $tran->from;
@@ -3625,6 +3625,7 @@ class qtype_preg_fa {
         }
         // Copy branches.
         $stop = $result->copy_modify_branches($this, $oldfront, $stopcoping, $isstart);
+
         $transitions = array();
         $startstates = $this->get_start_states();
         $endstates = $this->get_end_states();
