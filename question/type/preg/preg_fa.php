@@ -1355,6 +1355,17 @@ class qtype_preg_fa {
         }
     }
 
+
+    public function change_intersected_transitions($oldkey, $newkeys) {
+        if (array_key_exists($oldkey, $this->intersectedtransitions)) {
+            foreach ($newkeys as $newkey) {
+                foreach ($this->intersectedtransitions[$oldkey] as $transitions) {
+                    $this->add_intersected_transitions($newkey, $transitions);
+                }
+            }
+        }
+    }
+
     public function add_intersected_transitions($newkey, $transitions) {
         if (array_key_exists($newkey, $this->intersectedtransitions)) {
             $this->intersectedtransitions[$newkey] = array_merge($this->intersectedtransitions[$newkey], $transitions);

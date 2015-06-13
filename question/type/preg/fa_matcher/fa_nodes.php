@@ -645,6 +645,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
             $before = false;
             $automaton->redirect_transitions($cur['end'], $result['start']);
             $automaton->change_state_for_intersection($cur['end'], array($result['start']));
+            $automaton->change_intersected_transitions($cur['end'], array($result['start']));
             $automaton->change_recursive_start_states($cur['end'], array($result['start']));
             $automaton->change_recursive_end_states($cur['end'], array($result['start']));
             $borderstate = $result['start'];
@@ -704,10 +705,12 @@ class qtype_preg_fa_node_alt extends qtype_preg_fa_operator {
                 // Merge start and end states.
                 $automaton->redirect_transitions($cur['start'], $result['start']);
                 $automaton->change_state_for_intersection($cur['start'], array($result['start']));
+                $automaton->change_intersected_transitions($cur['start'], array($result['start']));
                 $automaton->change_recursive_start_states($cur['start'], array($result['start']));
                 $automaton->change_recursive_end_states($cur['start'], array($result['start']));
                 $automaton->redirect_transitions($cur['end'], $result['end']);
                 $automaton->change_state_for_intersection($cur['end'], array($result['end']));
+                $automaton->change_intersected_transitions($cur['end'], array($result['end']));
                 $automaton->change_recursive_start_states($cur['end'], array($result['end']));
                 $automaton->change_recursive_end_states($cur['end'], array($result['end']));
                 if ($cur['breakpos'] === null) {
@@ -1085,6 +1088,9 @@ class qtype_preg_fa_node_assert extends qtype_preg_fa_operator {
         $innerautomaton = $this->matcher->build_fa($this->operands[0], $transform);
         $body = array_pop($stack);
         $intersectedstate = $body['end'];
+        if ($intersectedstate === null) {
+            $intersectedstate = 0;
+        }
         $stack[] = $body;
         if ($this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_PLA)
         {
@@ -1092,6 +1098,7 @@ class qtype_preg_fa_node_assert extends qtype_preg_fa_operator {
         } else {
             $automaton->append_inner_automaton($intersectedstate, $innerautomaton, 1);
         }
+
         $this->pregnode->operands = array();
         $this->pregnode->operands[] = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
         $concat =  new qtype_preg_fa_node_concat($this->pregnode, $this->matcher);
