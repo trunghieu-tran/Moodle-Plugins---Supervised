@@ -1454,6 +1454,43 @@ class qtype_preg_cross_tests_from_preg_intersection {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
+    function data_for_test_assertions_lookahead_58() {
+        $test1 = array( 'str'=>'ac',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>0),
+                        'length'=>array(0=>2, 1=>1));
+
+        $test2 = array( 'str'=>'bc',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>0),
+                        'length'=>array(0=>2, 1=>1));
+
+        return array('regex'=>'((?=a)|[ab])c',
+                     'tests'=>array($test1, $test2),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
+
+    function data_for_test_assertions_lookahead_59() {
+        $test1 = array( 'str'=>'ab',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1));
+
+        $test2 = array( 'str'=>'c',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1));
+
+        return array('regex'=>'a(?=b)|c',
+                     'tests'=>array($test1, $test2),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
     function data_for_test_assertions_lookbehind_1() {
         $test1 = array( 'str'=>'abef',
                         'is_match'=>true,
@@ -2095,7 +2132,7 @@ class qtype_preg_cross_tests_from_preg_intersection {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
-    /*function data_for_test_assertions_lookbehind_29() {
+    function data_for_test_assertions_lookbehind_29() {
         $test1 = array( 'str'=>'abdc',
                         'is_match'=>true,
                         'full'=>false,
@@ -2121,7 +2158,7 @@ class qtype_preg_cross_tests_from_preg_intersection {
         return array('regex'=>'ab\b(?<=ab)\b( |d)c',
                      'tests'=>array($test1, $test2, $test3),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
-    }*/
+    }
 
     function data_for_test_assertions_lookbehind_30() {
         $test1 = array( 'str'=>'aabdc',
@@ -2664,6 +2701,44 @@ class qtype_preg_cross_tests_from_preg_intersection {
                      'tests'=>array($test1, $test2, $test3),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
+
+    function data_for_test_assertions_lookbehind_49() {
+        $test1 = array( 'str'=>'ca',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>2, 1=>1));
+
+        $test2 = array( 'str'=>'cb',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>1),
+                        'length'=>array(0=>2, 1=>1));
+
+        return array('regex'=>'c((?<=a)|[ab])',
+                     'tests'=>array($test1, $test2),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
+
+    function data_for_test_assertions_lookbehind_50() {
+        $test1 = array( 'str'=>'ba',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>1),
+                        'length'=>array(0=>1));
+
+        $test2 = array( 'str'=>'c',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1));
+
+        return array('regex'=>'(?<=b)a|c',
+                     'tests'=>array($test1, $test2),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
 
     function data_for_test_both_assertions_1() {
         $test1 = array( 'str'=>'ab',
@@ -3563,5 +3638,4 @@ class qtype_preg_cross_tests_from_preg_intersection {
                      'tests'=>array($test1, $test2),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
-
 }
