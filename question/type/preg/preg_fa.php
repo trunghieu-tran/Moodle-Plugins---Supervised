@@ -1819,13 +1819,13 @@ class qtype_preg_fa {
                                             $found = true;
                                         }
                                     }
-                                    /*$outgoing = $source->get_adjacent_transitions($curstate, true);
+                                    $outgoing = $source->get_adjacent_transitions($curstate, true);
                                     $notintersected = array();
                                     foreach ($outgoing as $out) {
                                         if (!$out->isforintersection) {
                                             $notintersected[] = $out->to;
                                         }
-                                    }*/
+                                    }
                                 } else {
                                     $outgoing = $this->get_adjacent_transitions($workstate, true);
                                     $found = false;
@@ -1844,13 +1844,13 @@ class qtype_preg_fa {
                                             $found = true;
                                         }
                                     }
-                                    /*$incoming = $source->get_adjacent_transitions($curstate, false);
+                                    $incoming = $source->get_adjacent_transitions($curstate, false);
                                     $notintersected = array();
                                     foreach ($incoming as $in) {
                                         if (!$in->isforintersection) {
                                             $notintersected[] = $in->from;
                                         }
-                                    }*/
+                                    }
                                 }
                             }
                             // Check end of coping.
@@ -2158,8 +2158,18 @@ class qtype_preg_fa {
      * @return array of transitions for intersection.
      */
     public function get_transitions_for_intersection($workstate, $direction) {
+        $result = array();
         $transitions = $this->get_adjacent_transitions($workstate, !$direction);
-        return $transitions;
+        if (array_key_exists($workstate, $this->intersectedtransitions)) {
+            foreach ($transitions as $tran) {
+                if ($tran->isforintersection) {
+                    $result[] = $tran;
+                }
+            }
+        } else {
+            $result = $transitions;
+        }
+        return $result;
     }
 
 
