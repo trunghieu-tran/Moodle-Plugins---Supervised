@@ -1116,9 +1116,11 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         if ($body['breakpos'] !== null || empty($result->adjacencymatrix)) {
             throw new qtype_preg_empty_fa_exception('', $body['breakpos']);
         }
-        if ($mergeassertions) {
-            $result->merge_end_transitions();
-        }
+        $mergesuccess = true;
+        /*if ($mergeassertions) {
+            while ($mergesuccess)
+            $mergesuccess = $result->merge_end_transitions();
+        }*/
         /*global $CFG;
         $CFG->pathtodot = '/usr/bin/dot';*/
         $intersected = array();
