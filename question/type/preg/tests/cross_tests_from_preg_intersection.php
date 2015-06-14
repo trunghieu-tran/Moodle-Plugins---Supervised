@@ -208,11 +208,9 @@ class qtype_preg_cross_tests_from_preg_intersection {
 
         $test4 = array( 'str'=>'ad',
                         'is_match'=>true,
-                        'full'=>false,
-                        'index_first'=>array(0=>0, 1=>1),
-                        'length'=>array(0=>1, 1=>0),
-                        'left'=>array(1),
-                        'next'=>'b');
+                        'full'=>true,
+                        'index_first'=>array(0=>0, 1=>2),
+                        'length'=>array(0=>2, 1=>0));
 
         return array('regex'=>'a(?=b)(\w?)*',
                      'tests'=>array($test1, $test2, $test3, $test4),
@@ -2138,7 +2136,7 @@ class qtype_preg_cross_tests_from_preg_intersection {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>2),
-                        'left'=>array(3),
+                        'left'=>array(2),
                         'next'=>' ');
 
         $test2 = array( 'str'=>'ab c',
@@ -2151,8 +2149,8 @@ class qtype_preg_cross_tests_from_preg_intersection {
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0, 1=>2),
-                        'length'=>array(0=>2, 1=>1),
-                        'left'=>array(2),
+                        'length'=>array(0=>3, 1=>1),
+                        'left'=>array(1),
                         'next'=>'c');
 
         return array('regex'=>'ab\b(?<=ab)\b( |d)c',
@@ -3158,8 +3156,8 @@ class qtype_preg_cross_tests_from_preg_intersection {
         $test1 = array( 'str'=>'',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>0),
-                        'length'=>array(0=>0, 1=>0));
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>0));
 
         $test2 = array( 'str'=>'abc',
                         'is_match'=>true,
@@ -3583,20 +3581,20 @@ class qtype_preg_cross_tests_from_preg_intersection {
         $test1 = array( 'str'=>'abdcg',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>2, 2=>3, 3=>0, 4=>0, 5=>0, 6=>4),
-                        'length'=>array(0=>5, 1=>1, 2=>0, 3=>5, 4=>4, 5=>3, 6=>1));
+                        'index_first'=>array(0=>0, 1=>3, 2=>4, 3=>0, 4=>0, 5=>4),
+                        'length'=>array(0=>5, 1=>1, 2=>0, 3=>4, 4=>3, 5=>1));
 
         $test2 = array( 'str'=>'abdabdcg',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>5, 2=>5, 3=>3, 4=>3, 5=>3, 6=>7),
-                        'length'=>array(0=>8, 1=>1, 2=>0, 3=>5, 4=>4, 5=>3, 6=>1));
+                        'index_first'=>array(0=>0, 1=>6, 2=>7, 3=>3, 4=>3, 5=>7),
+                        'length'=>array(0=>8, 1=>1, 2=>0, 3=>4, 4=>3, 5=>1));
 
         $test3 = array( 'str'=>'aefkg',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>1, 2=>1, 3=>1, 4=>2, 5=>-1, 6=>4),
-                        'length'=>array(0=>2, 1=>1, 2=>3, 3=>4, 4=>3, 5=>-1, 6=>1));
+                        'index_first'=>array(0=>0, 1=>3, 2=>4, 3=>1, 4=>-1, 5=>4),
+                        'length'=>array(0=>5, 1=>1, 2=>0, 3=>3, 4=>-1, 5=>1));
 
         return array('regex'=>'([a-z])*(?=(|efk)g(?<=((abd)+c|efk)g))(g|[a-f])',
                      'tests'=>array($test1, $test2, $test3),
