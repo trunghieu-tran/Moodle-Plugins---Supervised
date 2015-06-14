@@ -574,6 +574,7 @@ class qtype_preg_fa_transition {
             }
         }
         if ($resulttran !== null ) {
+
             $assert = $this->intersect_asserts($other);
             $resulttran->mergedbefore = $assert->mergedbefore;
             $resulttran->mergedafter = $assert->mergedafter;
@@ -1820,7 +1821,6 @@ class qtype_preg_fa {
                                     $found = false;
                                     foreach ($incoming as $in) {
                                         if ($in->isforintersection) {
-
                                             if (in_array($newstate, $this->statenumbers)) {
                                                 $interworkstate = array_search($newstate, $this->statenumbers);
                                             } else {
@@ -2000,9 +2000,11 @@ class qtype_preg_fa {
     }
 
     public function merge_end_transitions() {
+        $wasadded = false;
         foreach ($this->get_end_states() as $end) {
             $endtransitions = $this->get_adjacent_transitions($end, false);
             foreach ($endtransitions as $endtran) {
+                $isforintersection = false;
                 $beforeeps = true;
                 $intersectedtransitions = array();
                 foreach ($endtran->mergedbefore as $before) {
@@ -2041,17 +2043,23 @@ class qtype_preg_fa {
                                 } else {
                                     $intersectedtransitions[] = $clonetran;
                                 }
+                                if ($clonetran->isforintersection) {
+                                    $isforintersection = true;
+                                }
                                 $this->add_transition($clonetran);
                                 $wasadded = true;
                             }
                         }
                         if ($wasadded) {
-                            $this->change_state_for_intersection($endtran->from, array($endtran->to));
                             /*if  (array_key_exists($endtran->from, $this->innerautomata)) {
                                 unset($this->innerautomata[$endtran->from]);
                             }*/
-                            if  (array_key_exists($endtran->to, $this->innerautomata)) {
-                                $this->add_intersected_transitions($endtran->to, $intersectedtransitions);
+                            if ($endtran->isforintersection || $isforintersection) {
+                                $this->change_state_for_intersection($endtran->from, array($endtran->to));
+                                if  (array_key_exists($endtran->to, $this->innerautomata) ) {
+
+                                    $this->add_intersected_transitions($endtran->to, $intersectedtransitions);
+                                }
                             }
                             $this->remove_transition($endtran);
                         }
@@ -2060,6 +2068,7 @@ class qtype_preg_fa {
 
             }
         }
+        return $wasadded;
     }
 
     /**
@@ -2447,7 +2456,6 @@ class qtype_preg_fa {
                 $secondnumbers = $anotherfa->get_state_numbers();
                 $resnumbers = $result->get_state_numbers();
                 $resultnumber = $resnumbers[$curstate];
-
                 $numbers = explode(',', $resultnumber, 2);
                 $workstate1 = $this->find_state($numbers[0]);
                 foreach ($secondnumbers as $num) {
@@ -2458,6 +2466,7 @@ class qtype_preg_fa {
                 }
                 // Get transitions for intersection.
                 $intertransitions1 = $this->get_transitions_for_intersection($workstate1, $direction);
+
                 foreach ($intertransitions1 as &$tran) {
                     if ($tran->is_eps() && $tran->origin === qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND) {
                         unset($tran);
@@ -2610,6 +2619,18 @@ class qtype_preg_fa {
             }
             //$numbers[] = $number;
         }
+        foreach ($numbers as $number) {
+            if (array_key_exists($number, $this->intersectedtransitions)) {
+                $incoming = $this->get_adjacent_transitions($number, false);
+                $intransitions = $this->get_transitions_for_intersection($number,1);
+                $outgoing = $this->get_adjacent_transitions($number, true);
+                $outtransitions = $this->get_transitions_for_intersection($number,0);
+                if (count($incoming) == count($intransitions) && count($outgoing) == count($outtransitions)) {
+                    unset($this->intersectedtransitions[$number]);
+                }
+            }
+        }
+
         /*var_dump($numbers);
         var_dump($this->intersectedtransitions);*/
         $this->to_origin(qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST);
@@ -2694,7 +2715,7 @@ class qtype_preg_fa {
         }
 
         // Cycled last states.
-        if ((in_array($del->to, $endstates) && $del->is_eps()) || !$del->consumeschars) {
+        if (!$del->consumeschars) {
             return false;
         }
 
@@ -2756,6 +2777,7 @@ class qtype_preg_fa {
 
         $breakpos = null;
         $newkeys = array();
+        $isforintersection = false;
         if (!$back) {
             foreach ($clonetransitions as &$tran) {
                 $tostates[] = $tran->to;
@@ -2780,17 +2802,22 @@ class qtype_preg_fa {
                     } else {
                         $intersectedtransitions[] = $tran;
                     }
+                    if ($tran->isforintersection) {
+                        $isforintersection = true;
+                    }
                     $newkeys[] = $tran->to;
                     $transitionadded = true;
                 } else if ($breakpos === null) {
                     $breakpos = $del->pregleaf->position->compose($tran->pregleaf->position);
                 }
             }
-            unset($tran);
-            $this->change_state_for_intersection($del->to, array($del->from));
-            if  (array_key_exists($del->from, $this->innerautomata)) {
+            if ($del->isforintersection || $isforintersection) {
+                $this->change_state_for_intersection($del->to, array($del->from));
 
-                $this->add_intersected_transitions($del->from, $intersectedtransitions);
+                if  (array_key_exists($del->from, $this->innerautomata)) {
+
+                    $this->add_intersected_transitions($del->from, $intersectedtransitions);
+                }
             }
             $this->change_recursive_start_states($del->to, array($del->from));
             $this->change_recursive_end_states($del->to, $newkeys);
@@ -2817,6 +2844,9 @@ class qtype_preg_fa {
                     } else {
                         $intersectedtransitions[] = $tran;
                     }
+                    if ($tran->isforintersection) {
+                        $isforintersection = true;
+                    }
                     $this->add_transition($tran);
                     $transitionadded = true;
                 } else if ($breakpos === null) {
@@ -2824,10 +2854,11 @@ class qtype_preg_fa {
                 }
             }
             unset($tran);
-
-            $this->change_state_for_intersection($del->from, array($del->to));
-            if  (array_key_exists($del->to, $this->innerautomata)) {
-                $this->add_intersected_transitions($del->to, $intersectedtransitions);
+            if ($del->isforintersection || $isforintersection) {
+                $this->change_state_for_intersection($del->from, array($del->to));
+                if  (array_key_exists($del->to, $this->innerautomata)) {
+                    $this->add_intersected_transitions($del->to, $intersectedtransitions);
+                }
             }
             $this->change_recursive_end_states($del->from, array($del->to));
             $this->change_recursive_start_states($del->from, $newkeys);
@@ -3006,6 +3037,7 @@ class qtype_preg_fa {
                                 $clonetran = clone $transition;
                                 $clonetran->from = $state;
                                 $clonetran->to = $copiedstate;
+                                $clonetran->redirect_merged_transitions();
                                 $clonetran->consumeschars = false;
                                 $this->add_transition($clonetran);
                             }
@@ -3013,6 +3045,7 @@ class qtype_preg_fa {
                             $trancycle->consumeschars = false;
                             $trancycle->from = $copiedstate;
                             $trancycle->to = $copiedstate;
+                            $trancycle->redirect_merged_transitions();
                             $this->add_transition($trancycle);
                         }
                     }
@@ -3032,11 +3065,13 @@ class qtype_preg_fa {
                                 $clonetran = clone $transition;
                                 $clonetran->from = $state;
                                 $clonetran->to = $copiedstate;
+                                $clonetran->redirect_merged_transitions();
                                 $this->add_transition($clonetran);
                             }
                             $trancycle = clone $transition;
                             $trancycle->from = $copiedstate;
                             $trancycle->to = $copiedstate;
+                            $trancycle->redirect_merged_transitions();
                             $this->add_transition($trancycle);
                         }
                     }
@@ -3136,12 +3171,14 @@ class qtype_preg_fa {
                                 $clonetran->to = $state;
                                 $clonetran->from = $copiedstate;
                                 $clonetran->consumeschars = false;
+                                $clonetran->redirect_merged_transitions();
                                 $this->add_transition($clonetran);
                             }
                             $trancycle = clone $transition;
                             $trancycle->consumeschars = false;
                             $trancycle->from = $copiedstate;
                             $trancycle->to = $copiedstate;
+                            $trancycle->redirect_merged_transitions();
                             $this->add_transition($trancycle);
                         }
                     }
@@ -3161,11 +3198,13 @@ class qtype_preg_fa {
                                 $clonetran = clone $transition;
                                 $clonetran->to = $state;
                                 $clonetran->from = $copiedstate;
+                                $clonetran->redirect_merged_transitions();
                                 $this->add_transition($clonetran);
                             }
                             $trancycle = clone $transition;
                             $trancycle->from = $copiedstate;
                             $trancycle->to = $copiedstate;
+                            $trancycle->redirect_merged_transitions();
                             $this->add_transition($trancycle);
                         }
                     }
@@ -3458,6 +3497,7 @@ class qtype_preg_fa {
                             $addednumber = trim($addednumber, ",");
                             $addedstate = $result->add_state($addednumber);
                             $tran->to = $addedstate;
+                            $tran->redirect_merged_transitions();
                             $result->add_transition($tran);
                             $newstop[] = $addedstate;
                         }
@@ -3474,6 +3514,7 @@ class qtype_preg_fa {
                             $addednumber = trim($addednumber, ",");
                             $addedstate = $result->add_state($addednumber);
                             $tran->from = $addedstate;
+                            $tran->redirect_merged_transitions();
                             $result->add_transition($tran);
                             $newstop[] = $addedstate;
                         }
@@ -3502,6 +3543,7 @@ class qtype_preg_fa {
                             $addednumber = $result->get_inter_state($rightstopnumber, $secondnumbers[$transition->to]);
                             $addedstate = $result->add_state($addednumber);
                             $tran->to = $addedstate;
+                            $tran->redirect_merged_transitions();
                             $result->add_transition($tran);
                             $tran->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
                             $newstop[] = $addedstate;
@@ -3528,6 +3570,7 @@ class qtype_preg_fa {
                             $addednumber = $result->get_inter_state($rightstopnumber, $secondnumbers[$transition->from]);
                             $addedstate = $result->add_state($addednumber);
                             $tran->from = $addedstate;
+                            $tran->redirect_merged_transitions();
                             $tran->origin = qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND;
                             $result->add_transition($tran);
                             $newstop[] = $addedstate;
@@ -3611,7 +3654,6 @@ class qtype_preg_fa {
         $stop = array_merge($stop, $addedstop, $newstop);
         // Find intersection part.
         $this->get_intersection_part($anotherfa, $result, $stop, $isstart);
-
         // Set right start and end states for completing branches.
         $result->set_start_end_states_before_coping($this, $anotherfa);
 

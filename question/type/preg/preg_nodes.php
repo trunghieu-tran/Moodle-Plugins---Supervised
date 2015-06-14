@@ -563,6 +563,8 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
                 $result = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             } else if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET && $thishastags) {
                 $result = $other;
+            } else if ($other->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
+                $result = $this;
             }
         } else if ($this->type == qtype_preg_node::TYPE_LEAF_ASSERT && ($other->type ==qtype_preg_node::TYPE_LEAF_ASSERT ||
                     $other->type == qtype_preg_node::TYPE_LEAF_META && $other->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY)) {
