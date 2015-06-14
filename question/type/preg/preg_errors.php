@@ -32,6 +32,12 @@ class qtype_preg_error {
     /** An instance of qtype_preg_position. */
     public $position;
 
+    protected function sanitize_position($regex, &$position) {
+        if ($position === null) {
+            $position = new qtype_preg_position(0, core_text::strlen($regex) - 1, -1, -1, -1, -1);
+        }
+    }
+
     /**
      * Returns a string with first character in upper case and the rest of the string in lower case.
      */
@@ -60,9 +66,7 @@ class qtype_preg_error {
      */
     public function __construct($errormsg, $regex, $position, $preservemsg = false) {
 
-        if ($position === null) {
-            $position = new qtype_preg_position(0, core_text::strlen($regex) - 1, -1, -1, -1, -1);  // TODO
-        }
+        $this->sanitize_position($regex, $position);
 
         $errormsg = $this->uppercase_first_letter($errormsg);
         if (!$preservemsg) {
@@ -122,6 +126,8 @@ class qtype_preg_too_complex_error extends qtype_preg_error {
 
     public function __construct($regex, $matcher, $position = null) {
         global $CFG;
+
+        $this->sanitize_position($regex, $position);
 
         $a = new stdClass;
         $a->linefirst = $position->linefirst;
