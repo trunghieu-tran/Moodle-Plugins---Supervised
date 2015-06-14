@@ -414,7 +414,7 @@ class qtype_preg_cross_tests_from_preg_intersection1 {
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(2),
+                        'left'=>array(3),
                         'next'=>'b',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 
@@ -423,7 +423,7 @@ class qtype_preg_cross_tests_from_preg_intersection1 {
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(2),
+                        'left'=>array(3),
                         'next'=>'b',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 
@@ -1265,8 +1265,8 @@ class qtype_preg_cross_tests_from_preg_intersection1 {
         $test1 = array('str'=>"ab",
                        'is_match'=>true,
                        'full'=>true,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>1));
+                       'index_first'=>array(0=>0, 1=>0),
+                       'length'=>array(0=>1, 1=>1));
 
         $test2 = array('str'=>"bc",
                        'is_match'=>true,
@@ -2311,7 +2311,7 @@ class qtype_preg_cross_tests_from_preg_intersection1 {
         $test2 = array('str'=>"É–XYZ",
                        'is_match'=>true,
                        'full'=>true,
-                       'index_first'=>array(0=>1,1=>0),
+                       'index_first'=>array(0=>1,1=>1),
                        'length'=>array(0=>1,1=>1));
 
         $test3 = array('str'=>"*** Failers",
