@@ -158,11 +158,6 @@ abstract class qtype_preg_fa_node {
         $stack[] = $body;
     }
 
-
-
-
-
-
     public static function get_wordbreaks_transitions($pregleaf, $isinto) {
         $result = array();
         // Create transitions which can replace \b and \B.
@@ -405,9 +400,21 @@ class qtype_preg_fa_leaf extends qtype_preg_fa_node {
         // Create start and end states of the resulting automaton.
         $start = $automaton->add_state();
         $end = $automaton->add_state();
-
+        $transition = new qtype_preg_fa_transition($start, $this->pregnode, $end);
         // Add a corresponding transition between them.
-        $automaton->add_transition(new qtype_preg_fa_transition($start, $this->pregnode, $end));
+        if ($this->pregnode->type === qtype_preg_node::TYPE_LEAF_COMPLEX_ASSERT) {
+            if ($this->pregnode->subtype === qtype_preg_leaf_complex_assert::SUBTYPE_LOOKAHEAD) {
+                $automaton->append_inner_automaton($start, $this->pregnode->innerautomaton, 0);
+                $state =  $start;
+            } else {
+                $automaton->append_inner_automaton($end, $this->pregnode->innerautomaton, 1);
+                $state = $end;
+            }
+            $this->pregnode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+            $transition = new qtype_preg_fa_transition($start, $this->pregnode, $end);
+            $automaton->add_intersected_transitions($state, array($transition));
+        }
+        $automaton->add_transition($transition);
         $stack[] = array('start' => $start, 'end' => $end, 'breakpos' => null);
     }
 }
@@ -645,7 +652,7 @@ abstract class qtype_preg_fa_operator extends qtype_preg_fa_node {
             $before = false;
             $automaton->redirect_transitions($cur['end'], $result['start']);
             $automaton->change_state_for_intersection($cur['end'], array($result['start']));
-            $automaton->change_intersected_transitions($cur['end'], array($result['start']));
+            //$automaton->change_intersected_transitions($cur['end'], array($result['start']));
             $automaton->change_recursive_start_states($cur['end'], array($result['start']));
             $automaton->change_recursive_end_states($cur['end'], array($result['start']));
             $borderstate = $result['start'];
@@ -705,12 +712,12 @@ class qtype_preg_fa_node_alt extends qtype_preg_fa_operator {
                 // Merge start and end states.
                 $automaton->redirect_transitions($cur['start'], $result['start']);
                 $automaton->change_state_for_intersection($cur['start'], array($result['start']));
-                $automaton->change_intersected_transitions($cur['start'], array($result['start']));
+                //$automaton->change_intersected_transitions($cur['start'], array($result['start']));
                 $automaton->change_recursive_start_states($cur['start'], array($result['start']));
                 $automaton->change_recursive_end_states($cur['start'], array($result['start']));
                 $automaton->redirect_transitions($cur['end'], $result['end']);
                 $automaton->change_state_for_intersection($cur['end'], array($result['end']));
-                $automaton->change_intersected_transitions($cur['end'], array($result['end']));
+                //$automaton->change_intersected_transitions($cur['end'], array($result['end']));
                 $automaton->change_recursive_start_states($cur['end'], array($result['end']));
                 $automaton->change_recursive_end_states($cur['end'], array($result['end']));
                 if ($cur['breakpos'] === null) {
@@ -1086,21 +1093,15 @@ class qtype_preg_fa_node_assert extends qtype_preg_fa_operator {
 
     protected function create_automaton_inner(&$automaton, &$stack, $transform) {
         $innerautomaton = $this->matcher->build_fa($this->operands[0], $transform);
-        $body = array_pop($stack);
-        $intersectedstate = $body['end'];
-        if ($intersectedstate === null) {
-            $intersectedstate = 0;
-        }
-        $stack[] = $body;
         if ($this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_PLA)
         {
-            $automaton->append_inner_automaton($intersectedstate, $innerautomaton, 0);
+            $node = new qtype_preg_leaf_complex_assert(qtype_preg_leaf_complex_assert::SUBTYPE_LOOKAHEAD, $innerautomaton);
         } else {
-            $automaton->append_inner_automaton($intersectedstate, $innerautomaton, 1);
+            $node = new qtype_preg_leaf_complex_assert(qtype_preg_leaf_complex_assert::SUBTYPE_LOOKBEHIND, $innerautomaton);
         }
 
         $this->pregnode->operands = array();
-        $this->pregnode->operands[] = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+        $this->pregnode->operands[] = $node;//
         $concat =  new qtype_preg_fa_node_concat($this->pregnode, $this->matcher);
         $concat->create_automaton_inner($automaton, $stack, $transform);
     }

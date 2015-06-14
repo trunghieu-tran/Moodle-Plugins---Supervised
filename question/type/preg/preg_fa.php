@@ -1357,11 +1357,11 @@ class qtype_preg_fa {
 
 
     public function change_intersected_transitions($oldkey, $newkeys) {
+
         if (array_key_exists($oldkey, $this->intersectedtransitions)) {
             foreach ($newkeys as $newkey) {
-                foreach ($this->intersectedtransitions[$oldkey] as $transitions) {
-                    $this->add_intersected_transitions($newkey, $transitions);
-                }
+                $this->add_intersected_transitions($newkey, $this->intersectedtransitions[$oldkey]);
+
             }
         }
     }
@@ -2035,7 +2035,7 @@ class qtype_preg_fa {
                                 $clonetran->redirect_merged_transitions();
                                 // If exists than remember only marked as intersected.
                                 if (array_key_exists($endtran->from, $this->intersectedtransitions)) {
-                                    if (in_array($tran, $this->intersectedtransitions[$endtran->from])) {
+                                    if (in_array($endtran, $this->intersectedtransitions[$endtran->from])) {
                                         $intersectedtransitions[] = $clonetran;
                                     }
                                 } else {
@@ -2774,7 +2774,7 @@ class qtype_preg_fa {
                     $this->add_transition($tran);
                     // If exists than remember only marked as intersected.
                     if (array_key_exists($del->to, $this->intersectedtransitions)) {
-                        if (in_array($realtransitions[array_search($tran, $clonetransitions)], $this->intersectedtransitions[$del->to])) {
+                        if (in_array($del, $this->intersectedtransitions[$del->to])) {
                            $intersectedtransitions[] = $tran;
                         }
                     } else {
@@ -2811,7 +2811,7 @@ class qtype_preg_fa {
                     $newkeys[] = $tran->from;
                     // If exists than remember only marked as intersected.
                     if (array_key_exists($del->from, $this->intersectedtransitions)) {
-                        if (in_array($realtransitions[array_search($tran, $clonetransitions)], $this->intersectedtransitions[$del->from])) {
+                        if (in_array($del, $this->intersectedtransitions[$del->from])) {
                            $intersectedtransitions[] = $tran;
                         }
                     } else {
@@ -3570,12 +3570,11 @@ class qtype_preg_fa {
         $newstop = array();
         // Skip uncapturing transitions.
         if ($isstart == 0) {
-            $states = $anotherfa->get_start_states();
+            $states = array_values($anotherfa->get_start_states());
         } else {
-            $states = $anotherfa->get_end_states();
+            $states = array_values($anotherfa->get_end_states());
         }
         $newstop = $this->skip_uncapturing_transitions($anotherfa, $stateindex, $isstart, $result, $stop);
-
         $secforinter = $secondnumbers[$states[0]];
         $addedstop = array();
         foreach ($stop as $stopnumber) {
@@ -3612,6 +3611,7 @@ class qtype_preg_fa {
         $stop = array_merge($stop, $addedstop, $newstop);
         // Find intersection part.
         $this->get_intersection_part($anotherfa, $result, $stop, $isstart);
+
         // Set right start and end states for completing branches.
         $result->set_start_end_states_before_coping($this, $anotherfa);
 

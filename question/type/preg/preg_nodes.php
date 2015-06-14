@@ -313,6 +313,7 @@ abstract class qtype_preg_node {
     const TYPE_NODE_TEMPLATE = 'node_template';
     /** Error node. */
     const TYPE_NODE_ERROR = 'node_error';
+    const TYPE_LEAF_COMPLEX_ASSERT = 'leaf_complex_assert';
 
     /** Type one the node - should be equal to a constant defined in this class. */
     public $type;
@@ -1298,6 +1299,20 @@ class qtype_preg_leaf_meta extends qtype_preg_leaf {
         return 'ε';
     }
 
+}
+
+class qtype_preg_leaf_complex_assert extends qtype_preg_leaf_meta {
+
+    const SUBTYPE_LOOKAHEAD = 'lookahead_leaf_complex_assert';
+    const SUBTYPE_LOOKBEHIND = 'lookbehind_leaf_complex_assert';
+
+    public $innerautomaton;
+
+    public function __construct($subtype, $innerautomaton) {
+        $this->type = qtype_preg_node::TYPE_LEAF_COMPLEX_ASSERT;
+        $this->subtype = $subtype;
+        $this->innerautomaton = $innerautomaton;
+    }
 }
 
 /**
