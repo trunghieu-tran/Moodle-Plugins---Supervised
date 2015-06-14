@@ -3020,7 +3020,7 @@ class qtype_preg_fa {
                     }
                 }
                 // Copy cycled transitions.
-                if ($anotherfa->has_endstate($workstate2) && $fa->has_endstate($workstate1)) {
+                if ($anotherfa->has_endstate($workstate2) && $workstate1 !== false && $fa->has_endstate($workstate1)) {
                     $transitions = $anotherfa->get_adjacent_transitions($workstate2, true);
                     foreach ($transitions as $transition) {
                         if ($transition->from === $transition->to) {
@@ -3503,7 +3503,7 @@ class qtype_preg_fa {
                         }
                     }
                 }
-            } else if ($isstart == 1 && in_array($number, $startstates)) {
+            } else if ($isstart == 1 && in_array($number, $endstates)) {
                 $transitions = $this->get_adjacent_transitions($number, false);
                 foreach ($transitions as $transition) {
                     if ($transition->is_end_anchor() || $transition->is_eps()) {
