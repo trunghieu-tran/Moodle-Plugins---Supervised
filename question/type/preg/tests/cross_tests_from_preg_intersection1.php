@@ -284,19 +284,19 @@ class qtype_preg_cross_tests_from_preg_intersection1 {
 
     function data_for_test_630() {
         $test2 = array( 'str'=>'** Failers',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>1),
-                        'length'=>array(0=>0),
+                        'index_first'=>array(),
+                        'length'=>array(),
                         'left'=>array(1),
                         'next'=>'X',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 
         $test3 = array( 'str'=>'offX',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>1),
-                        'length'=>array(0=>0),
+                        'index_first'=>array(),
+                        'length'=>array(),
                         'left'=>array(1),
                         'next'=>'X',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
@@ -331,19 +331,19 @@ class qtype_preg_cross_tests_from_preg_intersection1 {
 
     function data_for_test_723() {
         $test3 = array( 'str'=>'** Failers',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>2),
-                        'length'=>array(0=>0),
+                        'index_first'=>array(),
+                        'length'=>array(),
                         'left'=>array(1),
                         'next'=>'b',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 
         $test4 = array( 'str'=>'xaabc',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>5),
-                        'length'=>array(0=>0),
+                        'index_first'=>array(),
+                        'length'=>array(),
                         'left'=>array(1),
                         'next'=>'b',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
@@ -354,30 +354,30 @@ class qtype_preg_cross_tests_from_preg_intersection1 {
 
     function data_for_test_724() {
         $test2 = array( 'str'=>'** Failers',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>2),
-                        'length'=>array(0=>1),
+                        'index_first'=>array(),
+                        'length'=>array(),
                         'left'=>array(1),
-                        'next'=>'b',
+                        'next'=>'[bB]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 
         $test3 = array( 'str'=>'aAAbc',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>5),
-                        'length'=>array(0=>0),
+                        'index_first'=>array(),
+                        'length'=>array(),
                         'left'=>array(1),
-                        'next'=>'b',
+                        'next'=>'[bB]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 
         $test4 = array( 'str'=>'xaabc',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>5),
-                        'length'=>array(0=>0),
+                        'index_first'=>array(),
+                        'length'=>array(),
                         'left'=>array(1),
-                        'next'=>'b',
+                        'next'=>'[bB]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 
         return array('regex'=>'(?<=[^a]{2})b',
@@ -451,10 +451,10 @@ class qtype_preg_cross_tests_from_preg_intersection1 {
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 
         $test4 = array( 'str'=>'foobbar',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>0,1=>3),
+                        'index_first'=>array(),
+                        'length'=>array(),
                         'left'=>array(4),
                         'next'=>'a',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
@@ -594,10 +594,10 @@ class qtype_preg_cross_tests_from_preg_intersection1 {
 
     function data_for_test_507() {
         $test2 = array( 'str'=>'*** Failers',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>6),
-                        'length'=>array(0=>0),
+                        'index_first'=>array(),
+                        'length'=>array(),
                         'left'=>array(1),
                         'next'=>'b',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
