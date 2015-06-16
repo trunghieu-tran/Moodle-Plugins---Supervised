@@ -3180,7 +3180,7 @@ class qtype_preg_fa {
                     }
                 }
                 // Copy cycled transitions.
-                if ($anotherfa->has_endstate($workstate2) && $workstate1 !== false && $fa->has_endstate($workstate1)) {
+                if ($hasendstate && !$noendstate && $workstate1 !== false && $fa->has_endstate($workstate1)) {
                     $transitions = $anotherfa->get_adjacent_transitions($workstate2, true);
                     foreach ($transitions as $transition) {
                         if ($transition->from === $transition->to) {
@@ -3331,7 +3331,7 @@ class qtype_preg_fa {
                     }
                 }
                 // Copy cycled transitions.
-                if ($hasstartstate && $fa->has_startstate($workstate1)) {
+                if ($hasstartstate && !$nostartstate && $fa->has_startstate($workstate1)) {
                     $transitions = $anotherfa->get_adjacent_transitions($workstate2, false);
                     foreach ($transitions as $transition) {
                         if ($transition->from === $transition->to) {
