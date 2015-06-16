@@ -2329,30 +2329,48 @@ class qtype_preg_fa {
         $fastates = $fa->get_state_numbers();
         $anotherfastates = $anotherfa->get_state_numbers();
         $states = $this->get_state_numbers();
+        $workstatessecond = array();
         // Set right start and end states.
         foreach ($states as $statenum) {
+            $workstatessecond = array();
             // Get states from first and second automata.
-            $numbers = explode(',', $statenum, 2);
+            $resnum = preg_replace('/,{2,}/', ',', $statenum);
+            $statecount = substr_count($resnum, ',');
+            $numbers = explode(',', $resnum, $statecount+1);
+            $workstate1 = null;
             if ($numbers[0] !== '') {
                 $workstate1 = array_search($numbers[0], $fastates);
             }
-            if ($numbers[1] != '') {
-                foreach ($anotherfastates as $num) {
-                    if (strpos($numbers[1], $num) === 0 || $numbers[1] == $num) {
-                        $workstate2 = array_search($num, $anotherfastates);
+            unset($numbers[0]);
+            foreach ($numbers as $secnum) {
+                if ($secnum != '') {
+                    foreach ($anotherfastates as $num) {
+                        if (strpos($secnum, $num) === 0 || $secnum == $num) {
+                            $workstatessecond[] = array_search($num, $anotherfastates);
+                        }
                     }
                 }
             }
             $state = array_search($statenum, $this->statenumbers);
+            $hasstartstate = false;
+            $hasendstate = false;
+            foreach ($workstatessecond as $number) {
+                if (in_array($number, $anotherfastarts)) {
+                    $hasstartstate = true;
+                }
+                if (in_array($number, $anotherfaends)) {
+                    $hasendstate = true;
+                }
+            }
             // Set start states.
-            $isfirststart = $numbers[0] !== '' && in_array($workstate1, $fastarts);
-            $issecstart = $numbers[1] !== '' && in_array($workstate2, $anotherfastarts);
+            $isfirststart = $workstate1 !== null && in_array($workstate1, $fastarts);
+            $issecstart = $hasstartstate;
             if (($isfirststart || $issecstart) && count($this->get_adjacent_transitions($state, false)) == 0) {
                 $this->add_start_state(array_search($statenum, $this->statenumbers));
             }
             // Set end states.
-            $isfirstend = $numbers[0] !== '' && in_array($workstate1, $faends);
-            $issecend = $numbers[1] !== '' && in_array($workstate2, $anotherfaends);
+            $isfirstend = $workstate1 !== null && in_array($workstate1, $faends);
+            $issecend = $hasendstate;
             if (($isfirstend || $issecend) /*&& count($this->get_adjacent_transitions($state, true)) == 0*/) {
                 $this->add_end_state(array_search($statenum, $this->statenumbers));
             }
@@ -2376,28 +2394,44 @@ class qtype_preg_fa {
         $states = $this->get_state_numbers();
         // Set right start and end states.
         foreach ($states as $statenum) {
+            $workstatessecond = array();
             // Get states from first and second automata.
-            $numbers = explode(',', $statenum, 2);
-            if ($numbers[0] != '') {
+            $resnum = preg_replace('/,{2,}/', ',', $statenum);
+            $statecount = substr_count($resnum, ',');
+            $numbers = explode(',', $resnum, $statecount+1);
+            $workstate1 = null;
+            if ($numbers[0] !== '') {
                 $workstate1 = array_search($numbers[0], $fastates);
             }
-
-            if ($numbers[1] != '') {
-                foreach ($anotherfastates as $num) {
-                    if (strpos($numbers[1], $num) === 0 || $numbers[1] == $num) {
-                        $workstate2 = array_search($num, $anotherfastates);
+            unset($numbers[0]);
+            foreach ($numbers as $secnum) {
+                if ($secnum != '') {
+                    foreach ($anotherfastates as $num) {
+                        if (strpos($secnum, $num) === 0 || $secnum == $num) {
+                            $workstatessecond[] = array_search($num, $anotherfastates);
+                        }
                     }
                 }
             }
+            $hasstartstate = false;
+            $hasendstate = false;
+            foreach ($workstatessecond as $number) {
+                if (in_array($number, $anotherfastarts)) {
+                    $hasstartstate = true;
+                }
+                if (in_array($number, $anotherfaends)) {
+                    $hasendstate = true;
+                }
+            }
             // Set start states.
-            $isfirststart = ($numbers[0] !== '' && in_array($workstate1, $fastarts)) || $numbers[0] == '';
-            $issecstart = ($numbers[1] !== '' && in_array($workstate2, $anotherfastarts)) || $numbers[1] == '';
+            $isfirststart = ($workstate1 !== null && in_array($workstate1, $fastarts)) || $workstate1 === null;
+            $issecstart = $hasstartstate || count($workstatessecond) == 0;
             if ($isfirststart && $issecstart) {
                 $this->add_start_state(array_search($statenum, $this->statenumbers));
             }
             // Set end states.
-            $isfirstend = ($numbers[0] !== '' && in_array($workstate1, $faends)) || $numbers[0] == '';
-            $issecend = ($numbers[1] !== '' && in_array($workstate2, $anotherfaends)) || $numbers[1] == '';
+            $isfirstend = ($workstate1 !== null && in_array($workstate1, $faends)) || $workstate1 === null;
+            $issecend = $hasendstate || count($workstatessecond) == 0;
             if ($isfirstend && $issecend) {
                 $this->add_end_state(array_search($statenum, $this->statenumbers));
             }
@@ -2445,26 +2479,34 @@ class qtype_preg_fa {
      * @param direction boolean intersect by superpose start or end state of anotherfa with stateindex state.
      * @return result automata.
      */
-    public function get_intersection_part($anotherfa, &$result, $start, $direction) {
+    public function get_intersection_part($anotherfa, &$result, $start, $direction, $interstates) {
         $oldfront = array();
         $newfront = array();
         $clones = array();
         $possibleend = array();
-
+        $workstatessecond = array();
         $oldfront = $start;
+        $wavenumber = 0;
+        $anotherfaendstates = $anotherfa->get_end_states();
+        $anotherfastartstates = $anotherfa->get_start_states();
         // Work with each state.
         while (!empty($oldfront)) {
             foreach ($oldfront as $curstate) {
+                $workstatessecond = array();
                 // Get states from first and second automata.
                 $secondnumbers = $anotherfa->get_state_numbers();
                 $resnumbers = $result->get_state_numbers();
                 $resultnumber = $resnumbers[$curstate];
-                $numbers = explode(',', $resultnumber, 2);
+                $resultnumber = preg_replace('/,{2,}/', ',', $resultnumber);
+                $statecount = substr_count($resultnumber, ',');
+                $numbers = explode(',', $resultnumber, $statecount+1);
                 $workstate1 = $this->find_state($numbers[0]);
-                foreach ($secondnumbers as $num) {
-                    if (strpos($numbers[1], $num) === 0 || $numbers[1] == $num) {
-                        $workstate2 = array_search($num, $secondnumbers);
-
+                unset($numbers[0]);
+                foreach ($numbers as $secnum) {
+                    foreach ($secondnumbers as $num) {
+                        if (strpos($secnum, $num) === 0 || $secnum == $num) {
+                            $workstatessecond[] = array_search($num, $secondnumbers);
+                        }
                     }
                 }
                 // Get transitions for intersection.
@@ -2475,7 +2517,41 @@ class qtype_preg_fa {
                         unset($tran);
                     }
                 }
-                $intertransitions2 = $anotherfa->get_transitions_for_intersection($workstate2, $direction);
+                $to = null;
+                $from = null;
+                // Get transitions for intersection from each second automaton.
+                if (count($workstatessecond) > 1) {
+                    $firstforinter = $anotherfa->get_transitions_for_intersection($workstatessecond[0], $direction);
+                    $i = 1;
+                    while ($i < count($workstatessecond)) {
+                        $resforinter = array();
+                        $secondforinter = $anotherfa->get_transitions_for_intersection($workstatessecond[$i], $direction);
+                        foreach ($firstforinter as $first) {
+                            foreach ($secondforinter as $second) {
+                                $intersection = $first->intersect($second);
+                                if ($intersection !== null) {
+                                    if ($from === null) {
+                                        $from = $result->get_inter_state($anotherfa->statenumbers[$first->from], $anotherfa->statenumbers[$second->from]);
+                                    } else {
+                                        $from = $result->get_inter_state($from, $anotherfa->statenumbers[$second->from]);
+                                    }
+                                    if ($to === null) {
+                                        $to = $result->get_inter_state($anotherfa->statenumbers[$first->to], $anotherfa->statenumbers[$second->to]);
+                                    } else {
+                                        $to = $result->get_inter_state($to, $anotherfa->statenumbers[$second->to]);
+                                    }
+                                    $resforinter[] = $intersection;
+                                }
+                            }
+                        }
+                        $firstforinter = $resforinter;
+                        $i++;
+                    }
+                    $intertransitions2 = $resforinter;
+                } else {
+                    $workstate2 = $workstatessecond[0];
+                    $intertransitions2 = $anotherfa->get_transitions_for_intersection($workstate2, $direction);
+                }
                 // Intersect all possible transitions.
                 $resulttransitions = array();
                 $resultnumbers = array();
@@ -2483,11 +2559,40 @@ class qtype_preg_fa {
                     foreach ($intertransitions2 as $intertran2) {
                         $resulttran = $intertran1->intersect($intertran2);
                         if ($resulttran !== null) {
-                            $resulttransitions[] = $resulttran;
                             if ($direction == 0) {
-                                $resultnumbers[] = $result->get_inter_state($this->statenumbers[$intertran1->to], $secondnumbers[$intertran2->to]);
+                                if ($to === null) {
+                                    $resnumber = $result->get_inter_state($this->statenumbers[$intertran1->to], $anotherfa->statenumbers[$intertran2->to]);
+                                } else {
+                                    $resnumber = $result->get_inter_state($this->statenumbers[$intertran1->to], $to);
+                                }
+
+                                if (in_array($intertran1->to, $interstates) && !$wavenumber) {
+                                    foreach ($anotherfastartstates as $start) {
+                                        $resnumber = $result->get_inter_state($resnumber, $start);
+                                        $resultnumbers[] = $resnumber;
+                                        $resulttransitions[] = $resulttran;
+                                    }
+                                } else {
+                                    $resultnumbers[] = $resnumber;
+                                    $resulttransitions[] = $resulttran;
+                                }
+
                             } else {
-                                $resultnumbers[] = $result->get_inter_state($this->statenumbers[$intertran1->from], $secondnumbers[$intertran2->from]);
+                                if ($from === null) {
+                                    $resnumber = $result->get_inter_state($this->statenumbers[$intertran1->from], $anotherfa->statenumbers[$intertran2->from]);
+                                } else {
+                                    $resnumber = $result->get_inter_state($this->statenumbers[$intertran1->from], $from);
+                                }
+                                if (in_array($intertran1->from, $interstates) && !$wavenumber) {
+                                    foreach ($anotherfaendstates as $end) {
+                                        $resnumber = $result->get_inter_state($resnumber, $end);
+                                        $resultnumbers[] = $resnumber;
+                                        $resulttransitions[] = $resulttran;
+                                    }
+                                } else {
+                                    $resultnumbers[] = $resnumber;
+                                    $resulttransitions[] = $resulttran;
+                                }
                             }
                         } else {
                             $result->breakpos = $intertran2->pregleaf->position;
@@ -2496,6 +2601,31 @@ class qtype_preg_fa {
                 }
                 // Analysis result transitions.
                 for ($i = 0; $i < count($resulttransitions); $i++) {
+                    // Change state if there are many inner states.
+                    // Get start/end states.
+                    $statecount = substr_count($resultnumbers[$i], ',');
+                    $numbers = explode(',', $resultnumbers[$i], $statecount+1);
+                    $newnumber = array();
+                    $newnumber[] = $numbers[0];
+                    unset($numbers[0]);
+
+                    foreach ($numbers as $num) {
+                        if ($direction == 0) {
+                            if (!in_array($num, $anotherfaendstates)) {
+                                $newnumber[] = $num;
+                            }
+                        } else {
+                            if (!in_array($num, $anotherfastartstates)) {
+                                $newnumber[] = $num;
+                            }
+                        }
+                    }
+
+                    // Get new number.
+                    $newnumberstr = implode(",", $newnumber);
+                    if (array_search($newnumber, $resnumbers) !== false) {
+                        $result->change_real_number(array_search($newnumber, $resnumbers), $resultnumbers[$i]);
+                    }
                     // Search state with the same number in result automata.
                     $searchstate = array_search($resultnumbers[$i], $resnumbers);
 
@@ -2532,6 +2662,7 @@ class qtype_preg_fa {
             $possibleend = $oldfront;
             $oldfront = $newfront;
             $newfront = array();
+            $wavenumber++;
         }
 
         // Set right start and end states.
@@ -2638,6 +2769,7 @@ class qtype_preg_fa {
 
         /*var_dump($numbers);
         var_dump($this->intersectedtransitions);*/
+
         $this->to_origin(qtype_preg_fa_transition::ORIGIN_TRANSITION_FIRST);
         $anotherfa->to_origin(qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND);
         $result = $this->intersect_fa($anotherfa, $numbers, $isstart);
@@ -2949,6 +3081,7 @@ class qtype_preg_fa {
         $front = array();
         $secondnumbers = $anotherfa->get_state_numbers();
         $firstnumbers = $fa->get_state_numbers();
+        $numbersfromsecond = array();
         // Find uncompleted branches.
         if ($direction == 0) {
             $states = $this->get_end_states();
@@ -2958,18 +3091,37 @@ class qtype_preg_fa {
                 }
             }
             foreach ($front as $state) {
+                $numbersfromsecond = array();
                 // Get states from first and second automata.
-                $numbers = explode(',', $this->statenumbers[$state], 2);
+                $resultnumber = preg_replace('/,{2,}/', ',', $this->statenumbers[$state]);
+                $statecount = substr_count($resultnumber, ',');
+                $numbers = explode(',', $resultnumber, $statecount+1);
                 $workstate1 = $fa->find_state($numbers[0]);
-                if ($numbers[1] != '') {
-                    foreach ($secondnumbers as $num) {
-                        if (strpos($numbers[1], $num) === 0 || $numbers[1] == $num) {
-                            $workstate2 = $anotherfa->find_state($num);
+                $workstate2 = null;
+                $work2 = null;
+                unset($numbers[0]);
+                foreach ($numbers as $secnum) {
+                    if ($secnum !== '') {
+                        foreach ($secondnumbers as $num) {
+                            if (strpos($secnum, $num) === 0 || $secnum == $num) {
+                                $numbersfromsecond[] = $anotherfa->find_state($num);
+                            }
                         }
                     }
                 }
+                $hasendstate = false;
+                $noendstate = false;
+                foreach ($numbersfromsecond as $number) {
+                    if ($anotherfa->has_endstate($number)) {
+                        $workstate2 = $number;
+                        $hasendstate = true;
+                    } else {
+                        $noendstate = true;
+                        $work2 = $number;
+                    }
+                }
                 $oldfront = array();
-                if (!$fa->has_endstate($workstate1) && $anotherfa->has_endstate($workstate2)) {
+                if (!$fa->has_endstate($workstate1) && $hasendstate) {
                     $transitions = $fa->get_adjacent_transitions($workstate1, true);
                     foreach ($transitions as $tran) {
                         $oldfront[] = $tran->to;
@@ -2997,8 +3149,8 @@ class qtype_preg_fa {
                     }
                 }
                 $oldfront = array();
-                if (!$anotherfa->has_endstate($workstate2) && $fa->has_endstate($workstate1)) {
-                    $transitions = $anotherfa->get_adjacent_transitions($workstate2, true);
+                if ($noendstate && $fa->has_endstate($workstate1)) {
+                    $transitions = $anotherfa->get_adjacent_transitions($work2, true);
                     foreach ($transitions as $tran) {
                         $oldfront[] = $tran->to;
                     }
@@ -3093,19 +3245,37 @@ class qtype_preg_fa {
                 }
             }
             foreach ($front as $state) {
-                // Get states from first and second automata.
-                $numbers = explode(',', $this->statenumbers[$state], 2);
+                $numbersfromsecond = array();
+                $resultnumber = preg_replace('/,{2,}/', ',', $this->statenumbers[$state]);
+                $statecount = substr_count($resultnumber, ',');
+                $numbers = explode(',', $resultnumber, $statecount+1);
                 $workstate1 = $fa->find_state($numbers[0]);
                 $workstate2 = null;
-                if ($numbers[1] != '') {
-                    foreach ($secondnumbers as $num) {
-                        if (strpos($numbers[1], $num) === 0 || $num == $numbers[1]) {
-                            $workstate2 = $anotherfa->find_state($num);
+                $work2 = null;
+                unset($numbers[0]);
+                foreach ($numbers as $secnum) {
+                    if ($secnum !== '') {
+                        foreach ($secondnumbers as $num) {
+                            if (strpos($secnum, $num) === 0 || $secnum == $num) {
+                                $numbersfromsecond[] = $anotherfa->find_state($num);
+                            }
                         }
                     }
                 }
+                $hasstartstate = false;
+                $nostartstate = false;
+                foreach ($numbersfromsecond as $number) {
+                    if ($anotherfa->has_startstate($number)) {
+                        $workstate2 = $number;
+                        $hasstartstate = true;
+                    } else {
+                        $nostartstate = true;
+                        $work2 = $number;
+                    }
+                }
+
                 $oldfront = array();
-                if (!$fa->has_startstate($workstate1) && $workstate2 !== null && $anotherfa->has_startstate($workstate2)) {
+                if (!$fa->has_startstate($workstate1) && $workstate2 !== null && $hasstartstate) {
                     $transitions = $fa->get_adjacent_transitions($workstate1, false);
                     foreach ($transitions as $tran) {
                         $oldfront[] = $tran->from;
@@ -3131,8 +3301,8 @@ class qtype_preg_fa {
                     }
                 }
                 $oldfront = array();
-                if (!$anotherfa->has_startstate($workstate2) && $fa->has_startstate($workstate1)) {
-                    $transitions = $anotherfa->get_adjacent_transitions($workstate2, false);
+                if ($nostartstate && $fa->has_startstate($workstate1)) {
+                    $transitions = $anotherfa->get_adjacent_transitions($work2, false);
                     $oldfront = array();
                     foreach ($transitions as $tran) {
                         $oldfront[] = $tran->from;
@@ -3161,7 +3331,7 @@ class qtype_preg_fa {
                     }
                 }
                 // Copy cycled transitions.
-                if ($anotherfa->has_startstate($workstate2) && $fa->has_startstate($workstate1)) {
+                if ($hasstartstate && $fa->has_startstate($workstate1)) {
                     $transitions = $anotherfa->get_adjacent_transitions($workstate2, false);
                     foreach ($transitions as $transition) {
                         if ($transition->from === $transition->to) {
@@ -3610,7 +3780,6 @@ class qtype_preg_fa {
         }
         // Copy branches.
         $stop = $result->copy_modify_branches($this, $oldfront, $stopcoping, $isstart);
-
         $transitions = array();
         $startstates = $this->get_start_states();
         $endstates = $this->get_end_states();
@@ -3661,7 +3830,7 @@ class qtype_preg_fa {
         }
         $stop = array_merge($stop, $addedstop, $newstop);
         // Find intersection part.
-        $this->get_intersection_part($anotherfa, $result, $stop, $isstart);
+        $this->get_intersection_part($anotherfa, $result, $stop, $isstart, $stateindex);
         // Set right start and end states for completing branches.
         $result->set_start_end_states_before_coping($this, $anotherfa);
 
