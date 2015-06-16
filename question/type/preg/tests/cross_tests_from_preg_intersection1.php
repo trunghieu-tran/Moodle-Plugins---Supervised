@@ -547,10 +547,10 @@ class qtype_preg_cross_tests_from_preg_intersection1 {
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 
         $test5 = array( 'str'=>'barfoo',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>6,1=>3),
-                        'length'=>array(0=>0,1=>3),
+                        'index_first'=>array(),
+                        'length'=>array(),
                         'left'=>array(6),
                         'next'=>'b',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
@@ -2333,10 +2333,10 @@ class qtype_preg_cross_tests_from_preg_intersection1 {
 
     function data_for_test_43() {
         $test1 = array('str'=>"XyyyaÄ€Ä€bXzzz",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>8),
-                       'length'=>array(0=>1));
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array());
 
         return array('regex'=>"(?<=a\\x{100}{2}b)X",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -2345,16 +2345,16 @@ class qtype_preg_cross_tests_from_preg_intersection1 {
 
     function data_for_test_80() {
         $test1 = array('str'=>"abcÈ€X",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>4),
-                       'length'=>array(0=>1));
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array());
 
         $test2 = array('str'=>"abcÄ€X",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>4),
-                       'length'=>array(0=>1));
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array());
 
         $test3 = array('str'=>"*** Failers",
                        'is_match'=>false,
@@ -2375,16 +2375,16 @@ class qtype_preg_cross_tests_from_preg_intersection1 {
 
     function data_for_test_81() {
         $test1 = array('str'=>"abcÈ€X",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>4),
-                       'length'=>array(0=>1));
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array());
 
         $test2 = array('str'=>"abcÄ€X",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>4),
-                       'length'=>array(0=>1));
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array());
 
         $test3 = array('str'=>"abQX",
                        'is_match'=>true,
@@ -2411,10 +2411,10 @@ class qtype_preg_cross_tests_from_preg_intersection1 {
 
     function data_for_test_82() {
         $test1 = array('str'=>"abcÄ€È€Ä€X",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>6),
-                       'length'=>array(0=>1));
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array());
 
         $test2 = array('str'=>"*** Failers",
                        'is_match'=>false,
@@ -2453,10 +2453,10 @@ class qtype_preg_cross_tests_from_preg_intersection1 {
 
     function data_for_test_20() {
         $test1 = array('str'=>"aÄ€bcd",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>2));
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array());
 
         return array('regex'=>"(?<=a\\x{100}b)cd",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
@@ -2465,10 +2465,10 @@ class qtype_preg_cross_tests_from_preg_intersection1 {
 
     function data_for_test_21() {
         $test1 = array('str'=>"aô€€€bcd",
-                       'is_match'=>true,
-                       'full'=>true,
-                       'index_first'=>array(0=>3),
-                       'length'=>array(0=>2));
+                       'is_match'=>false,
+                       'full'=>false,
+                       'index_first'=>array(),
+                       'length'=>array());
 
         return array('regex'=>"(?<=a\\x{100000}b)cd",
                      'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL),
