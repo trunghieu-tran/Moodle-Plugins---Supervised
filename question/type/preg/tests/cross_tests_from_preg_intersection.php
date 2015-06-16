@@ -3186,8 +3186,8 @@ class qtype_preg_cross_tests_from_preg_intersection {
         $test6 = array( 'str'=>'abcc',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>0, 2=>1, 3=>0),
-                        'length'=>array(0=>4, 1=>1, 2=>3, 3=>3));
+                        'index_first'=>array(0=>3, 1=>-1, 2=>-1, 3=>0),
+                        'length'=>array(0=>0, 1=>-1, 2=>-1, 3=>3));
 
         $test7 = array( 'str'=>'aaaabcc',
                         'is_match'=>true,
