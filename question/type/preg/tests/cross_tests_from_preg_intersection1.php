@@ -8,7 +8,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 
 class qtype_preg_cross_tests_from_preg_intersection1 {
 
-  function data_for_test_66() {
+    function data_for_test_66() {
         $test2 = array( 'str'=>'*** Failers',
                         'is_match'=>false,
                         'full'=>false,
@@ -311,7 +311,7 @@ class qtype_preg_cross_tests_from_preg_intersection1 {
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(3),
+                        'left'=>array(2),
                         'next'=>'[aA]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 
@@ -320,7 +320,7 @@ class qtype_preg_cross_tests_from_preg_intersection1 {
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(3),
+                        'left'=>array(2),
                         'next'=>'[aA]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 
@@ -469,8 +469,8 @@ class qtype_preg_cross_tests_from_preg_intersection1 {
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(5),
-                        'next'=>'a',
+                        'left'=>array(4),
+                        'next'=>'[bB]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 
         $test4 = array( 'str'=>'Abxxc',
@@ -689,7 +689,7 @@ class qtype_preg_cross_tests_from_preg_intersection1 {
                        'is_match'=>true,
                        'full'=>true,
                        'index_first'=>array(0=>1,1=>1,2=>4),
-                       'length'=>array(0=>3,1=>3,2=>0));
+                       'length'=>array(0=>4, 1=>4, 2=>1));
 
         $test2 = array('str'=>"1.875000282",
                        'is_match'=>true,
@@ -2311,7 +2311,7 @@ class qtype_preg_cross_tests_from_preg_intersection1 {
         $test2 = array('str'=>"É–XYZ",
                        'is_match'=>true,
                        'full'=>true,
-                       'index_first'=>array(0=>1,1=>1),
+                       'index_first'=>array(0=>2,1=>1),
                        'length'=>array(0=>1,1=>1));
 
         $test3 = array('str'=>"*** Failers",
