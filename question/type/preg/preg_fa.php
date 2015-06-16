@@ -735,6 +735,8 @@ class qtype_preg_fa {
 
     public $intersectedtransitions;
 
+    private $breakpos;
+
     public function __construct($handler = null, $subexprrefs = array()) {
         $this->handler = $handler;
         $this->subexpr_ref_numbers = array();
@@ -747,6 +749,7 @@ class qtype_preg_fa {
         $this->set_limits();
         $this->innerautomata = array();
         $this->intersectedtransitions = array();
+        $this->breakpos = null;
     }
 
     public function handler() {
@@ -2486,6 +2489,8 @@ class qtype_preg_fa {
                             } else {
                                 $resultnumbers[] = $result->get_inter_state($this->statenumbers[$intertran1->from], $secondnumbers[$intertran2->from]);
                             }
+                        } else {
+                            $result->breakpos = $intertran2->pregleaf->position;
                         }
                     }
                 }
@@ -2637,6 +2642,9 @@ class qtype_preg_fa {
         $anotherfa->to_origin(qtype_preg_fa_transition::ORIGIN_TRANSITION_SECOND);
         $result = $this->intersect_fa($anotherfa, $numbers, $isstart);
         $result->remove_unreachable_states();
+        if (empty($result->adjacencymatrix)) {
+            throw new qtype_preg_empty_fa_exception('', $result->breakpos);
+        }
         $result->remove_wrong_end_states();
         $result->lead_to_one_end();
         $result->merge_after_intersection();
