@@ -2958,8 +2958,8 @@ class qtype_preg_cross_tests_from_preg_intersection {
         $test1 = array( 'str'=>'abc',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>3, 1=>3, 2=>0),
-                        'length'=>array(0=>0, 1=>0, 2=>3));
+                        'index_first'=>array(0=>3, 1=>3, 2=>-1, 3=>0),
+                        'length'=>array(0=>0, 1=>0, 2=>-1, 3=>3));
 
         $test2 = array( 'str'=>'a',
                         'is_match'=>true,
@@ -3162,26 +3162,26 @@ class qtype_preg_cross_tests_from_preg_intersection {
         $test2 = array( 'str'=>'abc',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>0, 2=>1, 3=>0),
-                        'length'=>array(0=>3, 1=>1, 2=>2, 3=>3));
+                        'index_first'=>array(0=>3, 1=>-1, 2=>-1, 3=>0),
+                        'length'=>array(0=>0, 1=>-1, 2=>-1, 3=>3));
 
         $test3 = array( 'str'=>'aabc',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>0, 2=>2, 3=>0),
-                        'length'=>array(0=>4, 1=>2, 2=>2, 3=>4));
+                        'index_first'=>array(0=>4, 1=>-1, 2=>-1, 3=>0),
+                        'length'=>array(0=>0, 1=>-1, 2=>-1, 3=>4));
 
         $test4 = array( 'str'=>'bc',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>0, 2=>0, 3=>0),
-                        'length'=>array(0=>2, 1=>0, 2=>2, 3=>2));
+                        'index_first'=>array(0=>2, 1=>-1, 2=>-1, 3=>0),
+                        'length'=>array(0=>0, 1=>-1, 2=>-1, 3=>2));
 
         $test5 = array( 'str'=>'bcc',
                         'is_match'=>true,
                         'full'=>true,
-                        'index_first'=>array(0=>0, 1=>0, 2=>0, 3=>0),
-                        'length'=>array(0=>3, 1=>0, 2=>3, 3=>2));
+                        'index_first'=>array(0=>2, 1=>-1, 2=>-1, 3=>0),
+                        'length'=>array(0=>0, 1=>-1, 2=>-1, 3=>2));
 
         $test6 = array( 'str'=>'abcc',
                         'is_match'=>true,
