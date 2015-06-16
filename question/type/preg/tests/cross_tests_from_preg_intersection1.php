@@ -494,8 +494,8 @@ class qtype_preg_cross_tests_from_preg_intersection1 {
         $test6 = array( 'str'=>'abxxC',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>4),
+                        'index_first'=>array(0=>2, 1=>2),
+                        'length'=>array(0=>2, 1=>2),
                         'left'=>array(1),
                         'next'=>'c',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
