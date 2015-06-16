@@ -570,6 +570,9 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
                     $other->type == qtype_preg_node::TYPE_LEAF_META && $other->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY)) {
             $result = $this;
         }
+        if ($result !== null) {
+            $result->caseless = $this->caseless || $other->caseless;
+        }
         return $result;
     }
 
