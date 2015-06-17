@@ -1100,8 +1100,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
     public function build_fa($dstnode, $mergeassertions = false) {
         $result = new qtype_preg_fa($this, $this->get_nodes_with_subexpr_refs());
 
-        //$mergeassertions = true;
-
         $stack = array();
         $dstnode->create_automaton($result, $stack, $mergeassertions);
         $body = array_pop($stack);
@@ -1117,12 +1115,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             throw new qtype_preg_empty_fa_exception('', $body['breakpos']);
         }
         $mergesuccess = true;
-        /*if ($mergeassertions) {
-            while ($mergesuccess)
-            $mergesuccess = $result->merge_end_transitions();
-        }*/
-        /*global $CFG;
-        $CFG->pathtodot = '/usr/bin/dot';*/
         $intersected = array();
         if ($mergeassertions)
         {
@@ -1142,19 +1134,11 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                                 }
                             }
                         }
-                        /*$result->fa_to_dot('svg', "/home/elena/fa_2.svg");
-                        $automaton[0]->fa_to_dot('svg', "/home/elena/fa_3.svg");*/
                         $result = $result->intersect($automaton[0], $states, $automaton[1]);
-                        // $result->fa_to_dot('svg', "/home/elena/fa_1.svg", true);
                     }
                 }
             }
-            //$result->calculate_subexpr_start_and_end_states();
         }
-
-       /* global $CFG;
-        $CFG->pathtodot = '/usr/bin/dot';
-        $result->fa_to_dot('svg', "/home/elena/fa_1.svg");*/
 
         return $result;
     }
