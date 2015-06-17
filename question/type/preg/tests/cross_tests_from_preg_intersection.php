@@ -1372,10 +1372,10 @@ class qtype_preg_cross_tests_from_preg_intersection {
         $test5 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>2),
-                        'left'=>array(3),
-                        'next'=>'[ck]');
+                        'index_first'=>array(0=>0, 1=>-1, 2=>2),
+                        'length'=>array(0=>2, 1=>-1, 2=>0),
+                        'left'=>array(1),
+                        'next'=>'e');
 
         return array('regex'=>'a(b((?=cd)cd|)e)+',
                      'tests'=>array($test1, $test2, $test3, $test4, $test5),

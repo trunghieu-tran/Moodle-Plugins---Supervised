@@ -3194,10 +3194,10 @@ class qtype_preg_cross_tests_from_pcre {
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 
         $test4 = array( 'str'=>'foobbar',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>0,1=>0),
-                        'length'=>array(0=>0,1=>3),
+                        'index_first'=>array(),
+                        'length'=>array(),
                         'left'=>array(4),
                         'next'=>'a',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
@@ -3791,8 +3791,8 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(5),
-                        'next'=>'a',
+                        'left'=>array(4),
+                        'next'=>'[bB]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 
         $test4 = array( 'str'=>'Abxxc',
@@ -3816,8 +3816,8 @@ class qtype_preg_cross_tests_from_pcre {
         $test6 = array( 'str'=>'abxxC',
                         'is_match'=>true,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>4),
+                        'index_first'=>array(0=>2, 1=>2),
+                        'length'=>array(0=>2, 1=>2),
                         'left'=>array(1),
                         'next'=>'c',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
@@ -4101,10 +4101,10 @@ class qtype_preg_cross_tests_from_pcre {
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 
         $test5 = array( 'str'=>'barfoo',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>6,1=>3),
-                        'length'=>array(0=>0,1=>3),
+                        'index_first'=>array(),
+                        'length'=>array(),
                         'left'=>array(6),
                         'next'=>'b',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
@@ -5575,10 +5575,10 @@ class qtype_preg_cross_tests_from_pcre {
 
     function data_for_test_507() {
         $test2 = array( 'str'=>'*** Failers',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>6),
-                        'length'=>array(0=>0),
+                        'index_first'=>array(),
+                        'length'=>array(),
                         'left'=>array(1),
                         'next'=>'b',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
@@ -6744,19 +6744,19 @@ class qtype_preg_cross_tests_from_pcre {
 
     function data_for_test_630() {
         $test2 = array( 'str'=>'** Failers',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>1),
-                        'length'=>array(0=>0),
+                        'index_first'=>array(),
+                        'length'=>array(),
                         'left'=>array(1),
                         'next'=>'X',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 
         $test3 = array( 'str'=>'offX',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>1),
-                        'length'=>array(0=>0),
+                        'index_first'=>array(),
+                        'length'=>array(),
                         'left'=>array(1),
                         'next'=>'X',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
@@ -7254,7 +7254,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(3),
+                        'left'=>array(2),
                         'next'=>'[aA]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 
@@ -7263,7 +7263,7 @@ class qtype_preg_cross_tests_from_pcre {
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
-                        'left'=>array(3),
+                        'left'=>array(2),
                         'next'=>'[aA]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 
@@ -7298,19 +7298,19 @@ class qtype_preg_cross_tests_from_pcre {
 
     function data_for_test_723() {
         $test3 = array( 'str'=>'** Failers',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>2),
-                        'length'=>array(0=>0),
+                        'index_first'=>array(),
+                        'length'=>array(),
                         'left'=>array(1),
                         'next'=>'b',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 
         $test4 = array( 'str'=>'xaabc',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>5),
-                        'length'=>array(0=>0),
+                        'index_first'=>array(),
+                        'length'=>array(),
                         'left'=>array(1),
                         'next'=>'b',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
@@ -7321,30 +7321,30 @@ class qtype_preg_cross_tests_from_pcre {
 
     function data_for_test_724() {
         $test2 = array( 'str'=>'** Failers',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>2),
-                        'length'=>array(0=>1),
+                        'index_first'=>array(),
+                        'length'=>array(),
                         'left'=>array(1),
-                        'next'=>'b',
+                        'next'=>'[bB]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 
         $test3 = array( 'str'=>'aAAbc',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>5),
-                        'length'=>array(0=>0),
+                        'index_first'=>array(),
+                        'length'=>array(),
                         'left'=>array(1),
-                        'next'=>'b',
+                        'next'=>'[bB]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 
         $test4 = array( 'str'=>'xaabc',
-                        'is_match'=>true,
+                        'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>5),
-                        'length'=>array(0=>0),
+                        'index_first'=>array(),
+                        'length'=>array(),
                         'left'=>array(1),
-                        'next'=>'b',
+                        'next'=>'[bB]',
                         'tags'=>array(qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
 
         return array('regex'=>'(?<=[^a]{2})b',
