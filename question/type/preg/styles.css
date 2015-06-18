@@ -1,0 +1,74 @@
+/*.que.shortanswer .answer {
+    padding: 0.3em;
+    width: auto;
+    display: inline;
+}
+.que.shortanswer .answer input {
+    width: 80%;
+}*/
+
+/* Editing form. */
+body#page-question-type-preg div[id^=fitem_id_][id*=answer_] .fitemtitle label{
+    font-weight: bold;
+}
+
+body#page-question-type-preg div[id^=fitem_id_][id*=answer_] {
+    background: #EEE;
+    margin-bottom: 0;
+    margin-top: 0;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    border: 1px solid #BBB;
+    border-bottom: 0;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+body#page-question-type-preg div[id^=fitem_id_][id*=fraction_] {
+    background: #EEE;
+    margin-bottom: 0;
+    margin-top: 0;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    border: 1px solid #BBB;
+    border-top: 0;
+    border-bottom: 0;
+}
+
+body#page-question-type-preg div[id^=fitem_id_][id*=feedback_] {
+    background: #EEE;
+    margin-bottom: 2em;
+    margin-top: 0;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    border: 1px solid #BBB;
+    border-top: 0;
+}
+
+/* Feedback colors.*/
+#qtype-preg-colored-string .correct {
+    background-color: #beffa5;
+}
+
+#qtype-preg-colored-string .incorrect {
+    background-color: #fca19e;
+}
+
+#qtype-preg-colored-string .partiallycorrect {
+    background-color: #ffffa5;
+}
+
+.qtype-preg-yellow {
+    background-color: yellow;
+}
+
+.qtype-preg-orange {
+    background-color: orange;
+}
+
+.qtype-preg-highlighted-regex-text {
+    overflow: hidden;
+    white-space: pre-wrap;
+    word-break: break-all;
+    word-wrap: break-word;
+}
