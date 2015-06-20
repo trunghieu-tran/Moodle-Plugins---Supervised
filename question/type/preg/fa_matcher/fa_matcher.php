@@ -122,6 +122,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $stackitem->subexpr_to_subpatt = array(0 => $this->astroot);   // Remember this explicitly
         $stackitem->last_transition = null;
         $stackitem->last_match_len = 0;
+        $stackitem->last_match_is_partial = false;
         return $stackitem;
     }
 
@@ -144,9 +145,10 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         return $result;
     }
 
-    protected function set_last_transition($state, $transition, $length) {
+    protected function set_last_transition($state, $transition, $length, $ispartial) {
         $state->set_last_transition($transition);
         $state->set_last_match_len($length);
+        $state->set_last_match_is_partial($ispartial);
     }
 
     /**
@@ -210,7 +212,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         foreach ($transition->mergedafter as $tr) {
             $this->after_transition_passed($newstate, $tr, $curpos, 0, false);
         }
-        $this->set_last_transition($newstate, $transition, $newstate->length - $curstate->length);
+        $this->set_last_transition($newstate, $transition, $newstate->length - $curstate->length, false);
         return $newstate;
     }
 
@@ -260,7 +262,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
     protected function match_recursive_transition_begin($curstate, $transition, $str, $curpos, &$length, &$full, $addbacktracks) {
         $result = $this->match_transitions($curstate, $transition->mergedbefore, $str, $curpos, $length, $full, $addbacktracks);
         if ($full) {
-            $this->set_last_transition($result, $transition, $length);
+            $this->set_last_transition($result, $transition, $length, false);
         }
         return $result;
     }
@@ -277,7 +279,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
     protected function match_regular_transition($curstate, $transition, $str, $curpos, &$length, &$full, $addbacktracks) {
         $transitions = array_merge($transition->mergedbefore, array($transition), $transition->mergedafter);
         $newstate = $this->match_transitions($curstate, $transitions, $str, $curpos, $length, $full, $addbacktracks);
-        $this->set_last_transition($newstate, $transition, $newstate->length - $curstate->length);
+        $this->set_last_transition($newstate, $transition, $newstate->length - $curstate->length, !$full);
         return $newstate;
     }
 
@@ -355,21 +357,10 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
     protected function get_resume_state($str, $laststate) {
 
-        if ($laststate->last_match_len() > 0 && $laststate->last_transition()->pregleaf->type == qtype_preg_node::TYPE_LEAF_BACKREF) {
-            // The last transition was a partially matched backreference; we can only continue from this transition.
-            $backref_length = $laststate->length($laststate->last_transition()->pregleaf->number);
-            $prevpos = $laststate->startpos + $laststate->length - $laststate->last_match_len();
-
+        if ($laststate->last_match_is_partial()) {
             $resumestate = clone $laststate;
-            $this->after_transition_passed($resumestate, $laststate->last_transition(), $prevpos, $backref_length, false);
-            $resumestate->length -= $laststate->last_match_len(); // Backreference was partially matched
-
-            // Re-write the string with correct characters.
-            list($flag, $newchr) = $laststate->last_transition()->next_character($str, $resumestate->str, $prevpos, $laststate->last_match_len(), $laststate);
-            if ($flag !== qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE) {
-                $resumestate->str->concatenate($newchr);
-            }
-
+            $resumestate->length -= $laststate->last_match_len();
+            $resumestate->str = $resumestate->str->substring(0, $resumestate->startpos + $resumestate->length);
             return $resumestate;
         }
 
