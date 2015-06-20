@@ -145,7 +145,11 @@ abstract class block_formal_langs_abstract_language {
             }
         }
         $result = new $classname($this);
-        $result->string = $string;
+        $sourcestring = $string;
+        if (!is_object($string)) {
+            $sourcestring = new qtype_poasquestion\string($string);
+        }
+        $result->string = $sourcestring;
 
          // Update cache with new string
         if (array_key_exists($key, self::$cachedstringsbystring) == false) {
@@ -183,7 +187,11 @@ abstract class block_formal_langs_abstract_language {
         }
         $result = new $classname($this);
         $result->set_table_params($tablename,$tableid);
-        $result->string  = $string;
+        $sourcestring = $string;
+        if (!is_object($string)) {
+            $sourcestring = new qtype_poasquestion\string($string);
+        }
+        $result->string  = $sourcestring;
 
         // Insert entry into cache
         if (array_key_exists($key, self::$cachedstringsfromdb) == false) {
