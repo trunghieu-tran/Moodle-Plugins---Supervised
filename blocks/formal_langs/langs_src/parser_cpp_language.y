@@ -1512,6 +1512,12 @@ lvalue(R) ::= lvalue(A) leftsquarebracket(B) expr_prec_9(C) rightsquarebracket(D
 	R =  $this->create_node('lvalue', array( A, B, C, D));
 }
 
+lvalue(R) ::= lvalue(A) leftsquarebracket(B) rightsquarebracket(C) . {
+	$this->currentrule = new block_formal_langs_description_rule("%s", array("%ur(именительный)", "%s", "%s"));
+	R =  $this->create_node('lvalue', array( A, B, C));
+}
+
+
 possibly_identifier_preceded_ref(R) ::= ampersand(A) possibly_idenitifer_preceded_ptrs(B) . {
 	$this->currentrule = new block_formal_langs_description_rule("%s", array("%s", "%ur(именительный)"));
 	R =  $this->create_node('lvalue', array( A, B));
