@@ -59,6 +59,9 @@ class qtype_preg_fa_stack_item {
     // Length of the last match.
     public $last_match_len;
 
+    // Was the last transition matched partially? E.g. backreference, or a few merged transitions
+    public $last_match_is_partial;
+
     public function current_match($subpatt) {
         return isset($this->matches[$subpatt]) ? end($this->matches[$subpatt]) : null;
     }
@@ -337,6 +340,16 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
     public function set_last_match_len($value) {
         $end = end($this->stack);
         $end->last_match_len = $value;
+    }
+
+    public function last_match_is_partial() {
+        $end = end($this->stack);
+        return $end->last_match_is_partial;
+    }
+
+    public function set_last_match_is_partial($value) {
+        $end = end($this->stack);
+        $end->last_match_is_partial = $value;
     }
 
     public function set_flag($flag) {
