@@ -26,6 +26,7 @@ $string['addedmistakemessage_notexist'] = '{$a} should not be in response';
 $string['addedmistakeweight'] = 'Penalty for extra token';
 $string['addedmistakeweight_help'] = 'Penalty for each extra token in student\'s response, if the number of mistakes not exceed maximum mistake percentage.';
 $string['analyzersaredisabled'] = 'You must enable token sequence analysis or typo analysis, or both';
+$string['analyzersrequirevalidsyntaxtree'] = 'Analysis of enumerations and tree coverage analysis require answer to be syntaxically correct';
 $string['and'] = ' and ';
 $string['answersinstruct'] = 'Enter one or more correct answers. When you try to save the questions, answers will be tokenized using rules of selected language and you will be given an option to enter descriptions for each token. Token description is used instead of token text in mistake messages and hints to not disclose to the student actual value of the token. If you leave description empty, token value will be used instead. But you must enter correct number of empty strings as descriptions to be sure you don\'t just forget to enter descriptions when adding new answer.';
 $string['caseno'] = 'No, case is unimportant';

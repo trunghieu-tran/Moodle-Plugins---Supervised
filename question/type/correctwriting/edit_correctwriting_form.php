@@ -647,7 +647,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                 }
             }
         }
-        
+
         if (!$islexicalanalyzerenabled
             && !$issequenceanalyzerenabled
             && !$isenumanalyzerenabled
@@ -676,6 +676,18 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         foreach($data['answer'] as $key => $value) {
             $processedstring = $lang->create_from_string($value);
             $stream = $processedstring->stream;
+
+            if (is_object($lang)) {
+                if (count($stream->errors) == 0
+                    && ($isenumanalyzerenabled || $issyntaxanalyzerenabled)
+                    && $lang->could_parse()
+                ) {
+                    $syntaxtree = $processedstring->syntaxtree;
+                    if (count($syntaxtree) > 1) {
+                        $errors["answer[$key]"] = get_string('analyzersrequirevalidsyntaxtree', 'qtype_correctwriting');
+                    }
+                }
+            }
 
             if (count($stream->errors) != 0) {
                 $form = 'qtype_correctwriting_edit_form';
