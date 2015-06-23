@@ -4078,7 +4078,7 @@ str: abcÓ
                        'is_match'=>true,
                        'full'=>true,
                        'index_first'=>array(0=>1,1=>1,2=>4),
-                       'length'=>array(0=>3,1=>3,2=>0));
+                       'length'=>array(0=>4, 1=>4, 2=>1));
 
         $test2 = array('str'=>"1.875000282",
                        'is_match'=>true,
@@ -15614,8 +15614,8 @@ str: „XAZXB
         $test1 = array('str'=>"ab",
                        'is_match'=>true,
                        'full'=>true,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>1));
+                       'index_first'=>array(0=>0, 1=>0),
+                       'length'=>array(0=>1, 1=>1));
 
         $test2 = array('str'=>"bc",
                        'is_match'=>true,
