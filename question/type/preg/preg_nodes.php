@@ -971,7 +971,61 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
      * @return an object of qtype_preg_leaf_charset which is the intersection of this and other.
      */
     public function intersect_with_ranges(qtype_preg_leaf_charset $other) {
-        $ranges = array();
+        $interranges = array();
+
+        foreach ($this->flags as $flags) {
+            foreach ($other->flags as $otherflags) {
+                $altranges = array();
+                foreach ($flags as $flag) {
+                    foreach ($otherflags as $otherflag) {
+                        switch ($flag->type) {
+                            case qtype_preg_charset_flag::TYPE_SET:
+                                $ranges = qtype_preg_unicode::get_ranges_from_charset($flag->data, $this->caseless);
+                                $neg = $flag->negative;
+                                break;
+                            case qtype_preg_charset_flag::TYPE_FLAG:
+                                $ranges = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
+                                $neg = $flag->negative;
+                                break;
+                        }
+                        switch ($otherflag->type) {
+                            case qtype_preg_charset_flag::TYPE_SET:
+                                $otherranges = qtype_preg_unicode::get_ranges_from_charset($otherflag->data, $other->caseless);
+                                $otherneg = $otherflag->negative;
+                                break;
+                            case qtype_preg_charset_flag::TYPE_FLAG:
+                                $otherranges = call_user_func('qtype_preg_unicode::' . $otherflag->data . '_ranges');
+                                $otherneg = $otherflag->negative;
+                                break;
+                        }
+                        $xy = !$neg && !$otherneg;
+                        $xny = !$neg && $otherneg;
+                        $nxy = $neg && !$otherneg;
+                        $nxny = $neg && $otherneg;
+                        $resrange = qtype_preg_unicode::kinda_operator($ranges, $otherranges, $xy, $xny, $nxy, $nxny);
+                        if (!empty($resrange)) {
+                            $altranges[] = $resrange;
+                        }
+                    }
+                }
+            }
+            if (!empty($altranges)) {
+                $interranges[] = $altranges;
+            }
+        }
+        if (count($interranges) >= 2) {
+            $resrange = qtype_preg_unicode::kinda_operator($interranges[0], $interranges[1], true, false, false, false);
+            for ($i = 2; $i < count($interranges); $i++) {
+                $resrange = qtype_preg_unicode::kinda_operator($resrange, $interranges[$i], true, false, false, false);
+            }
+        }
+        if (empty($resrange)) {
+            $charset = null;
+        } else {
+            $charset = $this->intersect($other); 
+        }
+        return $charset;
+        /*$ranges = array();
         $resrange = array();
         $neg = array();
         $charset = $this->intersect($other);
@@ -1002,7 +1056,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         if (count($resrange) == 0) {
             $charset = null;
         }
-        return $charset;
+        return $charset;*/
     }
 
     public function is_equal($node, $numberoffset) {

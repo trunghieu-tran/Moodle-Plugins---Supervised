@@ -1101,7 +1101,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         if ($mergeassertions) {
             $result->remove_unreachable_states();
         }
-
+        /*global $CFG;
+        $CFG->pathtodot = '/usr/bin/dot';
+        $result->fa_to_dot('svg', "/home/elena/fa_1.svg");*/
         if ($body['breakpos'] !== null || empty($result->adjacencymatrix)) {
             throw new qtype_preg_empty_fa_exception('', $body['breakpos']);
         }
@@ -1125,12 +1127,18 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                                 }
                             }
                         }
+                        /*$result->fa_to_dot('svg', "/home/elena/fa_2.svg");
+                        $automaton[0]->fa_to_dot('svg', "/home/elena/fa_3.svg");*/
                         $result = $result->intersect($automaton[0], $states, $automaton[1]);
+                        /*$result->fa_to_dot('svg', "/home/elena/fa_1.svg");
+                        /*printf ($result->fa_to_dot());
+                        return $automaton[0];*/
                     }
                 }
             }
         }
-
+        
+        //$result->fa_to_dot('svg', "/home/elena/fa_1.svg");
         return $result;
     }
 
