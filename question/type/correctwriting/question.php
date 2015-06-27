@@ -132,7 +132,7 @@ class qtype_correctwriting_question extends question_graded_automatically
      * Whether syntax analyzer is enabled
      * @var int
      */
-    public $issyntaxanalyzerenabled = 1;
+    public $issyntaxanalyzerenabled = 0;
 
 
     /** Whether cache is valid
