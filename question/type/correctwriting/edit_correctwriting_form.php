@@ -177,7 +177,13 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
      */
     protected function definition_additional_sections(&$mform) {
         // Analyzer sections.
-        foreach ($this->analyzers as $name) {
+        $analyzers = $this->analyzers;
+        unset($analyzers[0x400]);
+        //  Disable syntax analyzers
+        $mform->addElement('hidden', 'issyntaxanalyzerenabled', true);
+        $mform->setType('issyntaxanalyzerenabled', PARAM_BOOL);
+        $mform->setDefault('issyntaxanalyzerenabled', 0);
+        foreach ($analyzers as $name) {
             $classname = 'qtype_correctwriting_' . $name;
             /** @var qtype_correctwriting_abstract_analyzer $analyzer */
             $analyzer = new $classname;
@@ -192,8 +198,11 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             $mform->setType($formname, PARAM_BOOL);
             // Disable all groups but enable sequence analyzer
             $default = 1;
-            if ($formname != 'issequenceanalyzerenabled') {
+            if ($formname != 'issequenceanalyzerenabled' && $formname != 'islexicalanalyzerenabled') {
                 $default = 0;
+            }
+            if ($formname == 'islexicalanalyzerenabled') {
+                $mform->addRule($formname, null, 'required', null, 'client');
             }
             $mform->setDefault($formname, $default);
             // TODO - default to admin config setting - use or not.
@@ -577,6 +586,54 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         return $result;
     }
 
+    /**
+     * Returns position of last or first token in tree
+     * @param block_formal_langs_ast_node_base $root root node
+     * @param bool $first whether we should take first token (or last if false)
+     * @return block_formal_langs_node_position
+     */
+    protected function get_position_for_token_in_tree($root, $first) {
+        $children = $root->childs();
+        $result = null;
+        if (count($children)  == 0) {
+            $result = $root->position();
+        } else {
+            if ($first) {
+                $result = self::get_position_for_token_in_tree($children[0], $first);
+            } else {
+                $lastindex = count($children) - 1;
+                $result = self::get_position_for_token_in_tree($children[$lastindex], $first);
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Formats string for  parsing error. First position must be before second position
+     * @param string $text text
+     * @param block_formal_langs_node_position $position1 position of first node
+     * @param block_formal_langs_node_position $position2 position of second node
+     * @return string error part
+     */
+    protected function format_string_for_parse_error($text, $position1, $position2) {
+        $e = function($a) {
+            $a = htmlspecialchars($a);
+            $t = str_repeat('&nbsp;', 4);
+            return str_replace(array("\t", ' '), array($t, '&nbsp;'), $a);
+        };
+        $result = $e(core_text::substr($text, 0 , $position1->stringstart()));
+        $lengthoffirst = $position1->stringend() - $position1->stringstart() + 1;
+        $result .= html_writer::tag('b', $e(core_text::substr($text, $position1->stringstart(), $lengthoffirst)));
+        if ($position1->stringend() + 1 != $position2->stringstart()) {
+            $lengthofspacebetween = $position2->stringstart() - $position1->stringend() - 1;
+            $result .= $e(core_text::substr($text, $position1->stringend() + 1, $lengthofspacebetween));
+        }
+        $lengthofsecond = $position2->stringend() - $position2->stringstart() + 1;
+        $result .= html_writer::tag('b', $e(core_text::substr($text, $position2->stringstart(), $lengthofsecond)));
+        $result .= $e(core_text::substr($text, $position2->stringend()+1));
+        return $result;
+    }
+
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
@@ -684,7 +741,14 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                 ) {
                     $syntaxtree = $processedstring->syntaxtree;
                     if (count($syntaxtree) > 1) {
-                        $errors["answer[$key]"] = get_string('analyzersrequirevalidsyntaxtree', 'qtype_correctwriting');
+                        $position1 = self::get_position_for_token_in_tree($syntaxtree[0], false);
+                        $position2 = self::get_position_for_token_in_tree($syntaxtree[1], true);
+                        $text = self::format_string_for_parse_error($value, $position1, $position2);
+                        $errors["answer[$key]"] = get_string(
+                            'analyzersrequirevalidsyntaxtree',
+                            'qtype_correctwriting',
+                            $text
+                        );
                     }
                 }
             }
