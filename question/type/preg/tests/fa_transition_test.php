@@ -199,6 +199,24 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
     }*/
 
     ////////////////////////////////////////// next_character
+    function test_aaa() {
+        $str = new qtype_poasquestion\string(" c");
+        $pos = 0;
+        $length = 0;
+
+        $esca = false;
+        $smallescz = false;
+        $capescz = false;
+        $circumflex = false;
+        $dollar = false;
+        $subexpr = false;
+
+        $transition1 = $this->transition_by_regex("[\\w\\W]", $esca, $smallescz, $capescz, $circumflex, $dollar, $subexpr);
+        $transition2 = $this->transition_by_regex("\\W", $esca, $smallescz, $capescz, $circumflex, $dollar, $subexpr);
+        $transition = $transition1->intersect($transition2);
+        $result = $transition->pregleaf->match($str, $pos, $length);
+        $this->assertTrue($result);
+    }
 
     function test_generation_empty_string() {
         $str = new qtype_poasquestion\string("ax");
