@@ -495,7 +495,7 @@ class qtype_preg_fa_transition {
         $otherhastags = $other->has_tags();
         $resulttran = null;
         $flag = new qtype_preg_charset_flag();
-        $flag->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string("\n"));
+        $flag->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion\string("\n"));
         $charset = new qtype_preg_leaf_charset();
         $charset->flags = array(array($flag));
         $charset->userinscription = array(new qtype_preg_userinscription("\n"));
@@ -2900,7 +2900,7 @@ class qtype_preg_fa {
         $intersection = null;
         $transitionadded = false;
         $flag = new qtype_preg_charset_flag();
-        $flag->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string("\n"));
+        $flag->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion\string("\n"));
         $charset = new qtype_preg_leaf_charset();
         $charset->flags = array(array($flag));
         $charset->userinscription = array(new qtype_preg_userinscription("\n"));
