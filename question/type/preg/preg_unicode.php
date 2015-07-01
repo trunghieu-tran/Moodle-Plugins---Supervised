@@ -8639,6 +8639,14 @@ class qtype_preg_unicode extends core_text {
     }
 
     public static function kinda_operator(&$ranges1, &$ranges2, $xy, $xny, $nxy, $nxny) {
+        // Special cases: unions
+        if ($ranges1 == null && $ranges2 != null && $xy && $xny && $nxy) {
+            return $ranges2;
+        }
+        if ($ranges1 != null && $ranges2 == null && $xy && $xny && $nxy) {
+            return $ranges1;
+        }
+        //
         if ($ranges1 == null || $ranges2 == null) {
             return array();
         }
