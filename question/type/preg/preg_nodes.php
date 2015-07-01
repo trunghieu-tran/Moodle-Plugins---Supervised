@@ -313,6 +313,7 @@ abstract class qtype_preg_node {
     const TYPE_NODE_TEMPLATE = 'node_template';
     /** Error node. */
     const TYPE_NODE_ERROR = 'node_error';
+    const TYPE_LEAF_COMPLEX_ASSERT = 'leaf_complex_assert';
 
     /** Type one the node - should be equal to a constant defined in this class. */
     public $type;
@@ -562,10 +563,15 @@ abstract class qtype_preg_leaf extends qtype_preg_node {
                 $result = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             } else if ($other->type == qtype_preg_node::TYPE_LEAF_CHARSET && $thishastags) {
                 $result = $other;
+            } else if ($other->type == qtype_preg_node::TYPE_LEAF_ASSERT) {
+                $result = $this;
             }
         } else if ($this->type == qtype_preg_node::TYPE_LEAF_ASSERT && ($other->type ==qtype_preg_node::TYPE_LEAF_ASSERT ||
                     $other->type == qtype_preg_node::TYPE_LEAF_META && $other->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY)) {
             $result = $this;
+        }
+        if ($result !== null) {
+            $result->caseless = $this->caseless || $other->caseless;
         }
         return $result;
     }
@@ -965,10 +971,155 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
      * @return an object of qtype_preg_leaf_charset which is the intersection of this and other.
      */
     public function intersect_with_ranges(qtype_preg_leaf_charset $other) {
-        $ranges = array();
+        /*$resultranges = array();
+        foreach ($this->flags as $flags) {
+            $ranges = array();
+            $neg = array();
+            foreach ($flags as $flag) {
+                switch ($flag->type) {
+                    case qtype_preg_charset_flag::TYPE_SET:
+                        $ranges[] = qtype_preg_unicode::get_ranges_from_charset($flag->data, $this->caseless);
+                        $neg[] = $flag->negative;
+                        break;
+                    case qtype_preg_charset_flag::TYPE_FLAG:
+                        $ranges[] = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
+                        $neg[] = $flag->negative;
+                        break;
+                }
+            }
+            if (count($ranges) >= 2) {
+                $xy = !$neg[0] && !$neg[1];
+                $xny = !$neg[0] && $neg[1];
+                $nxy = $neg[0] && !$neg[1];
+                $nxny = $neg[0] && $neg[1];
+                $resrange = qtype_preg_unicode::kinda_operator($ranges[0], $ranges[1], $xy, $xny, $nxy, $nxny);
+                for ($i = 2; $i < count($ranges); $i++) {
+                    $resrange = qtype_preg_unicode::kinda_operator($resrange, $ranges[$i], !$neg[$i], $neg[$i], false, false);
+                }
+            } else {
+                $resrange = $ranges[0];
+                $resneg = $neg[0];
+            }
+            foreach ($other->flags as $otherflags) {
+                $otherranges = array();
+                $otherneg = array();
+                foreach ($otherflags as $otherflag) {
+                    switch ($otherflag->type) {
+                        case qtype_preg_charset_flag::TYPE_SET:
+                            $otherranges[] = qtype_preg_unicode::get_ranges_from_charset($otherflag->data, $other->caseless);
+                            $otherneg[] = $otherflag->negative;
+                            break;
+                        case qtype_preg_charset_flag::TYPE_FLAG:
+                            $otherranges[] = call_user_func('qtype_preg_unicode::' . $otherflag->data . '_ranges');
+                            $otherneg[] = $otherflag->negative;
+                            break;
+                    }
+                    $resneg = false;
+                }
+                if (count($otherranges) >= 2) {
+                    $xy = !$otherneg[0] && !$otherneg[1];
+                    $xny = !$otherneg[0] && $otherneg[1];
+                    $nxy = $otherneg[0] && !$otherneg[1];
+                    $nxny = $otherneg[0] && $otherneg[1];
+                    $otherresrange = qtype_preg_unicode::kinda_operator($otherranges[0], $otherranges[1], $xy, $xny, $nxy, $nxny);
+                    for ($i = 2; $i < count($otherranges); $i++) {
+                        $otherresrange = qtype_preg_unicode::kinda_operator($otherresrange, $otherranges[$i], !$otherneg[$i], $otherneg[$i], false, false);
+                    }
+                    $otherresneg = false;
+                } else {
+                    $otherresrange = $otherranges[0];
+                    $otherresneg = $otherneg[0];
+                }
+                $xy = !$resneg && !$otherresneg;
+                $xny = !$resneg && $otherresneg;
+                $nxy = $resneg && !$otherresneg;
+                $nxny = $resneg && $otherresneg;
+                $result = qtype_preg_unicode::kinda_operator($resrange, $otherresrange, $xy, $xny, $nxy, $nxny);
+                if (!empty($result)) {
+                    $resultranges [] = $result;
+                }
+            }
+        }
+        if (!empty($resultranges)) {
+            $charset = $this->intersect($other); 
+        } else {
+            $charset = null;
+        }
+        return $charset;*/
+        $interranges = array();
+        $hasinter = true;
+        foreach ($this->flags as $flags) {
+
+            foreach ($other->flags as $otherflags) {
+                $thisaltranges = array();
+                foreach ($flags as $flag) {
+                    $otheraltranges = array();
+                    foreach ($otherflags as $otherflag) {
+                        switch ($flag->type) {
+                            case qtype_preg_charset_flag::TYPE_SET:
+                                $ranges = qtype_preg_unicode::get_ranges_from_charset($flag->data, $this->caseless);
+                                $neg = $flag->negative;
+                                break;
+                            case qtype_preg_charset_flag::TYPE_FLAG:
+                                $ranges = call_user_func('qtype_preg_unicode::' . $flag->data . '_ranges');
+                                $neg = $flag->negative;
+                                break;
+                        }
+                        switch ($otherflag->type) {
+                            case qtype_preg_charset_flag::TYPE_SET:
+                                $otherranges = qtype_preg_unicode::get_ranges_from_charset($otherflag->data, $other->caseless);
+                                $otherneg = $otherflag->negative;
+                                break;
+                            case qtype_preg_charset_flag::TYPE_FLAG:
+                                $otherranges = call_user_func('qtype_preg_unicode::' . $otherflag->data . '_ranges');
+                                $otherneg = $otherflag->negative;
+                                break;
+                        }
+                        $xy = !$neg && !$otherneg;
+                        $xny = !$neg && $otherneg;
+                        $nxy = $neg && !$otherneg;
+                        $nxny = $neg && $otherneg;
+                        $resrange = qtype_preg_unicode::kinda_operator($ranges, $otherranges, $xy, $xny, $nxy, $nxny);
+                        if (!empty($resrange)) {
+                            $otheraltranges[] = $resrange;
+                        } else if (count($this->flags) == 1){
+                            return null;
+                        }
+                    }
+                    if (!empty($otheraltranges)) {
+                        $thisaltranges = array_merge($thisaltranges, $otheraltranges);
+                    }
+                }
+                if (!empty($thisaltranges)) {
+                    $interranges[] = $thisaltranges;
+                }
+            }
+        }
+        $resrange = array();
+        if (count($interranges) >= 2) {
+            $resrange = qtype_preg_unicode::kinda_operator($interranges[0], $interranges[1], true, false, false, false);
+            for ($i = 2; $i < count($interranges); $i++) {
+                $resrange = qtype_preg_unicode::kinda_operator($resrange, $interranges[$i], true, false, false, false);
+            }
+        } else {
+            if (!empty($interranges)) {
+                $resrange = $interranges[0];
+            }
+        }
+        if (empty($resrange)) {
+            $charset = null;
+        } else {
+            $charset = $this->intersect($other); 
+        }
+        return $charset;
+        /*$ranges = array();
         $resrange = array();
         $neg = array();
+        var_dump($this);
+        var_dump($other);
         $charset = $this->intersect($other);
+        var_dump("expression");
+        var_dump($charset);
         foreach ($charset->flags as $flags) {
             foreach ($flags as $flag) {
                 switch ($flag->type) {
@@ -996,7 +1147,7 @@ class qtype_preg_leaf_charset extends qtype_preg_leaf {
         if (count($resrange) == 0) {
             $charset = null;
         }
-        return $charset;
+        return $charset;*/
     }
 
     public function is_equal($node, $numberoffset) {
@@ -1298,6 +1449,20 @@ class qtype_preg_leaf_meta extends qtype_preg_leaf {
         return 'ε';
     }
 
+}
+
+class qtype_preg_leaf_complex_assert extends qtype_preg_leaf_meta {
+
+    const SUBTYPE_LOOKAHEAD = 'lookahead_leaf_complex_assert';
+    const SUBTYPE_LOOKBEHIND = 'lookbehind_leaf_complex_assert';
+
+    public $innerautomaton;
+
+    public function __construct($subtype, $innerautomaton) {
+        $this->type = qtype_preg_node::TYPE_LEAF_COMPLEX_ASSERT;
+        $this->subtype = $subtype;
+        $this->innerautomaton = $innerautomaton;
+    }
 }
 
 /**

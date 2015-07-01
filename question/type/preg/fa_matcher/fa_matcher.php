@@ -66,6 +66,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             case qtype_preg_node::TYPE_LEAF_CHARSET:
             case qtype_preg_node::TYPE_LEAF_META:
             case qtype_preg_node::TYPE_LEAF_ASSERT:
+            case qtype_preg_node::TYPE_LEAF_COMPLEX_ASSERT:
             case qtype_preg_node::TYPE_LEAF_BACKREF:
             case qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL:
                 return 'qtype_preg_fa_leaf';
@@ -1090,8 +1091,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
     public function build_fa($dstnode, $mergeassertions = false) {
         $result = new qtype_preg_fa($this, $this->get_nodes_with_subexpr_refs());
 
-        //$mergeassertions = true;
-
         $stack = array();
         $dstnode->create_automaton($result, $stack, $mergeassertions);
         $body = array_pop($stack);
@@ -1102,15 +1101,13 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         if ($mergeassertions) {
             $result->remove_unreachable_states();
         }
-
+        /*global $CFG;
+        $CFG->pathtodot = '/usr/bin/dot';
+        $result->fa_to_dot('svg', "/home/elena/fa_1.svg");*/
         if ($body['breakpos'] !== null || empty($result->adjacencymatrix)) {
             throw new qtype_preg_empty_fa_exception('', $body['breakpos']);
         }
-        if ($mergeassertions) {
-            $result->merge_end_transitions();
-        }
-        /*global $CFG;
-        $CFG->pathtodot = '/usr/bin/dot';*/
+        $mergesuccess = true;
         $intersected = array();
         if ($mergeassertions)
         {
@@ -1130,25 +1127,20 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                                 }
                             }
                         }
-                        //$result->fa_to_dot('svg', "/home/elena/fa_2.svg");
-                        //$automaton[0]->fa_to_dot('svg', "/home/elena/fa_3.svg");
+                        /*$result->fa_to_dot('svg', "/home/elena/fa_2.svg");
+                        $automaton[0]->fa_to_dot('svg', "/home/elena/fa_3.svg");*/
                         $result = $result->intersect($automaton[0], $states, $automaton[1]);
-                        // $result->fa_to_dot('svg', "/home/elena/fa_1.svg", true);
+                        /*$result->fa_to_dot('svg', "/home/elena/fa_1.svg");
+                        /*printf ($result->fa_to_dot());
+                        return $automaton[0];*/
                     }
                 }
             }
-            //$result->calculate_subexpr_start_and_end_states();
         }
-
-        /*global $CFG;
-        $CFG->pathtodot = '/usr/bin/dot';
-        $namesuffix = $mergeassertions ? "merged" : "original";
-        $result->fa_to_dot('svg', "/home/user/fa_$namesuffix.svg");*/
-
+        
+        //$result->fa_to_dot('svg', "/home/elena/fa_1.svg");
         return $result;
     }
-
-
 
     protected function check_for_infinite_recursion() {
         $end = $this->automaton->get_end_states();
