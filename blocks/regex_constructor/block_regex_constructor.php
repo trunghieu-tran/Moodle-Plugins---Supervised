@@ -36,11 +36,8 @@ class block_regex_constructor extends block_base {
         $this->title = get_string('regex_constructor', 'block_regex_constructor');
     }
 
-    public function get_content() {
-        global $CFG;
-        if ($this->content !== null) {
-            return $this->content;
-        }
+    function get_required_javascript() {
+        parent::get_required_javascript();
 
         $this->page->requires->jquery_plugin('poasquestion-jquerymodule', 'qtype_poasquestion');
         $this->page->requires->jquery();
@@ -53,6 +50,13 @@ class block_regex_constructor extends block_base {
         $this->page->requires->string_for_js('savechanges', 'moodle');
         $this->page->requires->string_for_js('cancel', 'moodle');
         $this->page->requires->string_for_js('close', 'editor');
+    }
+
+    public function get_content() {
+        global $CFG;
+        if ($this->content !== null) {
+            return $this->content;
+        }
 
         $this->content =  new stdClass;
         $this->content->text = '<noscript>' . get_string('jsrequired', 'block_regex_constructor') . '</noscript>' .
