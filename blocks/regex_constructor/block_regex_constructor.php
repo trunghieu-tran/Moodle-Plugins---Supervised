@@ -28,18 +28,6 @@ global $PAGE;
 
 require_once($CFG->dirroot.'/blocks/moodleblock.class.php');
 
-$PAGE->requires->jquery_plugin('poasquestion-jquerymodule', 'qtype_poasquestion');
-$PAGE->requires->jquery();
-$PAGE->requires->jquery_plugin('ui');
-$PAGE->requires->jquery_plugin('ui-css');
-$PAGE->requires->jquery_plugin('poasquestion-jquerymodule', 'qtype_poasquestion');
-
-$PAGE->requires->string_for_js('collapseall', 'moodle');
-$PAGE->requires->string_for_js('expandall', 'moodle');
-$PAGE->requires->string_for_js('savechanges', 'moodle');
-$PAGE->requires->string_for_js('cancel', 'moodle');
-$PAGE->requires->string_for_js('close', 'editor');
-
 class block_regex_constructor extends block_base {
 
     private $id = 'regex_conscructor_block_window_opener_a';
@@ -53,6 +41,18 @@ class block_regex_constructor extends block_base {
         if ($this->content !== null) {
             return $this->content;
         }
+
+        $this->page->requires->jquery_plugin('poasquestion-jquerymodule', 'qtype_poasquestion');
+        $this->page->requires->jquery();
+        $this->page->requires->jquery_plugin('ui');
+        $this->page->requires->jquery_plugin('ui-css');
+        $this->page->requires->jquery_plugin('poasquestion-jquerymodule', 'qtype_poasquestion');
+
+        $this->page->requires->string_for_js('collapseall', 'moodle');
+        $this->page->requires->string_for_js('expandall', 'moodle');
+        $this->page->requires->string_for_js('savechanges', 'moodle');
+        $this->page->requires->string_for_js('cancel', 'moodle');
+        $this->page->requires->string_for_js('close', 'editor');
 
         $this->content =  new stdClass;
         $this->content->text = '<noscript>' . get_string('jsrequired', 'block_regex_constructor') . '</noscript>' .
