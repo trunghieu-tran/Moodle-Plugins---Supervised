@@ -26,11 +26,11 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'block_regex_constructor';
-$plugin->version  = 2015033000;
+$plugin->version  = 2015070200;
 $plugin->requires = 2014111000;
 $plugin->release = 'Regex Constructor 2.8';
 $plugin->maturity = MATURITY_STABLE;
 
 $plugin->dependencies = array(
-    'qtype_preg' => 2015033000
+    'qtype_preg' => 2015070200
 );

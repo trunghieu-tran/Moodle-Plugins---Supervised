@@ -25,10 +25,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qtype_preg';
-$plugin->version = 2015033000;
+$plugin->version = 2015070200;
 $plugin->requires = 2014050800;
-$plugin->release = 'Preg 2.8 Beta';
-$plugin->maturity = MATURITY_BETA;
+$plugin->release = 'Preg 2.8';
+$plugin->maturity = MATURITY_STABLE;
 
 $plugin->dependencies = array(
     'qtype_shortanswer' => 2013050100,
@@ -36,5 +36,5 @@ $plugin->dependencies = array(
     'qbehaviour_adaptivehintsnopenalties' => 2015033000,
     'qbehaviour_interactivehints' => 2015033000,
     'qtype_poasquestion' => 2015033000,
-    'block_formal_langs' => 2015033000
+    'block_formal_langs' => 2015070200
 );
