@@ -1104,7 +1104,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         /*global $CFG;
         $CFG->pathtodot = '/usr/bin/dot';
         $result->fa_to_dot('svg', "/home/elena/fa_1.svg");*/
-        if ($body['breakpos'] !== null || empty($result->adjacencymatrix)) {
+        if (($body['breakpos'] !== null && empty($result->adjacencymatrix)) || empty($result->adjacencymatrix)) {
             throw new qtype_preg_empty_fa_exception('', $body['breakpos']);
         }
         $mergesuccess = true;
