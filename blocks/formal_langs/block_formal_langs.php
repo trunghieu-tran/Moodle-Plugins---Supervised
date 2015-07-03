@@ -215,7 +215,7 @@ class block_formal_langs extends block_list {
         //  Fetch languages
         $languagerecords = $DB->get_records('block_formal_langs', array());
         //  Fetch global permissions
-        if (textlib::strlen($showedlanguages) != 0)
+        if (core_text::strlen($showedlanguages) != 0)
         {
             $showedarray = explode(',', $showedlanguages);
             $showall = false;
@@ -455,7 +455,7 @@ class block_formal_langs extends block_list {
             }
 
             $editlinks = '';
-            $caneditlang = $this->page->user_is_editing() && textlib::strlen($permission->scanrules) != 0;
+            $caneditlang = $this->page->user_is_editing() && core_text::strlen($permission->scanrules) != 0;
             $caneditlang =  $caneditlang && ($caneditall || ($caneditown && $permission->author == $USER->id));
             if ($caneditlang) {
                 $editlink = $CFG->wwwroot . '/blocks/formal_langs/edit.php?id=' . $permission->id . '&context=' . $context->id;

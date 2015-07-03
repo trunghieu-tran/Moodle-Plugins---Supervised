@@ -32,6 +32,20 @@ class block_formal_langs_c_token_base extends block_formal_langs_token_base {
         $name = str_replace('c_token_','', $name);
         return $name;
     }
+
+    /**
+     * This function returns true if editing distance is
+     * applicable to this type of tokens as lexical error weight and
+     * threshold.
+     *
+     * There are kind of tokens for which editing distances are
+     * inapplicable, like numbers.
+     *
+     * @return boolean
+     */
+    public function use_editing_distance() {
+        return false;
+    }
 }
 /** Describes a multiline comment
  */ 
@@ -51,21 +65,81 @@ class block_formal_langs_c_token_singleline_comment extends block_formal_langs_c
  */
 class block_formal_langs_c_token_keyword extends block_formal_langs_c_token_base
 {
-
+    /**
+     * This function returns true if editing distance is
+     * applicable to this type of tokens as lexical error weight and
+     * threshold.
+     *
+     * There are kind of tokens for which editing distances are
+     * inapplicable, like numbers.
+     *
+     * @return boolean
+     */
+    public function use_editing_distance() {
+        return true;
+    }
 }
 
 /** Describes a typename
  */ 
 class block_formal_langs_c_token_typename extends block_formal_langs_c_token_base
 {
+    public function additional_generation($token) {
+       /* $arraypairs = array();        
+        if ($this->value == 'char') {
+            $arraypairs[] = new block_formal_langs_matched_tokens_pair(array($this->tokenindex), array($token->tokenindex), 0, false, '');
+        }
+        if ()
+*/
+	return $arraypairs;
+    }
 
+    /**
+     * This function returns true if editing distance is
+     * applicable to this type of tokens as lexical error weight and
+     * threshold.
+     *
+     * There are kind of tokens for which editing distances are
+     * inapplicable, like numbers.
+     *
+     * @return boolean
+     */
+    public function use_editing_distance() {
+        return true;
+    }
 }
 
 /** Describes an identifier
  */ 
 class block_formal_langs_c_token_identifier extends block_formal_langs_c_token_base
 {
+    public function check_specific_error ($token) {
+        if ($this->value=='acos') {
+            if ($token->value=='cos') {
+                return 1;
+            }
+        }
+        if ($this->value=='cos') {
+            if ($token->value=='acos') {
+                return 1;
+            }
+        }
+        return 0;
+    }
 
+    /**
+     * This function returns true if editing distance is
+     * applicable to this type of tokens as lexical error weight and
+     * threshold.
+     *
+     * There are kind of tokens for which editing distances are
+     * inapplicable, like numbers.
+     *
+     * @return boolean
+     */
+    public function use_editing_distance() {
+        return true;
+    }
 }
 
 
@@ -80,8 +154,8 @@ class block_formal_langs_c_token_numeric extends block_formal_langs_c_token_base
     protected function numeric_value() {
         $v = (string)($this->value());
         $result = 0;
-        if (textlib::strpos($v, '.')  === false) {
-            if (textlib::strpos($v, 'x') !== false || textlib::strpos($v, 'X') !== false) {
+        if (core_text::strpos($v, '.')  === false) {
+            if (core_text::strpos($v, 'x') !== false || core_text::strpos($v, 'X') !== false) {
                 $result = hexdec($v);
             } else {
                 if ($v != '0' && $v[0] == '0') {
@@ -112,6 +186,20 @@ class block_formal_langs_c_token_numeric extends block_formal_langs_c_token_base
         }
         return $result;
     }
+
+    /**
+     * This function returns true if editing distance is
+     * applicable to this type of tokens as lexical error weight and
+     * threshold.
+     *
+     * There are kind of tokens for which editing distances are
+     * inapplicable, like numbers.
+     *
+     * @return boolean
+     */
+    public function use_editing_distance() {
+        return true;
+    }
 }
 
 
@@ -132,14 +220,43 @@ class block_formal_langs_c_token_character extends block_formal_langs_c_token_ba
  */ 
 class block_formal_langs_c_token_string extends block_formal_langs_c_token_base
 {
-
+    /**
+     * This function returns true if editing distance is
+     * applicable to this type of tokens as lexical error weight and
+     * threshold.
+     *
+     * There are kind of tokens for which editing distances are
+     * inapplicable, like numbers.
+     *
+     * @return boolean
+     */
+    public function use_editing_distance() {
+        return true;
+    }
 }
 
 /** Describes an operators (mathematical and C-specific)
  */ 
 class block_formal_langs_c_token_operators extends block_formal_langs_c_token_base
 {
-
+    public function check_specific_error ($token) {
+        if ($this->value == '==') {
+            if ($token->value == '=') {
+                return 1;
+            }
+        }
+        if ($this->value == ';') {
+            if ($token->value == ',') {
+                return 1;
+            }
+        }
+        if ($this->value == ',') {
+            if ($token->value == ';') {
+                return 1;
+            }
+        }
+        return 0;
+    }
 }
 
 /** Describes an ellipsis

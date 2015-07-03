@@ -31,62 +31,15 @@ require_once($CFG->dirroot.'/blocks/formal_langs/tests/test_utils.php');
 /**
  * Tests C++ parseable language
  */
-class block_formal_langs_cpp_language_test extends PHPUnit_Framework_TestCase {
+class block_formal_langs_cpp_parseable_language_test extends PHPUnit_Framework_TestCase {
+    
     /**
-     * Optimizes tree replacing nodes with one child with their child
-     * @param array|block_formal_langs_processed_string $nodes nodes
-     * @return array optimized array of trees
-     */
-    static function optimize_tree($nodes) {
-        if (is_a($nodes, 'block_formal_langs_processed_string')) {
-            $nodes->set_syntax_tree(self::optimize_tree($nodes->syntaxtree));
-        }
-        if (is_array($nodes)) {
-            $nodes = array_values($nodes);
-            $changed = true;
-            while($changed) {
-                $changed = false;
-                if (count($nodes)) {
-                    /** @var block_formal_langs_ast_node_base $node */
-                    foreach($nodes as $key => $node) {
-                        if (count($node->childs()) == 1) {
-                            $children = $node->childs();
-                            /** @var block_formal_langs_ast_node_base $child */
-                            $child = $children[0];
-                            $nodes[$key] = $child;
-                            $changed = true;
-                        }
-                    }
-                }
-            }
-            if (count($nodes)) {
-                foreach($nodes as $node) {
-                    $node->set_childs(self::optimize_tree($node->childs()));
-                }
-            }
-        }
-        return $nodes;
-    }
-
-    /**
-     * Makes a tree from string
-     * @param string $string
-     * @return array
-     */
-    static function make_from_string($string) {
-        $lang = new block_formal_langs_language_cpp_parseable_language();
-        $processedstring = $lang->create_from_string($string);
-        self::optimize_tree($processedstring);
-        return $processedstring->syntaxtree;
-    }
-
-    /**
-     * Converts a node tree to string
-     * @param array|block_formal_langs_ast_node_base $node a node
-     * @param int $paddingcount count of paddings
+     * Prints tests for external testing format
+     * @param $node
+     * @param $paddingcount
      * @return string
      */
-    static function print_node($node, $paddingcount)
+    public static function print_node_for_external($node, $paddingcount)
     {
         $result = '';
         if ($node == null) {
@@ -97,7 +50,7 @@ class block_formal_langs_cpp_language_test extends PHPUnit_Framework_TestCase {
         if (is_array($node)) {
             $result .= $padding . '[' . PHP_EOL;
             foreach($node as $i => $nodechild) {
-                $result .= self::print_node($nodechild, $paddingcount + 1);
+                $result .= self::print_node_for_external($nodechild, $paddingcount + 1);
                 if ($i != count($node) -1) {
                     $result .= $padding . ',' . PHP_EOL;
                 }
@@ -111,1561 +64,161 @@ class block_formal_langs_cpp_language_test extends PHPUnit_Framework_TestCase {
         }
         $value = '';
         if (is_a($node, 'block_formal_langs_token_base')) {
+            /** @noinspection PhpUndefinedMethodInspection */
             $value = $node->value();
         }
-        if (textlib::strlen($value)) {
+        if (core_text::strlen($value)) {
             $result .= $padding . $value . PHP_EOL;
         }
         //echo $padding . $node->type() . $value . PHP_EOL;
+        /** @noinspection PhpUndefinedMethodInspection */
         if (count($node->childs()))  {
-            $result .= $padding . '{' . PHP_EOL;
+            $result .= $padding . '(' . $node->type()  . ') {' . PHP_EOL;
+            /** @noinspection PhpUndefinedMethodInspection */
             foreach($node->childs() as $child) {
-                $result .= self::print_node($child, $paddingcount + 1);
+                $result .= self::print_node_for_external($child, $paddingcount + 1);
             }
             $result .= $padding . '}' . PHP_EOL;
         }
         return $result;
     }
 
-    function compare_trees($nodes, $string) {
-        $originaltestedstring = self::print_node($nodes, 0);
-        $testedstring = str_replace(array("\r", "\n", ' '), array('', '', ''), $originaltestedstring);
-        $string = str_replace(array("\r", "\n", ' '), array('', '', ''), $string);
-        $this->assertTrue($string == $testedstring, $originaltestedstring);
-    }
-
     /**
-     * Tests parsing simple literal
+     * Builds a recursive list of files
+     * @param string $dir directory
+     * @return array an array list
      */
-    public function test_numeric_literal() {
-        $trees = self::make_from_string('11');
-        $this->assertTrue($trees[0]->value() == '11');
-    }
-
-    /**
-     * Tests parsing empty string
-     */
-    public function test_empty() {
-        $trees = self::make_from_string('');
-        $this->assertTrue(count($trees) == 0);
-    }
-
-    /**
-     * Tests parsing two simple literals
-     */
-    public function test_two_literals() {
-        $trees = self::make_from_string('11  11');
-        $this->assertTrue($trees[0]->value() == '11');
-        $this->assertTrue($trees[1]->value() == '11');
-    }
-
-    /**
-     * Tests simple statements
-     */
-    public function test_statement1() {
-        $trees = self::make_from_string('11 + (11 * 11) % 11 << 11 >> 11;');
-        $result = '
-[
- {
-  {
-   {
+    public function build_recursive_list_of_files($dir)
     {
-     11
-     +
-     {
-      {
-       (
-       {
-        11
-        *
-        11
-       }
-       )
-      }
-      %
-      11
-     }
-    }
-    <<
-    11
-   }
-   >>
-   11
-  }
-  ;
- }
-]';
-        $this->compare_trees($trees, $result);
-    }
-
-    /**
-     * Tests variable definition
-     */
-    public function test_definition1() {
-        $trees = self::make_from_string('int a = 1 + 1;');
-        $result = '
-[
- {
-  {
-   int
-   a
-   =
-   {
-    1
-    +
-    1
-   }
-  }
-  ;
- }
-]';
-        $this->compare_trees($trees, $result);
-    }
-
-    /**
-     * Tests typedef definitions
-     */
-    public function test_typedef1() {
-        $trees = self::make_from_string('typedef int __int32; __int32 A = 32 + 64;');
-        $result = '
-[
- {
-  {
-   typedef
-   int
-   __int32
-   ;
-  }
-  {
-   {
-    __int32
-    A
-    =
-    {
-     32
-     +
-     64
-    }
-   }
-   ;
-  }
- }
-]';
-        $this->compare_trees($trees, $result);
-    }
-
-    /**
-     * Tests if-then-else condition
-     */
-    public function test_if_else1()  {
-        $trees = self::make_from_string('if (a > 22) a+=5; else { int b = rand(); a += b; }');
-        $result = '
-[
- {
-  {
-   if
-   (
-   {
-    a
-    >
-    22
-   }
-   )
-   {
-    {
-     a
-     +=
-     5
-    }
-    ;
-   }
-  }
-  else
-  {
-   {
-   {
-    {
-     {
-      int
-      b
-      =
-      {
-       rand
-       (
-       )
-      }
-     }
-     ;
-    }
-    {
-     {
-      a
-      +=
-      b
-     }
-     ;
-    }
-   }
-   }
-  }
- }
-]';
-        $this->compare_trees($trees, $result);
-    }
-
-    public function test_empty_switch() {
-        $trees = self::make_from_string('switch(a) { };');
-        $result = '
-[
- {
-  {
-   switch
-   (
-   a
-   )
-   {
-   }
-  }
-  ;
- }
-]
-        ';
-        $this->compare_trees($trees, $result);
-    }
-
-    public function test_switch_with_one_condition() {
-        $trees = self::make_from_string('switch(a) { case 1: { int test = a + b; } };');
-        $result = '
-[
- {
-  {
-   switch
-   (
-   a
-   )
-   {
-   {
-    case
-    1
-    :
-    {
-     {
-     {
-      {
-       int
-       test
-       =
-       {
-        a
-        +
-        b
-       }
-      }
-      ;
-     }
-     }
-    }
-   }
-   }
-  }
-  ;
- }
-]
-        ';
-        $this->compare_trees($trees, $result);
-    }
-
-    public function test_switch_common() {
-        $trees = self::make_from_string('switch(a) { case 1: { int test = a + b; } case 2: a+=x; default: a += x * 2; };');
-        $result = '
-[
- {
-  {
-   switch
-   (
-   a
-   )
-   {
-   {
-    {
-     {
-      case
-      1
-      :
-      {
-       {
-       {
-        {
-         int
-         test
-         =
-         {
-          a
-          +
-          b
-         }
+        $result = array();
+        if (is_dir($dir)) {
+            if ($dh = opendir($dir)) {
+                while (($file = readdir($dh)) !== false) {
+                    if ($file != '.' && $file != "..") {
+                        $fullname = $dir . DIRECTORY_SEPARATOR . $file;
+                        if (is_dir($fullname)) {
+                            $dirresult = self::build_recursive_list_of_files($fullname);
+                            if (count($result) == 0) {
+                                $result = $dirresult;
+                            } else {
+                                if (count($dirresult)) {
+                                    $result = array_merge($dirresult, $result);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            $result[] = $fullname;
+                        }
+                    }
+                }
+                closedir($dh);
+            }
         }
-        ;
-       }
-       }
-      }
-     }
-     {
-      case
-      2
-      :
-      {
-       {
-        a
-        +=
-        x
-       }
-       ;
-      }
-     }
-    }
-    {
-     default
-     :
-     {
-      {
-       a
-       +=
-       {
-        x
-        *
-        2
-       }
-      }
-      ;
-     }
-    }
-   }
-   }
-  }
-  ;
- }
-]
-        ';
-        $this->compare_trees($trees, $result);
-    }
-
-    public function test_try() {
-        $trees = self::make_from_string('typedef int Exception; try { a = unescaped_call(); } catch(Exception ex) { int a = 2;} catch(...) {}');
-        $result = '
-[
- {
-  {
-   typedef
-   int
-   Exception
-   ;
-  }
-  {
-   {
-    try
-    {
-    {
-     {
-      a
-      =
-      {
-       unescaped_call
-       (
-       )
-      }
-     }
-     ;
-    }
-    }
-   }
-   {
-    {
-     catch
-     (
-     {
-      Exception
-      ex
-     }
-     )
-     {
-     {
-      {
-       int
-       a
-       =
-       2
-      }
-      ;
-     }
-     }
-    }
-    {
-     catch
-     (
-     ...
-     )
-     {
-     }
-    }
-   }
-  }
- }
-]
-        ';
-        $this->compare_trees($trees, $result);
+        return $result;
     }
 
     /**
-     * Tests working with goto
+     * Builds a list for directory
+     * @param string $dir directory
+     * @return array list
      */
-    public function test_goto() {
-        $trees = self::make_from_string('label: int a = 2; if (b < 0) goto exit; printf("%d", 22); goto label; exit: return 0;');
-        $result = '
-[
- {
-  {
-   {
+    public function build_recursive_list($dir)
     {
-     {
-      {
-       {
-        label
-        :
-       }
-       {
+        $length = strlen($dir . DIRECTORY_SEPARATOR);
+        $files = self::build_recursive_list_of_files($dir);
+        if (count($files))
         {
-         int
-         a
-         =
-         2
+            $tmpfiles = array();
+            foreach($files as $v)
+            {
+                $tmpfiles[] = substr($v, $length);
+            }
+            $files = $tmpfiles;
         }
-        ;
-       }
-      }
-      {
-       if
-       (
-       {
-        b
-        <
-        0
-       }
-       )
-       {
-        goto
-        exit
-        ;
-       }
-      }
-     }
-     {
-      {
-       printf
-       (
-       {
-        "%d"
-        ,
-        22
-       }
-       )
-      }
-      ;
-     }
-    }
-    {
-     goto
-     label
-     ;
-    }
-   }
-   {
-    exit
-    :
-   }
-  }
-  {
-   return
-   0
-   ;
-  }
- }
-]
-        ';
-        $this->compare_trees($trees, $result);
+        return $files;
     }
 
     /**
-     * Test combination of working with return, break, continue and for
+     * Puts result to path
+     * @param $parent
+     * @param $filename
+     * @param $string
      */
-    public function test_return_break_continue_for() {
-        $trees = self::make_from_string('for(a = 3; a < 100; a++) { if (a == 25) continue; if (a == b) break; return 22; return; }');
-        $result = '
-[
- {
-  for
-  (
-  {
-   a
-   =
-   3
-  }
-  ;
-  {
-   a
-   <
-   100
-  }
-  ;
-  {
-   a
-   ++
-  }
-  )
-  {
-   {
-   {
+    public function put_result($parent, $filename, $string)
     {
-     {
-      {
-       if
-       (
-       {
-        a
-        ==
-        25
-       }
-       )
-       {
-        continue
-        ;
-       }
-      }
-      {
-       if
-       (
-       {
-        a
-        ==
-        b
-       }
-       )
-       {
-        break
-        ;
-       }
-      }
-     }
-     {
-      return
-      22
-      ;
-     }
-    }
-    {
-     return
-     ;
-    }
-   }
-   }
-  }
- }
-]
-        ';
-        $this->compare_trees($trees, $result);
-    }
-
-    /**
-     * Tests while loop
-     */
-    public function test_while() {
-        $trees = self::make_from_string('while(!acceptable(a)) perform_random_actions(&a);');
-        $result = '
-[
- {
-  while
-  (
-  {
-   !
-   {
-    acceptable
-    (
-    a
-    )
-   }
-  }
-  )
-  {
-   {
-    perform_random_actions
-    (
-    {
-     &
-     a
-    }
-    )
-   }
-   ;
-  }
- }
-]
-        ';
-        $this->compare_trees($trees, $result);
-    }
-
-    /**
-     * Tests do-while loop
-     */
-    public function test_do_while() {
-        $trees = self::make_from_string('do perform_random_actions(&a); while(!acceptable(a));');
-        $result = '
-[
- {
-  do
-  {
-   {
-    perform_random_actions
-    (
-    {
-     &
-     a
-    }
-    )
-   }
-   ;
-  }
-  while
-  (
-  {
-   !
-   {
-    acceptable
-    (
-    a
-    )
-   }
-  }
-  )
-  ;
- }
-]
-        ';
-        $this->compare_trees($trees, $result);
-    }
-
-    /**
-     * Test function definition
-     */
-    public function test_function_function() {
-        $trees = self::make_from_string('void test() { test(); } void test();');
-        $result = '
-[
- {
-  {
-   void
-   test
-   {
-    (
-    )
-   }
-   {
-    {
-    {
-     {
-      test
-      (
-      )
-     }
-     ;
-    }
-    }
-   }
-  }
-  {
-   void
-   test
-   {
-    (
-    )
-   }
-   ;
-  }
- }
-]
-        ';
-        $this->compare_trees($trees, $result);
-    }
-
-    /**
-     * Tests definition of class with constructor and destructor without actual code
-     */
-    public function test_class_with_constructor_and_destructor() {
-        $trees = self::make_from_string('class A { A(); ~A(); };');
-        $result = '
-[
- {
-  class
-  A
-  {
-   {
-   {
-    {
-     {
-      A
-      (
-      )
-     }
-     ;
-    }
-    {
-     {
-      ~
-      {
-       A
-       (
-       )
-      }
-     }
-     ;
-    }
-   }
-   }
-  }
-  ;
- }
-]
-        ';
-        $this->compare_trees($trees, $result);
-    }
-
-    /**
-     * Tests definition of class with constructor and destructor */
-    public function test_class_with_outer_definition_of_constructor_and_destructor() {
-        $trees = self::make_from_string('class A { A(); ~A(); }; A::A() { construct(this); } A::~A() { destroy(this); }');
-        $result = '
-[
- {
-  {
-   {
-    class
-    A
-    {
-     {
-     {
-      {
-       {
-        A
-        (
-        )
-       }
-       ;
-      }
-      {
-       {
-        ~
+        $parts = explode(DIRECTORY_SEPARATOR, $filename);
+        unset($parts[count($parts) - 1]);
+        if (count($parts))
         {
-         A
-         (
-         )
+            $currentpath = $parent;
+            foreach($parts as $part)
+            {
+                $dir = $currentpath . DIRECTORY_SEPARATOR . $part;
+                if (is_dir($dir) == false)
+                {
+                    mkdir($dir);
+                }
+                $currentpath = $dir;
+            }
         }
-       }
-       ;
-      }
-     }
-     }
-    }
-    ;
-   }
-   {
-    {
-     A
-     ::
-     A
-    }
-    (
-    )
-    {
-     {
-     {
-      {
-       construct
-       (
-       this
-       )
-      }
-      ;
-     }
-     }
-    }
-   }
-  }
-  {
-   A
-   ::
-   ~
-   A
-   (
-  }
- }
-]
-        ';
-        $this->compare_trees($trees, $result);
+
+        file_put_contents($parent . DIRECTORY_SEPARATOR . $filename, trim($string));
     }
 
     /**
-     * Tests definition of empty anonymous structure
+     * Run tests from external files
      */
-    public function test_empty_anonymous_struct() {
-        $trees = self::make_from_string('struct {} A;');
-        $result = '
-[
- {
-  struct
-  {
-   {
-   }
-  }
-  A
-  ;
- }
-]
-        ';
-        $this->compare_trees($trees, $result);
-    }
+    public function test_external_files() {
+        $parent = dirname(dirname(__FILE__));
+        $inputdir = $parent . DIRECTORY_SEPARATOR . "parsertests" . DIRECTORY_SEPARATOR .  "input";
+        $ethalondir =  $parent . DIRECTORY_SEPARATOR . "parsertests" . DIRECTORY_SEPARATOR .  "ethalon";
+        $resultdir =  $parent . DIRECTORY_SEPARATOR . "parsertests" . DIRECTORY_SEPARATOR .  "result";
+        $inputs = self::build_recursive_list($inputdir);
 
-    /**
-     * Test with struct and one field, using complex defintiions
-     */
-    public function test_struct_with_one_field_and_complex_definition() {
-        $trees = self::make_from_string('struct A { int k; } B;  A k;');
-        $result = '
-[
- {
-  {
-   struct
-   A
-   {
-    {
-    {
-     {
-      int
-      k
-     }
-     ;
-    }
-    }
-   }
-   B
-   ;
-  }
-  {
-   {
-    A
-    k
-   }
-   ;
-  }
- }
-]
-        ';
-        $this->compare_trees($trees, $result);
-    }
-
-    /**
-     * Tests union
-     */
-    public function test_union() {
-        $trees = self::make_from_string('union A { int k; double k2; char k3; };  A k;');
-        $result = '
-[
- {
-  {
-   union
-   A
-   {
-    {
-    {
-     {
-      {
-       {
-        int
-        k
-       }
-       ;
-      }
-      {
-       {
-        double
-        k2
-       }
-       ;
-      }
-     }
-     {
-      {
-       char
-       k3
-      }
-      ;
-     }
-    }
-    }
-   }
-   ;
-  }
-  {
-   {
-    A
-    k
-   }
-   ;
-  }
- }
-]
-        ';
-        $this->compare_trees($trees, $result);
-    }
-
-    /**
-     * Tests empty enum
-     */
-    public function test_empty_enum() {
-        $trees = self::make_from_string('enum K {}; K a;');
-        $result = '
-[
- {
-  {
-   enum
-   K
-   {
-    {
-    }
-   }
-   ;
-  }
-  {
-   {
-    K
-    a
-   }
-   ;
-  }
- }
-]
-        ';
-        $this->compare_trees($trees, $result);
-    }
-
-    /**
-     * Tests enum
-     */
-    public function test_enum_with_one_value() {
-        $trees = self::make_from_string('enum K { MY_VALUE }; K a;');
-        $result = '
-[
- {
-  {
-   enum
-   K
-   {
-    {
-    MY_VALUE
-    }
-   }
-   ;
-  }
-  {
-   {
-    K
-    a
-   }
-   ;
-  }
- }
-]
-        ';
-        $this->compare_trees($trees, $result);
-    }
-
-    /**
-     * Tests enum
-     */
-    public function test_enum_with_three_values() {
-        $trees = self::make_from_string('enum K { MY_VALUE, test1, test2 }; K a;');
-        $result = '
-[
- {
-  {
-   enum
-   K
-   {
-    {
-    {
-     {
-      MY_VALUE
-      ,
-      test1
-     }
-     ,
-     test2
-    }
-    }
-   }
-   ;
-  }
-  {
-   {
-    K
-    a
-   }
-   ;
-  }
- }
-]
-        ';
-        $this->compare_trees($trees, $result);
-    }
-
-    /**
-     * Tests enum
-     */
-    public function test_enum_with_numerical_data() {
-        $trees = self::make_from_string('enum K { MY_VALUE = 1, test1, test2 = 2 }; K a;');
-        $result = '
-[
- {
-  {
-   enum
-   K
-   {
-    {
-    {
-     {
-      {
-       MY_VALUE
-       =
-       1
-      }
-      ,
-      test1
-     }
-     ,
-     {
-      test2
-      =
-      2
-     }
-    }
-    }
-   }
-   ;
-  }
-  {
-   {
-    K
-    a
-   }
-   ;
-  }
- }
-]
-        ';
-        $this->compare_trees($trees, $result);
-    }
-
-    /**
-     * Tests one namespace definition
-     */
-    public function test_one_namespace() {
-        $trees = self::make_from_string('namespace A { class B; }');
-        $result = '
-[
- {
-  namespace
-  A
-  {
-   {
-   {
-    class
-    B
-    ;
-   }
-   }
-  }
- }
-]
-        ';
-        $this->compare_trees($trees, $result);
-    }
-
-    /**
-     * Tests three namespaces definition
-     */
-    public function test_three_namespaces() {
-        $trees = self::make_from_string('namespace A { class B; } namespace C { } namespace D { }');
-        $result = '
-[
- {
-  {
-   {
-    namespace
-    A
-    {
-     {
-     {
-      class
-      B
-      ;
-     }
-     }
-    }
-   }
-   {
-    namespace
-    C
-    {
-     {
-     }
-    }
-   }
-  }
-  {
-   namespace
-   D
-   {
-    {
-    }
-   }
-  }
- }
-]
-        ';
-        $this->compare_trees($trees, $result);
-    }
-
-    /**
-     * Tests namespace nesting
-     */
-    public function test_nested_namespaces() {
-        $trees = self::make_from_string('namespace A { namespace B { namespace C  { void main() { return; } }}}');
-        $result = '
-[
- {
-  namespace
-  A
-  {
-   {
-   {
-    namespace
-    B
-    {
-     {
-     {
-      namespace
-      C
-      {
-       {
-       {
-        void
-        main
+        if (!is_dir($ethalondir))
         {
-         (
-         )
+            mkdir($ethalondir);
         }
-        {
-         {
-         {
-          return
-          ;
-         }
-         }
-        }
-       }
-       }
-      }
-     }
-     }
-    }
-   }
-   }
-  }
- }
-]
-        ';
-        $this->compare_trees($trees, $result);
-    }
 
-    /**
-     * Tests nested namespaced with variable data
-     */
-    public function test_nested_namespace_with_related_variables() {
-        $trees = self::make_from_string('namespace A { namespace B { namespace C  { class D { }; }}} A::B::C::D k;');
-        $result = '
-[
- {
-  {
-   namespace
-   A
-   {
-    {
-    {
-     namespace
-     B
-     {
-      {
-      {
-       namespace
-       C
-       {
+        if (!is_dir($resultdir))
         {
-        {
-         class
-         D
-         {
-          {
-          }
-         }
-         ;
+            mkdir($resultdir);
         }
-        }
-       }
-      }
-      }
-     }
-    }
-    }
-   }
-  }
-  {
-   {
-    {
-     {
-      {
-       A
-       ::
-       B
-      }
-      ::
-      C
-     }
-     ::
-     D
-    }
-    k
-   }
-   ;
-  }
- }
-]
-        ';
-        $this->compare_trees($trees, $result);
-    }
 
-    /**
-     * Tests nested classes
-     */
-    public function test_nested_classes() {
-        $trees = self::make_from_string('class A {public: class B  { }; void f() {}  }; A::B k;');
-        $result = '
-[
- {
-  {
-   class
-   A
-   {
-    {
-    {
-     {
-      {
-       public
-       :
-      }
-      {
-       class
-       B
-       {
-        {
-        }
-       }
-       ;
-      }
-     }
-     {
-      void
-      f
-      {
-       (
-       )
-      }
-      {
-       {
-       }
-      }
-     }
-    }
-    }
-   }
-   ;
-  }
-  {
-   {
-    {
-     A
-     ::
-     B
-    }
-    k
-   }
-   ;
-  }
- }
-]
-        ';
-        $this->compare_trees($trees, $result);
-    }
+        if (count($inputs)) {
+            foreach($inputs as $file)
+            {
+                /** @noinspection PhpIncludeInspection */
+                include($inputdir . DIRECTORY_SEPARATOR . $file);
 
-    /**
-     * Tests long long int
-     */
-    public function test_long_long_int_in_union()  {
-        $trees = self::make_from_string('union Variant { unsigned int A; long long int A;  }; ');
-        $result = '
-[
- {
-  union
-  Variant
-  {
-   {
-   {
-    {
-     {
-      {
-       unsigned
-       int
-      }
-      A
-     }
-     ;
-    }
-    {
-     {
-      {
-       long
-       long
-       int
-      }
-      A
-     }
-     ;
-    }
-   }
-   }
-  }
-  ;
- }
-]
-        ';
-        $this->compare_trees($trees, $result);
-    }
+                $name = preg_replace("/\\.php$/", ".txt", $file);
 
-    /**
-     * Tests unsigned long long int
-     */
-    public function test_unsigned_long_long_int_in_union() {
-        $trees = self::make_from_string('union Variant { unsigned int A; unsigned long long int A;  }; ');
-        $result = '
-[
- {
-  union
-  Variant
-  {
-   {
-   {
-    {
-     {
-      {
-       unsigned
-       int
-      }
-      A
-     }
-     ;
-    }
-    {
-     {
-      {
-       unsigned
-       long
-       long
-       int
-      }
-      A
-     }
-     ;
-    }
-   }
-   }
-  }
-  ;
- }
-]
-        ';
-        $this->compare_trees($trees, $result);
-    }
-
-    /**
-     * Tests parsing simple program, which prints all passed arguments
-     */
-    public function test_print_arguments() {
-        $trees = self::make_from_string('
-        int main(int  argc, char ** argv)
-        {
-            for(i = 0; i < argc; i++)
-                printf("%d", argv[i]);
-            return 0;
+                $lang = new block_formal_langs_language_cpp_parseable_language();
+                /** @noinspection PhpUndefinedMethodInspection */
+                /** @noinspection PhpUndefinedVariableInspection */
+                $lang->parser()->set_namespace_tree($namespacetree);
+                /** @noinspection PhpUndefinedVariableInspection */
+                $result = $lang->create_from_string($string);
+                $newstring = self::print_node_for_external($result->syntaxtree, 0);
+                $name = preg_replace("/\\.php$/", ".txt", $file);
+                $ethalonfile = $ethalondir . DIRECTORY_SEPARATOR . $name;
+                $ethalon = @file_get_contents($ethalonfile);
+                if ($ethalon === false) {
+                    /** @noinspection PhpUndefinedMethodInspection */
+                    $this->assertTrue(false, 'Can\'t find some ethalon file' .  $ethalonfile);
+                } else {
+                    self::put_result($resultdir, $name, $newstring);
+                    $status = false;
+                    $ethalon = str_replace("\r\n", "\n", $ethalon);
+                    $newstring = str_replace("\r\n", "\n", $newstring);
+                    if ($ethalon == $newstring) {
+                        $status = true;
+                    }
+                    /** @noinspection PhpUndefinedMethodInspection */
+                    $this->assertTrue($status, 'Failed test ' .  $inputdir . DIRECTORY_SEPARATOR . $file);
+                }
+            }
         }
-        ');
-        $result = '
-[
- {
-  int
-  main
-  {
-   (
-   {
-    {
-     int
-     argc
-    }
-    ,
-    {
-     {
-      {
-       char
-       *
-      }
-      *
-     }
-     argv
-    }
-   }
-   )
-  }
-  {
-   {
-   {
-    {
-     for
-     (
-     {
-      i
-      =
-      0
-     }
-     ;
-     {
-      i
-      <
-      argc
-     }
-     ;
-     {
-      i
-      ++
-     }
-     )
-     {
-      {
-       printf
-       (
-       {
-        "%d"
-        ,
-        {
-         argv
-         [
-         i
-         ]
-        }
-       }
-       )
-      }
-      ;
-     }
-    }
-    {
-     return
-     0
-     ;
-    }
-   }
-   }
-  }
- }
-]
-        ';
-        $this->compare_trees($trees, $result);
-    }
-
-    /**
-     * Tests some visibility problems
-     */
-    public function test_visibility()  {
-        $trees = self::make_from_string('class Test { public: void k(); private: protected:  private slots: public signals: };');
-        $result = '
-        [
- {
-  class
-  Test
-  {
-   {
-   {
-    {
-     {
-      {
-       {
-        {
-         public
-         :
-        }
-        {
-         void
-         k
-         {
-          (
-          )
-         }
-         ;
-        }
-       }
-       {
-        private
-        :
-       }
-      }
-      {
-       protected
-       :
-      }
-     }
-     {
-      private
-      slots
-      :
-     }
-    }
-    {
-     public
-     signals
-     :
-    }
-   }
-   }
-  }
-  ;
- }
-]
-        ';
-        $this->compare_trees($trees, $result);
     }
 }

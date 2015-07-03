@@ -1,0 +1,32 @@
+[
+ (program) {
+  (stmt_list) {
+   (stmt_or_defined_macro) {
+    (stmt) {
+     (variable_declaration) {
+      (builtintype) {
+       int
+      }
+      (lvalue_or_assignment_list) {
+       (lvalue_or_assignment_list) {
+        t
+        ,
+        (lvalue) {
+         *
+         h
+        }
+       }
+       ,
+       (lvalue) {
+        k
+        [
+        ]
+       }
+      }
+     }
+     ;
+    }
+   }
+  }
+ }
+]

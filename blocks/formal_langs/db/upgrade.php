@@ -125,5 +125,29 @@ function xmldb_block_formal_langs_upgrade($oldversion = 0) {
 		*/
     }
 
+    if ($oldversion < 2015050600)  {
+        $dbman = $DB->get_manager();
+        $langname = 'cpp_parseable_language';
+        $clause = $DB->sql_compare_text('name')  . ' =  ?';
+        $statement = 'SELECT * FROM {block_formal_langs} WHERE ' . $clause;
+        $parseablelang = $DB->get_record_sql($statement, array($langname));
+        $langname = 'cpp_language';
+        $cpplang = $DB->get_record_sql($statement, array($langname));
+        if ($parseablelang !== false && $dbman->table_exists('qtype_correctwriting')) {
+            $dependentquestions = $DB->get_records('qtype_correctwriting', array('langid' => $parseablelang->id));
+            if (count($dependentquestions)) {
+                foreach($dependentquestions as $id => $qobj) {
+                    $qobj->langid = $cpplang->id;
+                    $DB->update_record('qtype_correctwriting', $qobj);
+                }
+            }
+        }
+        if ($cpplang !== false) {
+            $cpplang->name = 'cpp_parseable_language';
+            $cpplang->description = 'C++ language with basic preprocessor support';
+            $DB->update_record('block_formal_langs', $cpplang);
+        }
+    }
+
     return true;
 }
