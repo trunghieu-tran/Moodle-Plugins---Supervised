@@ -16,8 +16,8 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->version   = 2014101500;
-$plugin->release   = '0.0.0';
-$plugin->maturity  = MATURITY_ALPHA;
-$plugin->requires  = 2014051200;
+$plugin->version   = 2015070300;
+$plugin->release   = 'AJAX Question Categories 2.8';
+$plugin->maturity  = MATURITY_STABLE;
+$plugin->requires  = 2014050800;
 $plugin->component = 'local_ajaxcategories';
