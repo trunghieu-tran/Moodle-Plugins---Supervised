@@ -25,15 +25,27 @@ defined('MOODLE_INTERNAL') || die;
 global $CFG;
 
 require_once($CFG->dirroot.'/blocks/formal_langs/settingslib.php');
+require_once($CFG->dirroot.'/blocks/formal_langs/block_formal_langs.php');
 
-if($ADMIN->fulltree) {
-
-    $cfgname = 'block_formal_langs_showablelangs';
-    $label =  get_string('visiblelangslabel', 'block_formal_langs');
-    $description = get_string('visiblelangsdescription', 'block_formal_langs');
-    $default = array('1' => '1');
-    /** @var block_formal_langs_admin_setting_showable_languages $setting */
-    $setting  = new block_formal_langs_admin_setting_visible_languages($cfgname, $label, $description, $default, null);
-    $settings->add($setting);
-
+if(is_object($ADMIN)) {
+    $string = get_string('formallangsvisibilitysettings', 'block_formal_langs');
+    $ADMIN->add('blocksettings', new admin_externalpage('formallangsglobalsettings', $string,  $CFG->wwwroot . '/blocks/formal_langs/globalsettings.php'));
+    if ($ADMIN->fulltree) {
+        $settings->add(new admin_setting_configtext(
+            'block_formal_langs_maximum_lexical_backracking_execution_time',
+            get_string('maximumlexicalbacktrackingexecutuiontimesettingname', 'block_formal_langs'),
+            get_string('maximumlexicalbacktrackingexecutuiontimesettingdescription', 'block_formal_langs'),
+            30,
+            PARAM_INT,
+            20
+        ));
+        $settings->add(new admin_setting_configtext(
+            'block_formal_langs_maximum_variations_of_typo_correction',
+            get_string('maximumvariationsoftypocorrectionsettingname', 'block_formal_langs'),
+            get_string('maximumvariationsoftypocorrectionsettingdescription', 'block_formal_langs'),
+            5,
+            PARAM_INT,
+            20
+        ));
+    }
 }

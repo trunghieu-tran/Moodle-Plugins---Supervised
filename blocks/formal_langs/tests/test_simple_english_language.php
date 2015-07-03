@@ -139,5 +139,27 @@ class block_formal_langs_simple_english_language_test extends PHPUnit_Framework_
         $this->assertTrue($result[0]->value() == $test);
     }
 
+    public function test_multiline() {
+        $lang = new block_formal_langs_language_simple_english();
+        $test = 'mad
+                 man
+                ';
+        $processedstring = $lang->create_from_string($test);
+        $result = $processedstring->stream->tokens;
+        $this->assertTrue(count($result) == 2);
+        $this->assertTrue($result[0]->value() == 'mad');
+        $this->assertTrue($result[1]->value() == 'man');
+    }
+
+    public function test_stringpos() {
+        $lang = new block_formal_langs_language_simple_english();
+        $test = 'mad';
+        $processedstring = $lang->create_from_string($test);
+        $result = $processedstring->stream->tokens;
+        $this->assertTrue(count($result) == 1);
+        $this->assertTrue($result[0]->position()->stringstart() == 0);
+        $this->assertTrue($result[0]->position()->stringend() == 2);
+    }
+
 }
  ?>

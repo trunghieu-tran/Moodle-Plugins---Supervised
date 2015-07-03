@@ -28,7 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/shortanswer/renderer.php');
-require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 
 /**
@@ -38,7 +37,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
     public function formulation_and_controls(question_attempt $qa,
             question_display_options $options) {
 
-        $result = parent::formulation_and_controls($qa,$options);
+        $result = parent::formulation_and_controls($qa, $options);
 
         return $result;
     }
@@ -47,7 +46,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         $question = $qa->get_question();
         $response = $qa->get_last_qt_var('answer');
 
-        if ($response) {//Generate response-specific correct answer if there is response
+        if ($response) {// Generate response-specific correct answer if there is response.
             $correctanswer = $question->get_correct_response_ext(array('answer' => $response));
         } else {
             $correctanswer = $question->get_correct_response();
@@ -60,21 +59,21 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         return get_string('correctansweris', 'qtype_shortanswer', s($correctanswer['answer']));
     }
 
-    //Overloading feedback to add colored string
+    // Overloading feedback to add colored string.
     public function feedback(question_attempt $qa, question_display_options $options) {
 
         $question = $qa->get_question();
         $currentanswer = $qa->get_last_qt_var('answer');
-        if(!$currentanswer) {
+        if (!$currentanswer) {
             $currentanswer = '';
         }
 
-        //Render hints
-        $coloredhintrendered = false;//Is hint showing colored string rendered?
+        // Render hints.
+        $coloredhintrendered = false;// Is hint showing colored string rendered?
         $behaviour = $qa->get_behaviour();
         $hintmessage = '';
         $br =  html_writer::empty_tag('br');
-        if (is_a($behaviour, 'behaviour_with_hints')) {
+        if (is_a($behaviour, 'qtype_poasquestion\\behaviour_with_hints')) {
             $hints = $question->available_specific_hints(array('answer' => $currentanswer));
             $hints = $behaviour->adjust_hints($hints);
             foreach ($hints as $hintkey) {
@@ -88,15 +87,18 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
             }
         }
 
-        //Render simple colored string if specific feedback is possible and no hint including colored string was rendered.
+        // Render simple colored string if specific feedback is possible and no hint including colored string was rendered.
         if (!$coloredhintrendered && $options->feedback == question_display_options::VISIBLE) {
             $hintobj = $question->hint_object('hintmatchingpart');
-            $hintmessage = $hintobj->render_hint($this, $qa, $options, array('answer' => $currentanswer));
-            if (qtype_poasquestion_string::strlen($hintmessage) > 0) {
-                $hintmessage .= $br;
+            if ($hintobj->hint_available(array('answer' => $currentanswer))) {
+                $hintmessage = $hintobj->render_hint($this, $qa, $options, array('answer' => $currentanswer));
+                if (core_text::strlen($hintmessage) > 0) {
+                    $hintmessage .= $br;
+                }
             }
         }
 
+        $hintmessage = html_writer::tag('span', $hintmessage, array('id' => 'qtype-preg-colored-string'));
         $output = parent::feedback($qa, $options);
         return $hintmessage.$output;
     }
@@ -146,6 +148,15 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         return get_string('tobecontinued', 'qtype_preg', null);
     }
 
+    /** Renders correct icon if $correct = true, incorrect otherwise.*/
+    public function render_match_icon($correct) {
+        $fraction = 0;
+        if ($correct) {
+            $fraction = 1;
+        }
+        return $this->feedback_image($fraction);
+    }
+
     public function specific_feedback(question_attempt $qa) {
 
         $question = $qa->get_question();
@@ -154,7 +165,8 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
             return '';
         }
 
-        //////Teacher-defined feedback text for that answer
+        // Teacher-defined feedback text for that answer.
         return $question->get_feedback_for_response(array('answer' => $currentanswer), $qa);
     }
 }
+

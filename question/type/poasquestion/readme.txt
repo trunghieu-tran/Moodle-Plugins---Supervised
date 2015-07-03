@@ -12,7 +12,7 @@ Main code segments:
     If you need advanced hinting in you question, you could inherit hint definitions from these classes and use
     "adaptivehints" and "adaptivehintsnopenalties" behaviours
 * Unicode string class (written by Streltsov Valeriy)
-    allows to use [] on UTF-8 string without problems and call most textlib functions (and some more, like ord)
+    allows to use [] on UTF-8 string without problems and call most core_text functions (and some more, like ord)
     automatically converts to string
 * support for string tokenizing using JLex PHP
     - JLex PHP base file, modified to work with UTF-8 correctly

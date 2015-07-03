@@ -25,75 +25,86 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
-require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
-
 class qtype_preg_error {
 
-    // Human-understandable error message.
+    /** Human-understandable error message. */
     public $errormsg;
-    //
-    public $index_first;
-    //
-    public $index_last;
+    /** An instance of qtype_preg_position. */
+    public $position;
 
-    protected function highlight_regex($regex, $indfirst, $indlast) {
-        if ($indfirst >= 0 && $indlast >= 0) {
-            return htmlspecialchars(qtype_poasquestion_string::substr($regex, 0, $indfirst)) . '<b>' .
-                   htmlspecialchars(qtype_poasquestion_string::substr($regex, $indfirst, $indlast - $indfirst + 1)) . '</b>' .
-                   htmlspecialchars(qtype_poasquestion_string::substr($regex, $indlast + 1));
+    protected function sanitize_position($regex, &$position) {
+        if ($position === null) {
+            $position = new qtype_preg_position(0, core_text::strlen($regex) - 1, -1, -1, -1, -1);
+        }
+    }
+
+    /**
+     * Returns a string with first character in upper case and the rest of the string in lower case.
+     */
+    protected function uppercase_first_letter($str) {
+        $head = core_text::strtoupper(core_text::substr($str, 0, 1));
+        $tail = core_text::strtolower(core_text::substr($str, 1));
+        return $head . $tail;
+    }
+
+    protected function highlight_regex($regex, $position) {
+        if ($position->indfirst >= 0 && $position->indlast >= 0) {
+            return htmlspecialchars(core_text::substr($regex, 0, $position->indfirst)) . '<b>' .
+                   htmlspecialchars(core_text::substr($regex, $position->indfirst, $position->indlast - $position->indfirst + 1)) . '</b>' .
+                   htmlspecialchars(core_text::substr($regex, $position->indlast + 1));
         } else {
             return htmlspecialchars($regex);
         }
     }
 
-     public function __construct($errormsg, $regex = '', $index_first = -2, $index_last = -2, $preservemsg = false) {
+    /**
+     * Constructs error with given parameters.
+     * @param errormsg string error message to show to the user.
+     * @param regex string regular expression, containing error.
+     * @param position qtype_preg_position instance.
+     * @param preservemsg bool if true, message contains HTML code and should not be treated by htmlspecialchars function. PHP preg matcher use it to show links to PCRE documentation.
+     */
+    public function __construct($errormsg, $regex, $position, $preservemsg = false) {
+
+        $this->sanitize_position($regex, $position);
+
+        $errormsg = $this->uppercase_first_letter($errormsg);
         if (!$preservemsg) {
             $errormsg = htmlspecialchars($errormsg);
         }
-        $this->index_first = $index_first;
-        $this->index_last = $index_last;
-        if ($index_first != -2) {
-            $this->errormsg = $this->highlight_regex($regex, $index_first, $index_last). '<br/>' . $errormsg;
+        $this->position = $position;
+        if ($position->colfirst != -2) {
+            $this->errormsg = $this->highlight_regex($regex, $position) . '<br/>' . $errormsg;
         } else {
             $this->errormsg = $errormsg;
         }
-     }
+    }
 }
 
 // A syntax error occured while parsing a regex.
 class qtype_preg_parsing_error extends qtype_preg_error {
 
-    public function __construct($regex, $parsernode) {
-        $this->index_first = $parsernode->indfirst;
-        $this->index_last = $parsernode->indlast;
-        $this->errormsg = $this->highlight_regex($regex, $this->index_first, $this->index_last) . '<br/>' . $parsernode->error_string();
+    public function __construct($regex, $astnode) {
+        parent::__construct($astnode->error_string(), $regex, $astnode->position);
     }
 }
 
 // There's an unacceptable node in a regex.
 class qtype_preg_accepting_error extends qtype_preg_error {
 
-    /**
-     * Returns a string with first character converted to upper case.
-     */
-    public function uppercase_first_letter($str) {
-        $firstchar = qtype_poasquestion_string::strtoupper(qtype_poasquestion_string::substr($str, 0, 1));
-        $rest = qtype_poasquestion_string::substr($str, 1, qtype_poasquestion_string::strlen($str));
-        return $firstchar.$rest;
-    }
-
-    public function __construct($regex, $matchername, $nodename, $indexes) {
+    public function __construct($regex, $matchername, $nodename, $astnode) {
         $a = new stdClass;
-        $a->nodename = $this->uppercase_first_letter($nodename);
-        $a->indfirst = $indexes['start'];
-        $a->indlast = $indexes['end'];
+        $a->nodename = $nodename;
+        $a->linefirst = $astnode->position->linefirst;
+        $a->linelast = $astnode->position->linelast;
+        $a->colfirst = $astnode->position->colfirst;
+        $a->collast = $astnode->position->collast;
         $a->engine = get_string($matchername, 'qtype_preg');
-        $this->index_first = $a->indfirst;
-        $this->index_last = $a->indlast;
-        $this->errormsg = $this->highlight_regex($regex, $this->index_first, $this->index_last) . '<br/>' . get_string('unsupported', 'qtype_preg', $a);
-    }
 
+        $errormsg = get_string('unsupported', 'qtype_preg', $a);
+
+        parent::__construct($errormsg, $regex, $astnode->position);
+    }
 }
 
 // There's an unsupported modifier in a regex.
@@ -103,27 +114,59 @@ class qtype_preg_modifier_error extends qtype_preg_error {
         $a = new stdClass;
         $a->modifier = $modifier;
         $a->classname = $matchername;
-        $this->errormsg = get_string('unsupportedmodifier', 'qtype_preg', $a);
+
+        $errormsg = get_string('unsupportedmodifier', 'qtype_preg', $a);
+
+        parent::__construct($errormsg, '', null);
     }
 }
 
 // FA is too large.
 class qtype_preg_too_complex_error extends qtype_preg_error {
 
-    public function __construct($regex, $matcher, $indexes = array('start' => -1, 'end' => -2)) {
+    public function __construct($regex, $matcher, $position = null) {
         global $CFG;
+
+        $this->sanitize_position($regex, $position);
+
         $a = new stdClass;
-        if ($indexes['start'] == -1 && $indexes['end'] == -2) {
-            $a->indfirst = 0;
-            $a->indlast = qtype_poasquestion_string::strlen($regex) - 1;
-        } else {
-            $a->indfirst = $indexes['start'];
-            $a->indlast = $indexes['end'];
-        }
+        $a->linefirst = $position->linefirst;
+        $a->linelast = $position->linelast;
+        $a->colfirst = $position->colfirst;
+        $a->collast = $position->collast;
         $a->engine = get_string($matcher->name(), 'qtype_preg');
-        $this->index_first = $a->indfirst;
-        $this->index_last = $a->indlast;
-        $a->link = $CFG->wwwroot.'/'.$CFG->admin.'/settings.php?section=qtypesettingpreg';
-        $this->errormsg = $this->highlight_regex($regex, $this->index_first, $this->index_last) . '<br/>' . get_string('too_large_fa', 'qtype_preg', $a);
+        $a->link = $CFG->wwwroot . '/' . $CFG->admin . '/settings.php?section=qtypesettingpreg';
+
+        $errormsg = get_string('too_large_fa', 'qtype_preg', $a);
+
+        parent::__construct($errormsg, $regex, $position);
+    }
+}
+
+class qtype_preg_empty_fa_error extends qtype_preg_error {
+
+    public function __construct($regex, $position = null) {
+        $errormsg = get_string('empty_fa', 'qtype_preg');
+
+        parent::__construct($errormsg, $regex, $position);
+    }
+}
+
+class qtype_preg_backref_intersection_error extends qtype_preg_error {
+
+    public function __construct($regex, $position = null) {
+        $errormsg = get_string('backref_intersection', 'qtype_preg');
+
+        parent::__construct($errormsg, $regex, $position);
+    }
+}
+
+
+class qtype_preg_mergedassertion_option_error extends qtype_preg_error {
+
+    public function __construct($regex, $position = null) {
+        $errormsg = get_string('mergedassertion_option', 'qtype_preg');
+
+        parent::__construct($errormsg, $regex, $position);
     }
 }

@@ -1,15 +1,14 @@
-﻿<?php
+<?php
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
 class qtype_preg_unicode_test extends PHPUnit_Framework_TestCase {
 
     private $mincode;
-    private $this->maxcode;
+    private $maxcode;
 
     protected function setUp() {
         $this->mincode = qtype_preg_unicode::min_possible_code();
@@ -90,7 +89,10 @@ class qtype_preg_unicode_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($range2 === null);
     }
 
-    function test_ranges_kinda_intersection() {
+    /**
+     * Tests kinda_operator() for intersection and intersects()
+     */
+    function test_ranges_kinda_intersection_and_intersect() {
         // Case 1: the first set includes the second.
         $ranges1 = array(array(1, 10));
         $ranges2 = array(array(2, 6), array(8, 9));
@@ -100,6 +102,7 @@ class qtype_preg_unicode_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($result[0][1] === 6);
         $this->assertTrue($result[1][0] === 8);
         $this->assertTrue($result[1][1] === 9);
+        $this->assertTrue(qtype_preg_unicode::intersects($ranges1, $ranges2));
 
         // Case 2: the sets intersect in different ways
         $ranges1 = array(array(0, 10), array(12, 12), array(14, 18), array(24, 30));
@@ -118,6 +121,7 @@ class qtype_preg_unicode_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($result[4][1] === 26);
         $this->assertTrue($result[5][0] === 28);
         $this->assertTrue($result[5][1] === 30);
+        $this->assertTrue(qtype_preg_unicode::intersects($ranges1, $ranges2));
 
         // Case 3: two same sets.
         $ranges1 = array(array($this->mincode, $this->maxcode));
@@ -126,6 +130,7 @@ class qtype_preg_unicode_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(count($result) === 1);
         $this->assertTrue($result[0][0] === $this->mincode);
         $this->assertTrue($result[0][1] === $this->maxcode);
+        $this->assertTrue(qtype_preg_unicode::intersects($ranges1, $ranges2));
 
         // Case 4: two same sets of the only point.
         $ranges1 = array(array(5, 5));
@@ -134,12 +139,14 @@ class qtype_preg_unicode_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue(count($result) === 1);
         $this->assertTrue($result[0][0] === 5);
         $this->assertTrue($result[0][1] === 5);
+        $this->assertTrue(qtype_preg_unicode::intersects($ranges1, $ranges2));
 
         // Case 5: empty sets.
         $ranges1 = array();
         $ranges2 = array();
         $result = qtype_preg_unicode::kinda_operator($ranges1, $ranges2, true, false, false, false);
         $this->assertTrue(count($result) === 0);
+        $this->assertFalse(qtype_preg_unicode::intersects($ranges1, $ranges2));
     }
 
     function test_ranges_kinda_union() {
@@ -233,38 +240,38 @@ class qtype_preg_unicode_test extends PHPUnit_Framework_TestCase {
     }
 
     function test_get_ranges_from_charset() {
-        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion_string('a'));
+        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion\string('a'));
         $this->assertTrue(count($ranges) === 1);
-        $this->assertTrue($ranges[0][0] === qtype_poasquestion_string::ord('a'));
-        $this->assertTrue($ranges[0][1] === qtype_poasquestion_string::ord('a'));
+        $this->assertTrue($ranges[0][0] === core_text::utf8ord('a'));
+        $this->assertTrue($ranges[0][1] === core_text::utf8ord('a'));
 
-        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion_string('ab'));
+        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion\string('ab'));
         $this->assertTrue(count($ranges) === 1);
-        $this->assertTrue($ranges[0][0] === qtype_poasquestion_string::ord('a'));
-        $this->assertTrue($ranges[0][1] === qtype_poasquestion_string::ord('b'));
+        $this->assertTrue($ranges[0][0] === core_text::utf8ord('a'));
+        $this->assertTrue($ranges[0][1] === core_text::utf8ord('b'));
 
-        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion_string('abc'));
+        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion\string('abc'));
         $this->assertTrue(count($ranges) === 1);
-        $this->assertTrue($ranges[0][0] === qtype_poasquestion_string::ord('a'));
-        $this->assertTrue($ranges[0][1] === qtype_poasquestion_string::ord('c'));
+        $this->assertTrue($ranges[0][0] === core_text::utf8ord('a'));
+        $this->assertTrue($ranges[0][1] === core_text::utf8ord('c'));
 
-        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion_string('abde'));
+        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion\string('abde'));
         $this->assertTrue(count($ranges) === 2);
-        $this->assertTrue($ranges[0][0] === qtype_poasquestion_string::ord('a'));
-        $this->assertTrue($ranges[0][1] === qtype_poasquestion_string::ord('b'));
-        $this->assertTrue($ranges[1][0] === qtype_poasquestion_string::ord('d'));
-        $this->assertTrue($ranges[1][1] === qtype_poasquestion_string::ord('e'));
+        $this->assertTrue($ranges[0][0] === core_text::utf8ord('a'));
+        $this->assertTrue($ranges[0][1] === core_text::utf8ord('b'));
+        $this->assertTrue($ranges[1][0] === core_text::utf8ord('d'));
+        $this->assertTrue($ranges[1][1] === core_text::utf8ord('e'));
 
-        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion_string('acdfghj'));
+        $ranges = qtype_preg_unicode::get_ranges_from_charset(new qtype_poasquestion\string('acdfghj'));
         $this->assertTrue(count($ranges) === 4);
-        $this->assertTrue($ranges[0][0] === qtype_poasquestion_string::ord('a'));
-        $this->assertTrue($ranges[0][1] === qtype_poasquestion_string::ord('a'));
-        $this->assertTrue($ranges[1][0] === qtype_poasquestion_string::ord('c'));
-        $this->assertTrue($ranges[1][1] === qtype_poasquestion_string::ord('d'));
-        $this->assertTrue($ranges[2][0] === qtype_poasquestion_string::ord('f'));
-        $this->assertTrue($ranges[2][1] === qtype_poasquestion_string::ord('h'));
-        $this->assertTrue($ranges[3][0] === qtype_poasquestion_string::ord('j'));
-        $this->assertTrue($ranges[3][1] === qtype_poasquestion_string::ord('j'));
+        $this->assertTrue($ranges[0][0] === core_text::utf8ord('a'));
+        $this->assertTrue($ranges[0][1] === core_text::utf8ord('a'));
+        $this->assertTrue($ranges[1][0] === core_text::utf8ord('c'));
+        $this->assertTrue($ranges[1][1] === core_text::utf8ord('d'));
+        $this->assertTrue($ranges[2][0] === core_text::utf8ord('f'));
+        $this->assertTrue($ranges[2][1] === core_text::utf8ord('h'));
+        $this->assertTrue($ranges[3][0] === core_text::utf8ord('j'));
+        $this->assertTrue($ranges[3][1] === core_text::utf8ord('j'));
     }
 
     function test_ranges_binary_search() {
@@ -311,7 +318,7 @@ class qtype_preg_unicode_test extends PHPUnit_Framework_TestCase {
     function test_ranges_negation() {
         // Empty array.
         $ranges = array();
-        $this->assertTrue(qtype_preg_unicode::negate_ranges($ranges) === array(array(0, $this->maxcode)));
+        $this->assertTrue(qtype_preg_unicode::negate_ranges($ranges) === qtype_preg_unicode::dot_ranges());
         // One big range from 0 to maxcode.
         $ranges = array(array(0, $this->maxcode));
         $this->assertTrue(qtype_preg_unicode::negate_ranges($ranges) === array());

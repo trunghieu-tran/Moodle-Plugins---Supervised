@@ -60,5 +60,28 @@ class block_formal_langs_admin_setting_visible_languages extends admin_setting_c
         return true;
     }
 
+    /**
+     * Saves the setting(s) provided in $data
+     *
+     * @param array $data An array of data, if not array returns empty str
+     * @return mixed empty string on useless data or bool true=success, false=failed
+     */
+    public function write_setting($data) {
+        $result = parent::write_setting($data);
+        $globalresult = $result;
+        if ($result !== false) {
+            // Fairly copypasted - don't know how to avoid
+            $result = array();
+            foreach ($data as $key => $value) {
+                if ($value and array_key_exists($key, $this->choices)) {
+                    $result[] = $key;
+                }
+            }
+            $tmpresult = implode(',', $result);
+            block_formal_langs::sync_contexts_with_config($tmpresult);
+        }
+        return $globalresult;
+    }
+
 }
 

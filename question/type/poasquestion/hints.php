@@ -29,6 +29,8 @@
 
 
 defined('MOODLE_INTERNAL') || die();
+global $CFG;
+require_once($CFG->dirroot . '/question/type/questionbase.php');
 
 /**
  * Question which could return some specific hints and want to use *withhint behaviours should implement this
@@ -39,7 +41,7 @@ defined('MOODLE_INTERNAL') || die();
 interface question_with_qtype_specific_hints {
 
     /**
-     * Returns an array of available specific hint types depending on question settings
+     * Returns an array of all available specific hint types, that can be used in both student- and teacher-planned behaviours.
      *
      * The values are hint type indentifiers (hintkeys), unique for the qtype.
      * For multiple instance sequential hints hintkeys should end with '#' character.
@@ -48,7 +50,14 @@ interface question_with_qtype_specific_hints {
     public function available_specific_hints($response = null);
 
     /**
-     * Hint object factory
+     * Returns an array of available specific hint types for use in student-choosed behaviours.
+     *
+     * Used from student-choosen behaviours like 
+     */
+    public function hints_available_for_student($response = null);
+
+    /**
+     * Hint object factory.
      *
      * Returns a hint object for given type, for multiple instance choosen hints response may be needed to generate correct object.
      */
@@ -57,7 +66,7 @@ interface question_with_qtype_specific_hints {
 
 interface behaviour_with_hints {
     /**
-     * Adjust hintkey, adding number for sequential multiple instance hints.
+     * Adjust hintkey, adding current number for sequential multiple instance hints.
      *
      * Passed hintkey should ends with # character to be appended with number.
      */
@@ -65,11 +74,11 @@ interface behaviour_with_hints {
 
     /**
      * Adjust hints array, replacing every hintkey that ends with # with a whole 
-     * bunch of numbers up to max used in this attempt.
+     * bunch of hint numbers for hints, that should be shown in this step.
      */
     public function adjust_hints($hints);
 }
-
+//TODO - MOVED IN NAMESPACE, DELETE IN 2.9
 /**
  * Base class for question-type specific hints
  *
@@ -84,13 +93,21 @@ abstract class qtype_specific_hint {
      */
     const SINGLE_INSTANCE_HINT = 1;
     /** 
-     *  Choosen multiple instance hint allows several hint buttons, from which the user (either teacher or student, depending on behaviour) could choose one they want. 
+     *  Choosen multiple instance hint allows several hint buttons, from which the user
+     *  (either teacher or student, depending on behaviour) could choose one they want. 
      *  Example is hint, that would show how you should place misplaced lexem in correct writing question type.
+     *
+     *  In the hint options for interactive mode (save_hint_options function) available choosen multiple instance
+     *  hint keys should end on '_' character, behaviour will add all instances returned by available_specific_hints
+     *  starting from the prefixes from save_hint_options.
      */
     const CHOOSEN_MULTIPLE_INSTANCE_HINT = 2;
     /** 
      *  Sequential multuple instance hint allows several hints, that could be used only in sequence. 
      *  Current moodle text hints are example of this ones since there are no way to allow students to choose between them.
+     *
+     *  Hintkeys for sequential multiple instance hints should be returned ending with '#' character. Behaviour will expand
+     *  them appending number of instance.
      */
     const SEQENTIAL_MULTIPLE_INSTANCE_HINT = 3;
 
@@ -141,7 +158,7 @@ abstract class qtype_specific_hint {
      * Returns whether response is used to calculate penalty (cost) for the hint.
      */
     public function penalty_response_based() {
-        return false;//Most hint have fixed penalty (cost)
+        return false;// Most hint have fixed penalty (cost).
     }
 
     /**
@@ -153,12 +170,14 @@ abstract class qtype_specific_hint {
     abstract public function penalty_for_specific_hint($response = null);
 
     /**
-     * Question may decide to render buttons for some hints to place them in more appropriate place near a controls or in specific feedback.
+     * Question may decide to render buttons for some hints to place them in more appropriate place
+     * near a controls or in specific feedback.
      *
-     * Questions should render hint buttons when _nonresp_hintbtns and/or _resp_hintbtns behaviour variable is set, depending on whether hint is response based.
+     * Questions should render hint buttons when _nonresp_hintbtns and/or _resp_hintbtns behaviour
+     * variable is set, depending on whether hint is response based.
      */
     public function button_rendered_by_question() {
-        //By default, hint button should be rendered by behaviour.
+        // By default, hint button should be rendered by behaviour.
         return false;
     }
 
@@ -170,7 +189,7 @@ abstract class qtype_specific_hint {
      */
     abstract public function render_hint($renderer, question_attempt $qa, question_display_options $options, $response = null);
 }
-
+//TODO - MOVED IN NAMESPACE, DELETE IN 2.9
 /**
  * Class for compatibility with Moodle teacher-defined text and other hints
  *
@@ -192,33 +211,85 @@ class qtype_poasquestion_hintmoodle extends qtype_specific_hint {
     public function __construct($question, $hintkey) {
         $this->question = $question;
         $this->hintkey = $hintkey;
-        //Hintkey is like <hintname>#<number>
+        // Hintkey is like <hintname>#<number>
         $this->number = substr($hintkey, strpos($hintkey, '#') + 1);
     }
 
     public function hint_description() {
         $number = '';
         if (is_numeric($this->number)) {
-            $number = get_string ("No", 'qtype_poasquestion', $this->number + 1);
+            $number = get_string ('No', 'qtype_poasquestion', $this->number + 1);
         }
         return get_string('teachertext', 'qtype_poasquestion', $number);
     }
 
-     public function hint_response_based() {
-        return false;//Teacher-defined text hint has nothing to do with student's response.
-     }
+    public function hint_response_based() {
+        return false;// Teacher-defined text hint has nothing to do with student's response.
+    }
 
-     public function hint_available($response = null) {
+    public function hint_available($response = null) {
         return is_numeric($this->number) && $this->number < count($this->question->hints);
-     }
+    }
 
-     public function penalty_for_specific_hint($response = null) {
+    public function penalty_for_specific_hint($response = null) {
         return $this->question->penalty;
-     }
+    }
 
-     public function render_hint($renderer, question_attempt $qa, question_display_options $options, $response = null) {
+    public function render_hint($renderer, question_attempt $qa, question_display_options $options, $response = null) {
         $hint = $this->question->hints[$this->number];
-        $hint->adjust_display_options($options);//For the hints like question_hint_with_parts.
+        $hint->adjust_display_options($options);// For the hints like question_hint_with_parts.
         return $this->question->format_hint($hint, $qa);
-     }
+    }
+}
+//TODO - MOVED IN NAMESPACE, DELETE IN 2.9
+/**
+ * A special class for compatibility with interactivehints behaviour
+ *
+ * @copyright  2013 Sychev Oleg
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class qtype_poasquestion_moodlehint_adapter extends question_hint_with_parts {
+    /** @var boolean option to show the number of sub-parts of the question that were right. */
+    public $shownumcorrect;
+
+    /** @var boolean option to clear the parts of the question that were wrong on retry. */
+    public $clearwrong;
+
+    /** @var specific hint options (a number of specific hint keys, separated by line break character). */
+    public $options;
+
+
+    /**
+     * Constructor.
+     * @param int the hint id from the database.
+     * @param string $hint The hint text
+     * @param int the corresponding text FORMAT_... type.
+     * @param bool $shownumcorrect whether the number of right parts should be shown.
+     * @param bool $clearwrong whether the wrong parts should be reset.
+     * @param string options a number of specific hint keys, separated by line break character.
+     */
+    public function __construct($id, $hint, $hintformat, $shownumcorrect, $clearwrong, $options) {
+        parent::__construct($id, $hint, $hintformat, $shownumcorrect, $clearwrong);
+        $this->options = $options;
+    }
+
+    /**
+     * Create a basic hint from a row loaded from the question_hints table in the database.
+     * @param object $row with $row->hint, ->shownumcorrect, ->clearwrong and ->options set.
+     * @return qtype_poasquestion_moodlehint_adapter
+     */
+    public static function load_from_record($row) {
+        return new qtype_poasquestion_moodlehint_adapter($row->id, $row->hint, $row->hintformat,
+                $row->shownumcorrect, $row->clearwrong, $row->options);
+    }
+
+    /**
+     * Returns an array of moodle hint keys for this hint.
+     */
+    public function hintkeys() {
+
+        $hintkeys = explode("\n", $this->options);
+        // $hintkeys[] = 'hintmoodle#';// Moodle hint always active. ???TODO - check if this is necessary.
+        return $hintkeys;
+    }
 }

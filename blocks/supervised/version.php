@@ -1,6 +1,32 @@
 <?php
+// This file is part of Student Access Control Kit - https://code.google.com/p/oasychev-moodle-plugins/
+//
+// Student Access Control Kit is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Student Access Control Kit is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-// Version file for 'block_supervised'
+/**
+ * @package    block
+ * @subpackage supervised
+ * @author      Andrey Ushakov <andrey200964@yandex.ru>
+ * @copyright   2014 Oleg Sychev, Volgograd State Technical University
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
-$plugin->version = 2010102925;
-$plugin->cron = 300;    // 5 minutes - 300
+defined('MOODLE_INTERNAL') || die();
+
+$plugin->version    = 2014032200;           // The current module version (Date: YYYYMMDDXX).
+$plugin->requires   = 2013110500;           // Requires this Moodle version.
+$plugin->component  = 'block_supervised';   // Full name of the plugin (used for diagnostics).
+$plugin->cron       = 300;                  // Minimum execution interval for cron function in secs.
+$plugin->release    = 'Block Supervised 2.6';
+$plugin->maturity   = MATURITY_STABLE;

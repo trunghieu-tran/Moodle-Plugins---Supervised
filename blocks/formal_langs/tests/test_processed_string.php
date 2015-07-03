@@ -61,5 +61,20 @@ class block_formal_langs_processed_string_tests extends PHPUnit_Framework_TestCa
         $this->assertTrue($string->token_has_equal_to_student(2));
         $this->assertTrue($string->token_has_equal_to_student(3));
     }
+
+    public function test_processed_string_creation() {
+        $lang = new block_formal_langs_language_simple_english();
+
+        $string = $lang->create_from_string('word word word');
+        $classvalue = get_class($string->string);
+        $this->assertTrue($classvalue == 'qtype_poasquestion\\string');
+        $this->assertTrue((string)($string->string) == 'word word word');
+
+
+        $string = $lang->create_from_string( new qtype_poasquestion\string('word word word 2'));
+        $classvalue = get_class($string->string);
+        $this->assertTrue($classvalue == 'qtype_poasquestion\\string');
+        $this->assertTrue((string)($string->string) == 'word word word 2');
+    }
 }
  ?>

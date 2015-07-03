@@ -1,7 +1,7 @@
 <?php
-// This file is part of Preg question type - https://code.google.com/p/oasychev-moodle-plugins/
+// This file is part of Moodle - http://moodle.org/
 //
-// Preg question type is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -28,18 +28,14 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/question/type/shortanswer/edit_shortanswer_form.php');
 require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
-require_once($CFG->dirroot . '/question/type/preg/authors_tool/preg_widget.php');
+require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_text_and_button.php');
 
-MoodleQuickForm::registerElementType('text_button',
-    $CFG->dirroot.'/question/type/preg/authors_tool/preg_widget.php',
-    'MoodleQuickForm_text_button');
-    
 /**
  * Preg editing form definition.
  */
 class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
     /**
-     * This is overdrived method.
+     * This is overloaded method.
      * Get the list of form elements to repeat, one for each answer.
      * @param object $mform the form being built.
      * @param $label the label to use for each option.
@@ -49,99 +45,145 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
      *      field holding an array of answers
      * @return array of form fields.
      */
-     
-    function get_per_answer_fields($mform, $label, $gradeoptions,
-            &$repeatedoptions, &$answersoption) {
-            $repeated = parent::get_per_answer_fields($mform, $label, $gradeoptions, $repeatedoptions, $answersoption);
 
-            global $CFG;
-            /*$mform->registerNoSubmitButton('regextest');
-            $tmp = & $mform->createElement('submit', 'regextest', 'Test regex');*/
-            
-            $tmp = & $mform->createElement('text_button', 'answer', 'regex_test', get_string('answer', 'question'), array('link_on_button_image' => $CFG->wwwroot . '/pix/i/edit.gif'), array('size' => 80));
-            array_splice($repeated, 1, 1, array( '0' => $tmp));
-            
-            return $repeated;
+    protected function get_per_answer_fields($mform, $label, $gradeoptions, &$repeatedoptions, &$answersoption) {
+        $repeated = array();
+        $repeated[] = $mform->createElement('hidden', 'regextests', '');
+        $repeated[] = $mform->createElement('preg_text_and_button', 'answer', $label, 'regex_test');
+        $repeated[] = $mform->createElement('select', 'fraction', get_string('grade'), $gradeoptions);
+        $repeated[] = $mform->createElement('editor', 'feedback', get_string('feedback', 'question'),
+            array('rows' => 5), $this->editoroptions);
+        $repeatedoptions['answer']['type'] = PARAM_RAW;
+        $repeatedoptions['regextests']['type'] = PARAM_RAW;
+        $repeatedoptions['fraction']['default'] = 0;
+        $answersoption = 'answers';
+        return $repeated;
     }
+
+    protected function get_hint_fields($withclearwrong = false, $withshownumpartscorrect = false) {
+        $mform = $this->_form;
+        list($repeated, $repeatedoptions) = parent::get_hint_fields($withclearwrong, $withshownumpartscorrect);
+
+        $langselect = $mform->getElement('langid');
+        $langs = $langselect->getSelected();
+        $langobj = block_formal_langs::lang_object($langs[0]);
+        $hintoptions = array(
+            'hintmatchingpart' => get_string('hintbtn', 'qbehaviour_adaptivehints', get_string('hintcolouredstring', 'qtype_preg')),
+            'hintnextchar' => get_string('hintbtn', 'qbehaviour_adaptivehints', get_string('hintnextchar', 'qtype_preg')),
+            'hintnextlexem' => get_string('hintbtn', 'qbehaviour_adaptivehints', get_string('hintnextlexem', 'qtype_preg', $langobj->lexem_name()))
+        );
+
+        $repeated[] = $mform->createElement('select', 'interactivehint',
+            get_string('hintbtn', 'qbehaviour_adaptivehints', ''), $hintoptions);
+        return array($repeated, $repeatedoptions);
+    }
+
+    /**
+     * Perform the necessary preprocessing for the hint fields.
+     * @param object $question the data being passed to the form.
+     * @return object $question the modified data.
+     */
+    protected function data_preprocessing_hints($question, $withclearwrong = false,
+            $withshownumpartscorrect = false) {
+        if (empty($question->hints)) {
+            return $question;
+        }
+        $question = parent::data_preprocessing_hints($question, $withclearwrong, $withshownumpartscorrect);
+
+        foreach ($question->hints as $hint) {
+            $question->interactivehint[] = $hint->options;
+        }
+
+        return $question;
+    }
+
     /**
      * Add question-type specific form fields.
      *
      * @param MoodleQuickForm $mform the form being built.
      */
-    function definition_inner($mform) {
-        global $CFG;
-        global $PAGE;
+    protected function definition_inner($mform) {
+        global $CFG, $COURSE;
 
         question_bank::load_question_definition_classes($this->qtype());
         $qtypeclass = 'qtype_'.$this->qtype();
         $qtype = new $qtypeclass;
 
-        //$PAGE->requires->js('/question/type/preg/regex_test_push.js');
-
-        $mform->addElement('html', '<div><script type="text/javascript">preg_www_root = "' . $CFG->wwwroot . '";</script></div>');
-        $mform->addElement('html', '<div id="script_test"><script type="text/javascript" src="' . $CFG->wwwroot . '/question/type/preg/authors_tool/regex_test_push.js"></script></div>');
-
         $engines = $qtype->available_engines();
-        $mform->addElement('select','engine',get_string('engine','qtype_preg'),$engines);
-        $mform->setDefault('engine',$CFG->qtype_preg_defaultengine);
-        $mform->addHelpButton('engine','engine','qtype_preg');
+        $mform->addElement('select', 'engine', get_string('engine', 'qtype_preg'), $engines);
+        $mform->setDefault('engine', $CFG->qtype_preg_defaultengine);
+        $mform->addHelpButton('engine', 'engine', 'qtype_preg');
 
         $notations = $qtype->available_notations();
-        $mform->addElement('select','notation', get_string('notation', 'qtype_preg'), $notations);
+        $mform->addElement('select', 'notation', get_string('notation', 'qtype_preg'), $notations);
         $mform->setDefault('notation', $CFG->qtype_preg_defaultnotation);
         $mform->addHelpButton('notation', 'notation', 'qtype_preg');
 
-        $mform->addElement('selectyesno', 'usecharhint', get_string('usecharhint','qtype_preg'));
-        $mform->setDefault('usecharhint',0);
-        $mform->addHelpButton('usecharhint','usecharhint','qtype_preg');
-        $mform->addElement('text', 'charhintpenalty', get_string('charhintpenalty','qtype_preg'), array('size' => 3));
-        $mform->setDefault('charhintpenalty','0.2');
-        $mform->setType('charhintpenalty', PARAM_NUMBER);
-        $mform->addHelpButton('charhintpenalty','charhintpenalty','qtype_preg');
+        $mform->addElement('selectyesno', 'usecharhint', get_string('usecharhint', 'qtype_preg'));
+        $mform->setDefault('usecharhint', 0);
+        $mform->addHelpButton('usecharhint', 'usecharhint', 'qtype_preg');
+        $mform->addElement('text', 'charhintpenalty', get_string('charhintpenalty', 'qtype_preg'), array('size' => 3));
+        $mform->setDefault('charhintpenalty', '0.2');
+        $mform->setType('charhintpenalty', PARAM_FLOAT);
+        $mform->addHelpButton('charhintpenalty', 'charhintpenalty', 'qtype_preg');
 
-        $mform->addElement('selectyesno', 'uselexemhint', get_string('uselexemhint','qtype_preg'));
-        $mform->setDefault('uselexemhint',0);
-        $mform->addHelpButton('uselexemhint','uselexemhint','qtype_preg');
-        $mform->addElement('text', 'lexemhintpenalty', get_string('lexemhintpenalty','qtype_preg'), array('size' => 3));
-        $mform->setDefault('lexemhintpenalty','0.4');
-        $mform->setType('lexemhintpenalty', PARAM_NUMBER);
-        $mform->addHelpButton('lexemhintpenalty','lexemhintpenalty','qtype_preg');
-        $langs = block_formal_langs::available_langs();//TODO - add context
-        $mform->addElement('select', 'langid', get_string('langselect', 'qtype_preg'), $langs);
+        $mform->addElement('selectyesno', 'uselexemhint', get_string('uselexemhint', 'qtype_preg'));
+        $mform->setDefault('uselexemhint', 0);
+        $mform->addHelpButton('uselexemhint', 'uselexemhint', 'qtype_preg');
+        $mform->addElement('text', 'lexemhintpenalty', get_string('lexemhintpenalty', 'qtype_preg'), array('size' => 3));
+        $mform->setDefault('lexemhintpenalty', '0.4');
+        $mform->setType('lexemhintpenalty', PARAM_FLOAT);
+        $mform->addHelpButton('lexemhintpenalty', 'lexemhintpenalty', 'qtype_preg');
+
+        // Fetch course context if it is possible.
+        $context = null;
+        if ($COURSE != null) {
+            if (is_a($COURSE, 'stdClass')) {
+                $context = context_course::instance($COURSE->id);
+            } else {
+                $context = $COURSE->get_context();
+            }
+        }
+
+        $currentlanguages = block_formal_langs::available_langs( $context );
+        //$langs = block_formal_langs::available_langs();// TODO - add context.
+        $mform->addElement('select', 'langid', get_string('langselect', 'qtype_preg'), $currentlanguages);
         $mform->setDefault('langid', $CFG->qtype_preg_defaultlang);
-        $mform->addHelpButton('langid','langselect','qtype_preg');
-        $mform->addElement('text', 'lexemusername', get_string('lexemusername','qtype_preg'), array('size' => 54));
-        $mform->setDefault('lexemusername','word');
-        $mform->addHelpButton('lexemusername','lexemusername','qtype_preg');
+        $mform->addHelpButton('langid', 'langselect', 'qtype_preg');
+        $mform->addElement('text', 'lexemusername', get_string('lexemusername', 'qtype_preg'), array('size' => 54));
+        $mform->setDefault('lexemusername', '');
+        $mform->addHelpButton('lexemusername', 'lexemusername', 'qtype_preg');
         $mform->setAdvanced('lexemusername');
+        $mform->setType('lexemusername', PARAM_TEXT);
 
-        $creategrades = get_grade_options();
-        $mform->addElement('select','hintgradeborder',get_string('hintgradeborder','qtype_preg'),$creategrades->gradeoptions);
-        $mform->setDefault('hintgradeborder',1);
-        $mform->addHelpButton('hintgradeborder','hintgradeborder','qtype_preg');
+        $gradeoptions = question_bank::fraction_options();
+        $mform->addElement('select', 'hintgradeborder', get_string('hintgradeborder', 'qtype_preg'), $gradeoptions);
+        $mform->setDefault('hintgradeborder', 1);
+        $mform->addHelpButton('hintgradeborder', 'hintgradeborder', 'qtype_preg');
         $mform->setAdvanced('hintgradeborder');
 
-        $mform->addElement('selectyesno', 'exactmatch', get_string('exactmatch','qtype_preg'));
-        $mform->addHelpButton('exactmatch','exactmatch','qtype_preg');
-        $mform->setDefault('exactmatch',1);
+        $mform->addElement('selectyesno', 'exactmatch', get_string('exactmatch', 'qtype_preg'));
+        $mform->addHelpButton('exactmatch', 'exactmatch', 'qtype_preg');
+        $mform->setDefault('exactmatch', 1);
 
-        $mform->addElement('text', 'correctanswer', get_string('correctanswer','qtype_preg'), array('size' => 54));
-        $mform->addHelpButton('correctanswer','correctanswer','qtype_preg');
+        $mform->addElement('text', 'correctanswer', get_string('correctanswer', 'qtype_preg'), array('size' => 54));
+        $mform->addHelpButton('correctanswer', 'correctanswer', 'qtype_preg');
+        $mform->setType('correctanswer', PARAM_RAW);
 
-        //Set hint availability determined by engine capabilities
+        // Set hint availability determined by engine capabilities.
         foreach ($engines as $engine => $enginename) {
             $questionobj = new qtype_preg_question;
             $querymatcher = $questionobj->get_query_matcher($engine);
             if (!$querymatcher->is_supporting(qtype_preg_matcher::PARTIAL_MATCHING) ||
                 !$querymatcher->is_supporting(qtype_preg_matcher::CORRECT_ENDING)
                 ) {
-                $mform->disabledIf('hintgradeborder','engine', 'eq', $engine);
-                $mform->disabledIf('usecharhint','engine', 'eq', $engine);
-                $mform->disabledIf('charhintpenalty','engine', 'eq', $engine);
-                $mform->disabledIf('uselexemhint','engine', 'eq', $engine);
-                $mform->disabledIf('lexemhintpenalty','engine', 'eq', $engine);
-                $mform->disabledIf('langid','engine', 'eq', $engine);
-                $mform->disabledIf('lexemusername','engine', 'eq', $engine);
+                $mform->disabledIf('hintgradeborder', 'engine', 'eq', $engine);
+                $mform->disabledIf('usecharhint', 'engine', 'eq', $engine);
+                $mform->disabledIf('charhintpenalty', 'engine', 'eq', $engine);
+                $mform->disabledIf('uselexemhint', 'engine', 'eq', $engine);
+                $mform->disabledIf('lexemhintpenalty', 'engine', 'eq', $engine);
+                $mform->disabledIf('langid', 'engine', 'eq', $engine);
+                $mform->disabledIf('lexemusername', 'engine', 'eq', $engine);
             }
         }
 
@@ -152,16 +194,17 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
 
     }
 
-    function validation($data, $files) {
+    public function validation($data, $files) {
         $errors = parent::validation($data, $files);
         $answers = $data['answer'];
         $trimmedcorrectanswer = trim($data['correctanswer']);
-        //If no correct answer is entered, we should think it is correct to not force techer; otherwise we must check that it match with at least one 100% grade answer.
+        // If no correct answer is entered, we should think it is correct to not force teacher;
+        // otherwise we must check that it match with at least one 100% grade answer.
         $correctanswermatch = ($trimmedcorrectanswer=='');
         $passhintgradeborder = false;
         $fractions = $data['fraction'];
 
-        //Fill in some default data that could be absent due to disabling relevant form controls
+        // Fill in some default data that could be absent due to disabling relevant form controls.
         if (!array_key_exists('hintgradeborder', $data)) {
             $data['hintgradeborder'] = 1;
         }
@@ -177,31 +220,25 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         $i = 0;
         question_bank::load_question_definition_classes($this->qtype());
         $questionobj = new qtype_preg_question;
+
         foreach ($answers as $key => $answer) {
             $trimmedanswer = trim($answer);
             if ($trimmedanswer !== '') {
                 $hintused = ($data['usecharhint'] || $data['uselexemhint']) && $fractions[$key] >= $data['hintgradeborder'];
-                //Not using exactmatch option to not confuse user in error messages by things it adds to regex.
-                $matcher = $questionobj->get_matcher($data['engine'], $trimmedanswer, /*$data['exactmatch']*/false, $data['usecase'], (-1)*$i, $data['notation'], $hintused);
-                if($matcher->is_error_exists()) {//there are errors in the matching process
-                    $regexerrors = $matcher->get_errors();
+                // Create matcher to check regex for errors and try to match correct answer.
+                $matcher = $questionobj->get_matcher($data['engine'], $trimmedanswer, $data['exactmatch'],
+                        $questionobj->get_modifiers($data['usecase']), (-1)*$i, $data['notation'], $hintused);
+                if ($matcher->errors_exist()) {// There were errors in the matching process.
+                    $regexerrors = $matcher->get_error_messages();// Show no more than max errors.
                     $errors['answer['.$key.']'] = '';
-                    $i=0;
-                    $maxerrors = 5;
-                    if (isset($CFG->qtype_preg_maxerrorsshown)) {//show no more than max errors
-                        $maxerrors = $CFG->qtype_preg_maxerrorsshown;
-                    }
                     foreach ($regexerrors as $regexerror) {
-                        if ($i < $maxerrors) {
-                            $errors['answer['.$key.']'] .= $regexerror.'<br />';
-                        }
-                        $i++;
+                        $errors['answer['.$key.']'] .= $regexerror.'<br />';
                     }
-                    if ($i > $maxerrors) {
-                        $errors['answer['.$key.']'] .= get_string('toomanyerrors', 'qtype_preg' , $i - $maxerrors).'<br />';
+                } else if ($trimmedcorrectanswer != '' && $data['fraction'][$key] == 1) {
+                    // Correct answer (if supplied) should match at least one 100% grade answer.
+                    if ($matcher->match($trimmedcorrectanswer)->full) {
+                        $correctanswermatch=true;
                     }
-                } elseif ($trimmedcorrectanswer != '' && $data['fraction'][$key] == 1 && $matcher->match($trimmedcorrectanswer)->full) {
-                    $correctanswermatch=true;
                 }
                 if ($fractions[$key] >= $data['hintgradeborder']) {
                     $passhintgradeborder = true;
@@ -211,31 +248,45 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         }
 
         if ($correctanswermatch == false) {
-            $errors['correctanswer']=get_string('nocorrectanswermatch','qtype_preg');
+            $errors['correctanswer'] = get_string('nocorrectanswermatch', 'qtype_preg');
         }
 
-        if ($passhintgradeborder == false && $data['usecharhint']) {//no asnwer pass hint grade border
-            $errors['hintgradeborder']=get_string('nohintgradeborderpass','qtype_preg');
+        if ($passhintgradeborder == false && $data['usecharhint']) {// No answer pass hint grade border.
+            $errors['hintgradeborder'] = get_string('nohintgradeborderpass', 'qtype_preg');
         }
 
         $querymatcher = $questionobj->get_query_matcher($data['engine']);
-        //If engine doesn't support subpattern capturing, than no placeholders should be in feedback
-        if (!$querymatcher->is_supporting(qtype_preg_matcher::SUBPATTERN_CAPTURING)) {
+        // If engine doesn't support subexpression capturing, than no placeholders should be in feedback.
+        if (!$querymatcher->is_supporting(qtype_preg_matcher::SUBEXPRESSION_CAPTURING)) {
             $feedbacks = $data['feedback'];
             foreach ($feedbacks as $key => $feedback) {
-                if (is_array($feedback)) {//On some servers feedback is HTMLEditor, on another it is simple text area
+                if (is_array($feedback)) {// On some servers feedback is HTMLEditor, on another it is simple text area.
                     $feedback = $feedback['text'];
                 }
                 if (!empty($feedback) && preg_match('/\{\$([1-9][0-9]*|\w+)\}/', $feedback) == 1) {
-                    $errors['feedback['.$key.']'] = get_string('nosubpatterncapturing','qtype_preg',$querymatcher->name());
+                    $errors['feedback['.$key.']'] = get_string('nosubexprcapturing', 'qtype_preg', $querymatcher->name());
                 }
+            }
+        }
+
+        // Check that interactive hint settings doesn't contradict overall hint settings.
+        $interactivehints = $data['interactivehint'];
+        foreach($interactivehints as $key => $hint) {
+            if ($hint == 'hintnextchar' && $data['usecharhint'] != true) {
+                $errors['interactivehint['.$key.']'] = get_string('unallowedhint', 'qtype_preg', get_string('hintnextchar', 'qtype_preg'));
+            }
+            if ($hint == 'hintnextlexem' && $data['uselexemhint'] != true) {
+                $langs = block_formal_langs::available_langs();
+                $langobj = block_formal_langs::lang_object(array_keys($langs)[0]);
+                $errors['interactivehint['.$key.']'] = get_string('unallowedhint', 'qtype_preg', get_string('hintnextlexem', 'qtype_preg', $langobj->lexem_name()));
             }
         }
 
         return $errors;
     }
 
-    function qtype() {
+    public function qtype() {
         return 'preg';
     }
+
 }

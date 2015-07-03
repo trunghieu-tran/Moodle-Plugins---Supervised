@@ -25,7 +25,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-class qtype_poasquestion_string extends textlib implements ArrayAccess {
+/**
+ * @deprecated since 2.8
+ */
+class qtype_poasquestion_string extends core_text implements ArrayAccess {
     /** @var string the utf-8 string itself. */
     private $fstring;
     /**@var int length of the string, calculated when the string is modified. */
@@ -35,13 +38,44 @@ class qtype_poasquestion_string extends textlib implements ArrayAccess {
         $this->set_string($str);
     }
 
+    /**
+     * Replaces $search with $replace in $subject string.
+     */
+    public static function replace($search, $replace, $subject) {
+        $searchlen = self::strlen($search);
+
+        if ($searchlen == 0) {
+            return $subject;
+        }
+
+        $result = '';
+        do {
+            $to = self::strpos($subject, $search);
+            if ($to === false) {
+                $result .= $subject;
+                $subject = '';
+            } else {
+                $result .= self::substr($subject, 0, $to) . $replace;
+                $subject = self::substr($subject, $to + $searchlen);
+            }
+
+        }
+        while ($subject != '');
+
+        return $result;
+    }
+
     public function __toString() {
         return $this->fstring;
     }
 
     public function set_string($str) {
-        $this->fstring = $str;
-        $this->flength = self::strlen($str);
+        if (is_string($str)) {
+            $this->fstring = $str;
+        } else {
+            $this->fstring = '';
+        }
+        $this->flength = self::strlen($this->fstring);
     }
 
     public function string() {
@@ -71,9 +105,9 @@ class qtype_poasquestion_string extends textlib implements ArrayAccess {
      * @param str substring.
      * @return mixed the position of the substring if found, false otherwise.
      */
-    public function contains($str) {
+    public function contains($str, $offset = 0) {
         $str = (string)$str;
-        return self::strpos($this->fstring, $str);
+        return self::strpos($this->fstring, $str, $offset);
     }
 
     /**
@@ -84,6 +118,31 @@ class qtype_poasquestion_string extends textlib implements ArrayAccess {
      */
     public function substring($start, $length = null) {
         return new qtype_poasquestion_string(self::substr($this->fstring, $start, $length));
+    }
+
+    /**
+     *
+     */
+    public function startsWith($needle) {
+        if ($needle == '') {
+            return true;
+        }
+        return strncmp($this->fstring, $needle, strlen($needle)) === 0;
+    }
+
+    /**
+     *
+     */
+    public function endsWith($needle) {
+        if ($needle == '') {
+            return true;
+        }
+        $len = self::strlen($needle);
+        if ($len > $this->flength) {
+            return false;
+        }
+        $substr = self::substr($this->fstring, $this->flength - $len);
+        return $substr === $needle;
     }
 
     /**
@@ -126,33 +185,5 @@ class qtype_poasquestion_string extends textlib implements ArrayAccess {
 
     public function offsetUnset($offset) {
         // Do nothing.
-    }
-
-    /**
-     * Returns the code of a UTF-8 character.
-     * @param utf8chr - a UTF-8 character.
-     * @return int the code corresponding to the given UTF-8 character.
-     */
-    public static function ord($utf8chr) {
-        if ($utf8chr === '') {
-            return 0;
-        }
-        $ord0 = ord($utf8chr{0});
-        if ($ord0 >= 0 && $ord0 <= 127) {
-            return $ord0;
-        }
-        $ord1 = ord($utf8chr{1});
-        if ($ord0 >= 192 && $ord0 <= 223) {
-            return ($ord0 - 192) * 64 + ($ord1 - 128);
-        }
-        $ord2 = ord($utf8chr{2});
-        if ($ord0 >= 224 && $ord0 <= 239) {
-            return ($ord0 - 224) * 4096 + ($ord1 - 128) * 64 + ($ord2 - 128);
-        }
-        $ord3 = ord($utf8chr{3});
-        if ($ord0 >= 240 && $ord0 <= 247) {
-            return ($ord0 - 240) * 262144 + ($ord1 - 128 )* 4096 + ($ord2 - 128) * 64 + ($ord3 - 128);
-        }
-        return false;
     }
 }

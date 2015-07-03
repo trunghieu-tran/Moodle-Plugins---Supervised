@@ -162,6 +162,14 @@ class block_formal_langs_printf_language_test extends PHPUnit_Framework_TestCase
         }
     }
 
+    public function test_escaped_as_separate_lexemes() {
+        $string = '"\\"asd"';
+        $lang = new block_formal_langs_language_printf_language();
+        $processedstring = $lang->create_from_string($string);
+        $result = $processedstring->stream->tokens;
+        $this->assertTrue(count($result) == 4,  count($result) . ' tokens have returned');
+    }
+
     /**
      * Tests all specifier
      */
@@ -190,4 +198,5 @@ class block_formal_langs_printf_language_test extends PHPUnit_Framework_TestCase
             }
         }
     }
+
 }

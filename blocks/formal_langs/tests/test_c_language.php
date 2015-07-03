@@ -43,6 +43,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
     public function __construct() {
         $this->utils = new block_formal_langs_language_test_utils('block_formal_langs_language_c_language', $this);
     }
+
     // Tests a lexer of simple english language
     public function test_lexer() {
         $lang = new block_formal_langs_language_c_language();
@@ -54,6 +55,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($result[1]->value() == 'test');
         $this->assertTrue($result[2]->value() == ';');
     }
+
     /**
      * Tests numeric positions
      */
@@ -69,6 +71,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($tokens[1]->position()->colstart() == 3);
         $this->assertTrue($tokens[1]->position()->colend() == 6);
     }
+
     /**
      * Tests singleline comment and identifier position
      */
@@ -84,6 +87,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($tokens[1]->position()->colstart() == 4);
         $this->assertTrue($tokens[1]->position()->colend() == 9);
     }
+
     /**
      * Test for computing multiple strings position computing
      */
@@ -118,6 +122,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($tokens[2]->position()->colstart() == 9);
         $this->assertTrue($tokens[2]->position()->colend() == 11);
     }
+
     /**
      * Test for computing multiple character literals position computing
      */
@@ -170,7 +175,10 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($tokens[0]->position()->colstart() == 0, 'Error lexeme is at beginning');
         $this->assertTrue($tokens[0]->position()->colend() == 4, 'Error lexeme must be five characters long');
     }
-    // Tests scanning errors in the end
+
+    /** Tests scanning errors in the end
+     *  @outputBuffering disabled
+     */
     public function test_scanning_error_in_end() {
         $lang = new block_formal_langs_language_c_language();
         $processedstring = $lang->create_from_string('asv \'abc');
@@ -203,6 +211,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($tokens[1]->position()->colstart() == 4, 'Error lexeme is at the end');
         $this->assertTrue($tokens[1]->position()->colend() == 8, 'Error lexeme must be five characters long');
     }
+
     // Tests scanning errros in middle
     public function test_scanning_error_in_middle() {
         $lang = new block_formal_langs_language_c_language();
@@ -235,7 +244,39 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errors[0]->tokenindex == 1);
         $this->assertTrue($tokens[1]->position()->colstart() == 4, 'Error lexeme is at the end');
         $this->assertTrue($tokens[1]->position()->colend() == 8, 'Error lexeme must be five characters long');
+    public function test_scanning_error_in_middle() {
+        $lang = new block_formal_langs_language_c_language();
+        $processedstring = $lang->create_from_string('asv \'abc 1 + 1');
+        $errors = $processedstring->stream->errors;
+        $tokens = $processedstring->stream->tokens;
+        $this->assertTrue(count($errors) == 1, 'There must be one error in errors');
+        $this->assertTrue($errors[0]->tokenindex == 1);
+        $this->assertTrue($tokens[1]->position()->colstart() == 4);
+        $this->assertTrue($tokens[1]->position()->colend() == 4);
+        $processedstring = $lang->create_from_string('asv "abc 1 + 1');
+        $errors = $processedstring->stream->errors;
+        $tokens = $processedstring->stream->tokens;
+        $this->assertTrue(count($errors) == 1, 'There must be one error in errors');
+        $this->assertTrue($errors[0]->tokenindex == 1);
+        $this->assertTrue($tokens[1]->position()->colstart() == 4);
+        $this->assertTrue($tokens[1]->position()->colend() == 4);
+        $processedstring = $lang->create_from_string('asv /*abc 1 + 1');
+        $errors = $processedstring->stream->errors;
+        $tokens = $processedstring->stream->tokens;
+        $this->assertTrue(count($errors) == 1, 'There must be one error in errors');
+        $this->assertTrue($errors[0]->tokenindex == 1);
+        $this->assertTrue($tokens[1]->position()->colstart() == 4);
+        $this->assertTrue($tokens[1]->position()->colend() == 5);
+        //Multicharacter literal test
+        $processedstring = $lang->create_from_string('asv \'abc\' asv');
+        $errors = $processedstring->stream->errors;
+        $tokens = $processedstring->stream->tokens;
+        $this->assertTrue(count($errors) == 1, 'There must be one error in errors');
+        $this->assertTrue($errors[0]->tokenindex == 1);
+        $this->assertTrue($tokens[1]->position()->colstart() == 4, 'Error lexeme is at the end');
+        $this->assertTrue($tokens[1]->position()->colend() == 8, 'Error lexeme must be five characters long');
     }
+
     // Tests keywords
     public function test_keywords() {
         // Keywords
@@ -425,6 +466,7 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($result[1]->value() == '22.');
         $this->assertTrue($result[2]->value() == '22.22E+9');
     }
+
     //Test comments. We wont use line comment, because in Moodle we can enter only one line
     public function test_comments() {
         $lang = new block_formal_langs_language_c_language();
@@ -432,7 +474,30 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
         $result = $processedstring->stream->tokens;
         $this->assertTrue( count($processedstring->stream->errors) == 0);
         $this->assertTrue(count($result) == 1, 'There must be one lexeme');
-        $this->assertTrue($result[0]->value() == '/*  a comment */');    
+        $this->assertTrue($result[0]->value() == '/*  a comment */');
+
+    }
+
+    public function test_multiline() {
+        $lang = new block_formal_langs_language_c_language();
+        $test = 'mad
+                 man
+                ';
+        $processedstring = $lang->create_from_string($test);
+        $result = $processedstring->stream->tokens;
+        $this->assertTrue(count($result) == 2);
+        $this->assertTrue($result[0]->value() == 'mad');
+        $this->assertTrue($result[1]->value() == 'man');
+    }
+
+    public function test_stringpos() {
+        $lang = new block_formal_langs_language_c_language();
+        $test = 'mad';
+        $processedstring = $lang->create_from_string($test);
+        $result = $processedstring->stream->tokens;
+        $this->assertTrue(count($result) == 1);
+        $this->assertTrue($result[0]->position()->stringstart() == 0);
+        $this->assertTrue($result[0]->position()->stringend() == 2);
     }
 }
  ?>

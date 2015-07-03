@@ -24,7 +24,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 global $CFG;
-require_once($CFG->dirroot . '/question/type/poasquestion/backup/moodle2/backup_poasquestion_plugin.class.php');
+require_once ($CFG->dirroot . '/question/type/poasquestion/backup/moodle2/backup_poasquestion_plugin.class.php');
 
 class backup_qtype_correctwriting_plugin extends backup_qtype_poasquestion_plugin {
 
@@ -78,5 +78,3 @@ class backup_qtype_correctwriting_plugin extends backup_qtype_poasquestion_plugi
     }
 
 }
- 
- 

@@ -1,4 +1,18 @@
 <?php
+// This file is part of POAS question and related behaviours - https://code.google.com/p/oasychev-moodle-plugins/
+//
+// POAS question is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// POAS question is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -21,32 +35,32 @@ class qbehaviour_adaptivehints_renderer extends qbehaviour_adaptive_renderer {
 
     public function controls(question_attempt $qa, question_display_options $options) {
         $question = $qa->get_question();
-        $output = parent::controls($qa, $options);//submit button
+        $output = parent::controls($qa, $options);// Submit button.
         $penalty = $question->penalty;
         if ($penalty != 0) {
             $output .= $this->button_cost('withpossiblepenalty', $penalty, $options);
         }
         $output .= html_writer::empty_tag('br');
 
-        //Render buttons that should be rendered by behaviour.
-         foreach ($question->available_specific_hints() as $hintkey) {
+        // Render buttons that should be rendered by behaviour.
+         foreach ($question->hints_available_for_student() as $hintkey) {
 
             $behaviour = $qa->get_behaviour();
             $hintkey = $behaviour->adjust_hintkey($hintkey);
             $hintobj = $question->hint_object($hintkey);
 
-            if (!$hintobj->button_rendered_by_question()) {//Button(s) isn't rendered by the question, so behaviour must render it.
+            if (!$hintobj->button_rendered_by_question()) {// Button(s) isn't rendered by the question, so behaviour must render it.
 
-                //Check whether button should be rendered at all.
+                // Check whether button should be rendered at all.
                 $laststep = $qa->get_last_step();
                 if ($hintobj->hint_response_based()) {
                     $showhintbtn = $laststep->has_behaviour_var('_resp_hintbtns');
                 } else {
                     $showhintbtn = $laststep->has_behaviour_var('_nonresp_hintbtns');
                 }
-                //Hide hint button if such hint buttons should not shown at all or hint unavailable or hint already rendered.
-                if (!$showhintbtn || !$hintobj->hint_available() || ($laststep->has_behaviour_var('_render_'.$hintkey) && $hintobj->hint_type() !== qtype_specific_hint::SEQENTIAL_MULTIPLE_INSTANCE_HINT)) {
-                    //Should not pass $response to hint_available, since response could be changed in adaptive.
+                // Hide hint button if such hint buttons should not shown at all or hint unavailable or hint already rendered.
+                if (!$showhintbtn || !$hintobj->hint_available() || ($laststep->has_behaviour_var('_render_'.$hintkey) && $hintobj->hint_type() !== qtype_poasquestion\hint::SEQENTIAL_MULTIPLE_INSTANCE_HINT)) {
+                    // Should not pass $response to hint_available, since response could be changed in adaptive.
                     continue;
                 }
 
@@ -67,7 +81,7 @@ class qbehaviour_adaptivehints_renderer extends qbehaviour_adaptive_renderer {
         $question = $qa->get_question();
         $hintkey = $hintobj->hint_key();
 
-        //Render button.
+        // Render button.
         $attributes = array(
             'type' => 'submit',
             'id' => $qa->get_behaviour_field_name($hintkey.'btn'),
@@ -80,16 +94,16 @@ class qbehaviour_adaptivehints_renderer extends qbehaviour_adaptive_renderer {
         }
         $output = html_writer::empty_tag('input', $attributes);
 
-        //Cost message
-        if ($hintobj->penalty_response_based()) {//if penalty is response-based
-            //try to get last response
+        // Cost message.
+        if ($hintobj->penalty_response_based()) {// If penalty is response-based.
+            // Try to get last response.
             $response = $qa->get_last_qt_data();
             if (empty($response)) {
                 $response = null;
             }
             $penalty = $hintobj->penalty_for_specific_hint($response);
             if ($penalty != 0) {
-                $output .= $this->button_cost('withpenaltyapprox', $penalty, $options);//Note that reported penalty is approximation since user could change response in adaptive.
+                $output .= $this->button_cost('withpenaltyapprox', $penalty, $options);// Note that reported penalty is approximation since user could change response in adaptive.
             }
         } else {
             $penalty = $hintobj->penalty_for_specific_hint(null);
@@ -106,15 +120,15 @@ class qbehaviour_adaptivehints_renderer extends qbehaviour_adaptive_renderer {
          return $output;
     }
 
-    //Overload penalty_info to show actual penalty
+    // Overload penalty_info to show actual penalty.
     protected function penalty_info(question_attempt $qa, $mark,
             question_display_options $options) {
-        if (!$qa->get_question()->penalty && !$qa->get_last_behaviour_var('_hashint', false)) {//no penalty for the attempts and no hinting done
+        if (!$qa->get_question()->penalty && !$qa->get_last_behaviour_var('_hashint', false)) {// No penalty for the attempts and no hinting done.
             return '';
         }
         $output = '';
 
-        // Print details of grade adjustment due to penalties
+        // Print details of grade adjustment due to penalties.
         if ($mark->raw != $mark->cur) {
             $output .= ' ' . get_string('gradingdetailsadjustment', 'qbehaviour_adaptive', $mark);
         }
@@ -128,4 +142,3 @@ class qbehaviour_adaptivehints_renderer extends qbehaviour_adaptive_renderer {
         return $output;
     }
 }
-

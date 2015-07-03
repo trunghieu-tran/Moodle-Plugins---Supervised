@@ -19,3 +19,8 @@ cd langs_src
 ren  printf_language.lex.php language_printf_language.php
 move /y language_printf_language.php ..\language_printf_language.php
 cd ..
+java JLexPHP/Main langs_src/attribute_grammar_rule.lex
+cd langs_src
+ren  attribute_grammar_rule.lex.php language_attribute_grammar_language.php
+move /y language_attribute_grammar_language.php ..\anguage_attribute_grammar_language.php
+cd ..

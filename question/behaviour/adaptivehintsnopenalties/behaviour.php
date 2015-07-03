@@ -1,4 +1,18 @@
 <?php
+// This file is part of POAS question and related behaviours - https://code.google.com/p/oasychev-moodle-plugins/
+//
+// POAS question is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// POAS question is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 
 defined('MOODLE_INTERNAL') || die();
@@ -39,7 +53,7 @@ class qbehaviour_adaptivehintsnopenalties extends qbehaviour_adaptivehints {
         return get_string('hintused', 'qbehaviour_adaptivehintsnopenalties', $a);
     }
 
-    //Overloading this to have easy 'no penalties' adaptive version
+    // Overloading this to have easy 'no penalties' adaptive version.
     protected function adjusted_fraction($fraction, $penalty) {
         return $fraction;
     }

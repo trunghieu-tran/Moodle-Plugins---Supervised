@@ -1,26 +1,37 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="question/type/preg/db" VERSION="20111212" COMMENT="XMLDB file for Moodle question/type/preg"
+<XMLDB PATH="question/type/preg/db" VERSION="20131005" COMMENT="XMLDB file for Moodle question/type/preg"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="qtype_preg" COMMENT="Options for perl-compatible regular expression questions">
+    <TABLE NAME="qtype_preg_options" COMMENT="Options for perl-compatible regular expression questions">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="question"/>
-        <FIELD NAME="question" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="answers"/>
-        <FIELD NAME="answers" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="question" NEXT="usecase"/>
-        <FIELD NAME="usecase" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="false" SEQUENCE="false" PREVIOUS="answers" NEXT="correctanswer"/>
-        <FIELD NAME="correctanswer" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="usecase" NEXT="exactmatch"/>
-        <FIELD NAME="exactmatch" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" COMMENT="Whether user want to automatically use exact matching for all regular expression, or he want to set this manually in some of expressions." PREVIOUS="correctanswer" NEXT="usecharhint"/>
-        <FIELD NAME="usecharhint" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" COMMENT="Is hint mode available for this question" PREVIOUS="exactmatch" NEXT="charhintpenalty"/>
-        <FIELD NAME="charhintpenalty" TYPE="float" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" DECIMALS="2" COMMENT="Penalty for the hint" PREVIOUS="usecharhint" NEXT="hintgradeborder"/>
-        <FIELD NAME="hintgradeborder" TYPE="float" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" DECIMALS="2" COMMENT="Minimum fraction for the answers, that would be used for hinting purposes" PREVIOUS="charhintpenalty" NEXT="engine"/>
-        <FIELD NAME="engine" TYPE="char" LENGTH="50" NOTNULL="true" DEFAULT="preg_php_matcher" SEQUENCE="false" COMMENT="Class name of the matching engine" PREVIOUS="hintgradeborder" NEXT="notation"/>
-        <FIELD NAME="notation" TYPE="char" LENGTH="50" NOTNULL="true" DEFAULT="native" SEQUENCE="false" COMMENT="Notation of regular expressions used to write answer" PREVIOUS="engine" NEXT="uselexemhint"/>
-        <FIELD NAME="uselexemhint" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" COMMENT="Is next lexem hint available for this question" PREVIOUS="notation" NEXT="lexemhintpenalty"/>
-        <FIELD NAME="lexemhintpenalty" TYPE="float" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" DECIMALS="2" COMMENT="Penalty for the next lexem hint" PREVIOUS="uselexemhint" NEXT="langid"/>
-        <FIELD NAME="langid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Language id from the block formal languages" PREVIOUS="lexemhintpenalty" NEXT="lexemusername"/>
-        <FIELD NAME="lexemusername" TYPE="char" LENGTH="100" NOTNULL="true" DEFAULT="word" SEQUENCE="false" COMMENT="Teacher-preferred name for the lexem" PREVIOUS="langid"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="answers" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="usecase" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="correctanswer" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="exactmatch" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether user want to automatically use exact matching for all regular expression, or he want to set this manually in some of expressions."/>
+        <FIELD NAME="usecharhint" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Is hint mode available for this question"/>
+        <FIELD NAME="charhintpenalty" TYPE="float" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" DECIMALS="2" COMMENT="Penalty for the hint"/>
+        <FIELD NAME="hintgradeborder" TYPE="float" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false" DECIMALS="2" COMMENT="Minimum fraction for the answers, that would be used for hinting purposes"/>
+        <FIELD NAME="engine" TYPE="char" LENGTH="50" NOTNULL="true" DEFAULT="preg_php_matcher" SEQUENCE="false" COMMENT="Class name of the matching engine"/>
+        <FIELD NAME="notation" TYPE="char" LENGTH="50" NOTNULL="true" DEFAULT="native" SEQUENCE="false" COMMENT="Notation of regular expressions used to write answer"/>
+        <FIELD NAME="uselexemhint" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Is next lexem hint available for this question"/>
+        <FIELD NAME="lexemhintpenalty" TYPE="float" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" DECIMALS="2" COMMENT="Penalty for the next lexem hint"/>
+        <FIELD NAME="langid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Language id from the block formal languages"/>
+        <FIELD NAME="lexemusername" TYPE="char" LENGTH="100" NOTNULL="true" DEFAULT="word" SEQUENCE="false" COMMENT="Teacher-preferred name for the lexem"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="questionid" TYPE="foreign-unique" FIELDS="questionid" REFTABLE="question" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="qtype_preg_regex_tests" COMMENT="Test for regex">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="answerid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="regextests" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

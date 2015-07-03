@@ -1,0 +1,25 @@
+[
+ (program) {
+  (stmt_list) {
+   (stmt_list) {
+    (stmt_or_defined_macro) {
+     (stmt) {
+      (switch_stmt) {
+       switch
+       (
+       a
+       )
+       {
+       }
+      }
+     }
+    }
+   }
+   (stmt_or_defined_macro) {
+    (stmt) {
+     ;
+    }
+   }
+  }
+ }
+]

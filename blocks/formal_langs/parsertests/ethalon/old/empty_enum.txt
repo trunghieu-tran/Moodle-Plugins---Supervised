@@ -1,0 +1,28 @@
+[
+ (program) {
+  (stmt_list) {
+   (stmt_list) {
+    (enum_definition) {
+     (enum_definition_start) {
+      enum
+      K
+     }
+     (enum_body) {
+      {
+      }
+     }
+     ;
+    }
+   }
+   (stmt_or_defined_macro) {
+    (stmt) {
+     (variable_declaration) {
+      K
+      a
+     }
+     ;
+    }
+   }
+  }
+ }
+]
