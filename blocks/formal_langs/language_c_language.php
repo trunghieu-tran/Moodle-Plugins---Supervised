@@ -27,6 +27,7 @@ require_once($CFG->dirroot.'/blocks/formal_langs/language_base.php');
 require_once($CFG->dirroot.'/question/type/poasquestion/jlex.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/c_language_tokens.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/language_utils.php');
+require_once($CFG->dirroot.'/lib/textlib.class.php');
 class block_formal_langs_language_c_language extends block_formal_langs_predefined_language
 {
     public function __construct() {
@@ -229,6 +230,8 @@ class block_formal_langs_predefined_c_language_lexer_raw extends JLexBase  {
         $this->endyycol = $this->yycol + core_text::strlen($this->yytext()) - 1;
 		$this->endyychar = $this->yychar + core_text::strlen($this->yytext()) - 1;
         return $this->return_pos_by_field('stateyyline', 'stateyycol', 'stateyychar', 'endyyline', 'endyycol', 'endyychar');
+    }
+    private function return_error_token_pos() {
     }
     private function return_error_token_pos() {
         return $this->return_pos_by_field('stateyyline', 'stateyycol', 'stateyychar', 'yyline', 'yycol', 'yychar');
@@ -4911,7 +4914,9 @@ array(
         return $t;
     } else if ($this->yy_lexical_state == self::MULTILINE_COMMENT)  {
         return $this->hande_buffered_token_error($this->statestring, $this->buffer(), 2);
+        return $this->hande_buffered_token_error($this->statestring, $this->buffer(), 2);
     } else if ($this->yy_lexical_state == self::STRING)  {
+        return $this->hande_buffered_token_error($this->statestring, $this->statestring, 1);
         return $this->hande_buffered_token_error($this->statestring, $this->statestring, 1);
     } else if ($this->yy_lexical_state == self::CHARACTER)  {
         return $this->hande_buffered_token_error($this->statestring, $this->statestring, 1);
@@ -4921,6 +4926,7 @@ array(
             return $this->endtoken;
         } else {
             return null;
+        }
         }
     }
 			}

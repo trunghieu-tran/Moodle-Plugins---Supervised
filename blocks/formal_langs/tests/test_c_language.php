@@ -244,6 +244,37 @@ class block_formal_langs_c_language_test extends PHPUnit_Framework_TestCase {
         $this->assertTrue($errors[0]->tokenindex == 1);
         $this->assertTrue($tokens[1]->position()->colstart() == 4, 'Error lexeme is at the end');
         $this->assertTrue($tokens[1]->position()->colend() == 8, 'Error lexeme must be five characters long');
+    public function test_scanning_error_in_middle() {
+        $lang = new block_formal_langs_language_c_language();
+        $processedstring = $lang->create_from_string('asv \'abc 1 + 1');
+        $errors = $processedstring->stream->errors;
+        $tokens = $processedstring->stream->tokens;
+        $this->assertTrue(count($errors) == 1, 'There must be one error in errors');
+        $this->assertTrue($errors[0]->tokenindex == 1);
+        $this->assertTrue($tokens[1]->position()->colstart() == 4);
+        $this->assertTrue($tokens[1]->position()->colend() == 4);
+        $processedstring = $lang->create_from_string('asv "abc 1 + 1');
+        $errors = $processedstring->stream->errors;
+        $tokens = $processedstring->stream->tokens;
+        $this->assertTrue(count($errors) == 1, 'There must be one error in errors');
+        $this->assertTrue($errors[0]->tokenindex == 1);
+        $this->assertTrue($tokens[1]->position()->colstart() == 4);
+        $this->assertTrue($tokens[1]->position()->colend() == 4);
+        $processedstring = $lang->create_from_string('asv /*abc 1 + 1');
+        $errors = $processedstring->stream->errors;
+        $tokens = $processedstring->stream->tokens;
+        $this->assertTrue(count($errors) == 1, 'There must be one error in errors');
+        $this->assertTrue($errors[0]->tokenindex == 1);
+        $this->assertTrue($tokens[1]->position()->colstart() == 4);
+        $this->assertTrue($tokens[1]->position()->colend() == 5);
+        //Multicharacter literal test
+        $processedstring = $lang->create_from_string('asv \'abc\' asv');
+        $errors = $processedstring->stream->errors;
+        $tokens = $processedstring->stream->tokens;
+        $this->assertTrue(count($errors) == 1, 'There must be one error in errors');
+        $this->assertTrue($errors[0]->tokenindex == 1);
+        $this->assertTrue($tokens[1]->position()->colstart() == 4, 'Error lexeme is at the end');
+        $this->assertTrue($tokens[1]->position()->colend() == 8, 'Error lexeme must be five characters long');
     }
 
     // Tests keywords

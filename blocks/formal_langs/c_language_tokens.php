@@ -186,7 +186,6 @@ class block_formal_langs_c_token_numeric extends block_formal_langs_c_token_base
         }
         return $result;
     }
-
     /**
      * This function returns true if editing distance is
      * applicable to this type of tokens as lexical error weight and

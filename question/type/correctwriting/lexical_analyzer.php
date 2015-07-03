@@ -68,17 +68,16 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
      */
     protected function analyze() {
         if ($this->question->are_lexeme_sequences_equal($this->basestringpair)) {
-            parent::bypass();
+            $this->bypass();
+            $this->resultstringpairs[0]->assert_that_strings_are_equal();
             return;
         }
 
         $lexicalmistakes = $this->convert_lexer_errors_to_mistakes();
-
         // TODO: Biryukova's new code should be placed here!
         // 1. Compute self code - Mamontov
         // 1.1. Replace result with fixed strings
         $this->resultstringpairs = block_formal_langs_string_pair::best_string_pairs(
-            $this->question->get_used_language(),
             $this->basestringpair->correctstring(),
             $this->basestringpair->comparedstring(),
             $this->question->lexicalerrorthreshold,
@@ -87,25 +86,137 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
         );
 
         /** @var qtype_correctwriting_string_pair $pair */
+        $sequenceanalyzerdisabled = ($this->question->is_analyzer_enabled('sequence_analyzer') == false);
         foreach($this->resultstringpairs as $pair) {
-            $pair->tokenmappings[get_class($this)] = $pair->pairs_between_corrected_compared();
+            //$pair->tokenmappings[get_class($this)] = $pair->pairs_between_corrected_compared();
+            /** qtype_correctwriting_string_pair */
             $pair->analyzersequence[] = get_class($this);
-            // TODO: Biryukova: create own lexical_errors here and append it to pair, via
-            // append_mistakes
-            $pair->append_mistakes($lexicalmistakes);
+            if($pair->matches()==null){
+                $pair->setcorrectedstring($pair->comparedstring());
+                return;
+            }
+            $setmatches = $pair->matches()->matchedpairs;
+            $lexmistakes=array();
+            foreach ($setmatches as $onematch) {
+                /** @var block_formal_langs_matched_tokens_pair $onematch */
+                if ($onematch->mistakeweight > 0) {
+                    $lexmistake = new qtype_correctwriting_lexical_mistake($onematch);
+                    $lexmistake->stringpair = $pair;
+                    $lexmistake->answermistaken = $onematch->correcttokens;
+                    $lexmistake->responsemistaken = $onematch->comparedtokens;
+                    $lexmistake->mistakemsg = $onematch->message($this->basestringpair->correctstring(), $this->basestringpair->comparedstring());
+                    $lexmistake->weight = $onematch->mistakeweight;
+                    $lexmistakes[] = $lexmistake;
+                }
+            }
+            if ($sequenceanalyzerdisabled) {
+                $this->convert_non_covered_tokens_to_mistakes($pair);
+            }
+            $pair->append_mistakes($lexmistakes);
         }
+    }
+
+    /**
+     * Converts non-covered tokens from answer and response to mistakes
+     * @param qtype_correctwriting_string_pair $pair a pair to be converted
+     */
+    protected function convert_non_covered_tokens_to_mistakes($pair) {
+        $mistakes = array();
+        $noncoveredanswertokens = array();
+        $noncoveredresponsetokens = array();
+
+        // Fill non-covered tokens with all tokens
+        $correctpairtokens = $pair->correctstring()->stream->tokens;
+        for($i = 0; $i < count($correctpairtokens); $i++) {
+            $noncoveredanswertokens[$i] = 1;
+        }
+
+        $comparedpairtokens = $pair->comparedstring()->stream->tokens;
+        for($i = 0; $i < count($comparedpairtokens); $i++) {
+            $noncoveredresponsetokens[$i] = 1;
+        }
+
+        $setmatches = $pair->matches()->matchedpairs;
+        foreach ($setmatches as $onematch) {
+            /** @var block_formal_langs_matched_tokens_pair $onematch */
+            for($i = 0; $i < count($onematch->correcttokens); $i++) {
+                if (array_key_exists($onematch->correcttokens[$i], $noncoveredanswertokens)) {
+                    unset($noncoveredanswertokens[$onematch->correcttokens[$i]]);
+                }
+            }
+            /** @var block_formal_langs_matched_tokens_pair $onematch */
+            for($i = 0; $i < count($onematch->comparedtokens); $i++) {
+                if (array_key_exists($onematch->comparedtokens[$i], $noncoveredresponsetokens)) {
+                    unset($noncoveredresponsetokens[$onematch->comparedtokens[$i]]);
+                }
+            }
+        }
+
+        if (count($noncoveredanswertokens)) {
+            foreach($noncoveredanswertokens as $answerkey => $id) {
+                $mistakes[] = $this->create_absent_mistake($pair, $answerkey);
+            }
+        }
+        if (count($noncoveredresponsetokens)) {
+            foreach($noncoveredresponsetokens as $responsekey => $id) {
+                $mistakes[] = $this->create_added_mistake($pair, $responsekey);
+            }
+        }
+
+        if (count($mistakes)) {
+            $pair->append_mistakes($mistakes);
+        }
+    }
+
+    /**
+     * Creates a new mistake, that represents case, when odd lexeme is insert to index
+     * @param qtype_correctwriting_string_pair $pair a source pair
+     * @param int $responseindex index of lexeme in response
+     * @return qtype_correctwriting_lexeme_moved_mistake a mistake
+     */
+    private function create_added_mistake($pair, $responseindex) {
+        $result =  new qtype_correctwriting_lexeme_added_mistake($this->language,
+            $pair,
+            $responseindex, $this->question->token_comparing_options());
+        $result->weight =  $this->question->addedmistakeweight;
+        $result->mapfromcorrectedtocompared = false;
+        $result->source = get_class($this);
+        return $result;
+    }
+
+    /**
+     * Creates a new mistake, that represents case, when lexeme is skipped
+     * @param qtype_correctwriting_string_pair $pair a source pair
+     * @param int $answerindex   index of lexeme in answer
+     * @return qtype_correctwriting_lexeme_moved_mistake a mistake
+     */
+    private function create_absent_mistake($pair, $answerindex) {
+        $result = new qtype_correctwriting_lexeme_absent_mistake($this->language,
+            $pair,
+            $answerindex
+        );
+        $result->weight =  $this->question->absentmistakeweight;
+        $result->mapfromcorrectedtocompared = false;
+        $result->source = get_class($this);
+        return $result;
     }
 
 
     protected function bypass() {
-        parent::bypass();
         // You must create mistakes of skipped lexemes and additional lexemes
         // Also, you need to create matched 1:1 by simply comparing lexemes of two sequences
         // with ::is_same
-        $pairs = $this->result_pairs();
-        $string = $pairs[0];
+        $this->resultstringpairs = block_formal_langs_string_pair::best_string_pairs_for_bypass(
+            $this->basestringpair->correctstring(),
+            $this->basestringpair->comparedstring(),
+            $this->question->lexicalerrorthreshold,
+            $this->question->token_comparing_options(),
+            'qtype_correctwriting_string_pair'
+        );
+
         /** @var qtype_correctwriting_string_pair $string */
-        $string->set_mistakes($this->convert_lexer_errors_to_mistakes());
+        $this->resultstringpairs[0]->set_mistakes($this->convert_lexer_errors_to_mistakes());
+
     }
 
     /**
@@ -130,7 +241,7 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
              * @var block_formal_langs_lexical_error $error
              */
             foreach($this->basestringpair->comparedstring()->stream->errors as $index => $error) {
-                $mistake = new qtype_correctwriting_scanning_mistake();
+                $mistake = new qtype_correctwriting_scanning_mistake(null);
 
                 $message =  $error->errormessage;
                 $mistake->languagename = $this->question->get_used_language()->name();
@@ -190,11 +301,10 @@ class qtype_correctwriting_lexical_analyzer extends qtype_correctwriting_abstrac
 
     // Form and DB related functions.
     public function float_form_fields() {
-        return array(array('name' => 'lexicalerrorthreshold', 'default' => 0.33, 'advanced' => true, 'required' => false, 'min' => 0, 'max' => 1), //Lexical error threshold field
-                     array('name' => 'lexicalerrorweight','default' => 0.05, 'advanced' => true, 'required' => false, 'min' => 0, 'max' => 1),      //Lexical error weight field
-                     array('name' => 'absentmistakeweight', 'default' => 0.1, 'advanced' => true, 'min' => 0, 'max' => 1, 'required' => true),  //Absent token mistake weight field
-                     array('name' =>'addedmistakeweight', 'default' => 0.1, 'advanced' => true, 'min' => 0, 'max' => 1, 'required' => true),    //Extra token mistake weight field
-                    );
+        return array(
+            array('name' => 'lexicalerrorweight', 'default' => 0.05, 'advanced' => true, 'required' => false, 'min' => 0, 'max' => 1),      //Lexical error weight field
+            array('name' => 'lexicalerrorthreshold', 'default' => 0.33, 'advanced' => true, 'required' => false, 'min' => 0, 'max' => 1), //Lexical error threshold field
+        );
     }
 }
 

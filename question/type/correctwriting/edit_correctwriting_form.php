@@ -46,13 +46,16 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
      */
     private $floatfields = array('hintgradeborder' => array('default' => 0.9, 'advanced' => true, 'min' => 0, 'max' => 1),           // Hint grade border.
                                  'maxmistakepercentage' => array('default' => 0.7, 'advanced' => true, 'min' => 0, 'max' => 1),      // Max mistake percentage.
+                                 'absentmistakeweight' => array('default' => 0.1, 'advanced' => true, 'min' => 0, 'max' => 1, 'required' => true),  //Absent token mistake weight field
+                                 'addedmistakeweight' => array('default' => 0.1, 'advanced' => true, 'min' => 0, 'max' => 1, 'required' => true),    //Extra token mistake weight field
                                 );
 
     private $hintfloatfields = array('whatishintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2),       // "What is" hint penalty.
                                      'wheretxthintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2),     // "Where" text hint penalty.
                                      'absenthintpenaltyfactor' => array('default' => 1.0, 'advanced' => true, 'min' => 0, 'max' => 100),// Absent token mistake hint penalty factor.
-                                     'wherepichintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2)      // "Where" picture hint penalty.
-                                     );
+                                     'wherepichintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2),     // "Where" picture hint penalty.
+                                     'howtofixpichintpenalty' => array('default' => 1.1, 'advanced' => false, 'min' => 0, 'max' => 2)   // "How to fix" picture hint penalty.
+                                    );
 
     private $analyzers = null;
     /** Contains list of answer ids, that should be hidden
@@ -173,7 +176,13 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
      */
     protected function definition_additional_sections(&$mform) {
         // Analyzer sections.
-        foreach ($this->analyzers as $name) {
+        $analyzers = $this->analyzers;
+        unset($analyzers[0x400]);
+        //  Disable syntax analyzers
+        $mform->addElement('hidden', 'issyntaxanalyzerenabled', true);
+        $mform->setType('issyntaxanalyzerenabled', PARAM_BOOL);
+        $mform->setDefault('issyntaxanalyzerenabled', 0);
+        foreach ($analyzers as $name) {
             $classname = 'qtype_correctwriting_' . $name;
             /** @var qtype_correctwriting_abstract_analyzer $analyzer */
             $analyzer = new $classname;
@@ -182,14 +191,17 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
             $mform->addElement('header', $name . 'hdr', $uiname);
             $mform->addHelpButton($name . 'hdr', $name, 'qtype_correctwriting');
             // Add control whether to use analyzer.
-            $a = textlib::strtolower(textlib::substr($uiname, 0, 1)) . textlib::substr($uiname, 1);// Decapitalise first letter.
+            $a = core_text::strtolower(core_text::substr($uiname, 0, 1)) . core_text::substr($uiname, 1);// Decapitalise first letter.
             $formname = 'is' . str_replace('_', '', $name) . 'enabled';
             $mform->addElement('selectyesno', $formname, get_string('usesomething', 'qtype_correctwriting', $a));
             $mform->setType($formname, PARAM_BOOL);
             // Disable all groups but enable sequence analyzer
             $default = 1;
-            if ($formname != 'issequenceanalyzerenabled') {
+            if ($formname != 'issequenceanalyzerenabled' && $formname != 'islexicalanalyzerenabled') {
                 $default = 0;
+            }
+            if ($formname == 'islexicalanalyzerenabled') {
+                $mform->addRule($formname, null, 'required', null, 'client');
             }
             $mform->setDefault($formname, $default);
             // TODO - default to admin config setting - use or not.
@@ -227,9 +239,9 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $rows = count($textdata);
         $cols = 1;
         for ($i = 0; $i < count($textdata); $i++) {
-            $len = textlib::strlen($textdata[$i]);
+            $len = core_text::strlen($textdata[$i]);
             if ($len > $cols) {
-                $cols = textlib::strlen($textdata[$i]);
+                $cols = core_text::strlen($textdata[$i]);
             }
         }
         // A tab for IE-like browser
@@ -392,7 +404,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         $max = 0;
         if (count($lines) != 0) {
             foreach($lines as $line) {
-                $max = max($max, textlib::strlen($line));
+                $max = max($max, core_text::strlen($line));
             }
         }
         if ($max < 80) {
@@ -561,11 +573,11 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                 $tokenpos = $token->position();
                 $emesg = $error->errormessage . $br;
                 $left = $tokenpos->colstart();
-                $emesg .= ($left <= 0) ? '' : textlib::substr($value, 0, $left);
+                $emesg .= ($left <= 0) ? '' : core_text::substr($value, 0, $left);
                 $left =  $tokenpos->colend() -  $tokenpos->colstart() + 1;
-                $middlepart = ($left <= 0) ? '' : textlib::substr($value,  $tokenpos->colstart() , $left);
+                $middlepart = ($left <= 0) ? '' : core_text::substr($value,  $tokenpos->colstart() , $left);
                 $emesg .= '<b>' . $middlepart . '</b>';
-                $emesg .= textlib::substr($value, $tokenpos->colend() + 1);
+                $emesg .= core_text::substr($value, $tokenpos->colend() + 1);
                 $errormessages[] = $emesg;
                 $result = implode($br, $errormessages);
             }
@@ -573,10 +585,137 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         return $result;
     }
 
-    public function validation($data, $files) {
+    /**
+     * Returns position of last or first token in tree
+     * @param block_formal_langs_ast_node_base $root root node
+     * @param bool $first whether we should take first token (or last if false)
+     * @return block_formal_langs_node_position
+     */
+    protected function get_position_for_token_in_tree($root, $first) {
+        $children = $root->childs();
+        $result = null;
+        if (count($children)  == 0) {
+            $result = $root->position();
+        } else {
+            if ($first) {
+                $result = self::get_position_for_token_in_tree($children[0], $first);
+            } else {
+                $lastindex = count($children) - 1;
+                $result = self::get_position_for_token_in_tree($children[$lastindex], $first);
+            }
+        }
+        return $result;
+    }
 
+    /**
+     * Formats string for  parsing error. First position must be before second position
+     * @param string $text text
+     * @param block_formal_langs_node_position $position1 position of first node
+     * @param block_formal_langs_node_position $position2 position of second node
+     * @return string error part
+     */
+    protected function format_string_for_parse_error($text, $position1, $position2) {
+        $e = function($a) {
+            $a = htmlspecialchars($a);
+            $t = str_repeat('&nbsp;', 4);
+            return str_replace(array("\t", ' '), array($t, '&nbsp;'), $a);
+        };
+        $result = $e(core_text::substr($text, 0 , $position1->stringstart()));
+        $lengthoffirst = $position1->stringend() - $position1->stringstart() + 1;
+        $result .= html_writer::tag('b', $e(core_text::substr($text, $position1->stringstart(), $lengthoffirst)));
+        if ($position1->stringend() + 1 != $position2->stringstart()) {
+            $lengthofspacebetween = $position2->stringstart() - $position1->stringend() - 1;
+            $result .= $e(core_text::substr($text, $position1->stringend() + 1, $lengthofspacebetween));
+        }
+        $lengthofsecond = $position2->stringend() - $position2->stringstart() + 1;
+        $result .= html_writer::tag('b', $e(core_text::substr($text, $position2->stringstart(), $lengthofsecond)));
+        $result .= $e(core_text::substr($text, $position2->stringend()+1));
+        return $result;
+    }
+
+    public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
+        $islexicalanalyzerenabled = false;
+        if (array_key_exists('islexicalanalyzerenabled', $data)) {
+            $islexicalanalyzerenabled = intval($data['islexicalanalyzerenabled']);
+        }
+
+        $issequenceanalyzerenabled = false;
+        if (array_key_exists('issequenceanalyzerenabled', $data)) {
+            $issequenceanalyzerenabled = intval($data['issequenceanalyzerenabled']);
+        }
+
+        $issyntaxanalyzerenabled = false;
+        if (array_key_exists('issyntaxanalyzerenabled', $data)) {
+            $issyntaxanalyzerenabled = intval($data['issyntaxanalyzerenabled']);
+        }
+
+        $isenumanalyzerenabled = false;
+        if (array_key_exists('isenumanalyzerenabled', $data)) {
+            $isenumanalyzerenabled = intval($data['isenumanalyzerenabled']);
+        }
+
+        question_bank::load_question_definition_classes($this->qtype());
+        $qtypeclass = 'qtype_'.$this->qtype();
+        /** @var qtype_correctwriting $qtype */
+        $qtype = new $qtypeclass;
+        $this->analyzers = $qtype->analyzers();
+        foreach ($this->analyzers as $name) {
+            $analyzername = str_replace('_', '', $name);
+            $variablename = 'is' . $analyzername . 'enabled';
+            $isanalyzerenabled = $$variablename;
+            if ($isanalyzerenabled) {
+                $classname = 'qtype_correctwriting_' . $name;
+                /** @var qtype_correctwriting_abstract_analyzer $analyzer */
+                $analyzer = new $classname;
+                $requiredanalyzers = $analyzer->require_analyzers();
+                $alreadyerror = false;
+                if (count($requiredanalyzers)) {
+                    foreach($requiredanalyzers as $requiredanalyzerbasename) {
+                        $requiredanalyzerbasename = str_replace('qtype_correctwriting_', '', $requiredanalyzerbasename);
+                        $requiredanalyzerbasename = str_replace('_', '', $requiredanalyzerbasename);
+                        $isrequiredanalyzerenabled = ${'is' . $requiredanalyzerbasename . 'enabled'};
+                        if (!$isrequiredanalyzerenabled) {
+                            $errors[$variablename] = get_string(
+                                $analyzername . 'require' . $requiredanalyzerbasename,
+                                'qtype_correctwriting'
+                            );
+                            $alreadyerror = true;
+                        }
+                    }
+                }
+                if (!$alreadyerror) {
+                    if (array_key_exists('langid', $data)) {
+                        if (is_number($data['langid'])) {
+                            $langid = intval($data['langid']);
+                            $lang = block_formal_langs::lang_object($langid);
+                            if (is_object($lang)) {
+                                if ($analyzer->is_lang_compatible($lang) == false) {
+                                    $errors[$variablename] = get_string(
+                                        $analyzername . 'isincompatiblewithlang',
+                                        'qtype_correctwriting'
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!$islexicalanalyzerenabled
+            && !$issequenceanalyzerenabled
+            && !$isenumanalyzerenabled
+            && !$issyntaxanalyzerenabled) {
+            $errors['islexicalanalyzerenabled'] = get_string('analyzersaredisabled','qtype_correctwriting');
+        }
+
+        // TODO: Remove, when nice version of syntax analyzer will be implemented
+        if ($issyntaxanalyzerenabled) {
+            $errors['issyntaxanalyzerenabled'] = get_string('syntaxanalyzerisdisabled','qtype_correctwriting');
+        }
+        
         // Validate floating fields for min/max borders.
         foreach ($this->floatfields as $name => $params) {
             if ($data[$name] < $params['min']) {
@@ -593,6 +732,25 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
         foreach($data['answer'] as $key => $value) {
             $processedstring = $lang->create_from_string($value);
             $stream = $processedstring->stream;
+
+            if (is_object($lang)) {
+                if (count($stream->errors) == 0
+                    && ($isenumanalyzerenabled || $issyntaxanalyzerenabled)
+                    && $lang->could_parse()
+                ) {
+                    $syntaxtree = $processedstring->syntaxtree;
+                    if (count($syntaxtree) > 1) {
+                        $position1 = self::get_position_for_token_in_tree($syntaxtree[0], false);
+                        $position2 = self::get_position_for_token_in_tree($syntaxtree[1], true);
+                        $text = self::format_string_for_parse_error($value, $position1, $position2);
+                        $errors["answer[$key]"] = get_string(
+                            'analyzersrequirevalidsyntaxtree',
+                            'qtype_correctwriting',
+                            $text
+                        );
+                    }
+                }
+            }
 
             if (count($stream->errors) != 0) {
                 $form = 'qtype_correctwriting_edit_form';
@@ -618,7 +776,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                         if (array_key_exists($fieldkey, $errors) == false) {
                             $errors[$fieldkey] = get_string('parseerror', 'qtype_correctwriting');
                         } else {
-                            if (textlib::strlen($errors[$fieldkey]) == 0) {
+                            if (core_text::strlen($errors[$fieldkey]) == 0) {
                                 $errors[$fieldkey] = get_string('parseerror', 'qtype_correctwriting');
                             } else {
                                 $errors[$fieldkey] .= $br . get_string('parseerror', 'qtype_correctwriting');
@@ -644,7 +802,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                             if (array_key_exists($fieldkey, $errors) == false) {
                                 $errors[$fieldkey] = $mesg;
                             } else {
-                                if (textlib::strlen($errors[$fieldkey]) == 0) {
+                                if (core_text::strlen($errors[$fieldkey]) == 0) {
                                     $errors[$fieldkey] = $mesg;
                                 } else {
                                     $errors[$fieldkey] .= $br . $mesg;

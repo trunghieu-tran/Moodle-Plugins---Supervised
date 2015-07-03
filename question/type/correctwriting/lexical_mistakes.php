@@ -30,14 +30,90 @@ require_once($CFG->dirroot.'/question/type/correctwriting/response_mistakes.php'
 // A marker class to indicate errors from lexical analyzer. We need them to indicate
 // what lexemes was corrected by analyzer.
 class qtype_correctwriting_lexical_mistake extends qtype_correctwriting_response_mistake {
-
+    /** A pair of tokens, linked with lexeical mistake
+     *  @var block_formal_langs_matched_tokens_pair
+     */
+    public $tokenpair;
+    
+    /*! Mistakekey
+        @var string
+    */
+    public $str;
+    
     public function mistake_key() {
-        return '';//TODO - implement actually
+        return $this->str;//TODO - implement actually
+    }
+    
+    public function supported_hints() {
+        return array('whatis', 'howtofixpic');
+    }
+    
+    public function __construct($tokenpair){
+        $this->tokenpair = $tokenpair;
+        $this->str='typo_'.$this->tokenpair->correcttokens[0];
+    }
+
+    /**
+     * Returns description for whatis hint as text
+     * @return string
+     */
+    public function what_is_description() {
+        $description = $this->token_descriptions();
+        $a = new stdClass();
+        $a->tokendescr = $description;
+
+        $comparedstring = '';
+        $indexes = $this->tokenpair->comparedtokens;
+        if (count($indexes)) {
+            sort($indexes);
+            $strings = array();
+            foreach($indexes as $index) {
+                /** @var block_formal_langs_token_base $token */
+                $token = $this->stringpair->comparedstring()->stream->tokens[$index];
+                $string = $token->value();
+                if (is_object($string)) {
+                    /** @var qtype_poasquestion\string $string */
+                    $string = $string->string();
+                }
+                $strings[]=$string;
+            }
+            $result = implode(' ', $strings);
+            $comparedstring = $result;
+        }
+
+        $a->tokenvalue = $comparedstring;
+        $a->inthiscase =  get_string('inyouranswer', 'qtype_correctwriting', $a);
+        if (!is_string($a->tokenvalue)) {
+            $a->tokenvalue = $a->tokenvalue->string();
+        }
+        $description = get_string('whatishint', 'qtype_correctwriting', $a);
+        return $description;
+    }
+
+    public function token_descriptions($andvalue = false) {
+        if ($this->tokenpair->type != block_formal_langs_matched_tokens_pair::TYPE_MISSING_SEPARATOR) {
+            return parent::token_descriptions($andvalue);
+        }
+        $correctstring = $this->stringpair->correctstring();
+        $hasdescriptions = true;
+        foreach ($this->tokenpair->correcttokens as $index) {
+            $hasdescriptions = $hasdescriptions && $correctstring->has_description($index);
+        }
+        if ($hasdescriptions) {
+            return parent::token_descriptions($andvalue);
+        }
+        return null;
+    }
+
+    public function token_descriptions_as_mistake($andvalue = false) {
+        return parent::token_descriptions($andvalue);
     }
 }
 
-class qtype_correctwriting_scanning_mistake extends qtype_correctwriting_lexical_mistake {
-
+class qtype_correctwriting_scanning_mistake extends qtype_correctwriting_response_mistake {
+    public function mistake_key() {
+        return '';//TODO - implement actually
+    }
 }
 
 ?>

@@ -367,6 +367,16 @@ class block_formal_langs_comparing_options {
 }
 
 /**
+ * Class for options, controlling strings comparison process.
+ */
+class block_formal_langs_comparing_options {
+    /**
+     * @var bool true if comparing is case sensitive, false if insensitive
+     */
+    public $usecase;
+}
+
+/**
  * Class for base tokens.
  *
  * Class for storing tokens. Class - token, object of the token class
@@ -526,8 +536,20 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
             }
         }
         return $matrix[$lenstr1][$lenstr2];
+        $str1= $this->value;
+        $str2= $token->value;
+        $length_of_str1=strlen($str1);                 //define the length of str1
+        $length_of_str2=strlen($str2);                 //define the length of str2
+        if(!($length_of_str1-$max<=$length_of_str2 && $length_of_str2<=$length_of_str1+$max))
+            return -1;
+        //$distance=$this->editing_distance($token);    //define the distance of damerau-levenshtein 
+        $distance = block_formal_langs_token_base::damerau_levenshtein($str1,$str2);
+        if($distance<=$max)
+            return $distance;
+        else
+            return -1;
     }
-
+    
     /* Calculates redaction between two strings.
      *
      * @return str redaction distance
@@ -810,7 +832,7 @@ class block_formal_langs_token_base extends block_formal_langs_ast_node_base {
         }
         return $possiblepairs;
     }
-    
+
     /**
      * Returns a string caseinsensitive semantic value of token
      * @return string

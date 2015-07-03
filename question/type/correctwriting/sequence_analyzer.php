@@ -65,11 +65,35 @@ class  qtype_correctwriting_sequence_analyzer extends qtype_correctwriting_abstr
         parent::__construct($question, $basepair, $language, $bypass);
     }
 
+    /**
+     * Returns maximal LCS count, which shold be returned
+     * @return int
+     */
+    protected function lcs_count_threshold() {
+        global $CFG;
+        if (intval($CFG->qtype_correctwriting_max_temp_lcs) <= 0) {
+            return 0;
+        }
+        return intval($CFG->qtype_correctwriting_max_temp_lcs);
+    }
+
     protected function analyze() {
-        $answertokens = $this->basestringpair->correctstring()->stream;
+        $answertokens = $this->basestringpair->enum_correct_string()->stream;
         $responsetokens = $this->basestringpair->correctedstring()->stream;
+        /*echo "<pre>";
+        echo "===================\n";
+        echo "enumcorrectstring: ";
+        foreach($answertokens->tokens as $token) {
+            echo $token->value() . " ";
+        }
+        echo "\n";
+        echo "correctedstring:   ";
+        foreach($responsetokens->tokens as $token) {
+            echo $token->value() . " ";
+        }
+        echo "\n";*/
         $options = $this->question->token_comparing_options();
-        $alllcs = qtype_correctwriting_sequence_analyzer::lcs($answertokens, $responsetokens, $options);
+        $alllcs = qtype_correctwriting_sequence_analyzer::lcs($answertokens, $responsetokens, $options, $this->lcs_count_threshold());
 
         $weights = new stdClass;
         $weights->movedweight = $this->question->movedmistakeweight;
@@ -89,6 +113,15 @@ class  qtype_correctwriting_sequence_analyzer extends qtype_correctwriting_abstr
             $this->fill_matches($pair);
             $pair->append_mistakes($this->matches_to_mistakes($pair, $weights));
         }
+        /*foreach($this->resultstringpairs as $pair) {
+            echo "pair:            \n";
+            foreach($pair->mistakes() as $mistake) {
+                echo str_replace(array('qtype_correctwriting_', '_mistake'), array('', ''), get_class($mistake)) . " ";
+            }
+            echo "\n";
+        }
+        echo "===================\n";
+        echo "</pre>";*/
     }
 
     /**
@@ -107,177 +140,137 @@ class  qtype_correctwriting_sequence_analyzer extends qtype_correctwriting_abstr
      * @param  block_formal_langs_token_stream $answerstream  array of answer tokens
      * @param  block_formal_langs_token_stream $responsestream array of response tokens
      * @param  block_formal_langs_comparing_options $options options for comparing lexemes
+     * @param  int $threshold maximal count of found LCS (0 - is unbounded). We shold care, because
+     * there could be answers with 70 000+ possible LCS and it can consume a lot of memory
      * @return array array of individual lcs arrays
      */
-    public static function lcs($answerstream, $responsestream, $options) {
-        // Extract data from method
+    public static function lcs($answerstream, $responsestream, $options, $threshold = 0) {
+        // Extract answer and response array of stream
         $answer = $answerstream->tokens;
         $response = $responsestream->tokens;
-        // Find all matches, they become nodes of a graph.
-        // After that we can use Floyd-Warshall algorithm
+
+        // http://stackoverflow.com/questions/18496665/longest-common-subsequence-print-all-subsequences
+        
+        // An array of matches, where keys are indexes of answer and values are arrays of
+        // indexes from response
         $matches = array();
-        // Match is defined as tuple <i,j>
-        for ($i = 0; $i < count($answer); $i++) {
-            for($j = 0; $j < count($response); $j++) {
-                /** @var block_formal_langs_token_base $answertoken */
-                $answertoken = $answer[$i];
-                if ($answertoken->is_same($response[$j], $options)) {
-                    $matches[] = array($i, $j);
-                }
+        // Fill an array of matches filling an lcs data
+        $answercount = count($answer);
+        $responsecount = count($response);
+
+        // Compute C as lcs
+        $C = array();
+        for($i = 0; $i <= $answercount; $i++) {
+            $C[$i] = array();
+            for($j = 0; $j <= $responsecount; $j++) {
+                $C[$i][$j] = 0;
             }
         }
-
-
-        // If nothing found - no matches, return
-        if (count($matches) === 0)
-            return array();
-        // Matrix of longest paths on graph, defined as matches
-        // nodes, where edged defined as for all n1,n2
-        // edge between n1 and n2 exist, if n1 < n2 <=> n1[0] < n2[0] && n1[1] < n2[1]
-        // Way in matrix is defined as tuple <sum of weight, center node index>
-        // A predecessor matrix, needed for computing is merged with common way matrix
-        // We fill only upper-right part, because we can easily prove, that
-        // only upper-right part will be filled
-        $waymatrix = array();
-        for ($i = 0; $i < count($matches); $i++) {
-            $waymatrix[$i] = array();
-            for($j = $i; $j < count($matches); $j++) {
-                $waymatrix[$i][$j] = array(0, null);
-                if ($matches[$i][0] < $matches[$j][0] && $matches[$i][1] < $matches[$j][1]) {
-                    $waymatrix[$i][$j][0] = -1;
-                }
-            }
-        }
-
-
-
-        // This is slightly modified Floyd-Warshall algorithm runned for this graph
-        // He sets a center node, so restoration of path will be more complicated
-        // An unusual boundaries is set because there must exist all of element
-        // and due to some fill method the bounds can be deduced.
-        for ($k = 0; ($k < count($matches)); $k++) {
-
-            for($i = 0; $i <= $k; $i++) {
-                for($j = $k;  $j < count($matches); $j++) {
-                    $iklength = $waymatrix[$i][$k][0];
-                    $kjlength = $waymatrix[$k][$j][0];
-                    $newlength = $iklength + $kjlength;
-                    $oldlength = $waymatrix[$i][$j][0];
-                    if ($newlength < $oldlength && $iklength !== 0 && $kjlength !== 0) {
-                        $waymatrix[$i][$j][0] = $newlength;
-                        $waymatrix[$i][$j][1] = $k;
-                    }
-                }
-            }
-
-        }
-
-
-
-
-        // Minimal weight of way in this method refers to a longest sequence
-        $minimalweight = 0;
-        // Array of ways as a tuple <from_match, to_match>, where matches are nodes
-        $ways = array();
-
-        // Find minimal weight
-        for($i = 0; $i < count($matches); $i++) {
-            for($j = $i; $j < count($matches); $j++) {
-                if ($waymatrix[$i][$j][0] < $minimalweight)
-                    $minimalweight = $waymatrix[$i][$j][0];
-            }
-        }
-
-        $onematches = ($minimalweight ===0);
-
-        // Find ways, matched for minimal weight
-        for($i = 0; ($i < count($matches)) && !$onematches; $i++) {
-            for($j = $i; $j < count($matches); $j++) {
-                if ($waymatrix[$i][$j][0] == $minimalweight)
-                    $ways[] = array($i, $j);
-            }
-        }
-
-
-
-        // In case of one match, we can simly reconstruct it as array of matches
-        $matchesways = array();
-        if ($onematches)
-        {
-            for ($i=0;$i<count($matches);$i++) {
-                $matchesways[] = array( $matches[$i] );
-            }
-        }
-
-        // Reconstruct ways as array of match indexes
-        for($i = 0; ($i < count($ways)) && !$onematches; $i++) {
-            // Creates a new global way task for finding a way
-            $waytask = new stdClass();
-            $waytask->i = $ways[$i][0]; // These fields defines nodes, where
-            $waytask->j = $ways[$i][1]; // way between them must be reconstructed
-            $waytask->iktask = null;    // These are references
-            $waytask->kjtask = null;    // which will be filled, when we are deferring loops
-            $waytask->result = array(); // In this field result is stored
-
-
-            $evalqueue = array( $waytask );
-            $deferqueue = array();
-            // When this loop is over, some primitive ways are computed
-            // and deferqueue is filled backwards with new items
-            while ( count($evalqueue) ) {
-                $task = array_shift($evalqueue);
-                $ti = $task->i;
-                $tj = $task->j;
-                $k = $waymatrix[$ti][$tj][1];
-                if ($k === null) {
-                    $task->result = array( $matches[$ti], $matches[$tj] );
+				
+        for($i =  0; $i < $answercount; $i++) {
+            for($j =  0; $j < $responsecount; $j++) {
+                if ($answer[$i]->is_same($response[$j], $options)) {
+                    $C[$i + 1][$j + 1] = $C[$i][$j] + 1;
                 } else {
-                    // Create task for reconstructing a way from i to k
-                    $iktask = new stdClass();
-                    $iktask->i = $ti;
-                    $iktask->j = $k;
-                    $iktask->iktask = null;
-                    $iktask->kjtask = null;
-                    $iktask->result = array();
-                    $task->iktask = $iktask;
-                    $evalqueue[] = $iktask;
-
-                    $kjtask = new stdClass();
-                    $kjtask->i = $k;
-                    $kjtask->j = $tj;
-                    $kjtask->iktask = null;
-                    $kjtask->kjtask = null;
-                    $kjtask->result = array();
-                    $task->kjtask = $kjtask;
-                    $evalqueue[] = $kjtask;
-
-                    if (count($deferqueue) == 0) {
-                        $deferqueue[] = $task;
+                    $C[$i + 1][$j + 1] = max($C[$i+1][$j], $C[$i][$j + 1]);
+                }
+            }
+        }
+        $cache = array();
+        $backtrackall = function($i, $j) use($C, $answer, $response, $options, &$backtrackall, &$cache, $threshold) {
+            gc_collect_cycles();
+            $globalcachekey = $i . ' . ' . $j;
+            if (array_key_exists($globalcachekey, $cache)) {
+                return $cache[$globalcachekey];
+            }
+            if ($i == 0 || $j == 0) {
+                $result = array();
+            } else {
+                if ($answer[$i - 1]->is_same($response[$j - 1], $options)) {
+                    $newmatch = array(($i - 1) => ($j - 1));
+                    $result = $backtrackall($i - 1, $j - 1);
+                    if (count($result)) {
+                        foreach ($result as $key => $match) {
+                            if (count($match)) {
+                                $match = $match + $newmatch;
+                            } else {
+                                $match = $newmatch;
+                            }
+                            $result[$key] = $match;
+                        }
                     } else {
-                        array_unshift($deferqueue, $task);
+                        $result = array($newmatch);
+                    }
+                    return $result;
+                } else {
+                    $result = array();
+                    if ($C[$i][$j - 1] >= $C[$i - 1][$j]) {
+                        $result = $backtrackall($i, $j - 1);
+                    }
+                    if ($C[$i - 1][$j] >= $C[$i][$j - 1]) {
+                        $result2 = $backtrackall($i - 1, $j);
+                        if (count($result)) {
+                            $result = array_merge($result, $result2);
+                        } else {
+                            $result = $result2;
+                        }
                     }
                 }
             }
-
-            // Now, we could just reconstruct ways for data
-            while( count($deferqueue) ) {
-                $task = array_shift($deferqueue);
-                // Now we merge ways from task and put them into result
-                $task->result = array_merge( $task->iktask->result, array_slice($task->kjtask->result, 1) );
+            if ($threshold != 0) {
+                if (count($result) > $threshold) {
+                    $result = array_slice($result, 0, $threshold);
+                }
             }
-            $matchesways[] = $waytask->result;
+            $cache[$globalcachekey] = $result;
+            return $result;
+        };
+        
+		// We modify this algorithm, since if we just call on last element, only one LCS could be returned. So, we pull all of maxlength and backtrack them
+        $verticalcount = count($C);
+        $horizontalcount = count($C[0]);
+        
+        $poses = array();
+        $maxvalue = 0;
+        
+        for($i = 1; $i < $verticalcount - 1; $i++) {
+            if ($C[$i][$horizontalcount - 1] > $maxvalue) {
+                $maxvalue = $C[$i][$horizontalcount - 1];
+                $poses = array( array($i, $horizontalcount - 1) );
+            } else {
+                if ($C[$i][$horizontalcount - 1] == $maxvalue && $maxvalue != 0) {
+                    $poses[] = array($i, $horizontalcount - 1);
+                }
+            }
         }
-
-        // Now we convert LCS to result format
-        for($i = 0; $i < count($matchesways); $i++) {
+        
+        for($i = 1; $i < $horizontalcount; $i++) {
+            if ($C[$verticalcount - 1][$i] > $maxvalue) {
+                $maxvalue = $C[$verticalcount - 1][$i];
+                $poses = array( array($verticalcount - 1, $i) );
+            } else {
+                if ($C[$verticalcount - 1][$i] == $maxvalue && $maxvalue !=0) {
+                    $poses[] = array($verticalcount - 1, $i) ;
+                }
+            }
+        }
+        
+        if (count($poses) == 0) {
+            $lcs = $backtrackall($answercount, $responsecount);    
+        } else {
             $lcs = array();
-            for($j = 0; $j < count($matchesways[$i]); $j++) {
-                $lcs[$matchesways[$i][$j][0]] = $matchesways[$i][$j][1];
+            foreach($poses as $pos) {
+                $lcs2 = $backtrackall($pos[0], $pos[1]);
+                if (count($lcs2)) {
+                    foreach($lcs2 as $lcstmp) {
+                        if (!in_array($lcstmp, $lcs)) {
+                            $lcs[] = $lcstmp;
+                        }
+                    }
+                }            
             }
-            $matchesways[$i] = $lcs;
         }
-
-        return $matchesways;
+        return $lcs;
     }
     /**
      * Creates a new mistake, that represents case, when one lexeme moved to other position
@@ -334,7 +327,9 @@ class  qtype_correctwriting_sequence_analyzer extends qtype_correctwriting_abstr
             $result[0] = array( $i );
             $result[1] = array( $i );
         }
-        $pair->tokenmappings[get_class($this)] = $result;
+        if (property_exists($pair, 'tokenmappings')) {
+            $pair->tokenmappings[get_class($this)] = $result;
+        }
     }
     /**
      * Returns an array of mistakes objects for given individual lcs array.
@@ -344,7 +339,7 @@ class  qtype_correctwriting_sequence_analyzer extends qtype_correctwriting_abstr
      * @return array array of mistake objects
      */
     public function matches_to_mistakes($pair,$weights) {
-        $answer = &$this->basestringpair->correctstring()->stream->tokens;
+        $answer = &$this->basestringpair->enum_correct_string()->stream->tokens;
         $response = &$this->basestringpair->correctedstring()->stream->tokens;
         $pair->addedlexemesindexes = array();
         $pair->skippedlexemesindexes = array();
