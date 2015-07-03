@@ -39,7 +39,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
 
     function test_consumes_false() {
         $handler = new qtype_preg_fa_matcher('\Wa\W');
-        $transitions = $handler->automaton->get_adjacent_transitions($handler->automaton->start_states()[0], true);
+        $transitions = $handler->automaton->get_adjacent_transitions($handler->automaton->get_start_states()[0], true);
         $transition = $transitions[0];
         $transition->consumeschars = false;
         $handler->match(' a ');
@@ -48,7 +48,7 @@ class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
 
     function test_intersection_false() {
         $handler = new qtype_preg_fa_matcher("[a!&]");
-        $transitions = $handler->automaton->get_adjacent_transitions($handler->automaton->start_states()[0], true);
+        $transitions = $handler->automaton->get_adjacent_transitions($handler->automaton->get_start_states()[0], true);
         $transition = $transitions[0];
         // Create \W.
         $flagbigw = new qtype_preg_charset_flag();
