@@ -112,7 +112,6 @@ class restore_qtype_poasquestion_plugin extends restore_qtype_plugin {
             $data[$qtfield] = $this->newquestionid;
 
             if ($this->supportdenormalizedanswers)  {
-                }
             }
             // Insert record.
             $newitemid = $DB->insert_record($tablename, $data);
