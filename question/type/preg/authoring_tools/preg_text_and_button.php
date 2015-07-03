@@ -26,9 +26,9 @@ class qtype_preg_text_and_button extends qtype_poasquestion_text_and_button {
         global $CFG;
         global $PAGE;
 
-        $attributes = array('rows' => 1, 'cols' => 80);
+        $attributes = array('rows' => 1, 'cols' => 80, 'style' => 'width: 95%');
         $elementLinks = array(
-            'link_to_button_image' => $CFG->wwwroot . '/theme/image.php/standard/core/1359744739/t/edit',
+            'link_to_button_image' => $CFG->wwwroot . '/theme/image.php/clean/core/1410350174/t/edit',
             'link_to_page' => $CFG->wwwroot . '/question/type/preg/authoring_tools/preg_authoring.php'
         );
         $dialogWidth = '90%';

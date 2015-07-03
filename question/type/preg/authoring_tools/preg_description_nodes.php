@@ -92,19 +92,19 @@ abstract class qtype_preg_description_node {
         }
         $str = get_string($key, 'qtype_preg', $a);
         // TODO process $a directly in classes
-        $str = qtype_poasquestion_string::replace('{$a}', '%', $str);
-        $str = qtype_poasquestion_string::replace('{$a->firstoperand}', '%1', $str);
-        $str = qtype_poasquestion_string::replace('{$a->secondoperand}', '%2', $str);
-        $str = qtype_poasquestion_string::replace('{$a->thirdoperand}', '%3', $str);
-        $str = qtype_poasquestion_string::replace('{$a->', '%', $str);
-        $str = qtype_poasquestion_string::replace('}', '', $str);
+        $str = qtype_poasquestion\string::replace('{$a}', '%', $str);
+        $str = qtype_poasquestion\string::replace('{$a->firstoperand}', '%1', $str);
+        $str = qtype_poasquestion\string::replace('{$a->secondoperand}', '%2', $str);
+        $str = qtype_poasquestion\string::replace('{$a->thirdoperand}', '%3', $str);
+        $str = qtype_poasquestion\string::replace('{$a->', '%', $str);
+        $str = qtype_poasquestion\string::replace('}', '', $str);
         return $str;
     }
 
     /**
      * returns true if engine support the node, rejection string otherwise
      */
-    public function accept() {
+    public function accept($options) {
         return true;
     }
 
@@ -116,13 +116,16 @@ abstract class qtype_preg_description_node {
     }
 
     /**
-     * Puts $s instead of %s in numbering pattern. Puts node id instead of %n.
+     * Wraps $s into pattern $numbering_pattern
+     * %content will be replaced with generated string
+     * %idclass will be replaced with 'description_node_IDENTIFIER'
+     * %optionalclasses will be replaced with style classes (with space prefix!)
+     * %optionalclassesdevider will be replaced with space if %optionalclasses is no null
+     * %style will be replaced with style classes
      *
      * @param type $s this string will be placed instead of %s
      */
     protected function numbering_pattern($numbering_pattern, $s) { // TODO - rename
-        //return qtype_poasquestion_string::replace('%s', $s, qtype_poasquestion_string::replace('%n', $this->pregnode->id, $numbering_pattern));
-        $result = $s;
         $classes = array();
         $bgclor = 'white';
 
@@ -134,12 +137,15 @@ abstract class qtype_preg_description_node {
             $bgclor = 'orange';
         }
 
-        if ($numbering_pattern !== "%%tests%%" && (count($classes) !== 0 || $bgclor !== '')) {
-            $classesstr = count($classes) ? ' class="' . implode(' ', $classes) . '"' : '';
-            $stylestr = $bgclor!==null ? ' style="background: ' . $bgclor . '"' : '';
-            $result = '<span' . $classesstr . $stylestr . '>' . $result . '</span>';
-        }
+        $classesstr = count($classes) ? implode(' ', $classes) : '';
+        $classesstrdivider = count($classes) ? ' ' : '';
+        $stylestr = $bgclor!==null ? 'background: ' . $bgclor : '';
 
+        $result = qtype_poasquestion\string::replace('%content', $s, $numbering_pattern);
+        $result = qtype_poasquestion\string::replace('%idclass', 'description_node_'.$this->pregnode->id, $result);
+        $result = qtype_poasquestion\string::replace('%optionalclassesdevider', $classesstrdivider, $result);
+        $result = qtype_poasquestion\string::replace('%optionalclasses', $classesstr, $result);
+        $result = qtype_poasquestion\string::replace('%style', $stylestr, $result);
         return $result;
     }
 }
@@ -180,7 +186,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
     /**
      * Checks if a character is printable
      *
-     * @param $utf8chr character (from qtype_poasquestion_string) for check
+     * @param $utf8chr character (from qtype_poasquestion\string) for check
      */
     public static function is_chr_printable($code) {
         return qtype_preg_unicode::search_number_binary($code, qtype_preg_unicode::C_ranges()) === false &&
@@ -214,7 +220,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
     /**
      * Describes character with code $code
      *
-     * @param int|qtype_poasquestion_string $char character from qtype_poasquestion_string for describe or decimal code of character
+     * @param int|qtype_poasquestion\string $char character from qtype_poasquestion\string for describe or decimal code of character
      * @param bool $escapehtml a flag indicating whether to escape html characters (& < > " ')
      * @param string $form required form
      * @return string describes of character
@@ -249,7 +255,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
      *     ...
      * );
      *
-     * @param $str object of qtype_poasquestion_string.
+     * @param $str object of qtype_poasquestion\string.
      * @return mixed[] array with ranges and simple characters (see description of the function).
      */
     public function find_ranges($str) {
@@ -355,7 +361,7 @@ class qtype_preg_description_leaf_charset extends qtype_preg_description_leaf {
     public function pattern($node_parent = null, $form = null) {
         $characters = array();
         // check errors
-        if (count($this->pregnode->errors) > 0) {
+        if (!empty($this->pregnode->errors)) {
             return $this->pregnode->errors[0]->error_string();
         }
 
@@ -544,14 +550,14 @@ abstract class qtype_preg_description_operator extends qtype_preg_description_no
         $replaces = $this->what_to_replace($description);
         foreach ($replaces as $num => $data) {
             $child_description = $this->operands[$num - 1]->description($numbering_pattern, $this, $data['form']);
-            $description = qtype_poasquestion_string::replace($data['toreplace'], $child_description, $description);
+            $description = qtype_poasquestion\string::replace($data['toreplace'], $child_description, $description);
         }
         qtype_preg_description_leaf_options::check_options($this, $description, $form);
         return $description;
     }
 
     protected function what_to_replace($str) {
-        $str = new qtype_poasquestion_string($str);
+        $str = new qtype_poasquestion\string($str);
         $pos = null;
         $form = null;
         $numstr = null;
@@ -694,9 +700,9 @@ class qtype_preg_description_node_concat extends qtype_preg_description_operator
             if ($prevdescription === null) {
                 $prevdescription = $right->description($numbering_pattern, $this, $replace[2]['form']);
             }
-            $description = qtype_poasquestion_string::replace($replace[2]['toreplace'], $prevdescription, $description);
+            $description = qtype_poasquestion\string::replace($replace[2]['toreplace'], $prevdescription, $description);
             $child_description = $left->description($numbering_pattern, $this, $replace[1]['form']);
-            $description = qtype_poasquestion_string::replace($replace[1]['toreplace'], $child_description, $description);
+            $description = qtype_poasquestion\string::replace($replace[1]['toreplace'], $child_description, $description);
             $prevdescription = $description;
         }
         $description = $this->numbering_pattern($numbering_pattern, $description);
@@ -732,9 +738,9 @@ class qtype_preg_description_node_alt extends qtype_preg_description_operator {
             if ($prevdescription === null) {
                 $prevdescription = $right->description($numbering_pattern, $this, $replace[2]['form']);
             }
-            $description = qtype_poasquestion_string::replace($replace[2]['toreplace'], $prevdescription, $description);
+            $description = qtype_poasquestion\string::replace($replace[2]['toreplace'], $prevdescription, $description);
             $child_description = $left->description($numbering_pattern, $this, $replace[1]['form']);
-            $description = qtype_poasquestion_string::replace($replace[1]['toreplace'], $child_description, $description);
+            $description = qtype_poasquestion\string::replace($replace[1]['toreplace'], $child_description, $description);
             $prevdescription = $description;
         }
         $description = $this->numbering_pattern($numbering_pattern, $description);
@@ -838,9 +844,65 @@ class qtype_preg_description_node_cond_subexpr extends qtype_preg_description_op
         $resultpattern = parent::description($numbering_pattern, $this, $form);
         if (core_text::strpos($resultpattern, '%cond') !== false) {
             $conddescription = $this->condbranch->description($numbering_pattern, $this, $form);
-            $resultpattern = qtype_poasquestion_string::replace('%cond', $conddescription, $resultpattern);
+            $resultpattern = qtype_poasquestion\string::replace('%cond', $conddescription, $resultpattern);
         }
         return $resultpattern;
+    }
+}
+
+class qtype_preg_description_node_template extends qtype_preg_description_operator
+{
+    public $regex;
+    public $template;
+
+    /**
+     * Construct array of operands, using method qtype_regex_handler::from_preg_node()
+     *
+     * @param qtype_preg_node $node Reference to automatically generated (by handler) abstract node.
+     * @param type $matcher Reference to handler, which generates nodes.
+     */
+    public function __construct($node, $matcher) {
+        parent::__construct($node, $matcher);
+        if (empty($this->pregnode->errors)) {
+            $this->template = qtype_preg\template::available_templates()[$this->pregnode->name];
+            $this->regex = $matcher->from_preg_node($this->template->regex); // TODO - options
+        }
+        /*foreach ($this->pregnode->operands as $operand) {
+            array_push($this->operands, $matcher->from_preg_node($operand));
+        }*/
+    }
+
+    /**
+     * Override of abstract qtype_preg_description_operator::pattern()
+     */
+    public function pattern($node_parent = null, $form = null) {
+        if (!empty($this->pregnode->errors)) {
+            return $this->pregnode->errors[0]->error_string();
+        }
+        return $this->template->get_description();
+    }
+}
+
+class qtype_preg_description_leaf_template extends qtype_preg_description_leaf {
+    public function __construct($node, $matcher) {
+        parent::__construct($node, $matcher);
+        if (empty($this->pregnode->errors)) {
+            $this->template = qtype_preg\template::available_templates()[$this->pregnode->name];
+            $this->regex = $matcher->from_preg_node($this->template->regex); // TODO - options
+        }
+        /*foreach ($this->pregnode->operands as $operand) {
+            array_push($this->operands, $matcher->from_preg_node($operand));
+        }*/
+    }
+
+    /**
+     * Override of abstract qtype_preg_description_operator::pattern()
+     */
+    public function pattern($node_parent = null, $form = null) {
+        if (!empty($this->pregnode->errors)) {
+            return $this->pregnode->errors[0]->error_string();
+        }
+        return $this->template->get_description();
     }
 }
 

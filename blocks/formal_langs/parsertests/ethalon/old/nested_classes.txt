@@ -1,0 +1,75 @@
+[
+ (program) {
+  (stmt_list) {
+   (stmt_list) {
+    (stmt_or_defined_macro) {
+     (class_or_union_or_struct) {
+      (identified_type_meta_specifier_with_template_def) {
+       class
+       A
+      }
+      (structure_body) {
+       {
+       (stmt_or_visibility_spec_list) {
+        (stmt_or_visibility_spec_list) {
+         (visibility_spec_full) {
+          public
+          :
+         }
+         (stmt_or_defined_macro) {
+          (class_or_union_or_struct) {
+           (identified_type_meta_specifier_with_template_def) {
+            class
+            B
+           }
+           (structure_body) {
+            {
+            }
+           }
+           ;
+          }
+         }
+        }
+        (stmt_or_defined_macro) {
+         (builtintype) {
+          void
+         }
+         (function_definition_without_type) {
+          f
+          (formal_args_list_with_or_without_const) {
+           (args_list) {
+            (
+            )
+           }
+          }
+          (function_body) {
+           {
+           }
+          }
+         }
+        }
+       }
+       }
+      }
+      ;
+     }
+    }
+   }
+   (stmt_or_defined_macro) {
+    (stmt) {
+     (variable_declaration) {
+      (scoped_type) {
+       (namespace_resolve) {
+        A
+        ::
+       }
+       B
+      }
+      k
+     }
+     ;
+    }
+   }
+  }
+ }
+]

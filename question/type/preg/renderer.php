@@ -28,7 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/shortanswer/renderer.php');
-require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 
 /**
@@ -74,7 +73,7 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         $behaviour = $qa->get_behaviour();
         $hintmessage = '';
         $br =  html_writer::empty_tag('br');
-        if (is_a($behaviour, 'behaviour_with_hints')) {
+        if (is_a($behaviour, 'qtype_poasquestion\\behaviour_with_hints')) {
             $hints = $question->available_specific_hints(array('answer' => $currentanswer));
             $hints = $behaviour->adjust_hints($hints);
             foreach ($hints as $hintkey) {
@@ -91,12 +90,15 @@ class qtype_preg_renderer extends qtype_shortanswer_renderer {
         // Render simple colored string if specific feedback is possible and no hint including colored string was rendered.
         if (!$coloredhintrendered && $options->feedback == question_display_options::VISIBLE) {
             $hintobj = $question->hint_object('hintmatchingpart');
-            $hintmessage = $hintobj->render_hint($this, $qa, $options, array('answer' => $currentanswer));
-            if (qtype_poasquestion_string::strlen($hintmessage) > 0) {
-                $hintmessage .= $br;
+            if ($hintobj->hint_available(array('answer' => $currentanswer))) {
+                $hintmessage = $hintobj->render_hint($this, $qa, $options, array('answer' => $currentanswer));
+                if (core_text::strlen($hintmessage) > 0) {
+                    $hintmessage .= $br;
+                }
             }
         }
 
+        $hintmessage = html_writer::tag('span', $hintmessage, array('id' => 'qtype-preg-colored-string'));
         $output = parent::feedback($qa, $options);
         return $hintmessage.$output;
     }

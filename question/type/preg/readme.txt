@@ -7,6 +7,7 @@ Authors:
 3. Explaining graph (authoring tool) - Vladimir Ivanov.
 4. Syntax tree (authoring tool) - Grigory Terekhov.
 5. Regex description (authoring tool) - Dmitriy Pahomov.
+6. Assertion support - Elena Lepilkina.
 
 Thanks going to:
 * Joseph Rezeau - for been devoted tester of preg question type in several releases;
@@ -68,7 +69,7 @@ There is no 'best' matching enginge, so you could choose best fit for every ques
 choosing default engine, that could be set on the question type settings page.
 
 If you primary need is to use very complex regular expressions, than "PHP preg extension" is you most likely choice.
-By "very complex" we understand regular expression using complex assertions, conditional subexpressions, recursion etc.
+By "very complex" we understand regular expression using complex assertions etc.
 
 If you regular expressions are not that hardcore, but you want to make heavy use of hinting facility, choose FA engine instead.
 

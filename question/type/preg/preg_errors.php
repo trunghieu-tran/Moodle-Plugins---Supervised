@@ -25,9 +25,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
-require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
-
 class qtype_preg_error {
 
     /** Human-understandable error message. */
@@ -35,20 +32,26 @@ class qtype_preg_error {
     /** An instance of qtype_preg_position. */
     public $position;
 
+    protected function sanitize_position($regex, &$position) {
+        if ($position === null) {
+            $position = new qtype_preg_position(0, core_text::strlen($regex) - 1, -1, -1, -1, -1);
+        }
+    }
+
     /**
      * Returns a string with first character in upper case and the rest of the string in lower case.
      */
     protected function uppercase_first_letter($str) {
-        $head = qtype_poasquestion_string::strtoupper(qtype_poasquestion_string::substr($str, 0, 1));
-        $tail = qtype_poasquestion_string::strtolower(qtype_poasquestion_string::substr($str, 1));
+        $head = core_text::strtoupper(core_text::substr($str, 0, 1));
+        $tail = core_text::strtolower(core_text::substr($str, 1));
         return $head . $tail;
     }
 
     protected function highlight_regex($regex, $position) {
         if ($position->indfirst >= 0 && $position->indlast >= 0) {
-            return htmlspecialchars(qtype_poasquestion_string::substr($regex, 0, $position->indfirst)) . '<b>' .
-                   htmlspecialchars(qtype_poasquestion_string::substr($regex, $position->indfirst, $position->indlast - $position->indfirst + 1)) . '</b>' .
-                   htmlspecialchars(qtype_poasquestion_string::substr($regex, $position->indlast + 1));
+            return htmlspecialchars(core_text::substr($regex, 0, $position->indfirst)) . '<b>' .
+                   htmlspecialchars(core_text::substr($regex, $position->indfirst, $position->indlast - $position->indfirst + 1)) . '</b>' .
+                   htmlspecialchars(core_text::substr($regex, $position->indlast + 1));
         } else {
             return htmlspecialchars($regex);
         }
@@ -62,6 +65,9 @@ class qtype_preg_error {
      * @param preservemsg bool if true, message contains HTML code and should not be treated by htmlspecialchars function. PHP preg matcher use it to show links to PCRE documentation.
      */
     public function __construct($errormsg, $regex, $position, $preservemsg = false) {
+
+        $this->sanitize_position($regex, $position);
+
         $errormsg = $this->uppercase_first_letter($errormsg);
         if (!$preservemsg) {
             $errormsg = htmlspecialchars($errormsg);
@@ -111,7 +117,7 @@ class qtype_preg_modifier_error extends qtype_preg_error {
 
         $errormsg = get_string('unsupportedmodifier', 'qtype_preg', $a);
 
-        parent::__construct($errormsg);
+        parent::__construct($errormsg, '', null);
     }
 }
 
@@ -121,9 +127,7 @@ class qtype_preg_too_complex_error extends qtype_preg_error {
     public function __construct($regex, $matcher, $position = null) {
         global $CFG;
 
-        if ($position === null) {
-            $position = new qtype_preg_position(0, qtype_poasquestion_string::strlen($regex) - 1, -1, -1, -1, -1);  // TODO
-        }
+        $this->sanitize_position($regex, $position);
 
         $a = new stdClass;
         $a->linefirst = $position->linefirst;
@@ -134,6 +138,34 @@ class qtype_preg_too_complex_error extends qtype_preg_error {
         $a->link = $CFG->wwwroot . '/' . $CFG->admin . '/settings.php?section=qtypesettingpreg';
 
         $errormsg = get_string('too_large_fa', 'qtype_preg', $a);
+
+        parent::__construct($errormsg, $regex, $position);
+    }
+}
+
+class qtype_preg_empty_fa_error extends qtype_preg_error {
+
+    public function __construct($regex, $position = null) {
+        $errormsg = get_string('empty_fa', 'qtype_preg');
+
+        parent::__construct($errormsg, $regex, $position);
+    }
+}
+
+class qtype_preg_backref_intersection_error extends qtype_preg_error {
+
+    public function __construct($regex, $position = null) {
+        $errormsg = get_string('backref_intersection', 'qtype_preg');
+
+        parent::__construct($errormsg, $regex, $position);
+    }
+}
+
+
+class qtype_preg_mergedassertion_option_error extends qtype_preg_error {
+
+    public function __construct($regex, $position = null) {
+        $errormsg = get_string('mergedassertion_option', 'qtype_preg');
 
         parent::__construct($errormsg, $regex, $position);
     }

@@ -25,7 +25,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-class qtype_poasquestion_string extends textlib implements ArrayAccess {
+/**
+ * @deprecated since 2.8
+ */
+class qtype_poasquestion_string extends core_text implements ArrayAccess {
     /** @var string the utf-8 string itself. */
     private $fstring;
     /**@var int length of the string, calculated when the string is modified. */
@@ -115,6 +118,31 @@ class qtype_poasquestion_string extends textlib implements ArrayAccess {
      */
     public function substring($start, $length = null) {
         return new qtype_poasquestion_string(self::substr($this->fstring, $start, $length));
+    }
+
+    /**
+     *
+     */
+    public function startsWith($needle) {
+        if ($needle == '') {
+            return true;
+        }
+        return strncmp($this->fstring, $needle, strlen($needle)) === 0;
+    }
+
+    /**
+     *
+     */
+    public function endsWith($needle) {
+        if ($needle == '') {
+            return true;
+        }
+        $len = self::strlen($needle);
+        if ($len > $this->flength) {
+            return false;
+        }
+        $substr = self::substr($this->fstring, $this->flength - $len);
+        return $substr === $needle;
     }
 
     /**

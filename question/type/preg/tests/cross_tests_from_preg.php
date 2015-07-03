@@ -204,8 +204,10 @@ class qtype_preg_cross_tests_from_preg {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
+                        'ext_index_first'=>array(0=>0),
+                        'ext_length'=>array(0=>3),
                         'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+                        'next'=>'');
 
         $test4 = array('str'=>'abc',
                        'is_match'=>true,
@@ -458,8 +460,10 @@ class qtype_preg_cross_tests_from_preg {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>4),
+                        'ext_index_first'=>array(0=>0),
+                        'ext_length'=>array(0=>4),
                         'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+                        'next'=>'');
 
         return array('regex'=>'^a[^b]cd$',
                      'tests'=>array($test1, $test2, $test3),
@@ -585,7 +589,7 @@ class qtype_preg_cross_tests_from_preg {
 
         return array('regex'=>'^[a-z 0-9]\b[a-z 0-9]\B[a-z 0-9]',
                      'tests'=>array($test1, $test2, $test3),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_simple_2() {
@@ -597,7 +601,7 @@ class qtype_preg_cross_tests_from_preg {
 
         return array('regex'=>'[A-Z0-5=]\b[0-5A-R=]',
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_simple_3() {
@@ -611,7 +615,7 @@ class qtype_preg_cross_tests_from_preg {
 
         return array('regex'=>'\b[0-5A-R]',
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_simple_4() {
@@ -623,7 +627,7 @@ class qtype_preg_cross_tests_from_preg {
 
         return array('regex'=>'[A-Z0-5]\B[0-5A-R]',
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_simple_5() {
@@ -651,7 +655,7 @@ class qtype_preg_cross_tests_from_preg {
 
         return array('regex'=>'[A-Z0-5 ]+\b[0-5A-R ]+',
                      'tests'=>array($test1, /*$test2,*/ $test3),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_simple_6() {
@@ -666,22 +670,26 @@ class qtype_preg_cross_tests_from_preg {
                        'full'=>false,
                        'index_first'=>array(0=>0),
                        'length'=>array(0=>3),
+                       'index_first'=>array(0=>0),
+                       'length'=>array(0=>3),
                        'left'=>array(0),
-                       'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+                       'next'=>'');
 
         return array('regex'=>'abc$',
                      'tests'=>array($test1, $test2),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_simple_7() {
         $test1 = array('str'=>'bc',
-                       'is_match'=>true,
+                       'is_match'=>false,
                        'full'=>false,
-                       'index_first'=>array(0=>0),
-                       'length'=>array(0=>1),
-                       'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
-                       'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+                       'index_first'=>array(),
+                       'length'=>array(),
+                       'ext_index_first'=>array(0=>0),
+                       'ext_length'=>array(0=>1),
+                       'left'=>array(1),
+                       'next'=>'a');
 
         $test2 = array('str'=>'ac',
                        'is_match'=>true,
@@ -691,7 +699,29 @@ class qtype_preg_cross_tests_from_preg {
 
         return array('regex'=>'a|(b$)c',
                      'tests'=>array($test1, $test2),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
+    }
+
+    function data_for_test_assertions_simple_7_1() {
+        $test1 = array('str'=>'ac',
+                       'is_match'=>true,
+                       'full'=>false,
+                       'index_first'=>array(0=>0),
+                       'length'=>array(0=>1),
+                       'ext_index_first'=>array(0=>0),
+                       'ext_length'=>array(0=>2),
+                       'left'=>array(1),
+                       'next'=>'\n');
+
+        $test2 = array('str'=>"a\n",
+                       'is_match'=>true,
+                       'full'=>true,
+                       'index_first'=>array(0=>0),
+                       'length'=>array(0=>2));
+
+        return array('regex'=>'a\Z[c\n]',
+                     'tests'=>array($test1, $test2),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_simple_8() {
@@ -705,7 +735,7 @@ class qtype_preg_cross_tests_from_preg {
 
         return array('regex'=>'$abca',
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_simple_9() {
@@ -719,7 +749,7 @@ class qtype_preg_cross_tests_from_preg {
 
         return array('regex'=>'abc^',
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_simple_10() {
@@ -737,7 +767,7 @@ class qtype_preg_cross_tests_from_preg {
 
         return array('regex'=>'a|(^)c',
                      'tests'=>array($test1, $test2),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_simple_11() {
@@ -749,7 +779,7 @@ class qtype_preg_cross_tests_from_preg {
 
         return array('regex'=>'^abca',
                      'tests'=>array($test1),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_BACKTRACKING, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_simple_12() {
@@ -769,7 +799,7 @@ class qtype_preg_cross_tests_from_preg {
 
         return array('regex'=>'^ab',
                      'tests'=>array($test1, $test2),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_DFA));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_DFA, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_simple_13() {
@@ -784,12 +814,14 @@ class qtype_preg_cross_tests_from_preg {
                         'full'=>false,
                         'index_first'=>array(0=>1),
                         'length'=>array(0=>2),
+                        'index_first'=>array(0=>1),
+                        'length'=>array(0=>2),
                         'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+                        'next'=>'');
 
         return array('regex'=>'ab$',
                      'tests'=>array($test1, $test2),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_DFA));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_DFA, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     function data_for_test_assertions_simple_14() {
@@ -812,12 +844,14 @@ class qtype_preg_cross_tests_from_preg {
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>2),
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2),
                         'left'=>array(0),
-                        'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
+                        'next'=>'');
 
         return array('regex'=>'^ab$',
                      'tests'=>array($test1, $test2, $test3),
-                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_DFA));
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_DFA, qtype_preg_cross_tester::TAG_FAIL_MODE_MERGE));
     }
 
     /*function data_for_test_assertions_simple_15() {
@@ -2802,6 +2836,26 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
+    function data_for_test_extended_local() {
+        $test1 = array( 'str'=>'abcdefg',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>7));
+
+        $test2 = array( 'str'=>'ab: c   d  e fg',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2),
+                        'left'=>array(5),
+                        'next'=>'c');
+
+        return array('regex'=>'ab(?x: c   d  e )fg',
+                     'tests'=>array($test1, $test2),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+    }
+
     // Tests for cases with ambiguity - subexpressions, quantifiers and backreferences.
     function data_for_test_empty_match() {
         $test1 = array( 'str'=>'abcd',
@@ -3902,9 +3956,9 @@ class qtype_preg_cross_tests_from_preg {
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>3),
                         'ext_index_first'=>array(0=>0,1=>2),
-                        'ext_length'=>array(0=>5,1=>3),
-                        'left'=>array(2),
-                        'next'=>'f');
+                        'ext_length'=>array(0=>3,1=>1),
+                        'left'=>array(1),
+                        'next'=>'h');
 
         return array('regex'=>'ab(cd|efg|h)',
                      'tests'=>array($test1, $test2, $test3),
@@ -4764,14 +4818,14 @@ class qtype_preg_cross_tests_from_preg {
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
-    function data_for_test_uprops_and_posix_negative_negative() {
+    function data_for_test_uprops_and_posix_negative_negative_1() {
         $test1 = array( 'str'=>'',
                         'is_match'=>false,
                         'full'=>false,
                         'index_first'=>array(),
                         'length'=>array(),
                         'left'=>array(1),
-                        'next'=>'[^\P{C}[:^alpha:]\H]');
+                        'next'=>'[^\P{L}[:^alpha:]\W]');
 
         $test2 = array( 'str'=>'!',
                         'is_match'=>false,
@@ -4779,18 +4833,31 @@ class qtype_preg_cross_tests_from_preg {
                         'index_first'=>array(),
                         'length'=>array(),
                         'left'=>array(1),
-                        'next'=>'[^\P{C}[:^alpha:]\H]');
+                        'next'=>'[^\P{L}[:^alpha:]\W]');
 
         $test3 = array( 'str'=>'alnum characters here',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>5),
+                        'left'=>array(0));
+
+        return array('regex'=>'[^\P{L}[:^alpha:]\W]+',
+                     'tests'=>array($test1, $test2, $test3),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+    }
+
+    function data_for_test_uprops_and_posix_negative_negative_2() {
+        $test1 = array( 'str'=>'abcd',
                         'is_match'=>false,
                         'full'=>false,
-                        'index_first'=>array(0=>0),
-                        'length'=>array(0=>21),
-                        'left'=>array(0),
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER);
 
-        return array('regex'=>'[^\P{C}[:^alpha:]\H]+',
-                     'tests'=>array($test1, $test2),
+        return array('regex'=>'[^\P{C}[:^alpha:]\H]+',  // This is an empty charset
+                     'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
     }
 
@@ -4902,7 +4969,7 @@ class qtype_preg_cross_tests_from_preg {
                         'length'=>array(0=>3),
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
 
-        return array('regex'=>"a\n\\nb",
+        return array('regex'=>"a\nb",
                      'tests'=>array($test1));
     }
 
@@ -4962,17 +5029,305 @@ class qtype_preg_cross_tests_from_preg {
                      'tests'=>array($test1));
     }
 
-    /*function data_for_test_leaf_assert_G() {
+    function data_for_test_subexpr_call_1() {
+        $test1 = array( 'str'=>'',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'left'=>array(4),
+                        'next'=>'a');
+
+        $test2 = array( 'str'=>'ab',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0,1=>0),
+                        'length'=>array(0=>2,1=>2),
+                        'left'=>array(2),
+                        'next'=>'a');
+
+        $test3 = array( 'str'=>'abab',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0),
+                        'length'=>array(0=>4,1=>2));
+
+        return array('regex'=>'(ab)(?1)',
+                     'tests'=>array($test1, $test2, $test3));
+    }
+
+    function data_for_test_subexpr_call_2() {
+        $test1 = array( 'str'=>'a',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1));
+
+        return array('regex'=>'(a){0}(?1)',
+                     'tests'=>array($test1));
+    }
+
+    function data_for_test_subexpr_call_case_sensitivity() {
+        $test1 = array( 'str'=>'abAB',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0,1=>0),
+                        'length'=>array(0=>2,1=>2),
+                        'left'=>array(2),
+                        'next'=>'a');
+
+        $test2 = array( 'str'=>'abab',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0),
+                        'length'=>array(0=>4,1=>2));
+
+        return array('regex'=>'(ab)(?i:(?1))',
+                     'tests'=>array($test1, $test2));
+    }
+
+    function data_for_test_recursion_1() {
+        $test1 = array( 'str'=>'[]',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2));
+
+        $test2 = array( 'str'=>'[[]]',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>1),
+                        'length'=>array(0=>4,1=>2));
+
+        $test3 = array( 'str'=>'[[[]]]',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>1),
+                        'length'=>array(0=>6,1=>4));
+
+        return array('regex'=>'\[((?R))?\]',
+                     'tests'=>array($test1, $test2, $test3));
+    }
+
+    function data_for_test_recursion_2() {
+        $test1 = array( 'str'=>'[',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1),
+                        'ext_index_first'=>array(0=>0),
+                        'ext_length'=>array(0=>3),
+                        'left'=>array(2),
+                        'next'=>'a',
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        $test2 = array( 'str'=>'[[',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>1),
+                        'ext_index_first'=>array(0=>0),
+                        'ext_length'=>array(0=>3),
+                        'left'=>array(2),
+                        'next'=>'a',
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        $test3 = array( 'str'=>'[a[',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>3),
+                        'ext_index_first'=>array(0=>0),
+                        'ext_length'=>array(0=>3),
+                        'left'=>array(1),
+                        'next'=>'\]',
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        $test4 = array( 'str'=>'[a[a',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>4),
+                        'ext_index_first'=>array(0=>0),
+                        'ext_length'=>array(0=>3),
+                        'left'=>array(1),
+                        'next'=>'\]',
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        return array('regex'=>'\[[a-z](?R)?\]',
+                     'tests'=>array($test1, $test2, $test3, $test4));
+    }
+
+    function data_for_test_recursion_3() {
+        $test1 = array( 'str'=>'[a[a',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>4),
+                        'ext_index_first'=>array(0=>0,1=>0),
+                        'ext_length'=>array(0=>3,1=>3),
+                        'left'=>array(1),
+                        'next'=>'\]',
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        $test2 = array( 'str'=>'[a[a]',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>5),
+                        'ext_index_first'=>array(0=>0,1=>0),
+                        'ext_length'=>array(0=>6,1=>6),
+                        'left'=>array(1),
+                        'next'=>'\]',
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        return array('regex'=>'^(\[[a-z](?1)?\])$',
+                     'tests'=>array($test1, $test2));
+    }
+
+    function data_for_test_recursion_4() {
+        $test1 = array( 'str'=>'b',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0,2=>1),
+                        'length'=>array(0=>1,1=>1,2=>0),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        $test2 = array( 'str'=>'bbbbbbbb',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0,2=>8),
+                        'length'=>array(0=>8,1=>8,2=>0),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        return array('regex'=>'^(b(?1)?)(b*)$',
+                     'tests'=>array($test1, $test2));
+    }
+
+    function data_for_test_recursion_5() {
+        $test1 = array( 'str'=>'b',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0,2=>1),
+                        'length'=>array(0=>1,1=>1,2=>0),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        $test2 = array( 'str'=>'bbbbbbbb',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0,2=>8),
+                        'length'=>array(0=>8,1=>8,2=>0),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        return array('regex'=>'^(b*)(b?(?2)?)$',
+                     'tests'=>array($test1, $test2));
+    }
+
+    function data_for_test_recursion_6() {
+        $test1 = array( 'str'=>'((b))',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0,2=>1),
+                        'length'=>array(0=>5,1=>5,2=>3),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        $test2 = array( 'str'=>'((((b))))',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0),
+                        'length'=>array(0=>9,1=>9),
+                        'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+
+        return array('regex'=>'^(\((?:(?-1)|    (\((?:(?-1)|b)\))   )\))$',
+                     'modifiers'=>'x',
+                     'tests'=>array($test1, $test2));
+    }
+
+    function data_for_test_cond_subexpr_subexpr_generation() {
+        $test1 = array( 'str'=>'',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'ext_index_first'=>array(0=>0),
+                        'ext_length'=>array(0=>1),
+                        'left'=>array(1),
+                        'next'=>'e');
+
+        $test2 = array( 'str'=>'ab',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>2),
+                        'ext_index_first'=>array(0=>0),
+                        'ext_length'=>array(0=>1),
+                        'left'=>array(1),
+                        'next'=>'e');
+
+        $test3 = array( 'str'=>'abc',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0,1=>0),
+                        'length'=>array(0=>3,1=>3),
+                        'ext_index_first'=>array(0=>0,1=>0),
+                        'ext_length'=>array(0=>4,1=>3),
+                        'left'=>array(1),
+                        'next'=>'d');
+
+        return array('regex'=>'(abc)?(?(1)d|e)',
+                     'tests'=>array($test1, $test2, $test3),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+    }
+
+    function data_for_test_cond_subexpr_recursion_generation() {
+        $test1 = array( 'str'=>'',
+                        'is_match'=>false,
+                        'full'=>false,
+                        'index_first'=>array(),
+                        'length'=>array(),
+                        'ext_index_first'=>array(0=>0,1=>0),
+                        'ext_length'=>array(0=>1,1=>1),
+                        'left'=>array(1),
+                        'next'=>'1');
+
+        $test2 = array( 'str'=>'1',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0),
+                        'length'=>array(0=>1,1=>1));
+
+        $test3 = array( 'str'=>'1abcde',
+                        'is_match'=>true,
+                        'full'=>false,
+                        'index_first'=>array(0=>0),
+                        'length'=>array(0=>6),
+                        'ext_index_first'=>array(0=>0,1=>0),
+                        'ext_length'=>array(0=>1,1=>1),
+                        'left'=>array(0),
+                        'next'=>'');
+
+        $test4 = array( 'str'=>'1abcdef',
+                        'is_match'=>true,
+                        'full'=>true,
+                        'index_first'=>array(0=>0,1=>0),
+                        'length'=>array(0=>7,1=>7));
+
+        return array('regex'=>'^((?(R1)abcdef|1)(?1)?)$',
+                     'tests'=>array($test1, $test2, $test3, $test4),
+                     'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
+    }
+
+    function data_for_test_leaf_assert_G() {
         $test1 = array( 'str'=>'ab',
                         'is_match'=>true,
                         'full'=>false,
                         'index_first'=>array(0=>0),
                         'length'=>array(0=>1),
-                        'left'=>array(0),
+                        'left'=>array(qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT),
                         'next'=>qtype_preg_matching_results::UNKNOWN_NEXT_CHARACTER,
                         'tags'=>array(qtype_preg_cross_tester::TAG_FROM_NFA));
 
         return array('regex'=>'a\Gb',
                      'tests'=>array($test1));
-    }*/
+    }
 }

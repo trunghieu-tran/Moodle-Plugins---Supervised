@@ -27,8 +27,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
-require_once($CFG->dirroot . '/question/type/poasquestion/hints.php');
 require_once($CFG->dirroot . '/question/type/questionbase.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');
 
@@ -39,7 +37,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_preg_question extends question_graded_automatically
-        implements question_automatically_gradable, question_with_qtype_specific_hints {
+        implements question_automatically_gradable, qtype_poasquestion\question_with_hints {
 
     // Fields defining a question.
     /** @var array of question_answer objects. */
@@ -68,7 +66,7 @@ class qtype_preg_question extends question_graded_automatically
     public $langid;
     /** @var preferred name for a lexem by the teacher. */
     public $lexemusername;
-	public $regextests = array();
+    public $regextests = array();
 
     // Other fields.
     /** @var cache of matcher objects: key is answer id, value is matcher object. */
@@ -181,7 +179,7 @@ class qtype_preg_question extends question_graded_automatically
             if ($matchresults->full) {// Don't need to look more if we find full match.
                 $bestfitanswer = $answer;
                 $bestmatchresult = $matchresults;
-                $fitness = qtype_poasquestion_string::strlen($response['answer']);
+                $fitness = core_text::strlen($response['answer']);
                 break;
             }
 
@@ -287,18 +285,26 @@ class qtype_preg_question extends question_graded_automatically
 
             $matchingoptions->notation = $notation;
             $matchingoptions->exactmatch = $exact;
+            if(! is_null($CFG->qtype_preg_assertfailmode)) {
+                $matchingoptions->mergeassertions = $CFG->qtype_preg_assertfailmode;
+            }
 
             $engineclass = 'qtype_preg_'.$engine;
             $matcher = new $engineclass($regex, $matchingoptions);
 
             if ($matcher->errors_exist() && !$hintpossible && $engine != 'php_preg_matcher') {
-                // Custom engine can't handle regex and hints not needed, let's try preg_match instead.
-                $engine = 'php_preg_matcher';
-                require_once($CFG->dirroot . '/question/type/preg/'.$engine.'/'.$engine.'.php');
-                $engineclass = 'qtype_preg_'.$engine;
-                $newmatcher = new $engineclass($regex, $matchingoptions);
-                if (!$newmatcher->errors_exist()) {// We still prefer to show error messages from custom engine, since they are much more detailed.
-                    $matcher = $newmatcher;
+                // There is one exception - regex that can not match due to empty FA.
+                // PCRE does not look for this problem, FA matcher does.
+                $errors = $matcher->get_errors();
+                if (count($errors) > 1 || !array_key_exists(0, $errors) || !is_a($errors[0], 'qtype_preg_empty_fa_error')) {
+                    // Custom engine can't handle regex and hints not needed, let's try preg_match instead.
+                    $engine = 'php_preg_matcher';
+                    require_once($CFG->dirroot . '/question/type/preg/'.$engine.'/'.$engine.'.php');
+                    $engineclass = 'qtype_preg_'.$engine;
+                    $newmatcher = new $engineclass($regex, $matchingoptions);
+                    if (!$newmatcher->errors_exist()) {// We still prefer to show error messages from custom engine, since they are much more detailed.
+                        $matcher = $newmatcher;
+                    }
                 }
             }
 
@@ -396,7 +402,7 @@ class qtype_preg_question extends question_graded_automatically
     public function insert_subexpressions($subject, $response, $matchresults) {
 
         // Sanity check.
-        if (qtype_poasquestion_string::strpos($subject, '{$') === false || qtype_poasquestion_string::strpos($subject, '}') === false) {
+        if (core_text::strpos($subject, '{$') === false || core_text::strpos($subject, '}') === false) {
             // There are no placeholders for sure.
             return $subject;
         }
@@ -408,7 +414,7 @@ class qtype_preg_question extends question_graded_automatically
             $startindex = $matchresults->index_first($i);
             $length = $matchresults->length($i);
             if ($startindex != qtype_preg_matching_results::NO_MATCH_FOUND) {
-                $replace = qtype_poasquestion_string::substr($answer, $startindex, $length);
+                $replace = core_text::substr($answer, $startindex, $length);
             } else {
                 $replace = '';
             }
@@ -472,7 +478,7 @@ class qtype_preg_question extends question_graded_automatically
     public function hint_object($hintkey, $response = null) {
         // Moodle-specific hints.
         if (substr($hintkey, 0, 11) == 'hintmoodle#') {
-            return new qtype_poasquestion_hintmoodle($this, $hintkey);
+            return new qtype_poasquestion\hintmoodle($this, $hintkey);
         }
 
         // Preg specific hints.

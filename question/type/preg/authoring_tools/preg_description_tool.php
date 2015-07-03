@@ -212,12 +212,8 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
             $string = $this->dstroot->description($numbering_pattern, null, null);
             $string = preg_replace('%;((?:</span>)?)]%u', '\1]', $string);   // Postprocessing
         }
-        // put string into $wholepattern
-        if (empty($wholepattern) || $wholepattern === '%s') { // TODO - mb place this string to lang?
-            $wholepattern = '<span style="background: white">%s</span>';
-        }
-        if ($wholepattern !== '%%tests%%') {
-            $string = qtype_poasquestion_string::replace('%s', $string, $wholepattern);
+        if (!empty($wholepattern)) {
+            $string = qtype_poasquestion\string::replace('%content', $string, $wholepattern);
         }
         $this->options = $backupoptions; // restore original options
         return $string;
@@ -227,7 +223,7 @@ class qtype_preg_description_tool extends qtype_preg_authoring_tool {
      * Calling default description() with default params
      */
     public function default_description() {
-        return $this->description('<span class="description_node_%n">%s</span>');
+        return $this->description('<span class="%idclass%optionalclassesdevider%optionalclasses" style="%style" >%content</span>', '<span style="background: white">%content</span>');
     }
 
     /**

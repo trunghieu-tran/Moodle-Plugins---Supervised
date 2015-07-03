@@ -265,17 +265,36 @@ class qtype_preg_tool_syntax_tree_test extends PHPUnit_Framework_TestCase {
 
     function test_spaces() {
         $tree = new qtype_preg_syntax_tree_tool(' ');
+        $json = $tree->generate_json();
         //var_dump($tree->get_dst_root()->dot_script(new qtype_preg_dot_node_context($tree, true)));
     }
 
     function test_something() {
-        $tree = new qtype_preg_syntax_tree_tool('(?:(a{6,6})|([^b-f]))(?(2)A)\1+[f\dgjf\w]f');
+        $tree = new qtype_preg_syntax_tree_tool('(?(2)A)');
+        $json = $tree->generate_json();
         //var_dump($tree->get_dst_root()->dot_script(new qtype_preg_dot_node_context($tree, true)));
     }
 
     function test_syntax_errors() {
         $tree = new qtype_preg_syntax_tree_tool('a(');
-        //$json = $tree->generate_json($json);
+        $json = $tree->generate_json();
         //var_dump($tree->get_dst_root()->dot_script(new qtype_preg_dot_node_context($tree, true)));
+    }
+
+    function test_templates() {
+        $tree = new qtype_preg_syntax_tree_tool('(?###word)');
+        $json = $tree->generate_json();
+
+        $tree = new qtype_preg_syntax_tree_tool('(?###bad_non_existing_word)');
+        $json = $tree->generate_json();
+
+        $tree = new qtype_preg_syntax_tree_tool('(?###parens_opt<)(?###word)(?###>)');
+        $json = $tree->generate_json();
+
+        $tree = new qtype_preg_syntax_tree_tool('(?###bad_non_existing_parens_opt<)(?###word)(?###>)');
+        $json = $tree->generate_json();
+
+        $tree = new qtype_preg_syntax_tree_tool('(?###parens_opt<)syntax error here');
+        $json = $tree->generate_json();
     }
  }

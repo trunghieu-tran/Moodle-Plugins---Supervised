@@ -22,7 +22,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     public function test_charset($regex,$expected_en,$expected_ru)
     {
         $handler = new qtype_preg_description_tool($regex);
-        $result = $handler->description('%%tests%%','%%tests%%');
+        $result = $handler->description('%content','%content');
         $this->assertEquals($expected_en, $result);
     }
     public function charset_provider()
@@ -49,7 +49,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     public function test_meta()
     {
         $handler = new qtype_preg_description_tool('a|b|');
-        $result = $handler->description('%%tests%%','%%tests%%');
+        $result = $handler->description('%content','%content');
         $expected = '<span style="color:blue">a</span> or <span style="color:blue">b</span> or nothing';
         $this->assertEquals($expected, $result);
     }
@@ -63,7 +63,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     {
         $handler = new qtype_preg_description_tool($regex);
         //var_dump($handler);
-        $result = $handler->description('%%tests%%','%%tests%%');
+        $result = $handler->description('%content','%content');
         $this->assertEquals($expected_en, $result);
     }
     public function assert_provider()
@@ -85,8 +85,8 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     {
         $handler = new qtype_preg_description_tool('(a)\1');
         //var_dump($handler);
-        $result = $handler->description('%%tests%%','%%tests%%');
-        $expected = 'subpattern #1: [ <span style="color:blue">a</span> ] then text that matched by subpattern #1';
+        $result = $handler->description('%content','%content');
+        $expected = 'subpattern #1: [ <span style="color:blue">a</span> ] then text matched by subpattern #1';
         $this->assertEquals($expected, $result);
     }
 
@@ -96,7 +96,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     {
         $handler = new qtype_preg_description_tool('(?(R)a|b)');
         //var_dump($handler);
-        $result = $handler->description('%%tests%%','%%tests%%');
+        $result = $handler->description('%content','%content');
         $expected = 'if the whole pattern is in recursive matching then check: [<span style="color:blue">a</span>] else check: [<span style="color:blue">b</span>]';
         $this->assertEquals($expected, $result);
     }
@@ -110,7 +110,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     {
         $handler = new qtype_preg_description_tool($regex);
         //var_dump($handler);
-        $result = $handler->description('%%tests%%','%%tests%%');
+        $result = $handler->description('%content','%content');
         $this->assertEquals($expected_en, $result);
     }
 
@@ -136,7 +136,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     {
         $handler = new qtype_preg_description_tool($regex);
         //var_dump($handler);
-        $result = $handler->description('%%tests%%','%%tests%%');
+        $result = $handler->description('%content','%content');
         $this->assertEquals($expected_en, $result);
     }
 
@@ -158,7 +158,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     {
         $handler = new qtype_preg_description_tool($regex);
         //var_dump($handler);
-        $result = $handler->description('%%tests%%','%%tests%%');
+        $result = $handler->description('%content','%content');
         $this->assertEquals($expected_en, $result);
     }
 
@@ -185,7 +185,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     {
         $handler = new qtype_preg_description_tool($regex);
         //var_dump($handler);
-        $result = $handler->description('%%tests%%','%%tests%%');
+        $result = $handler->description('%content','%content');
         $this->assertEquals($expected_en, $result);
     }
 
@@ -213,7 +213,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     {
         $handler = new qtype_preg_description_tool($regex);
         //var_dump($handler);
-        $result = $handler->description('%%tests%%','%%tests%%');
+        $result = $handler->description('%content','%content');
         $this->assertEquals($expected_en, $result);
     }
 
@@ -229,15 +229,15 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
 
     //------------------------------------------------------------------
 
-    /*public function test_numbering()
+    public function test_numbering()
     {
         $handler = new qtype_preg_description_tool('([a|b]|)\W+');
         //var_dump($handler);
         $result = $handler->default_description();
         //$expected = '<span class="description_node_6"><span class="description_node_3">subexpression #1: [<span class="description_node_2"><span class="description_node_0">one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">|</span>, <span style="color:blue">b</span>;</span> or <span class="description_node_1">nothing</span></span>]</span> then <span class="description_node_5"><span class="description_node_4">not word character</span> is repeated any number of times</span></span>';
-        $expected = '<span class="description_node_1"><span class="description_node_2">subexpression #1: [<span class="description_node_3"><span class="description_node_4">one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">|</span>, <span style="color:blue">b</span>;</span> or <span class="description_node_5">nothing</span></span>]</span> then <span class="description_node_6"><span class="description_node_7">not word character</span> is repeated any number of times</span></span>';
+        $expected = '<span style="background: white"><span class="description_node_1" style="background: white" ><span class="description_node_2" style="background: white" >subpattern #1: [ <span class="description_node_3" style="background: white" ><span class="description_node_4" style="background: white" >one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">&#124;</span>, <span style="color:blue">b</span>;</span> or <span class="description_node_5" style="background: white" >nothing</span></span> ]</span> then <span class="description_node_6" style="background: white" ><span class="description_node_7" style="background: white" >not a word character</span> repeated any number of times</span></span></span>';
         $this->assertEquals($expected, $result);
-    }*/
+    }
 
     //------------------------------------------------------------------
 
@@ -248,7 +248,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     {
         $handler = new qtype_preg_description_tool($regex);
         //if($regex == '(?(?=a)b)' )var_dump($handler->dstroot);
-        $result = $handler->description('%%tests%%','%%tests%%');
+        $result = $handler->description('%content','%content');
         $this->assertEquals($expected_en, $result);
     }
 
@@ -277,14 +277,14 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     {
         $handler = new qtype_preg_description_tool($regex);
         //var_dump($handler);
-        $result = $handler->description('%%tests%%','%%tests%%');
+        $result = $handler->description('%content','%content');
         $this->assertEquals($expected_en, $result);
     }
 
     public function postprocessing_provider()
     {
         return array(
-          array('([abc])','subpattern #1: [one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">b</span>, <span style="color:blue">c</span>]','рус - TODO'),
+          array('([abc])','subpattern #1: [ one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">b</span>, <span style="color:blue">c</span>; ]','рус - TODO'),
           array('[^\S]','a white space','рус - TODO'),
         );
     }
@@ -298,16 +298,45 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     {
         $handler = new qtype_preg_description_tool($regex);
         //var_dump($handler);
-        $result = $handler->description('%%tests%%','%%tests%%');
+        $result = $handler->description('%content','%content');
         $this->assertEquals($expected_en, $result);
     }
 
     public function subexpression_provider()
     {
         return array(
-          array('(?:[abc])','grouping: [ one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">b</span>, <span style="color:blue">c</span> ]','рус - TODO'),
+          array('(?:[abc])','grouping: [ one of the following characters: <span style="color:blue">a</span>, <span style="color:blue">b</span>, <span style="color:blue">c</span>; ]','рус - TODO'),
           //array('(?|(a)|(b))','1','рус - TODO'), doesnt work now
         );
+    }
+
+    /**
+     * @dataProvider templates_provider
+     */
+    public function test_templates($regex,$expected_en,$expected_ru)
+    {
+        $handler = new qtype_preg_description_tool($regex);
+        $root = $handler->get_ast_root();
+        //var_dump($handler);
+        $result = $handler->description('%content','%content');
+        $this->assertEquals($expected_en, $result);
+        //$this->assertTrue(false);
+    }
+
+    public function templates_provider()
+    {
+        return array(
+            array('(?###word)', 'word', 'tbd'),
+            array('(?###integer)', 'integer', 'tbd'),
+            array('(?###parens_req<)a(?###>)', '$$1 in parens', 'tbd'),
+            array('(?###parens_opt<)a(?###>)', '$$1 in optional parens', 'tbd')
+        );
+    }
+
+    public function test_template_errors() {
+        $handler = new qtype_preg_description_tool('(?###wtf)');
+        $root = $handler->get_ast_root();
+        $whatever = $handler->description('%content','%content');
     }
 
     //------------------------------------------------------------------
@@ -319,7 +348,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
     {
         $handler = new qtype_preg_description_tool($regex);
         //var_dump($handler);
-        $result = $handler->description('%%tests%%','%%tests%%');
+        $result = $handler->description('%content','%content');
         $this->assertEquals($expected_en, $result);
     }
 
@@ -358,7 +387,7 @@ class qtype_preg_tool_description_test extends PHPUnit_Framework_TestCase {
         //var_dump($options);
         $handler = new qtype_preg_description_tool($regex);
         //var_dump($handler);
-        $result = $handler->description('%%tests%%','%%tests%%');
+        $result = $handler->description('%content','%content');
         $this->assertEquals($expected_en, $result);
     }*/
 }

@@ -10,6 +10,7 @@ class qtype_preg_cross_tests_from_att_austin {
                        'length'=>array(0=>10,1=>10,2=>3,3=>7,4=>0));
 
         return array('regex'=>"((week|wee)(night|knights))(s*)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -22,6 +23,7 @@ class qtype_preg_cross_tests_from_att_austin {
                        'length'=>array(0=>4,1=>1,2=>3));
 
         return array('regex'=>"(w|wx)(y|x.*)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -34,6 +36,7 @@ class qtype_preg_cross_tests_from_att_austin {
                        'length'=>array(0=>4,1=>2,2=>1));
 
         return array('regex'=>"(w|wx)(y|x.*).*",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -46,6 +49,7 @@ class qtype_preg_cross_tests_from_att_austin {
                        'length'=>array(0=>4,1=>2));
 
         return array('regex'=>"(a{2,3})\\1*",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -58,6 +62,7 @@ class qtype_preg_cross_tests_from_att_austin {
                        'length'=>array(0=>3,1=>3));
 
         return array('regex'=>"(a{2,3})\\1*",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -70,6 +75,7 @@ class qtype_preg_cross_tests_from_att_austin {
                        'length'=>array(0=>4,1=>2));
 
         return array('regex'=>"(a{2,3})\\1",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -82,6 +88,7 @@ class qtype_preg_cross_tests_from_att_austin {
                        'length'=>array());
 
         return array('regex'=>"(a*(b)*){2}\\2",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
     }
@@ -94,6 +101,7 @@ class qtype_preg_cross_tests_from_att_austin {
                        'length'=>array(0=>5,1=>5,3=>5));
 
         return array('regex'=>"((..)*(.....)*)*",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -106,6 +114,7 @@ class qtype_preg_cross_tests_from_att_austin {
                        'length'=>array(0=>2,1=>1));
 
         return array('regex'=>"(^b)\\1",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -118,6 +127,7 @@ class qtype_preg_cross_tests_from_att_austin {
                        'length'=>array(0=>2,1=>1));
 
         return array('regex'=>"(^b)\\1",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -130,6 +140,7 @@ class qtype_preg_cross_tests_from_att_austin {
                        'length'=>array(0=>10,1=>4,2=>5,3=>1));
 
         return array('regex'=>"(week|wee)(night|knights)(s*)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -142,6 +153,7 @@ class qtype_preg_cross_tests_from_att_austin {
                        'length'=>array(0=>2,1=>2));
 
         return array('regex'=>"(.|..).*",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -154,6 +166,7 @@ class qtype_preg_cross_tests_from_att_austin {
                        'length'=>array(0=>2,1=>2));
 
         return array('regex'=>"(..)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -166,6 +179,7 @@ class qtype_preg_cross_tests_from_att_austin {
                        'length'=>array(0=>2,1=>2));
 
         return array('regex'=>"(.{1,2})",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -178,6 +192,7 @@ class qtype_preg_cross_tests_from_att_austin {
                        'length'=>array(0=>10,1=>4,2=>5,3=>1));
 
         return array('regex'=>"(wee|week)(knights|night)(s*)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -190,6 +205,7 @@ class qtype_preg_cross_tests_from_att_austin {
                        'length'=>array(0=>10,1=>3,2=>7));
 
         return array('regex'=>"(wee|week)(knights|night)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -202,6 +218,7 @@ class qtype_preg_cross_tests_from_att_austin {
                        'length'=>array(0=>10,1=>3,2=>7));
 
         return array('regex'=>"(week|wee)(night|knights)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -214,6 +231,7 @@ class qtype_preg_cross_tests_from_att_austin {
                        'length'=>array(0=>6,1=>3,3=>3));
 
         return array('regex'=>"((abc){0,2}(abc){0,2})\\3",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -226,6 +244,7 @@ class qtype_preg_cross_tests_from_att_austin {
                        'length'=>array(0=>8,1=>2));
 
         return array('regex'=>"(a.*z|b.*y)*.*",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -238,6 +257,7 @@ class qtype_preg_cross_tests_from_att_austin {
                        'length'=>array(0=>6,1=>0));
 
         return array('regex'=>"(x?)*y\\1z?",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -250,6 +270,7 @@ class qtype_preg_cross_tests_from_att_austin {
                        'length'=>array(0=>10,1=>3,2=>1,3=>5,4=>1));
 
         return array('regex'=>"(wee)(k*)(night|knights)(s*)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -262,6 +283,7 @@ class qtype_preg_cross_tests_from_att_austin {
                        'length'=>array(0=>10,1=>3,2=>5,3=>1));
 
         return array('regex'=>"(wee)k*(night|knights)(s*)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }

@@ -52,4 +52,9 @@ if ($ADMIN->fulltree) {
                     get_string('fa_state_limit_description', 'qtype_preg'), 250, PARAM_INT));
     $settings->add(new admin_setting_configtext('qtype_preg_fa_transition_limit', get_string('fa_transition_limit', 'qtype_preg'),
                     get_string('fa_transition_limit_description', 'qtype_preg'), 250, PARAM_INT));
+    $settings->add(new admin_setting_configtext('qtype_preg_fa_simulation_state_limit', get_string('fa_simulation_state_limit', 'qtype_preg'),
+                    get_string('fa_simulation_state_limit_description', 'qtype_preg'), 2000, PARAM_INT));
+    $assertionsupport = array ('0' => get_string('assertfailmodeasis', 'qtype_preg'), '1' => get_string('assertfailmodemerge', 'qtype_preg'));
+    $settings->add(new admin_setting_configselect('qtype_preg_assertfailmode', get_string('assertfailmodelabel', 'qtype_preg'),
+                    get_string('assertfailmodedescription', 'qtype_preg'), '0', $assertionsupport));
 }

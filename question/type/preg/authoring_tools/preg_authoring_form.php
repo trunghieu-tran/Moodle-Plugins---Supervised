@@ -10,6 +10,9 @@
 
 //defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+global $PAGE;
+
 require_once($CFG->libdir . '/formslib.php');
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_syntax_tree_nodes.php');
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_regex_testing_tool.php');
@@ -18,6 +21,8 @@ require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explainin
 require_once($CFG->dirroot . '/question/type/preg/question.php');
 require_once($CFG->dirroot . '/question/type/preg/questiontype.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');
+
+$PAGE->requires->jquery_plugin('poasquestion-jquerymodule', 'qtype_poasquestion');
 
 class qtype_preg_authoring_form extends moodleform {
 
@@ -32,13 +37,6 @@ class qtype_preg_authoring_form extends moodleform {
     //Add elements to form
     function definition() {
         global $CFG;
-        global $PAGE;
-
-        $PAGE->requires->js('/question/type/poasquestion/jquery.panzoom.js');
-        $PAGE->requires->js('/question/type/poasquestion/jquery-textrange.js');
-        $PAGE->requires->js('/question/type/poasquestion/interface.js');
-        /*$PAGE->requires->css('/question/type/poasquestion/shadow.css');
-        $PAGE->requires->css('/question/type/poasquestion/rect.css');*/
 
         // Create the form.
         $qtype = new qtype_preg();
@@ -54,7 +52,7 @@ class qtype_preg_authoring_form extends moodleform {
         $mform->addElement('header', 'regex_input_header', get_string('authoring_form_edit_header', 'qtype_preg'));
         $mform->setExpanded('regex_input_header', (bool)get_user_preferences('qtype_preg_regex_input_expanded', true));
         $mform->addHelpButton('regex_input_header', 'authoring_form_edit_header', 'qtype_preg');
-        $mform->addElement('textarea', 'regex_text', get_string('authoring_form_text', 'qtype_preg'), array('cols' => 150, 'rows' => 1));
+        $mform->addElement('textarea', 'regex_text', get_string('authoring_form_text', 'qtype_preg'), array('rows' => 1, 'cols' => 80, 'style' => 'width: 100%', 'class'=>'qtype-preg-highlighted-regex-text'));
         $mform->setType('regex_text', PARAM_RAW);
 
         $topline = array();

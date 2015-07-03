@@ -305,6 +305,7 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
     }
 
     public function test_get_matcher() {
+        global $CFG;
         // Test case insensitivity.
         $testquestion = clone $this->testquestion;
         $matcher = $testquestion->get_matcher($testquestion->engine, $testquestion->answers[100]->answer, true, $testquestion->get_modifiers(false));
@@ -326,6 +327,219 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
         // Test space inside square brackets.
         $matchresults = $matcher->match('Do cats eatbats?');
         $this->assertFalse($matchresults->full);
+
+        // -------------------- Tests for empty automata. ----------------------------
+        // Regular expression that can not match due to start/end string assertions.
+        // In that case get_matcher should return fa_matcher even if PHP matcher can match expression.
+        $CFG->qtype_preg_assertfailmode = 1; // Fail mode merge on.
+        $matcher = $testquestion->get_matcher('fa_matcher', 'a^b', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(1, count($errors));
+        $this->assertTrue(is_a($errors[0], 'qtype_preg_empty_fa_error'));
+        $this->assertEquals(0, $errors[0]->position->indfirst);
+        $this->assertEquals(1, $errors[0]->position->indlast);
+
+        $matcher = $testquestion->get_matcher('fa_matcher', '(?m)a^b', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(1, count($errors));
+        $this->assertTrue(is_a($errors[0], 'qtype_preg_empty_fa_error'));
+        $this->assertEquals(4, $errors[0]->position->indfirst);
+        $this->assertEquals(5, $errors[0]->position->indlast);
+
+        $matcher = $testquestion->get_matcher('fa_matcher', 'a$b', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(1, count($errors));
+        $this->assertTrue(is_a($errors[0], 'qtype_preg_empty_fa_error'));
+        $this->assertEquals(1, $errors[0]->position->indfirst);
+        $this->assertEquals(2, $errors[0]->position->indlast);
+
+        $matcher = $testquestion->get_matcher('fa_matcher', '(?m)a$b', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(1, count($errors));
+        $this->assertTrue(is_a($errors[0], 'qtype_preg_empty_fa_error'));
+        $this->assertEquals(5, $errors[0]->position->indfirst);
+        $this->assertEquals(6, $errors[0]->position->indlast);
+
+        $matcher = $testquestion->get_matcher('fa_matcher', 'a\n^b^c', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(1, count($errors));
+        $this->assertTrue(is_a($errors[0], 'qtype_preg_empty_fa_error'));
+        $this->assertEquals(4, $errors[0]->position->indfirst);
+        $this->assertEquals(5, $errors[0]->position->indlast);
+
+        $matcher = $testquestion->get_matcher('fa_matcher', '(?m)a\n^b^c', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(1, count($errors));
+        $this->assertTrue(is_a($errors[0], 'qtype_preg_empty_fa_error'));
+        $this->assertEquals(8, $errors[0]->position->indfirst);
+        $this->assertEquals(9, $errors[0]->position->indlast);
+
+        $matcher = $testquestion->get_matcher('fa_matcher', '(?m)a[a-z\n]^b[a-z]^c', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(1, count($errors));
+        $this->assertTrue(is_a($errors[0], 'qtype_preg_empty_fa_error'));
+        $this->assertEquals(14, $errors[0]->position->indfirst);
+        $this->assertEquals(19, $errors[0]->position->indlast);
+
+        $matcher = $testquestion->get_matcher('fa_matcher', '(?m)a$[a-z]b[a-z]^c', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(1, count($errors));
+        $this->assertTrue(is_a($errors[0], 'qtype_preg_empty_fa_error'));
+        $this->assertEquals(12, $errors[0]->position->indfirst);
+        $this->assertEquals(17, $errors[0]->position->indlast);
+
+        $matcher = $testquestion->get_matcher('fa_matcher', '(?m)a[a-z\n]^b', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(0, count($errors));
+
+        $matcher = $testquestion->get_matcher('fa_matcher', '(?m)a(\n|c)^b', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(0, count($errors));
+
+        $matcher = $testquestion->get_matcher('fa_matcher', '(ac^|d)b', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(0, count($errors));
+
+        $matcher = $testquestion->get_matcher('fa_matcher', '(?m)b$(cd|\n)', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(0, count($errors));
+
+        $matcher = $testquestion->get_matcher('fa_matcher', 'a|b$c', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(0, count($errors));
+
+        $matcher = $testquestion->get_matcher('fa_matcher', '(b$)*c', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(0, count($errors));
+
+        $matcher = $testquestion->get_matcher('fa_matcher', '(b^)+c', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(1, count($errors));
+        $this->assertTrue(is_a($errors[0], 'qtype_preg_empty_fa_error'));
+        $this->assertEquals(1, $errors[0]->position->indfirst);
+        $this->assertEquals(2, $errors[0]->position->indlast);
+
+        $matcher = $testquestion->get_matcher('fa_matcher', '(?m)(b$)+\n', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(0, count($errors));
+
+        $matcher = $testquestion->get_matcher('fa_matcher', '(b^)?a', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(0, count($errors));
+
+        $matcher = $testquestion->get_matcher('fa_matcher', '(?m)a(\n|c)^b[a-z]^c', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(1, count($errors));
+        $this->assertTrue(is_a($errors[0], 'qtype_preg_empty_fa_error'));
+        $this->assertEquals(13, $errors[0]->position->indfirst);
+        $this->assertEquals(18, $errors[0]->position->indlast);
+
+        $matcher = $testquestion->get_matcher('fa_matcher', 'a\bb', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(1, count($errors));
+        $this->assertTrue(is_a($errors[0], 'qtype_preg_empty_fa_error'));
+        $this->assertEquals(0, $errors[0]->position->indfirst);
+        $this->assertEquals(2, $errors[0]->position->indlast);
+
+        $matcher = $testquestion->get_matcher('fa_matcher', 'a\B\t', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(1, count($errors));
+        $this->assertTrue(is_a($errors[0], 'qtype_preg_empty_fa_error'));
+        $this->assertEquals(0, $errors[0]->position->indfirst);
+        $this->assertEquals(2, $errors[0]->position->indlast);
+
+        $matcher = $testquestion->get_matcher('fa_matcher', 'a\B\t', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(1, count($errors));
+        $this->assertTrue(is_a($errors[0], 'qtype_preg_empty_fa_error'));
+        $this->assertEquals(0, $errors[0]->position->indfirst);
+        $this->assertEquals(2, $errors[0]->position->indlast);
+
+        $matcher = $testquestion->get_matcher('fa_matcher', 'a\B(\t| )', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(1, count($errors));
+        $this->assertTrue(is_a($errors[0], 'qtype_preg_empty_fa_error'));
+        $this->assertEquals(0, $errors[0]->position->indfirst);
+        $this->assertEquals(2, $errors[0]->position->indlast);
+
+        $matcher = $testquestion->get_matcher('fa_matcher', 'a\b(\t|s)', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(0, count($errors));
+
+        $matcher = $testquestion->get_matcher('fa_matcher', 'a\b*\t', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(0, count($errors));
+
+        $matcher = $testquestion->get_matcher('fa_matcher', '(a\b)+\t', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(0, count($errors));
+
+        $matcher = $testquestion->get_matcher('fa_matcher', 'a\bb c\b$', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(1, count($errors));
+        $this->assertTrue(is_a($errors[0], 'qtype_preg_empty_fa_error'));
+        $this->assertEquals(0, $errors[0]->position->indfirst);
+        $this->assertEquals(2, $errors[0]->position->indlast);
+
+        $matcher = $testquestion->get_matcher('fa_matcher', '(a\b)+\t\Bc', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(1, count($errors));
+        $this->assertTrue(is_a($errors[0], 'qtype_preg_empty_fa_error'));
+        $this->assertEquals(6, $errors[0]->position->indfirst);
+        $this->assertEquals(9, $errors[0]->position->indlast);
+
+        $matcher = $testquestion->get_matcher('fa_matcher', '(a|\b)\t\B(c|d)', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(1, count($errors));
+        $this->assertTrue(is_a($errors[0], 'qtype_preg_empty_fa_error'));
+        $this->assertEquals(6, $errors[0]->position->indfirst);
+        $this->assertEquals(9, $errors[0]->position->indlast);
+
+        $matcher = $testquestion->get_matcher('fa_matcher', 'a\B ( |\t)\ba', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(1, count($errors));
+        $this->assertTrue(is_a($errors[0], 'qtype_preg_empty_fa_error'));
+        $this->assertEquals(0, $errors[0]->position->indfirst);
+        $this->assertEquals(2, $errors[0]->position->indlast);
+
+        $matcher = $testquestion->get_matcher('fa_matcher', '(?(DEFINE)(?<byte>2[0-4]\d|25[0-5]|1\d\d|[1-9]?\d))\b(?&byte)(\.(?&byte)){3}', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(0, count($errors));
+
+        $matcher = $testquestion->get_matcher('fa_matcher', 'a{0,1}(^bc)', false, 0, null, 'native', false);
+        $errors = $matcher->get_errors();
+        $this->assertTrue(is_a($matcher, 'qtype_preg_fa_matcher'));
+        $this->assertEquals(0, count($errors));
     }
 
     public function test_insert_subexpressions() {
@@ -423,4 +637,5 @@ class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
          '(z|y(x))(w)'
          '(?P<name>value)nonvalue|(?P<noname>wrongvalue)'*/
     }
+
 }

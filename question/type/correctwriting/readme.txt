@@ -2,21 +2,27 @@ Correct writing question
 -------------------------------------------
 
 Authors:
-1. Idea, string analysis method, general architecture, hints implementation - Oleg Sychev
-2. Question type code, sequence analyzer, picture generation - Dmitry Mamontov
-
-Thanks going to:
-* Maria Birukova - for help with icon
+1. Idea, string analysis method, general architecture, hints implementation - Oleg Sychev.
+2. Question type code, sequence analysis, picture generation - Dmitry Mamontov.
+3. Typo analysis - Maria Birukova with help from Dmitry Mamontov.
+4. Enumeration analysis - Vadim Klevtsov.
 
 1. Description
 When you teach the syntax of a new language - either a human or a programming one - you often finding
 youself teaching to write correct words (symbols etc) in a correct order. This question will help you with it.
 
-It analyzes student's response on words (well, actuall tokens or lexeme) level, find the closest possible match with
+The question contains several analyzers and could be used in different ways.
+
+Typo analysis used to find typos (inserted, deleted, replaced characters and transpositions), missed and extraneous separators.
+
+Seqence analyzes student's response on words (well, actuall tokens or lexeme) level, find the closest possible match with
 you answers and shows messages about mistakes to the students. Currently supported mistakes are:
  - misplaced word;
  - missing word;
  - extraneous word.
+
+Enumeration analyzer helps sequence: if you have a part of you enumeration, where elements could be written in any order,
+you could leave question to find the order maximally resebling student's response, instead of entering every possible order manually.
 
 In order to teach student to think grammaticaly, you must not reveal the actual mistaken words, but their
 grammatical roles when possible (i.e. except extraneous word). Consider student thinking about such messages:
