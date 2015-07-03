@@ -40,7 +40,7 @@ require_capability('block/supervised:editlessontypes', $PAGE->context);
 $PAGE->set_url('/blocks/supervised/lessontypes/addedit.php', array('courseid' => $courseid));
 $PAGE->set_pagelayout('standard');
 require('breadcrumbs.php');
-
+$context = context_course::instance($courseid);
 
 // Initializing variables depending of mode.
 if (!$id) {   // Add mode.
@@ -82,16 +82,18 @@ if ($mform->is_cancelled()) {
         if (!$newid = $DB->insert_record('block_supervised_lessontype', $fromform)) {
             print_error('insertlessontypeerror', 'block_supervised');
         }
-        // TODO Logging.
-        add_to_log($COURSE->id, 'role', 'add lesson type',
-            "blocks/supervised/lessontypes/addedit.php?id={$newid}&courseid={$COURSE->id}", $fromform->name);
+        $event = \block_supervised\event\add_lessontype::create(array('context' => $context,
+            'userid' => $USER->id, 'other' => array('fromform_name' => ($fromform->name),
+            'courseid' => $courseid, 'newlessontypeid' => $newid)));
+        $event->trigger();
     } else {     // Edit mode.
         if (!$DB->update_record('block_supervised_lessontype', $fromform)) {
             print_error('insertlessontypeerror', 'block_supervised');
         }
-        // TODO Logging.
-        add_to_log($COURSE->id, 'role', 'edit lesson type',
-            "blocks/supervised/lessontypes/addedit.php?id={$fromform->id}&courseid={$COURSE->id}", $fromform->name);
+        $event = \block_supervised\event\update_lessontype::create(array('context' => $context,
+            'userid' => $USER->id, 'other' => array('fromform_name' => ($fromform->name),
+            'courseid' => $courseid, 'fromform_id' => $fromform->id)));
+        $event->trigger();
     }
     $url = new moodle_url('/blocks/supervised/lessontypes/view.php', array('courseid' => $courseid));
     redirect($url);

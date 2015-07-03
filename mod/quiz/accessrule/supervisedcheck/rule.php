@@ -68,29 +68,29 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
         // If we are here, check is required.
         // Reorganize $lessontypesdb array.
         $lessontypes = array_keys($lessontypesdb);
-
+        $error = "";
         // Get user's active sessions.
-        $sessions = user_active_sessions();
-        if (empty($sessions)) {
-            // We havn't active sessions with current user ip and group.
-            return get_string('iperror', 'quizaccess_supervisedcheck');
-        }
-
-        // Filter sessions by lessontype and userid.
-        foreach ($sessions as $id => $session) {
-            // Check if current session's lessontype is in passed $lessontypes array.
-            $islessontype = in_array($session->lessontypeid, $lessontypes);
-            if ( !$islessontype ) {
-                // Remove current session.
-                unset($sessions[$id]);
-            }
-        }
-
+        $sessions = user_active_sessions($lessontypes,$error);
+        
         if (!empty($sessions)) {
             return false;
         } else {
-            // We havn't active sessions for quiz's lesson types.
-            return get_string('noaccess', 'quizaccess_supervisedcheck');
+            if (strcmp($error,"iperror") == 0) {
+                // We havn't active sessions with current user ip.
+                return get_string('iperror', 'quizaccess_supervisedcheck');
+            }
+            else if (strcmp($error, "grouperror") == 0) {
+                // We havn't active sessions with current user ip.
+                if($this->quiz->supervisedmode == 2) {
+                    return get_string('noaccess', 'quizaccess_supervisedcheck');
+                } else {
+                    return get_string('noaccessall', 'quizaccess_supervisedcheck');
+                }
+            }
+            else if (strcmp($error, "lessontypeerror") == 0) {
+                // We havn't active sessions with current user lesson type.
+                return get_string('lessontypeerror', 'quizaccess_supervisedcheck');
+            }
         }
     }
 
@@ -175,9 +175,16 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
                 $rule->supervisedmode       = $quiz->supervisedmode; // ...must be 2.
                 $DB->update_record('quizaccess_supervisedcheck', $rule);
             }
+            $oldrulesids = array();
             // Delete any remaining old rules.
-            foreach ($oldrules as $oldrule) {
-                $DB->delete_records('quizaccess_supervisedcheck', array('id' => $oldrule->id));
+            if(!empty($oldrules)) {
+                foreach ($oldrules as $oldrule) {
+                    $oldrulesids[] = $oldrule->id;
+                }
+                list($insql, $inparams) = $DB->get_in_or_equal($oldrulesids);
+                $sqlstring = " id ";
+                $sqlstring .= $insql;
+                $DB->delete_records_select('quizaccess_supervisedcheck', $sqlstring, $inparams);
             }
         } else {
             // Update an existing rule if possible.
@@ -192,9 +199,16 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
             $rule->lessontypeid         = -1;
             $rule->supervisedmode       = $quiz->supervisedmode;   // ...0 or 1.
             $DB->update_record('quizaccess_supervisedcheck', $rule);
+            $oldrulesids = array();
             // Delete any remaining old rules.
-            foreach ($oldrules as $oldrule) {
-                $DB->delete_records('quizaccess_supervisedcheck', array('id' => $oldrule->id));
+            if(!empty($oldrules)) {
+                foreach ($oldrules as $oldrule) {
+                    $oldrulesids[] = $oldrule->id;
+                }
+                list($insql, $inparams) = $DB->get_in_or_equal($oldrulesids);
+                $sqlstring = " id ";
+                $sqlstring .= $insql;
+                $DB->delete_records_select('quizaccess_supervisedcheck', $sqlstring, $inparams);
             }
         }
     }
@@ -247,5 +261,10 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
         }
 
         return $errors;
+    }
+    
+    public static function delete_settings($quiz) {
+        global $DB;
+        $DB->delete_records('quizaccess_supervisedcheck', array('quizid' => $quiz->id));
     }
 }

@@ -76,6 +76,7 @@ if (file_exists($mform)) {
 $mform = new addedit_classroom_form();
 $toform['courseid'] = $courseid;
 $mform->set_data($toform);
+$context = context_course::instance($courseid);
 
 if ($mform->is_cancelled()) {
     // Cancelled forms redirect to the course main page.
@@ -87,18 +88,18 @@ if ($mform->is_cancelled()) {
         if (!$newid = $DB->insert_record('block_supervised_classroom', $fromform)) {
             print_error('insertclassroomerror', 'block_supervised');
         }
-        // TODO Logging.
-        add_to_log($COURSE->id, 'role', 'add classroom',
-            "blocks/supervised/classrooms/addedit.php?id={$newid}&courseid={$COURSE->id}", $fromform->name);
+        $event = \block_supervised\event\add_classroom::create(array('context' => $context, 'userid' => $USER->id,
+                'other' => array('fromform_name' => ($fromform->name), 'courseid' => $courseid, 'newclassid' => $newid)));
+        $event->trigger();
     } else {     // Edit mode.
 
         if (!$DB->update_record('block_supervised_classroom', $fromform)) {
             print_error('insertclassroomerror', 'block_supervised');
         }
-        // TODO Logging.
-        add_to_log($COURSE->id, 'role', 'edit classroom',
-            "blocks/supervised/classrooms/addedit.php?id={$fromform->id}&courseid={$COURSE->id}", $fromform->name);
-
+        $event = \block_supervised\event\update_classroom::create(array('context' => $context,
+            'userid' => $USER->id, 'other' => array('fromform_name' => ($fromform->name),
+            'courseid' => $courseid, 'fromform_id' => $fromform->id)));
+        $event->trigger();
         // Find all Active and Planned sessions and update their ip lists.
         $select = "SELECT * FROM {block_supervised_session}
                     WHERE classroomid = :classroomid

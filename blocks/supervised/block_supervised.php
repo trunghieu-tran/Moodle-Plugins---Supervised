@@ -122,7 +122,8 @@ class block_supervised extends block_base {
      * @return bool true if the planned session exists
      */
     private function render_plannedsession_form(&$title, &$formbody) {
-        global $CFG, $COURSE, $DB;
+        global $CFG, $COURSE, $DB, $USER;
+        $context = context_course::instance($COURSE->id);
         $plannedsession = $this->get_teacher_planned_session();
 
         if ( !empty($plannedsession) ) {
@@ -151,22 +152,15 @@ class block_supervised extends block_base {
                     print_error('insertsessionerror', 'block_supervised');
                 }
                 update_users_in_session($plannedsession->groupid, $plannedsession->courseid, $plannedsession->id);
-                // TODO Logging.
-                add_to_log($COURSE->id, 'role', 'start planned session',
-                    'blocks/supervised/sessions/view.php?courseid='.$COURSE->id, '');
-                // Trigger event (session started).
-                $sessioninfo = new stdClass();
-                $sessioninfo->courseid      = $plannedsession->courseid;
-                $sessioninfo->groupid       = $plannedsession->groupid;
-                $sessioninfo->lessontypeid  = $plannedsession->lessontypeid;
-                events_trigger('session_started', $sessioninfo);
-
+                $event = \block_supervised\event\start_planned_session::create(array('context' => $context,
+                    'userid' => $USER->id, 'other' => array('courseid' => $COURSE->id,
+                    'groupid' => $plannedsession->groupid, 'lessontypeid' => $plannedsession->lessontypeid)));
+                $event->trigger();
                 unset($plannedsession);
             } else {
                 $title = get_string('plannedsessiontitle', 'block_supervised');
                 // Display form.
                 $toform['id']               = $COURSE->id;
-
                 $strftimedatetime = get_string('strftimerecent');
                 $toform['classroomid']      = $plannedsession->classroomid;
                 $toform['groupid']          = $plannedsession->groupid;
@@ -175,7 +169,6 @@ class block_supervised extends block_base {
                 $toform['timestart']        = userdate($plannedsession->timestart, $strftimedatetime);
                 $toform['timeend']          = userdate($plannedsession->timeend, $strftimedatetime);
                 $toform['sessioncomment']   = $plannedsession->sessioncomment;
-
                 $mform->set_data($toform);
                 $formbody = $mform->render();
             }
@@ -193,7 +186,8 @@ class block_supervised extends block_base {
      * @return bool true if the active session exists
      */
     private function render_activesession_form(&$title, &$formbody) {
-        global $CFG, $COURSE, $DB;
+        global $CFG, $COURSE, $DB, $USER;
+        $context = context_course::instance($COURSE->id);
         $activesession  = $this->get_teacher_active_session();
 
         if ( !empty($activesession) ) {
@@ -219,23 +213,17 @@ class block_supervised extends block_base {
                 if (!$DB->update_record('block_supervised_session', $activesession)) {
                     print_error('insertsessionerror', 'block_supervised');
                 }
-                // TODO Logging.
-                add_to_log($COURSE->id, 'role', 'finish session',
-                    'blocks/supervised/sessions/view.php?courseid='.$COURSE->id, '');
-
-                // Trigger event (session finished).
-                $sessioninfo = new stdClass();
-                $sessioninfo->courseid      = $activesession->courseid;
-                $sessioninfo->groupid       = $activesession->groupid;
-                $sessioninfo->lessontypeid  = $activesession->lessontypeid;
-                events_trigger('session_finished', $sessioninfo);
+                $event = \block_supervised\event\finish_session::create(array('context' => $context,
+                'userid' => $USER->id, 'other' => array('courseid' => $activesession->courseid,
+                'groupid' => $activesession->groupid, 'lessontypeid' => $activesession->lessontypeid)));
+                $event->trigger();
 
                 unset($activesession);
             } else if ($fromform = $mform->get_data()) {
-                // Update session
-                // TODO Logging.
-                add_to_log($COURSE->id, 'role', 'update active session',
-                    'blocks/supervised/sessions/view.php?courseid='.$COURSE->id, '');
+                // Update session.
+                $event = \block_supervised\event\update_active_session::create(array('context' => $context,
+                'userid' => $USER->id, 'other' => array('courseid' => $COURSE->id)));
+                $event->trigger();
                 $title = get_string('activesessiontitle', 'block_supervised');
                 $oldgroupid = $activesession->groupid;
                 $newgroupid = $fromform->groupid;
@@ -253,12 +241,10 @@ class block_supervised extends block_base {
                 update_users_in_session($activesession->groupid, $activesession->courseid, $activesession->id);
                 // Trigger event (session updated) if group was updated.
                 if ($oldgroupid != $newgroupid) {
-                    $sessioninfo = new stdClass();
-                    $sessioninfo->courseid      = $activesession->courseid;
-                    $sessioninfo->oldgroupid    = $oldgroupid;
-                    $sessioninfo->newgroupid    = $newgroupid;
-                    $sessioninfo->lessontypeid  = $activesession->lessontypeid;
-                    events_trigger('session_updated', $sessioninfo);
+                    $event = \block_supervised\event\update_session::create(array('context' => $context,
+                    'userid' => $USER->id, 'other' => array('courseid' => $activesession->courseid, 'oldgroupid' => $oldgroupid,
+                    'newgroupid' => $newgroupid, 'lessontypeid' => $activesession->lessontypeid)));
+                    $event->trigger();
                 }
 
                 // Refresh block: render active session form.
@@ -315,7 +301,7 @@ class block_supervised extends block_base {
      */
     private function render_startsession_form(&$title, &$formbody) {
         global $CFG, $COURSE, $DB, $USER;
-
+        $context = context_course::instance($COURSE->id);
         $title = get_string('nosessionstitle', 'block_supervised');
         // Prepare form.
         $mform = $CFG->dirroot."/blocks/supervised/startsession_block_form.php";
@@ -327,13 +313,10 @@ class block_supervised extends block_base {
         $mform = new startsession_block_form();
 
         if ($fromform = $mform->get_data()) {
-            // Trigger event (session started).
-            $sessioninfo = new stdClass();
-            $sessioninfo->courseid      = $COURSE->id;
-            $sessioninfo->groupid       = $fromform->groupid;
-            $sessioninfo->lessontypeid  = $fromform->lessontypeid;
-            events_trigger('session_started', $sessioninfo);
-
+            $event = \block_supervised\event\start_session::create(array('context' => $context,
+            'userid' => $USER->id, 'other' => array('courseid' => $COURSE->id, 'groupid' => $fromform->groupid,
+            'lessontypeid' => $fromform->lessontypeid)));
+            $event->trigger();
             // Start session.
             $curtime = time();
             $fromform->state          = StateSession::ACTIVE;
@@ -347,9 +330,6 @@ class block_supervised extends block_base {
                 print_error('insertsessionerror', 'block_supervised');
             }
             update_users_in_session($fromform->groupid, $fromform->courseid, $newid);
-            // TODO Logging.
-            add_to_log($COURSE->id, 'role', 'start session',
-                'blocks/supervised/sessions/view.php?courseid='.$COURSE->id, '');
             // Refresh block: render active session form.
             $title = '';
             $formbody = '';

@@ -74,16 +74,16 @@ if (file_exists($mform)) {
 $mform = new delete_session_form();
 
 
-
+$context = context_course::instance($courseid);
 if ($mform->is_cancelled()) {
     // Cancelled forms redirect to the sessions view page.
     $url = new moodle_url('/blocks/supervised/sessions/view.php', array('courseid' => $courseid));
     redirect($url);
 } else if ($fromform = $mform->get_data()) {
     // Delete session.
-    // TODO Logging.
-    add_to_log($COURSE->id, 'role', 'delete session',
-        'blocks/supervised/sessions/view.php?courseid='.$COURSE->id, '');
+    $event = \block_supervised\event\delete_session::create(array('context' => $context,
+        'userid' => $USER->id, 'other' => array('courseid' => $courseid)));
+    $event->trigger();
     $DB->delete_records('block_supervised_session', array('id' => $id));
     $DB->delete_records('block_supervised_user', array('sessionid' => $id));
     // Send e-mail to teacher.

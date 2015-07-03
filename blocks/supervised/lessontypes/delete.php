@@ -27,6 +27,7 @@ require_once('../lib.php');
 $id         = required_param('id', PARAM_INT);              // Lessontype id.
 $courseid   = required_param('courseid', PARAM_INT);
 $delete     = optional_param('delete', '', PARAM_ALPHANUM); // Delete confirmation hash.
+$context    = context_course::instance($COURSE->id);
 
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
     print_error('invalidcourseid');
@@ -78,9 +79,10 @@ if (!confirm_sesskey()) {
 // OK checks done, delete the lessontype now.
 $DB->delete_records('block_supervised_lessontype', array('id' => $id));
 
-// TODO Logging.
-add_to_log($COURSE->id, 'role', 'delete lesson type',
-    "blocks/supervised/lessontypes/view.php?courseid={$COURSE->id}", $lessontype->name);
+$event = \block_supervised\event\delete_lessontype::create(array('context' => $context,
+    'userid' => $USER->id, 'other' => array('courseid' => $courseid, 'deletedid' => $lessontype->id,
+    'lessontypename' => $lessontype->name)));
+$event->trigger();
 
 // Redirect to lessontypes page.
 $url = new moodle_url('/blocks/supervised/lessontypes/view.php', array('courseid' => $courseid));

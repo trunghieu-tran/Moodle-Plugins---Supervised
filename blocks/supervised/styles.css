@@ -16,9 +16,16 @@
 
 .block_supervised .content .mform .fitem .fstatic,
 .block_supervised .content .mform .fitem .fselect,
+.block_supervised .content .mform .fitem .fsubmit,
+.block_supervised .content .mform .fitem .fgroup,
+.block_supervised .content .mform .fitem .flink,
 .block_supervised .content .mform .fitem .ftext {
     margin-left: 0;
     width: auto;
+}
+
+.block_supervised .content .mform .fitem .flink {
+    font-size: 13px;
 }
 
 /* Styles for view sessions page */
