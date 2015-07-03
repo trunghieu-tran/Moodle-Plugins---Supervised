@@ -1,0 +1,102 @@
+[
+ (program) {
+  (stmt_list) {
+   (stmt_list) {
+    (stmt_or_defined_macro) {
+     (stmt) {
+      (switch_stmt) {
+       switch
+       (
+       a
+       )
+       {
+       (switch_case_list) {
+        (switch_case_list) {
+         (switch_case_list) {
+          (case) {
+           case
+           1
+           :
+           (stmt_list) {
+            (stmt_or_defined_macro) {
+             (stmt) {
+              {
+              (stmt_list) {
+               (stmt_or_defined_macro) {
+                (stmt) {
+                 (variable_declaration) {
+                  (builtintype) {
+                   int
+                  }
+                  (assign) {
+                   test
+                   =
+                   (expr_plus) {
+                    a
+                    +
+                    b
+                   }
+                  }
+                 }
+                 ;
+                }
+               }
+              }
+              }
+             }
+            }
+           }
+          }
+         }
+         (case) {
+          case
+          2
+          :
+          (stmt_list) {
+           (stmt_or_defined_macro) {
+            (stmt) {
+             (expr_plus_assign) {
+              a
+              +=
+              x
+             }
+             ;
+            }
+           }
+          }
+         }
+        }
+        (case) {
+         default
+         :
+         (stmt_list) {
+          (stmt_or_defined_macro) {
+           (stmt) {
+            (expr_plus_assign) {
+             a
+             +=
+             (expr_multiply) {
+              x
+              *
+              2
+             }
+            }
+            ;
+           }
+          }
+         }
+        }
+       }
+       }
+      }
+     }
+    }
+   }
+   (stmt_or_defined_macro) {
+    (stmt) {
+     ;
+    }
+   }
+  }
+ }
+]

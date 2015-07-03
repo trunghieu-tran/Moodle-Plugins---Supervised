@@ -1,0 +1,18 @@
+[
+ (expr_typecast) {
+  (c_style_typecast_operator) {
+   (
+   (type_with_ptr) {
+    (builtintype) {
+     int
+    }
+    *
+   }
+   )
+  }
+  (preprocessor_stringify) {
+   #
+   a
+  }
+ }
+]

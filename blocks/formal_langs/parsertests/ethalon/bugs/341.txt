@@ -1,0 +1,56 @@
+[
+ (program) {
+  (stmt_list) {
+   (stmt_list) {
+    (stmt_or_defined_macro) {
+     (stmt) {
+      (variable_declaration) {
+       (builtintype) {
+        int
+       }
+       (assign) {
+        k
+        =
+        (expr_minus) {
+         (expr_plus) {
+          (expr_plus) {
+           (expr_division) {
+            j
+            /
+            h
+           }
+           +
+           t
+          }
+          +
+          o
+         }
+         -
+         r
+        }
+       }
+      }
+      ;
+     }
+    }
+   }
+   (stmt_or_defined_macro) {
+    (stmt) {
+     (variable_declaration) {
+      bool
+      (assign) {
+       g
+       =
+       (expr_assign) {
+        kill
+        =
+        live
+       }
+      }
+     }
+     ;
+    }
+   }
+  }
+ }
+]

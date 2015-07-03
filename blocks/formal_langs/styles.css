@@ -1,0 +1,16 @@
+.block_formal_langs .icon.column.c0 {
+    padding-right: 3px;
+}
+.block_formal_langs .column.c1 {
+    display: inline !important;
+}
+.block_formal_langs .padright {
+    padding-right: 6px;
+}
+.block_formal_langs li {
+    margin-bottom: 5px;
+}
+.global-affected-courses {
+    color: red;
+    margin-top: 10px;
+}
