@@ -28,7 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/question/type/poasquestion/stringstream/stringstream.php');
-require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/poasquestion/questiontype.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_notations.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
@@ -96,8 +95,12 @@ class qtype_preg_handling_options {
     public $exactmatch = false;
     /** @var boolean Should lexer and parser try hard to preserve all nodes, including grouping and option nodes. */
     public $preserveallnodes = false;
+    /** @var boolean Should lexer and parser recognize templates in comments like (?###word). */
+    public $parsetemplates = true;
     /** @var boolean Should parser expand nodes x{m,n} to sequences like xxxx?x?x?x?. */
     public $expandquantifiers = false;
+    /** @var boolean Should parser replace non-recursive subexpr calls (?1) with the subexpr node clone. */
+    public $replacesubexprcalls = false;
     /** @var boolean Are we running in debug mode? If so, engines can print debug information during matching. */
     public $debugmode = false;
     /** @var string Notation, in which regex was passed*/
@@ -217,7 +220,7 @@ class qtype_preg_handling_options {
     public function modifiers_to_string() {
         $result = '';
         foreach (self::get_all_modifiers() as $mod) {
-            if ($this->modifiers & $mod) {
+            if ($this->is_modifier_set($mod)) {
                 $result .= self::modifier_to_char($mod);
             }
         }
@@ -240,7 +243,7 @@ class qtype_preg_handling_options {
 
 class qtype_preg_regex_handler {
 
-    /** Regular expression as an object of qtype_poasquestion_string. */
+    /** Regular expression as an object of qtype_poasquestion\string. */
     protected $regex;
     /** Regular expression handling options, may be different for different handlers. */
     protected $options;
@@ -274,7 +277,7 @@ class qtype_preg_regex_handler {
         }
 
         if ($regex == '' || $regex === null) {
-            $this->regex = new qtype_poasquestion_string('');
+            $this->regex = new qtype_poasquestion\string('');
             $this->options = $options;
             return;
         }
@@ -288,18 +291,7 @@ class qtype_preg_regex_handler {
             $options = $notationobj->convert_options($usednotation);
         }
 
-        // Look for unsupported modifiers.
-        $allmodifiers = qtype_preg_handling_options::get_all_modifiers();
-        $supportedmodifiers = $this->get_supported_modifiers();
-        foreach ($allmodifiers as $mod) {
-            $passed = $options->is_modifier_set($mod);
-            $supported = $supportedmodifiers & $mod;
-            if ($passed && !$supported) {
-                $this->errors[] = new qtype_preg_modifier_error($this->name(), $mod);
-            }
-        }
-
-        $this->regex = new qtype_poasquestion_string($regex);
+        $this->regex = new qtype_poasquestion\string($regex);
         $this->options = $options;
 
         // Do parsing.
@@ -335,7 +327,7 @@ class qtype_preg_regex_handler {
                qtype_preg_handling_options::MODIFIER_CASELESS |         // Any qtype_preg_matcher should support case insensitivity.
                qtype_preg_handling_options::MODIFIER_DOLLAR_ENDONLY |
                qtype_preg_handling_options::MODIFIER_DOTALL |
-               qtype_preg_handling_options::MODIFIER_DUPNAMES |
+               //qtype_preg_handling_options::MODIFIER_DUPNAMES |
                qtype_preg_handling_options::MODIFIER_EXTENDED |
                qtype_preg_handling_options::MODIFIER_MULTILINE |
                qtype_preg_handling_options::MODIFIER_UTF8;
@@ -443,9 +435,16 @@ class qtype_preg_regex_handler {
     /**
      * Returns subexpressions name => number map.
      */
-    public function get_subexpr_map() {
+    public function get_subexpr_name_to_number_map() {
         if ($this->lexer !== null) {
-            return $this->lexer->get_subexpr_map();
+            return $this->lexer->get_subexpr_name_to_number_map();
+        }
+        return array();
+    }
+
+    public function get_subexpr_number_to_nodes_map() {
+        if ($this->parser !== null) {
+            return $this->parser->get_subexpr_number_to_nodes_map();
         }
         return array();
     }
@@ -453,10 +452,10 @@ class qtype_preg_regex_handler {
     /**
      * Returns subpatterns number => node map.
      */
-    public function get_subpatt_map() {
+    public function get_subpatt_number_to_node_map() {
         $result = array();
         if ($this->parser !== null) {
-            $result = $this->parser->get_subpatt_map();
+            $result = $this->parser->get_subpatt_number_to_node_map();
         }
         if ($this->selectednode !== null) {
             $result[-2] = $this->selectednode;
@@ -511,7 +510,13 @@ class qtype_preg_regex_handler {
         $enginenodename = $this->get_engine_node_name($pregnode->type, $pregnode->subtype);
         if (class_exists($enginenodename)) {
             $enginenode = new $enginenodename($pregnode, $this);
-            $acceptresult = $enginenode->accept();
+            try {
+                $acceptresult = $enginenode->accept($this->options);
+
+            } catch (qtype_preg_mergedassertion_option_exception $e) {
+                $this->errors[$enginenodename] = new qtype_preg_mergedassertion_option_error($this->regex);
+                return;
+            }
             if ($acceptresult !== true && !isset($this->errors[$enginenodename])) {
                 // Highlight first occurence of the unaccepted node.
                 $this->errors[$enginenodename] = new qtype_preg_accepting_error($this->regex, $this->name(), $acceptresult, $pregnode);
@@ -629,42 +634,36 @@ class qtype_preg_regex_handler {
         return false;
     }
 
-    /**
-     * Does lexical and syntaxical analysis of the regex and builds an abstract syntax tree, saving root node in $this->astroot.
-     * @param string regex - regular expression for building tree.
-     */
-    protected function build_tree($regex) {
-        StringStreamController::createRef('regex', $regex);
-        $pseudofile = fopen('string://regex', 'r');
-        $this->lexer = new qtype_preg_lexer($pseudofile);
-        $this->lexer->set_options($this->options);
+    protected function find_errors($regex, &$lexer, &$parser) {
+        // All errors are found with preserveallnodes == true.
+        $options = clone $this->options;
+        $options->preserveallnodes = true;
 
-        $this->parser = new qtype_preg_parser($this->options);
+        // Tokenize regex.
+        $hastemplates = false;
+        $tokens = qtype_preg_lexer::tokenize_regex($regex, $options, $lexer, $hastemplates);
 
-        while (($token = $this->lexer->nextToken()) !== null) {
-            if (!is_array($token)) {
-                $this->parser->doParse($token->type, $token->value);
-            } else {
-                foreach ($token as $curtoken) {
-                    $this->parser->doParse($curtoken->type, $curtoken->value);
-                }
-            }
+        // Parse tokens.
+        $parser = new qtype_preg_parser($options);
+        foreach ($tokens as $token) {
+            $parser->doParse($token->type, $token->value);
         }
 
-        // Lexer returns errors for an unclosed character set or wrong modifiers.
-        $lexerrors = $this->lexer->get_error_nodes();
+        // Parse specific lexer errors.
+        $lexerrors = $lexer->get_error_nodes();
         foreach ($lexerrors as $node) {
             if ($node->subtype == qtype_preg_node_error::SUBTYPE_UNCLOSED_CHARSET || $node->subtype == qtype_preg_node_error::SUBTYPE_MISSING_COMMENT_ENDING) {
-                $this->parser->doParse(qtype_preg_parser::PARSELEAF, $node);
+                $parser->doParse(qtype_preg_parser::PARSELEAF, $node);
             }
             $this->errornodes[] = $node;
             $this->errors[] = new qtype_preg_parsing_error($regex, $node);
         }
 
-        $this->parser->doParse(0, 0);
+        // Parsing is finished.
+        $parser->doParse(0, 0);
 
         // Parser contains other errors inside AST nodes.
-        $parseerrors = $this->parser->get_error_nodes();
+        $parseerrors = $parser->get_error_nodes();
         foreach ($parseerrors as $node) {
             $this->errornodes[] = $node;
             // There can be a specific accepting error.
@@ -675,17 +674,54 @@ class qtype_preg_regex_handler {
                 $this->errors[] = new qtype_preg_parsing_error($regex, $node);
             }
         }
+    }
 
-        // Set AST and DST roots.
+    /**
+     * Does lexical and syntaxical analysis of the regex and builds an abstract syntax tree, saving root node in $this->astroot.
+     * @param string regex - regular expression for building tree.
+     */
+    protected function build_tree($regex) {
+        // Find errors first. If there is one, save the AST as is and exit.
+        $this->find_errors($regex, $this->lexer, $this->parser);
         $this->astroot = $this->parser->get_root();
-        if ($this->astroot !== null && !$this->errors_exist()) { // Add necessary nodes.
-            if ($this->options->exactmatch) {
+
+        if (!$this->errors_exist()) {
+            // No errors in the regex. Parse again if needed (preserveallnodes == false)
+            if (!$this->options->preserveallnodes) {
+                // Use templates preprocessor.
+                $resultregex = '';
+                $tokens = qtype_preg\template::process_regex($regex, $this->options, $this->lexer, $resultregex);
+
+                // Pass tokens to the parser.
+                $this->parser = new qtype_preg_parser($this->options);
+                foreach ($tokens as $token) {
+                    $this->parser->doParse($token->type, $token->value);
+                }
+
+                // Parsing is finished.
+                $this->parser->doParse(0, 0);
+
+                $this->regex = new qtype_poasquestion\string($resultregex);
+                $this->astroot = $this->parser->get_root();
+
+                // Look for unsupported modifiers.
+                $supportedmodifiers = $this->get_supported_modifiers();
+                foreach ($this->lexer->get_all_modifiers() as $mod) {
+                    $supported = $supportedmodifiers & $mod;
+                    if (!$supported) {
+                        $this->errors[] = new qtype_preg_modifier_error($this->name(), qtype_preg_handling_options::modifier_to_char($mod));
+                    }
+                }
+            }
+
+            // Add necessary nodes.
+            if ($this->astroot !== null && $this->options->exactmatch) {
                 $newroot = $this->add_exact_match_nodes($this->astroot);
                 $this->astroot->subpattern = -1;
                 $this->astroot = $newroot;
                 $this->astroot->subpattern = 0;
             }
-            if ($this->options->selection->indfirst != -2) {
+            if ($this->astroot !== null && $this->options->selection->indfirst != -2) {
                 $newroot = $this->add_selection_nodes($this->astroot);
                 $this->astroot->subpattern = -1;
                 $this->astroot = $newroot;
@@ -693,11 +729,9 @@ class qtype_preg_regex_handler {
             }
         }
 
-        if ($this->astroot != null) {
+        if ($this->astroot !== null) {
             $this->dstroot = $this->from_preg_node(clone $this->astroot);
         }
-
-        fclose($pseudofile);
     }
 
     /**
@@ -773,5 +807,27 @@ class qtype_preg_regex_handler {
             }
         }
         return null;
+    }
+
+    /**
+     * Checks that the two nodes are equivalent
+     * @param $handler qtype_preg_regex_handler other node
+     * @return bool is $handler fully equals to this handler
+     */
+    public function is_equal($handler) {
+        $thisroot = $this->get_ast_root();
+        $otherroot = $handler->get_ast_root();
+        return $thisroot->is_equal($otherroot, 0);
+    }
+
+    /**
+     * Finds all occurrences of $node subtree in the current tree
+     * @param $handler qtype_preg_regex_handler subtree to find
+     * @return array array of roots of founded subtrees
+     */
+    public function find_all_subtrees($handler) {
+        $thisroot = $this->get_ast_root();
+        $otherroot = $handler->get_ast_root();
+        return $thisroot->find_all_subtrees($otherroot, 0);
     }
 }

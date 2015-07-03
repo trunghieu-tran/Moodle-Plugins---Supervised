@@ -60,122 +60,6 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         return $repeated;
     }
 
-    // TODO - delete when this will be in the core (hopefully 2.6).
-    protected function data_preprocessing_answers($question, $withanswerfiles = false) {
-        if (empty($question->options->answers)) {
-            return $question;
-        }
-
-        $key = 0;
-        foreach ($question->options->answers as $answer) {
-            if ($withanswerfiles) {
-                // Prepare the feedback editor to display files in draft area.
-                $draftitemid = file_get_submitted_draft_itemid('answer['.$key.']');
-                $question->answer[$key]['text'] = file_prepare_draft_area(
-                    $draftitemid,          // Draftid
-                    $this->context->id,    // context
-                    'question',            // component
-                    'answer',              // filarea
-                    !empty($answer->id) ? (int) $answer->id : null, // itemid
-                    $this->fileoptions,    // options
-                    $answer->answer        // text.
-                );
-                $question->answer[$key]['itemid'] = $draftitemid;
-                $question->answer[$key]['format'] = $answer->answerformat;
-            } else {
-                $question->answer[$key] = $answer->answer;
-            }
-
-            $question->fraction[$key] = 0 + $answer->fraction;
-            $question->feedback[$key] = array();
-
-            // Evil hack alert. Formslib can store defaults in two ways for
-            // repeat elements:
-            //   ->_defaultValues['fraction[0]'] and
-            //   ->_defaultValues['fraction'][0].
-            // The $repeatedoptions['fraction']['default'] = 0 bit above means
-            // that ->_defaultValues['fraction[0]'] has already been set, but we
-            // are using object notation here, so we will be setting
-            // ->_defaultValues['fraction'][0]. That does not work, so we have
-            // to unset ->_defaultValues['fraction[0]'].
-            unset($this->_form->_defaultValues["fraction[$key]"]);
-
-            // Prepare the feedback editor to display files in draft area.
-            $draftitemid = file_get_submitted_draft_itemid('feedback['.$key.']');
-            $question->feedback[$key]['text'] = file_prepare_draft_area(
-                $draftitemid,          // Draftid
-                $this->context->id,    // context
-                'question',            // component
-                'answerfeedback',      // filarea
-                !empty($answer->id) ? (int) $answer->id : null, // itemid
-                $this->fileoptions,    // options
-                $answer->feedback      // text.
-            );
-            $question->feedback[$key]['itemid'] = $draftitemid;
-            $question->feedback[$key]['format'] = $answer->feedbackformat;
-            $key++;
-
-        }
-
-        // Now process extra answer fields.
-        $extraanswerfields = question_bank::get_qtype($question->qtype)->extra_answer_fields();
-        if (is_array($extraanswerfields)) {
-            // Omit table name.
-            array_shift($extraanswerfields);
-            $question = $this->data_preprocessing_extra_answer_fields($question, $extraanswerfields, $withanswerfiles);
-        }
-
-        return $question;
-    }
-
-    // TODO - delete when this will be in the core (hopefully 2.6).
-    /**
-     * Perform the necessary preprocessing for the extra answer fields.
-     *
-     * Questions that do something not trivial when editing extra answer fields
-     * will want to override this.
-     * @param object $question the data being passed to the form.
-     * @param array $extrafields extra answer fields (without table name).
-     * @return object $question the modified data.
-     */
-    protected function data_preprocessing_extra_answer_fields($question, $extrafields, $withanswerfiles = false) {
-        // Setting $question->$field[$key] won't work in PHP, so we need set an array of answer values to $question->$field.
-        // As we may have several extra fields with data for several answers in each, we use an array of arrays.
-        // Index in $extrafieldsdata is an extra answer field name, value - array of it's data for each answer.
-        $extrafieldsdata = array();
-        // First, prepare an array if empty arrays for each extra answer fields data.
-        foreach ($extraanswerfields as $field) {
-            $extrafieldsdata[$field] = array();
-        }
-
-        // Fill arrays with data from $question->options->answers.
-        $key = 0;
-        foreach ($question->options->answers as $answer) {
-            foreach ($extraanswerfields as $field) {
-                // See hack comment in {@link data_preprocessing_answers()}.
-                unset($this->_form->_defaultValues["{$field}[{$key}]"]);
-                $extrafieldsdata[$field][$key] = $this->data_preprocessing_extra_answer_field($answer, $field);
-            }
-            $key++;
-        }
-
-        // Set this data in the $question object.
-        foreach ($extraanswerfields as $field) {
-            $question->$field = $extrafieldsdata[$field];
-        }
-        return $question;
-    }
-
-    /**
-     * Perfmorm preprocessing for particular extra answer field.
-     *
-     * Questions with non-trivial DB - form element relationship will
-     * want to override this.
-     */
-    protected function data_preprocessing_extra_answer_field($answer, $field) {
-        return $answer->$field;
-    }
-
     protected function get_hint_fields($withclearwrong = false, $withshownumpartscorrect = false) {
         $mform = $this->_form;
         list($repeated, $repeatedoptions) = parent::get_hint_fields($withclearwrong, $withshownumpartscorrect);
@@ -240,7 +124,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         $mform->addHelpButton('usecharhint', 'usecharhint', 'qtype_preg');
         $mform->addElement('text', 'charhintpenalty', get_string('charhintpenalty', 'qtype_preg'), array('size' => 3));
         $mform->setDefault('charhintpenalty', '0.2');
-        $mform->setType('charhintpenalty', PARAM_NUMBER);
+        $mform->setType('charhintpenalty', PARAM_FLOAT);
         $mform->addHelpButton('charhintpenalty', 'charhintpenalty', 'qtype_preg');
 
         $mform->addElement('selectyesno', 'uselexemhint', get_string('uselexemhint', 'qtype_preg'));
@@ -248,7 +132,7 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         $mform->addHelpButton('uselexemhint', 'uselexemhint', 'qtype_preg');
         $mform->addElement('text', 'lexemhintpenalty', get_string('lexemhintpenalty', 'qtype_preg'), array('size' => 3));
         $mform->setDefault('lexemhintpenalty', '0.4');
-        $mform->setType('lexemhintpenalty', PARAM_NUMBER);
+        $mform->setType('lexemhintpenalty', PARAM_FLOAT);
         $mform->addHelpButton('lexemhintpenalty', 'lexemhintpenalty', 'qtype_preg');
 
         // Fetch course context if it is possible.
@@ -272,8 +156,8 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         $mform->setAdvanced('lexemusername');
         $mform->setType('lexemusername', PARAM_TEXT);
 
-        $creategrades = get_grade_options();
-        $mform->addElement('select', 'hintgradeborder', get_string('hintgradeborder', 'qtype_preg'), $creategrades->gradeoptions);
+        $gradeoptions = question_bank::fraction_options();
+        $mform->addElement('select', 'hintgradeborder', get_string('hintgradeborder', 'qtype_preg'), $gradeoptions);
         $mform->setDefault('hintgradeborder', 1);
         $mform->addHelpButton('hintgradeborder', 'hintgradeborder', 'qtype_preg');
         $mform->setAdvanced('hintgradeborder');
@@ -386,13 +270,14 @@ class qtype_preg_edit_form extends qtype_shortanswer_edit_form {
         }
 
         // Check that interactive hint settings doesn't contradict overall hint settings.
-        $langobj = block_formal_langs::lang_object($data['langid']);
         $interactivehints = $data['interactivehint'];
         foreach($interactivehints as $key => $hint) {
             if ($hint == 'hintnextchar' && $data['usecharhint'] != true) {
                 $errors['interactivehint['.$key.']'] = get_string('unallowedhint', 'qtype_preg', get_string('hintnextchar', 'qtype_preg'));
             }
             if ($hint == 'hintnextlexem' && $data['uselexemhint'] != true) {
+                $langs = block_formal_langs::available_langs();
+                $langobj = block_formal_langs::lang_object(array_keys($langs)[0]);
                 $errors['interactivehint['.$key.']'] = get_string('unallowedhint', 'qtype_preg', get_string('hintnextlexem', 'qtype_preg', $langobj->lexem_name()));
             }
         }

@@ -29,6 +29,7 @@
 
 
 defined('MOODLE_INTERNAL') || die();
+global $CFG;
 require_once($CFG->dirroot . '/question/type/questionbase.php');
 
 /**
@@ -77,7 +78,7 @@ interface behaviour_with_hints {
      */
     public function adjust_hints($hints);
 }
-
+//TODO - MOVED IN NAMESPACE, DELETE IN 2.9
 /**
  * Base class for question-type specific hints
  *
@@ -188,7 +189,7 @@ abstract class qtype_specific_hint {
      */
     abstract public function render_hint($renderer, question_attempt $qa, question_display_options $options, $response = null);
 }
-
+//TODO - MOVED IN NAMESPACE, DELETE IN 2.9
 /**
  * Class for compatibility with Moodle teacher-defined text and other hints
  *
@@ -240,7 +241,7 @@ class qtype_poasquestion_hintmoodle extends qtype_specific_hint {
         return $this->question->format_hint($hint, $qa);
     }
 }
-
+//TODO - MOVED IN NAMESPACE, DELETE IN 2.9
 /**
  * A special class for compatibility with interactivehints behaviour
  *

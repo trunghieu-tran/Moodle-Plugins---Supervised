@@ -56,8 +56,8 @@ function xmldb_block_formal_langs_install() {
 
     $lang = new stdClass();
     $lang->uiname = 'C++ programming language';
-    $lang->description = 'C++ language, with only lexer. One-line comments not supported';
-    $lang->name = 'cpp_language';
+    $lang->description = 'C++ language with basic preprocessor support';
+    $lang->name = 'cpp_parseable_language';
     $lang->scanrules = null;
     $lang->parserules = null;
     $lang->version='1.0';
@@ -95,6 +95,17 @@ function xmldb_block_formal_langs_install() {
     $lang->lexemname = '';
     $lang->version='1.0';
     $lang->visible = 1;
+    $lang = new stdClass();
+    $lang->ui_name = 'C formatting string rules';
+    $lang->description = 'C formatting string rules, as used in printf';
+    $lang->name = 'printf_language';
+    $lang->scanrules = null;
+    $lang->parserules = null;
+    $lang->version='1.0';
+    $lang->visible = 1;
+    $lang->lexemname = '';
+
+    $DB->insert_record('block_formal_langs',$lang);
 	
     $DB->insert_record('block_formal_langs',$lang);
 	*/

@@ -64,7 +64,7 @@ abstract class qtype_preg_syntax_tree_node {
     /**
      * Returns true if this node is supported, rejection string otherwise.
      */
-    public function accept() {
+    public function accept($options) {
         return true; // Accepting anything by default.
     }
 
@@ -439,6 +439,26 @@ class qtype_preg_syntax_tree_leaf_options extends qtype_preg_syntax_tree_leaf {
     }
 }
 
+class qtype_preg_syntax_tree_leaf_template extends qtype_preg_syntax_tree_leaf {
+
+    public function tooltip() {
+        $available = qtype_preg\template::available_templates();
+        if ($this->pregnode->name != '' && array_key_exists($this->pregnode->name, $available)) {
+            return get_string('leaf_template', 'qtype_preg') . '&#10;' . get_string('description_template_' . $this->pregnode->name, 'qtype_preg');
+        }
+
+        return 'unknown template';
+    }
+
+    public function shape_color() {
+        $available = qtype_preg\template::available_templates();
+        if ($this->pregnode->name != '' && array_key_exists($this->pregnode->name, $available)) {
+            return 'blue';
+        }
+        return 'red';
+    }
+}
+
 class qtype_preg_syntax_tree_node_quant extends qtype_preg_syntax_tree_operator {
 
     public function tooltip() {
@@ -483,7 +503,7 @@ class qtype_preg_syntax_tree_node_subexpr extends qtype_preg_syntax_tree_operato
 
     public function tooltip() {
         $result = get_string($this->pregnode->lang_key(true), 'qtype_preg', $this->pregnode);
-        $result = qtype_poasquestion_string::replace(': [ {$a->firstoperand} ]', '', $result);
+        $result = qtype_poasquestion\string::replace(': [ {$a->firstoperand} ]', '', $result);
         return $result;
     }
 }
@@ -510,5 +530,42 @@ class qtype_preg_syntax_tree_node_error extends qtype_preg_syntax_tree_operator 
 
     public function shape_color() {
         return 'red';
+    }
+}
+
+class qtype_preg_syntax_tree_node_template extends qtype_preg_syntax_tree_operator {
+
+    public function label() {
+        return parent::label() . '...(?:###>)';
+    }
+
+    public function tooltip() {
+        $available = qtype_preg\template::available_templates();
+        if ($this->pregnode->name != '' && array_key_exists($this->pregnode->name, $available)) {
+            return get_string('node_template', 'qtype_preg') . '&#10;' . get_string('description_template_' . $this->pregnode->name, 'qtype_preg');
+        }
+
+        return 'unknown template';
+    }
+
+    public function shape_color() {
+        $available = qtype_preg\template::available_templates();
+        if ($this->pregnode->name != '' && array_key_exists($this->pregnode->name, $available)) {
+            return 'blue';
+        }
+        return 'red';
+    }
+
+    public function label_for_edge($operand) {
+        if (count($this->operands) < 2) {
+            return '';
+        }
+        $available = qtype_preg\template::available_templates();
+        $parametersdescription = null;
+        if ($this->pregnode->name != '' && array_key_exists($this->pregnode->name, $available)) {
+            $parametersdescription = $available[$this->pregnode->name]->get_parametersdescription();
+        }
+        $j = array_search($operand, $this->operands);
+        return $parametersdescription === null ? get_string('explain_parameter', 'qtype_preg') :  $parametersdescription[$j];
     }
 }

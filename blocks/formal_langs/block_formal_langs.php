@@ -131,6 +131,45 @@ class block_formal_langs extends block_list {
     }
 
     /**
+     * Finds or insers language definition.
+     * All fields must be set
+     * @param array $language as tuple <ui_name, description, name, scanrules, parserules, version visible>.
+     * @return int id of inserted language
+     */
+    public static function find_or_insert_language($language) {
+        global $DB;
+        // Seek for language and insert it if not found, handling some error stuff
+        // Also cannot compare strings in some common case.
+        $sql = 'SELECT id
+                      FROM {block_formal_langs}
+                     WHERE ';
+        $filternames = array('name', 'version');
+        $filtervalues = array($language['name'], $language['version']);
+        if ($language['scanrules'] != null || $language['parserules'] != null) {
+            $filternames[] = 'scanrules';
+            $filternames[] = 'parserules';
+            $filtervalues[]  = $language['scanrules'] ;
+            $filtervalues[]  = $language['parserules'];
+        }
+        // Transform columns into sql comparisons
+        $sqlfilternames = array();
+        foreach($filternames as $name) {
+            $sqlfilternames[] = $DB->sql_compare_text($name, 512) . ' = ' . $DB->sql_compare_text('?', 512);
+        }
+        // Build actual sql request
+        $sql .= implode(' AND ', $sqlfilternames);
+        $sql .= ';';
+
+        $record = $DB->get_record_sql($sql, $filtervalues);
+        if ($record == false) {
+            $result = $DB->insert_record('block_formal_langs', $language);
+        } else {
+            $result = $record->id;
+        }
+        return $result;
+    }
+
+    /**
      * Finds or inserts language definition.
      * All fields must be set
      * @param array $language as tuple <ui_name, description, name, scanrules, parserules, version visible>.
@@ -215,7 +254,7 @@ class block_formal_langs extends block_list {
         //  Fetch languages
         $languagerecords = $DB->get_records('block_formal_langs', array());
         //  Fetch global permissions
-        if (textlib::strlen($showedlanguages) != 0)
+        if (core_text::strlen($showedlanguages) != 0)
         {
             $showedarray = explode(',', $showedlanguages);
             $showall = false;
@@ -455,7 +494,7 @@ class block_formal_langs extends block_list {
             }
 
             $editlinks = '';
-            $caneditlang = $this->page->user_is_editing() && textlib::strlen($permission->scanrules) != 0;
+            $caneditlang = $this->page->user_is_editing() && core_text::strlen($permission->scanrules) != 0;
             $caneditlang =  $caneditlang && ($caneditall || ($caneditown && $permission->author == $USER->id));
             if ($caneditlang) {
                 $editlink = $CFG->wwwroot . '/blocks/formal_langs/edit.php?id=' . $permission->id . '&context=' . $context->id;

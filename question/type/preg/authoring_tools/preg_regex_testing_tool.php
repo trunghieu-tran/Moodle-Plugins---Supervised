@@ -35,6 +35,8 @@ class qtype_preg_regex_testing_tool implements qtype_preg_i_authoring_tool {
     private $errormsgs = null;
 
     public function __construct($regex, $strings, $usecase, $exactmatch, $engine, $notation, $selection) {
+        global $CFG;
+
         $this->regex = $regex;
         $this->engine = $engine;
         $this->notation = $notation;
@@ -62,6 +64,7 @@ class qtype_preg_regex_testing_tool implements qtype_preg_i_authoring_tool {
         $matchingoptions->notation = $notation;
         $matchingoptions->exactmatch = $exactmatch;
         $matchingoptions->selection = $selection;
+        $matchingoptions->mergeassertions = $CFG->qtype_preg_assertfailmode;
         $engineclass = 'qtype_preg_' . $engine;
         $matcher = new $engineclass($regex, $matchingoptions);
         if ($matcher->errors_exist()) {
@@ -117,7 +120,11 @@ class qtype_preg_regex_testing_tool implements qtype_preg_i_authoring_tool {
         $result = '';
         foreach ($strings as $string) {
             $matchresults = $this->matcher->match($string);
-            $result .= $hintmatch->render_colored_string_by_matchresults($renderer, $matchresults, true) . '<br />';
+            $hintmessage = $hintmatch->render_colored_string_by_matchresults($renderer, $matchresults, true);
+            if (!empty($string)) {
+                $hintmessage = html_writer::tag('span', $hintmessage, array('id' => 'qtype-preg-colored-string'));
+            }
+            $result .=  $hintmessage . html_writer::empty_tag('br');
         }
         return $result;
     }

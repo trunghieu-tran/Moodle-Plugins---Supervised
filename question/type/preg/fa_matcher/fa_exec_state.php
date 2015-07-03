@@ -28,52 +28,30 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/fa_matcher/fa_nodes.php');
 
-/**
- * Represents an execution state of an fa.
- */
-class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
+class qtype_preg_fa_stack_item {
 
-    // Indicates that this state is a full match state.
-    const FLAG_FULL = 0x01;
-    // Indicates that this state had \A or ^ transition.
-    const FLAG_VISITED_START_ANCHOR = 0x02;
-    // Indicates that this state had \Z \z or $ transition.
-    const FLAG_VISITED_END_ANCHOR   = 0x04;
+    // The subexpression number being matched.
+    public $subexpr;
 
-    // FA being executed.
-    public $matcher;
-
-    // Level of recursion
-    public $recursionlevel;
+    // Position where recursion was started.
+    public $recursionstartpos;
 
     // The corresponding fa state.
     public $state;
+
+    // Is the match full.
+    public $full;
+
+    // Bitwise union of qtype_preg_leaf NEXT_CHAR_XXX flags.
+    public $next_char_flags;
 
     // 2-dimensional array of matches; 1st is subpattern number; 2nd is repetitions of the subpattern.
     // Each subpattern is initialized with (-1,-1) at start.
     public $matches;
 
-    // Starting position of the match.
-    public $startpos;
-
-    // Length of the match.
-    public $length;
-
     // Array used mostly for disambiguation when there are duplicate subpexpressions numbers.
     // Keys are subexpr numbers, values are qtype_preg_node objects.
     public $subexpr_to_subpatt;
-
-    // Bitwise union of the above constants.
-    public $flags;
-
-    // How many characters left for full match?
-    public $left;
-
-    // Match extension in case of partial match. An object of this same class.
-    public $extendedmatch;
-
-    // String being captured and/or generated.
-    public $str;
 
     // The last transition matched.
     public $last_transition;
@@ -81,75 +59,33 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
     // Length of the last match.
     public $last_match_len;
 
-    // States to backtrack to when generating extensions of partial matches.
-    public $backtrack_states;
+    // Was the last transition matched partially? E.g. backreference, or a few merged transitions
+    public $last_match_is_partial;
 
-    public function __clone() {
-        $this->str = clone $this->str;  // Needs to be cloned for correct string generation.
-    }
-
-    public static function empty_subpatt_match() {
-        return array(qtype_preg_matching_results::NO_MATCH_FOUND, qtype_preg_matching_results::NO_MATCH_FOUND);
-    }
-
-    public static function is_being_captured($index, $length) {
-        return ($index != qtype_preg_matching_results::NO_MATCH_FOUND && $length == qtype_preg_matching_results::NO_MATCH_FOUND);
-    }
-
-    public function set_flag($flag) {
-        $this->flags = ($this->flags | $flag);
-    }
-
-    public function unset_flag($flag) {
-        $flag = ~$flag;
-        $this->flags = ($this->flags & $flag);
-    }
-
-    public function is_flag_set($flag) {
-        return ($this->flags & $flag) != 0;
-    }
-
-    public function set_full($value) {
-        if ($value) {
-            $this->set_flag(self::FLAG_FULL);
-        } else {
-            $this->unset_flag(self::FLAG_FULL);
-        }
-    }
-
-    public function is_full() {
-        return $this->is_flag_set(self::FLAG_FULL);
-    }
-
-    public function root_subpatt_number() {
-        return $this->matcher->get_ast_root()->subpattern;
-    }
-
-    // Returns the current match for the given subpattern number. If there was no attemt to match, returns null.
     public function current_match($subpatt) {
-        if (!isset($this->matches[$subpatt])) {
-            return null;
-        }
-        return end($this->matches[$subpatt]);
+        return isset($this->matches[$subpatt]) ? end($this->matches[$subpatt]) : null;
     }
 
-    // Sets the current match for the given subpattern number.
     public function set_current_match($subpatt, $index, $length) {
         if (!array_key_exists($subpatt, $this->matches)) {
-            // Can get here when matching recursive patterns
             return;
         }
         $count = count($this->matches[$subpatt]);
         $this->matches[$subpatt][$count - 1] = array($index, $length);
     }
 
-    // Returns the last match for the given subpattern number. This function has different behaviour in PCRE and POSIX mode.
-    // If there was no attemt to match, returns null.
-    protected function last_match($subpatt) {
-        if ($this->matcher->get_options()->mode == qtype_preg_handling_options::MODE_POSIX) {
-            return $this->current_match($subpatt);
+    public function last_match($mode, $subpatt) {
+        // POSIX mode
+        if ($mode === qtype_preg_handling_options::MODE_POSIX) {
+            $result = $this->current_match($subpatt);
+            if ($result === null) {
+                return null;
+            }
+            return qtype_preg_fa_exec_state::is_being_captured($result[0], $result[1]) ? qtype_preg_fa_exec_state::empty_subpatt_match()
+                                                                                       : $result;
         }
 
+        // PCRE mode
         if (!isset($this->matches[$subpatt])) {
             return null;
         }
@@ -157,142 +93,53 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
         $matches = $this->matches[$subpatt];
         $count = count($matches);
 
-        // It's a tricky part. PCRE uses last successful match for situations like "(a|b\1)*" and string "ababbabbba".
-        // Hence we need to iterate from the last to the first repetitions until a match found.
+        // It's a tricky thing. PCRE uses last successful match for situations like "(a|b\1)*" and string "ababbabbba".
+        // So we need to iterate from the last to the first repetitions until a match found.
         for ($i = $count - 1; $i >= 0; $i--) {
             $cur = $matches[$i];
-            if ($cur[0] != qtype_preg_matching_results::NO_MATCH_FOUND && $cur[1] != qtype_preg_matching_results::NO_MATCH_FOUND) {
+            if (qtype_preg_fa_exec_state::is_completely_captured($cur[0], $cur[1])) {
                 return $cur;
             }
         }
-        return self::empty_subpatt_match();
+
+        return qtype_preg_fa_exec_state::empty_subpatt_match();
     }
 
-    // Checks if this state equals another
-    /*public function equals($to) {
-        if ($this->state !== $to->state) {
-            return false;
-        }
-        if (!$this->matcher->get_options()->capturesubexpressions) {
-            return $this->length == $to->length;
-        }
-        foreach ($this->matches as $key => $repetitions) {
-            if ($this->current_match($key) !== $to->current_match($key)) {
-                return false;
-            }
-        }
-        return true;
-    }*/
-
-    protected function find_dup_subexpr_match($subexpr) {
-        if ($subexpr == 0) {
-            return array($this->startpos, $this->length);
-        }
+    public function last_subexpr_match($mode, $subexpr) {
         if (!isset($this->subexpr_to_subpatt[$subexpr])) {
-            // Can get here when {0} occurs in the regex.
-            return self::empty_subpatt_match();
+            return null;
         }
         $subpatt = $this->subexpr_to_subpatt[$subexpr]->subpattern;
-        $last = $this->last_match($subpatt);
-        if (!self::is_being_captured($last[0], $last[1])) {
+        $last = $this->last_match($mode, $subpatt);
+        if (qtype_preg_fa_exec_state::is_completely_captured($last[0], $last[1])) {
             return $last;
         }
-        return self::empty_subpatt_match();
+        return qtype_preg_fa_exec_state::empty_subpatt_match();
     }
 
-    public function is_subexpr_opened($subexpr) {
-        return array_key_exists($subexpr, $this->subexpr_to_subpatt);
-    }
-
-    public function has_duplicate_subexpression() {
-        foreach ($this->subexpr_to_subpatt as $node) {
-            if ($node->type == qtype_preg_node::TYPE_NODE_SUBEXPR && $node->isduplicate) {
-                return true;
-            }
+    public function is_subexpr_match_started($subexpr) {
+        if (!isset($this->subexpr_to_subpatt[$subexpr])) {
+            return false;
         }
-        return false;
-    }
-
-    public function index_first($subexpr = 0) {
-        $last = $this->find_dup_subexpr_match($subexpr);
-        return $last[0];
-    }
-
-    public function length($subexpr = 0) {
-        $last = $this->find_dup_subexpr_match($subexpr);
-        return $last[1];
-    }
-
-    public function is_subexpr_captured($subexpr) {
-        $last = $this->find_dup_subexpr_match($subexpr);
-        return $last[1] != qtype_preg_matching_results::NO_MATCH_FOUND;
-    }
-
-    public function match_from_pos_internal($str, $startpos, $subexpr = 0, $recursionlevel = 0) {
-        return $this->matcher->match_from_pos_internal($str, $startpos, $subexpr, $recursionlevel);
-    }
-
-    public function start_pos() {
-        return $this->startpos;
-    }
-
-    public function recursion_level() {
-        return $this->recursionlevel;
-    }
-
-    public function to_matching_results() {
-        $index = array();
-        $length = array();
-        $subexprs = array(-2);
-        for ($subexpr = 0; $subexpr <= $this->matcher->get_max_subexpr(); $subexpr++) {
-            $subexprs[] = $subexpr;
-        }
-        foreach ($subexprs as $subexpr) {
-            if (!isset($this->subexpr_to_subpatt[$subexpr])) {
-                // Can get here when {0} occurs in the regex.
-                $index[$subexpr] = qtype_preg_matching_results::NO_MATCH_FOUND;
-                $length[$subexpr] = qtype_preg_matching_results::NO_MATCH_FOUND;
-            } else {
-                $subpatt = $this->subexpr_to_subpatt[$subexpr]->subpattern;
-                $match = $this->last_match($subpatt);
-                if ($match[1] != qtype_preg_matching_results::NO_MATCH_FOUND) {
-                    $index[$subexpr] = $match[0];
-                    $length[$subexpr] = $match[1];
-                } else {
-                    $index[$subexpr] = qtype_preg_matching_results::NO_MATCH_FOUND;
-                    $length[$subexpr] = qtype_preg_matching_results::NO_MATCH_FOUND;
-                }
-            }
-        }
-        if ($length[-2] == qtype_preg_matching_results::NO_MATCH_FOUND) {
-            $cur = $this->current_match(-2);
-            if ($cur !== null && $cur[0] != qtype_preg_matching_results::NO_MATCH_FOUND) {
-                $index[-2] = $cur[0];
-                $length[-2] = $this->length - $cur[0];
-            }
-        }
-        $index[0] = $this->startpos;
-        $length[0] = $this->length;
-        $result = new qtype_preg_matching_results($this->is_full(), $index, $length, $this->left, $this->extendedmatch);
-        $result->set_source_info($this->str, $this->matcher->get_max_subexpr(), $this->matcher->get_subexpr_map());
-        return $result;
+        $current = $this->current_match($this->subexpr_to_subpatt[$subexpr]->subpattern);
+        return ($current !== null && $current[0] !== qtype_preg_matching_results::NO_MATCH_FOUND);
     }
 
     /**
      * Resets the given subpattern to no match.
      */
-    public function begin_subpatt_iteration($node) {
-        if (!$this->matcher->get_options()->capturesubexpressions && $node->subpattern != $this->root_subpatt_number()) {
+    protected function begin_subpatt_iteration($node, $matcher) {
+        if (!$matcher->get_options()->capturesubexpressions && $node->subpattern !== $matcher->get_ast_root()->subpattern) {
             return;
         }
 
         $nodes = array($node);
-        if ($this->matcher->get_options()->capturesubexpressions) {
-            $nodes = array_merge($nodes, $this->matcher->get_nested_nodes($node->subpattern));
+        if ($matcher->get_options()->capturesubexpressions) {
+            $nodes = array_merge($nodes, $matcher->get_nested_nodes($node->subpattern));
         }
 
         foreach ($nodes as $node) {
-            if ($node->subpattern == -1) {
+            if ($node->subpattern === -1) {
                 continue;
             }
 
@@ -302,11 +149,60 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
                 $this->matches[$node->subpattern] = array(); // Very first iteration.
             }
 
-            if ($cur[0] == qtype_preg_matching_results::NO_MATCH_FOUND && $cur[1] == qtype_preg_matching_results::NO_MATCH_FOUND) {
+            if ($cur[0] === qtype_preg_matching_results::NO_MATCH_FOUND && $cur[1] === qtype_preg_matching_results::NO_MATCH_FOUND) {
                 continue;   // The new iteration is already started.
             }
 
-            $this->matches[$node->subpattern][] = self::empty_subpatt_match();
+            $this->matches[$node->subpattern][] = qtype_preg_fa_exec_state::empty_subpatt_match();
+        }
+    }
+
+    public function write_tag_values($transition, $strpos, $matchlen, $matcher) {
+        // Begin a new iteration of a subpattern. All "bigger" (inner) subpatterns will start a new iteration recursively.
+        if ($transition->minopentag !== null) {
+            $this->begin_subpatt_iteration($transition->minopentag, $matcher);
+        }
+
+        $options = $matcher->get_options();
+
+        // Set matches to ($strpos, -1) for the new iteration.
+        foreach ($transition->opentags as $tag) {
+            if (!$options->capturesubexpressions && $tag->subpattern !== $matcher->get_ast_root()->subpattern) {
+                continue;
+            }
+            // Starting indexes are always the same, equal $strpos
+            $index = $strpos;
+            $this->set_current_match($tag->subpattern, $index, qtype_preg_matching_results::NO_MATCH_FOUND);
+            //echo "open tag {$tag->subpattern}: ($index, -1)\n";
+        }
+
+        // Set matches to ($strpos, length) for the ending iterations.
+        foreach ($transition->closetags as $tag) {
+            if (!$options->capturesubexpressions && $tag->subpattern !== $matcher->get_ast_root()->subpattern) {
+                continue;
+            }
+            $current_match = $this->current_match($tag->subpattern);
+            $index = $current_match[0];
+            $length = $strpos - $index + $matchlen;
+            if ($index !== qtype_preg_matching_results::NO_MATCH_FOUND) {
+                $this->set_current_match($tag->subpattern, $index, $length);
+                //echo "close tag {$tag->subpattern}: ($index, $length)\n";
+            }
+        }
+
+        // Some stuff for subexpressions.
+        foreach ($transition->opentags as $tag) {
+            if ($tag->subtype !== qtype_preg_node_subexpr::SUBTYPE_SUBEXPR) {
+                continue;
+            }
+            if (!$options->capturesubexpressions && $tag->subpattern !== $matcher->get_ast_root()->subpattern) {
+                continue;
+            }
+            $this->subexpr_to_subpatt[$tag->number] = $tag;
+            //echo "subexpr {$tag->number} is subpatt {$tag->subpattern}\n";
+            if ($tag->name !== null && !array_key_exists($tag->name, $this->subexpr_to_subpatt)) {  // Don't overwrite existing string keys
+                $this->subexpr_to_subpatt[$tag->name] = $tag;
+            }
         }
     }
 
@@ -322,9 +218,352 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
             for ($i = $count - 1; $i > 0; $i--) {
                 $penult = $repetitions[$i - 1];
                 $last = $repetitions[$i];
-                if ($last[1] != qtype_preg_matching_results::NO_MATCH_FOUND && $penult == $last) {
+                if ($penult === $last) {
                     return true;
                 }
+            }
+        }
+        return false;
+    }
+
+    public function subpatts_to_string() {
+        $res = '';
+        foreach ($this->matches as $subpatt => $repetitions) {
+            $res .= $subpatt . ': ';
+            foreach ($repetitions as $repetition) {
+                $ind = $repetition[0];
+                $len = $repetition[1];
+                $res .= "($ind, $len) ";
+            }
+            $res .= "\n";
+        }
+        return $res;
+    }
+
+    public function subexprs_to_string($mode) {
+        $res = '';
+        foreach ($this->subexpr_to_subpatt as $subexpr => $node) {
+            $lastmatch = $this->last_subexpr_match($mode, $node->subpattern);
+            $ind = $lastmatch[0];
+            $len = $lastmatch[1];
+            $res .= $subexpr . ": ($ind, $len) ";
+        }
+        $res .= "\n";
+        return $res;
+    }
+}
+
+/**
+ * Represents an execution state of an fa.
+ */
+class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
+
+    // FA being executed.
+    public $matcher;
+
+    // Starting position of the match.
+    public $startpos;
+
+    // Length of the match.
+    public $length;
+
+    // How many characters left for full match?
+    public $left;
+
+    // Match extension in case of partial match. An object of this same class.
+    public $extendedmatch;
+
+    // String being captured and/or generated.
+    public $str;
+
+    // Array of qtype_preg_fa_stack_item objects
+    public $stack;
+
+    // States to backtrack to when generating extensions of partial matches.
+    public $backtrack_states;
+
+    public function __clone() {
+        $this->str = clone $this->str;  // Needs to be cloned for correct string generation.
+        foreach ($this->stack as $key => $item) {
+            $this->stack[$key] = clone $item;
+        }
+    }
+
+    public static function empty_subpatt_match() {
+        return array(qtype_preg_matching_results::NO_MATCH_FOUND, qtype_preg_matching_results::NO_MATCH_FOUND);
+    }
+
+    public static function is_being_captured($index, $length) {
+        return $index !== qtype_preg_matching_results::NO_MATCH_FOUND && $length === qtype_preg_matching_results::NO_MATCH_FOUND;
+    }
+
+    public static function is_completely_captured($index, $length) {
+        return $index !== qtype_preg_matching_results::NO_MATCH_FOUND && $length !== qtype_preg_matching_results::NO_MATCH_FOUND;
+    }
+
+/// wrapper functions
+
+    public function subexpr() {
+        $end = end($this->stack);
+        return $end->subexpr;
+    }
+
+    public function recursion_level() {
+        return count($this->stack) - 1;
+    }
+
+    public function state() {
+        $end = end($this->stack);
+        return $end->state;
+    }
+
+    public function set_state($value) {
+        $end = end($this->stack);
+        $end->state = $value;
+    }
+
+    public function last_transition() {
+        $end = end($this->stack);
+        return $end->last_transition;
+    }
+
+    public function set_last_transition($value) {
+        $end = end($this->stack);
+        $end->last_transition = $value;
+    }
+
+    public function last_match_len() {
+        $end = end($this->stack);
+        return $end->last_match_len;
+    }
+
+    public function set_last_match_len($value) {
+        $end = end($this->stack);
+        $end->last_match_len = $value;
+    }
+
+    public function last_match_is_partial() {
+        $end = end($this->stack);
+        return $end->last_match_is_partial;
+    }
+
+    public function set_last_match_is_partial($value) {
+        $end = end($this->stack);
+        $end->last_match_is_partial = $value;
+    }
+
+    public function set_flag($flag) {
+        $end = end($this->stack);
+        $end->next_char_flags = ($end->next_char_flags | $flag);
+    }
+
+    public function unset_flag($flag) {
+        $flag = ~$flag;
+        $end = end($this->stack);
+        $end->next_char_flags = ($end->next_char_flags & $flag);
+    }
+
+    public function is_flag_set($flag) {
+        $end = end($this->stack);
+        return ($end->next_char_flags & $flag) !== 0;
+    }
+
+    public function set_full($value) {
+        $end = end($this->stack);
+        $end->full = $value;
+    }
+
+    public function is_full() {
+        $end = end($this->stack);
+        return $end->full;
+    }
+
+///
+
+    /**
+     * Returns the current match for the given subpattern number. If there was no attemt to match, returns null.
+     * @param subpatt - subpattern number.
+     * @param wholestack - should we scan the whole stack, or just the top item.
+     */
+    protected function current_match($subpatt/*, $wholestack = false*/) {
+        $array = /*$wholestack
+               ? array_reverse($this->stack)
+               :*/ array(end($this->stack));
+        foreach ($array as $item) {
+            $tmp = $item->current_match($subpatt);
+            if ($tmp !== null) {
+                return $tmp;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Sets the current match for the given subpattern number. Always works with the top stack item.
+     */
+    protected function set_current_match($subpatt, $index, $length) {
+        $end = end($this->stack);
+        $end->set_current_match($subpatt, $index, $length);
+    }
+
+    /**
+     * Returns the last successfull match for the given subpattern.
+     * Behaves differently in PCRE and POSIX modes.
+     * If there was no attemt to match, returns null.
+     * @param subpatt - subpattern number.
+     * @param wholestack - should we scan the whole stack, or just the top item.
+     */
+    protected function last_match($subpatt/*, $wholestack = false*/) {
+        if ($this->matcher->get_options()->mode === qtype_preg_handling_options::MODE_POSIX) {
+            $result = $this->current_match($subpatt/*, $wholestack*/);
+            if ($result === null) {
+                return null;
+            }
+            return self::is_being_captured($result[0], $result[1]) ? self::empty_subpatt_match()
+                                                                   : $result;
+        }
+
+        $array =/* $wholestack
+               ? array_reverse($this->stack)
+               :*/ array(end($this->stack));
+
+        $hasattempts = false;
+
+        foreach ($array as $item) {
+            $cur = $item->last_match($this->matcher->get_options()->mode, $subpatt);
+            $hasattempts = $hasattempts || ($cur !== null);
+            if (self::is_completely_captured($cur[0], $cur[1])) {
+                return $cur;
+            }
+        }
+
+        return $hasattempts ? self::empty_subpatt_match() : null;
+    }
+
+    protected function last_subexpr_match($subexpr) {
+        $array = array_reverse($this->stack);
+
+        $hasattempts = false;
+
+        foreach ($array as $item) {
+            $cur = $item->last_subexpr_match($this->matcher->get_options()->mode, $subexpr);
+            $hasattempts = $hasattempts || ($cur !== null);
+            if (self::is_completely_captured($cur[0], $cur[1])) {
+                return $cur;
+            }
+        }
+
+        return $hasattempts ? self::empty_subpatt_match() : null;
+    }
+
+    public function is_subexpr_match_started($subexpr) {
+        $end = end($this->stack);
+        if ($subexpr == 0 && $end->subexpr == 0) {
+            return true;
+        }
+        return $end->is_subexpr_match_started($subexpr);
+    }
+
+    public function start_pos() {
+        return $this->startpos;
+    }
+
+    public function index_first($subexpr = 0) {
+        $last = $this->last_subexpr_match($subexpr);
+        return $last === null ? qtype_preg_matching_results::NO_MATCH_FOUND
+                              : $last[0];
+    }
+
+    public function length($subexpr = 0) {
+        $last = $this->last_subexpr_match($subexpr);
+        return $last === null ? qtype_preg_matching_results::NO_MATCH_FOUND
+                              : $last[1];
+    }
+
+    public function is_subexpr_captured($subexpr = 0) {
+        $last = $this->last_subexpr_match($subexpr);
+        return $last !== null && self::is_completely_captured($last[0], $last[1]);
+    }
+
+    public function is_subexpr_captured_top($subexpr = 0) {
+        $end = end($this->stack);
+        $last = $end->last_subexpr_match($this->matcher->get_options()->mode, $subexpr);
+        return $last !== null && self::is_completely_captured($last[0], $last[1]);
+    }
+
+    public function is_recursion($subexpr = 0) {
+        if ($this->recursion_level() === 0) {
+            return false;
+        }
+        return $subexpr === 0 || $this->subexpr() === $subexpr; // (R) or (R0) means any recoursive call
+    }
+
+    /**
+     * Helper method to detect the actual length without leading and trailing non-consuming transitions;
+     */
+    public function length_minus_nonconsuming() {
+        $subpatt = $this->matcher->get_ast_root()->subpattern;
+        if (!isset($this->stack[0]->matches[$subpatt])) {
+            return 0;   // Ain't no match at all!!!
+        }
+
+        $tmp = $this->stack[0]->matches[$subpatt][0];
+        $transition = $this->last_transition();
+        $firstskippedcount = $tmp[0] - $this->startpos;
+        $lastskippedcount = ($transition === null || $transition->consumeschars)
+                          ? 0
+                          : $this->last_match_len();
+        return $this->length - $firstskippedcount - $lastskippedcount;
+    }
+
+    public function to_matching_results() {
+        $index = array();
+        $length = array();
+        $subexprs = array(-2);
+        for ($subexpr = 0; $subexpr <= $this->matcher->get_max_subexpr(); $subexpr++) {
+            $subexprs[] = $subexpr;
+        }
+        // The following loop will set all subexpre to either full match or no match.
+        foreach ($subexprs as $subexpr) {
+            $match = $this->last_subexpr_match($subexpr);
+            if ($match !== null && self::is_completely_captured($match[0], $match[1])) {
+                $index[$subexpr] = $match[0];
+                $length[$subexpr] = $match[1];
+            } else {
+                $index[$subexpr] = qtype_preg_matching_results::NO_MATCH_FOUND;
+                $length[$subexpr] = qtype_preg_matching_results::NO_MATCH_FOUND;
+            }
+        }
+
+        // Some stuff for partial matches.
+        //$firstskippedcount = 0;
+        if ($length[0] === qtype_preg_matching_results::NO_MATCH_FOUND) {
+            $cur = $this->current_match(0);
+            if ($cur !== null && $cur[0] !== qtype_preg_matching_results::NO_MATCH_FOUND) {
+                //$firstskippedcount = $cur[0] - $this->startpos;
+                $index[0] = $cur[0];
+                $length[0] = $this->length_minus_nonconsuming();
+            }
+        }
+        if ($length[-2] === qtype_preg_matching_results::NO_MATCH_FOUND) {
+            $cur = $this->current_match(-2);
+            if ($cur !== null && $cur[0] !== qtype_preg_matching_results::NO_MATCH_FOUND) {
+                $index[-2] = $cur[0];
+                $length[-2] = $this->length_minus_nonconsuming() - $cur[0];
+            }
+        }
+        $result = new qtype_preg_matching_results($this->is_full(), $index, $length, $this->left, $this->extendedmatch);
+        $result->set_source_info($this->str, $this->matcher->get_max_subexpr(), $this->matcher->get_subexpr_name_to_number_map());
+        return $result;
+    }
+
+    /**
+     * Checks if this state contains null iterations, for example \b*. Such states should be skipped during matching.
+     */
+    public function has_null_iterations() {
+        foreach ($this->stack as $stackitem) {
+            if ($stackitem->has_null_iterations()) {
+                return true;
             }
         }
         return false;
@@ -338,6 +577,7 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
         //echo $this->subpatts_to_string();
         //echo "vs\n";
         //echo $other->subpatts_to_string();
+
         // Check for full match.
         if ($this->is_full() && !$other->is_full()) {
             //echo "wins 1\n";
@@ -347,11 +587,33 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
             return false;
         }
 
+        // Choose the leftmost match
+        // Indices for the whole regex can differ when assertions merging is turned on.
+        $this_index = isset($this->stack[0]->matches[$this->matcher->get_ast_root()->subpattern])
+                    ? $this->stack[0]->matches[$this->matcher->get_ast_root()->subpattern][0][0]
+                    : qtype_preg_matching_results::NO_MATCH_FOUND;
+        $other_index = isset($other->stack[0]->matches[$this->matcher->get_ast_root()->subpattern])
+                     ? $other->stack[0]->matches[$this->matcher->get_ast_root()->subpattern][0][0]
+                     : qtype_preg_matching_results::NO_MATCH_FOUND;
+
+        if ($this_index !== qtype_preg_matching_results::NO_MATCH_FOUND && $other_index === qtype_preg_matching_results::NO_MATCH_FOUND) {
+            return true;
+        } else if ($other_index !== qtype_preg_matching_results::NO_MATCH_FOUND && $this_index === qtype_preg_matching_results::NO_MATCH_FOUND) {
+            return false;
+        }
+        if ($this_index !== qtype_preg_matching_results::NO_MATCH_FOUND && $this_index < $other_index) {
+            return true;
+        } else if ($other_index !== qtype_preg_matching_results::NO_MATCH_FOUND && $other_index < $this_index) {
+            return false;
+        }
+
         // Choose the longest match
-        if ($this->length > $other->length) {
+        $this_length = $this->length_minus_nonconsuming();
+        $other_length = $other->length_minus_nonconsuming();
+        if ($this_length > $other_length) {
             //echo "wins 1\n";
             return true;
-        } else if ($other->length > $this->length) {
+        } else if ($other_length > $this_length) {
             //echo "wins 2\n";
             return false;
         }
@@ -367,97 +629,115 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
             }
         }
 
-        $subpattmap = $this->matcher->get_subpatt_map();
+        $subpattmap = $this->matcher->get_subpatt_number_to_node_map();
         $refsmap = $this->matcher->get_subexpr_refs_map();
 
         // PCRE/POSIX selection goes on below. Iterate over all subpatterns skipping the first which is the whole expression.
-        $modepcre = $this->matcher->get_options()->mode == qtype_preg_handling_options::MODE_PCRE;
-        for ($i = $this->root_subpatt_number() + 1; $i <= $this->matcher->get_max_subpatt(); $i++) {
-            $this_match = isset($this->matches[$i]) ? $this->matches[$i] : array(self::empty_subpatt_match());
-            $other_match = isset($other->matches[$i]) ? $other->matches[$i] : array(self::empty_subpatt_match());
+        $modepcre = $this->matcher->get_options()->mode === qtype_preg_handling_options::MODE_PCRE;
 
-            $this_repetitions_count = count($this_match);
-            $other_repetitions_count = count($other_match);
+        // We will compare corresponding stack objects.
+        $tocompare = array();
+        for ($i = 0; $i < min(count($this->stack), count($other->stack)); ++$i) {
+            $tocompare[] = array($this->stack[$i], $other->stack[$i]);
+        }
 
-            $repetitions_count_difference = $this_repetitions_count - $other_repetitions_count;
-            if ($modepcre && abs($repetitions_count_difference) == 1) {
-                // PCRE mode selection: if states have N and N + 1 subpattern repetitions, respectively,
-                // and the (N + 1)th repetition is empty, then select the second state. And vice versa.
-                $this_last = $this->last_match($i);
-                $other_last = $other->last_match($i);
-                if ($repetitions_count_difference == 1 && $this_last[1] == 0 && $this_last[0] > $other_last[0]) {
-                    //echo "wins 1\n";
-                    return true;
-                } else if ($repetitions_count_difference == -1 && $other_last[1] == 0 && $other_last[0] > $this_last[0]) {
-                    //echo "wins 2\n";
-                    return false;
-                }
-            }
+        foreach ($tocompare as $stackitems) {
+            for ($i = $this->matcher->get_ast_root()->subpattern + 1; $i <= $this->matcher->get_max_subpatt(); $i++) {
+                $this_match = isset($stackitems[0]->matches[$i]) ? $stackitems[0]->matches[$i] : null;
+                $other_match = isset($stackitems[1]->matches[$i]) ? $stackitems[1]->matches[$i] : null;
 
-            // Iterate over all repetitions.
-            for ($j = 0; $j < min($this_repetitions_count, $other_repetitions_count); $j++) {
-                $this_index = $this_match[$j][0];
-                $this_length = $this_match[$j][1];
-                $other_index = $other_match[$j][0];
-                $other_length = $other_match[$j][1];
-                $this_being_captured = self::is_being_captured($this_index, $this_length);
-                $other_being_captured = self::is_being_captured($other_index, $other_length);
+                $this_repetitions_count = count($this_match);
+                $other_repetitions_count = count($other_match);
 
-                if ($matchinginprogress && $this_being_captured) {
-                    $this_length = $this->startpos + $this->length - $this_index;
-                }
-                if ($matchinginprogress && $other_being_captured) {
-                    $other_length = $this->startpos + $other->length - $other_index;
-                }
-
-                // Continue if both iterations have no match.
-                if ($this_index == qtype_preg_matching_results::NO_MATCH_FOUND && $other_index == qtype_preg_matching_results::NO_MATCH_FOUND) {
+                // count === 0 means that there were no attempts at all.
+                if ($this_repetitions_count === 0 && $other_repetitions_count === 0) {
                     continue;
-                }
-
-                // Match existance.
-                if ($other_index == qtype_preg_matching_results::NO_MATCH_FOUND) {
-                    //echo "wins 1\n";
+                } else if ($other_repetitions_count === 0) {
                     return true;
-                } else if ($this_index == qtype_preg_matching_results::NO_MATCH_FOUND) {
-                    //echo "wins 2\n";
+                } else if ($this_repetitions_count === 0) {
                     return false;
                 }
 
-                // Longest of all possible matches.
-                if ($this_length > $other_length) {
-                    //echo "wins 1\n";
-                    return true;
-                } else if ($other_length > $this_length) {
-                    //echo "wins 2!!\n";
-                    return false;
-                }
-            }
-
-            // Now let's see if this is a backreferenced subexpression. Not sure, but looks like the following code implies that
-            // the referenced subexpression has zero-length match. It does the trick for the situations like:
-            // :RE#49:B    \(a*\)*b\1*     ab  (0,2)(1,1)
-            // Yes, the match is NOT (0,2)(0,1) because \1 should me zero-length-matched, not skipped.
-            if ($subpattmap[$i]->type == qtype_preg_node::TYPE_NODE_SUBEXPR && array_key_exists($subpattmap[$i]->number, $refsmap)) {
-                $refs = $refsmap[$subpattmap[$i]->number];
-                foreach ($refs as $ref) {
-                    $this_ref_last = $this->last_match($ref->subpattern);
-                    $other_ref_last = $other->last_match($ref->subpattern);
-                    $this_ref_captured = $this_ref_last[1] != qtype_preg_matching_results::NO_MATCH_FOUND;
-                    $other_ref_captured = $other_ref_last[1] != qtype_preg_matching_results::NO_MATCH_FOUND;
-                    if ($this_ref_captured && !$other_ref_captured) {
+                $repetitions_count_difference = $this_repetitions_count - $other_repetitions_count;
+                if ($modepcre && abs($repetitions_count_difference) === 1) {
+                    // PCRE mode selection: if states have N and N + 1 subpattern repetitions, respectively,
+                    // and the (N + 1)th repetition is empty, then select the second state. And vice versa.
+                    $this_last = $stackitems[0]->last_match($this->matcher->get_options()->mode, $i);
+                    $other_last = $stackitems[1]->last_match($this->matcher->get_options()->mode, $i);
+                    if ($repetitions_count_difference === 1 && $this_last[1] === 0 && $this_last[0] > $other_last[0]) {
+                        //echo "wins 1\n";
                         return true;
-                    } else if ($other_ref_captured && !$this_ref_captured) {
+                    } else if ($repetitions_count_difference === -1 && $other_last[1] === 0 && $other_last[0] > $this_last[0]) {
+                        //echo "wins 2\n";
                         return false;
                     }
                 }
-            }
 
-            // Finally, select the one with minimal repetitions count.
-            if ($this_repetitions_count < $other_repetitions_count) {
-                return true;
-            } else if ($other_repetitions_count < $this_repetitions_count) {
-                return false;
+                // Iterate over all repetitions.
+                for ($j = 0; $j < min($this_repetitions_count, $other_repetitions_count); $j++) {
+                    $this_index = $this_match[$j][0];
+                    $this_length = $this_match[$j][1];
+                    $other_index = $other_match[$j][0];
+                    $other_length = $other_match[$j][1];
+                    $this_being_captured = self::is_being_captured($this_index, $this_length);
+                    $other_being_captured = self::is_being_captured($other_index, $other_length);
+
+                    if ($matchinginprogress && $this_being_captured) {
+                        $this_length = $this->startpos + $this->length - $this_index;
+                    }
+                    if ($matchinginprogress && $other_being_captured) {
+                        $other_length = $this->startpos + $other->length - $other_index;
+                    }
+
+                    // Continue if both iterations have no match.
+                    if ($this_index === qtype_preg_matching_results::NO_MATCH_FOUND && $other_index === qtype_preg_matching_results::NO_MATCH_FOUND) {
+                        continue;
+                    }
+
+                    // Match existance.
+                    if ($other_index === qtype_preg_matching_results::NO_MATCH_FOUND) {
+                        //echo "wins 1\n";
+                        return true;
+                    } else if ($this_index === qtype_preg_matching_results::NO_MATCH_FOUND) {
+                        //echo "wins 2\n";
+                        return false;
+                    }
+
+                    // Longest of all possible matches.
+                    if ($this_length > $other_length) {
+                        //echo "wins 1\n";
+                        return true;
+                    } else if ($other_length > $this_length) {
+                        //echo "wins 2!!\n";
+                        return false;
+                    }
+                }
+
+                // Now let's see if this is a backreferenced subexpression. Not sure, but looks like the following code implies that
+                // the referenced subexpression has zero-length match. It does the trick for the situations like:
+                // :RE#49:B    \(a*\)*b\1*     ab  (0,2)(1,1)
+                // Yes, the match is NOT (0,2)(0,1) because \1 should me zero-length-matched, not skipped.
+                if ($subpattmap[$i]->type === qtype_preg_node::TYPE_NODE_SUBEXPR && array_key_exists($subpattmap[$i]->number, $refsmap)) {
+                    $refs = $refsmap[$subpattmap[$i]->number];
+                    foreach ($refs as $ref) {
+                        $this_ref_last = $this->last_match($ref->subpattern);
+                        $other_ref_last = $other->last_match($ref->subpattern);
+                        $this_ref_captured = self::is_completely_captured($this_ref_last[0], $this_ref_last[1]);
+                        $other_ref_captured = self::is_completely_captured($other_ref_last[0], $other_ref_last[1]);
+                        if ($this_ref_captured && !$other_ref_captured) {
+                            return true;
+                        } else if ($other_ref_captured && !$this_ref_captured) {
+                            return false;
+                        }
+                    }
+                }
+
+                // Finally, select the one with minimal repetitions count.
+                if ($this_repetitions_count < $other_repetitions_count) {
+                    return true;
+                } else if ($other_repetitions_count < $this_repetitions_count) {
+                    return false;
+                }
             }
         }
 
@@ -475,6 +755,12 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
             return false;
         }
 
+        if ($this->recursion_level() < $other->recursion_level()) {
+            return true;
+        } else if ($other->recursion_level() < $this->recursion_level()) {
+            return false;
+        }
+
         if ($this->length < $other->length) {
             return true;
         } else if ($other->length < $this->length) {
@@ -484,98 +770,33 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
         return false;
     }
 
-    /**
-     * Writes subpatterns start\end information to this state.
-     */
-    public function write_tag_values($transition, $tagsetpos, $strpos, $matchlen) {
-        foreach ($transition->tagsets as $tagset) {
-            if ($tagset->pos == $tagsetpos) {
-                $this->write_tag_values_inner($tagset, $strpos, $matchlen);
+    public function equals($other) {
+        if ($this->is_full() !== $other->is_full() ||
+            $this->recursion_level() !== $other->recursion_level() ||
+            $this->length !== $other->length ||
+            $this->recursive_calls_sequence() !== $other->recursive_calls_sequence()) {
+            return false;
+        }
+
+        for ($i = 0; $i < count($this->stack); ++$i) {
+            if ($this->stack[$i]->matches !== $other->stack[$i]->matches) {
+                return false;
             }
         }
+
+        return true;
     }
 
-    public function write_tag_values_inner($tagset, $strpos, $matchlen) {
-        // Begin a new iteration of a subpattern. All "bigger" (inner) subpatterns will start a new iteration recursively.
-        $min = $tagset->min_open_tag();
-        if ($min !== null) {
-            $this->begin_subpatt_iteration($min->pregnode);
-        }
-
-        $options = $this->matcher->get_options();
-
-        // Set matches to ($strpos, -1) for the new iteration.
-        foreach ($tagset->tags as $tag) {
-            if ($tag->type != qtype_preg_fa_tag::TYPE_OPEN) {
-                continue;
-            }
-            if (!$options->capturesubexpressions && $tag->pregnode->subpattern != $this->root_subpatt_number()) {
-                continue;
-            }
-            // Starting indexes are always the same, equal $strpos
-            $index = $strpos;
-            if ($tagset->pos == qtype_preg_fa_tag_set::POS_AFTER_TRANSITION) {
-                $index += $matchlen;
-            }
-            //echo "opening {$tag->pregnode->subpattern} at pos {$tagset->pos}\n";
-            $this->set_current_match($tag->pregnode->subpattern, $index, qtype_preg_matching_results::NO_MATCH_FOUND);
-        }
-
-        // Set matches to ($strpos, length) for the ending iterations.
-        foreach ($tagset->tags as $tag) {
-            if ($tag->type != qtype_preg_fa_tag::TYPE_CLOSE) {
-                continue;
-            }
-            if (!$options->capturesubexpressions && $tag->pregnode->subpattern != $this->root_subpatt_number()) {
-                continue;
-            }
-            $current_match = $this->current_match($tag->pregnode->subpattern);
-            $index = $current_match[0];
-            $length = $strpos - $index;
-            if ($tagset->pos != qtype_preg_fa_tag_set::POS_BEFORE_TRANSITION) {
-                $length += $matchlen;
-            }
-            //echo "closing {$tag->pregnode->subpattern} at pos {$tagset->pos}\n";
-            if ($index != qtype_preg_matching_results::NO_MATCH_FOUND) {
-                $this->set_current_match($tag->pregnode->subpattern, $index, $length);
-            }
-        }
-
-        // Some stuff for subexpressions.
-        foreach ($tagset->tags as $tag) {
-            if ($tag->type != qtype_preg_fa_tag::TYPE_OPEN || $tag->pregnode->subtype != qtype_preg_node_subexpr::SUBTYPE_SUBEXPR) {
-                continue;
-            }
-            if (!$options->capturesubexpressions && $tag->pregnode->subpattern != $this->root_subpatt_number()) {
-                continue;
-            }
-            $this->subexpr_to_subpatt[$tag->pregnode->number] = $tag->pregnode;
-        }
+    public function write_tag_values($transition, $strpos, $matchlen) {
+        $end = end($this->stack);
+        $end->write_tag_values($transition, $strpos, $matchlen, $this->matcher);
     }
 
-    public function subpatts_to_string() {
-        $res = '';
-        foreach ($this->matches as $subpatt => $repetitions) {
-            $res .= $subpatt . ': ';
-            foreach ($repetitions as $repetition) {
-                $ind = $repetition[0];
-                $len = $repetition[1];
-                $res .= "($ind, $len) ";
-            }
-            $res .= "\n";
+    public function recursive_calls_sequence() {
+        $result = '';
+        foreach ($this->stack as $stackitem) {
+            $result .= $stackitem->subexpr;
         }
-        return $res;
-    }
-
-    public function subexprs_to_string() {
-        $res = '';
-        foreach ($this->subexpr_to_subpatt as $subexpr => $node) {
-            $lastmatch = $this->last_match($node->subpattern);
-            $ind = $lastmatch[0];
-            $len = $lastmatch[1];
-            $res .= $subexpr . ": ($ind, $len) ";
-        }
-        $res .= "\n";
-        return $res;
+        return $result;
     }
 }

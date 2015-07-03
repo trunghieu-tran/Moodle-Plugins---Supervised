@@ -41,7 +41,8 @@ class qtype_preg_explaining_graph_tool_node {
     public $fillcolor   = 'white';  // Filling color of node on image.
     public $invert = false;         // Flag of inversion of node.
     public $ismarked = false;       // Flag of marking (for voids).
-    public $type = self::TYPE_OTHER;   // Type of node.
+    public $type = self::TYPE_OTHER;// Type of node.
+    public $borderoftemplate = null;
 
     // Possible types of node.
     const TYPE_POINT       = 'node_point';
@@ -50,6 +51,7 @@ class qtype_preg_explaining_graph_tool_node {
     const TYPE_BOUNDARY    = 'node_boundary';
     const TYPE_VOID        = 'node_void';
     const TYPE_OPTION      = 'node_option';
+    const TYPE_TEMPLATE    = 'node_template';
     const TYPE_OTHER       = 'node_other';
 
     public function __construct($lbl, $shp, $clr, $ownr, $id, $stl = 'solid', $fll = 'white') {
@@ -131,6 +133,8 @@ class qtype_preg_explaining_graph_tool_link {
     public $owner = null;       // Subgraph which has this link.
     public $tooltip = '';       // Tooltip for link.
     public $color = 'black';    // Color of arrow.
+    public $ltail = null;       // Behavior of link's tail with clusters.
+    public $lhead = null;       // Behavior of link's head with clusters.
     public $id = -1;            // Id of link.
 
     public function __construct($lbl, $src, $dst, $ownr = null, $stl = 'normal') {
@@ -261,15 +265,19 @@ class qtype_preg_explaining_graph_tool_subgraph {
 
                     // Find a link between neighbor and his right neighbor, then change source to new node.
                     $tmpneighbor = $neighbor->find_neighbor_dst($gmain);
+                    $has_next = false;
                     if ($tmpneighbor !== null) {
                         $tmpneighbor = $gmain->find_link($neighbor, $tmpneighbor);
                         $tmpneighbor->source = $tmp;
+                        $has_next = true;
                     }
 
                     // Destroy old link.
-                    $tmpneighbor = $gmain->find_link($tmpdnode, $neighbor);
-                    unset($tmpneighbor->owner->links[array_search($tmpneighbor, $tmpneighbor->owner->links)]);
-                    $tmpneighbor->owner->links = array_values($tmpneighbor->owner->links);
+                    $tmpneighborlink = $gmain->find_link($tmpdnode, $neighbor);
+                    if ($has_next && $tmpneighborlink->lhead !== null)
+                        $this->copy_lattrs_for_right($tmpneighborlink, $tmpneighbor);
+                    unset($tmpneighborlink->owner->links[array_search($tmpneighborlink, $tmpneighborlink->owner->links)]);
+                    $tmpneighborlink->owner->links = array_values($tmpneighborlink->owner->links);
 
                     // Destroy old node.
                     unset($this->nodes[array_search($neighbor, $this->nodes)]);
@@ -413,11 +421,13 @@ class qtype_preg_explaining_graph_tool_subgraph {
 
                 // Destroy links between nighbors and assert.
                 $tmplink = $gmain->find_link($leftneighbor, $tmpdnode);
+                $this->copy_lattrs_for_left($tmplink, $this->links[count($this->links)-1]);
                 unset($tmplink->owner->links[array_search($tmplink, $tmplink->owner->links)]);
                 $tmplink->owner->links = array_values($tmplink->owner->links);
                 // If right neighbor isn't existing then there is no to destroy.
                 if ($rightneighbor !== null) {
                     $tmplink = $gmain->find_link($tmpdnode, $rightneighbor);
+                    $this->copy_lattrs_for_right($tmplink, $this->links[count($this->links)-1]);
                     unset($tmplink->owner->links[array_search($tmplink, $tmplink->owner->links)]);
                     $tmplink->owner->links = array_values($tmplink->owner->links);
                 }
@@ -447,20 +457,21 @@ class qtype_preg_explaining_graph_tool_subgraph {
                 if ($iter->type != qtype_preg_explaining_graph_tool_node::TYPE_OPTION) {
                     if ($this->isselection != true || $iter->ismarked) {
                         // Find a link between left neighbor and void.
-                        $tmpneighbor = $gmain->find_link($neighborl, $iter);
-                        $tmpneighbor->destination = $neighborr;    // Set a new destination.
-                        $tmpneighbor->tooltip = "Void";
-                        $tmpneighbor->id = $iter->id;
+                        $tmplink_l = $gmain->find_link($neighborl, $iter);
+                        $tmplink_l->destination = $neighborr;    // Set a new destination.
+                        $tmplink_l->tooltip = "Void";
+                        $tmplink_l->id = $iter->id;
 
                         if ($neighborr !== null) {
                             // Find a link between void and right neighbor and destroy it.
-                            $tmpneighbor = $gmain->find_link($iter, $neighborr);
-                            unset($tmpneighbor->owner->links[array_search($tmpneighbor, $tmpneighbor->owner->links)]);
-                            $tmpneighbor->owner->links = array_values($tmpneighbor->owner->links);
+                            $tmplink_r = $gmain->find_link($iter, $neighborr);
+                            $this->copy_lattrs_for_right($tmplink_r, $tmplink_l);
+                            unset($tmplink_r->owner->links[array_search($tmplink_r, $tmplink_r->owner->links)]);
+                            $tmplink_r->owner->links = array_values($tmplink_r->owner->links);
                         } else {
                             $point = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
                             $this->nodes[] = $point;
-                            $tmpneighbor->destination = $point;    // Set a new destination.
+                            $tmplink_l->destination = $point;    // Set a new destination.
                         }
                     } elseif (count($this->nodes) === 1) {
                         $pointl = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
@@ -469,32 +480,33 @@ class qtype_preg_explaining_graph_tool_subgraph {
                         $this->nodes[] = $pointr;
 
                         // Find a link between left neighbor and void.
-                        $tmpneighbor = $gmain->find_link($neighborl, $iter);
-                        $tmpneighbor->destination = $pointl;    // Set a new destination.
+                        $tmplink_l = $gmain->find_link($neighborl, $iter);
+                        $tmplink_l->destination = $pointl;    // Set a new destination.
 
                         // Find a link between void and right neighbor.
-                        $tmpneighbor = $gmain->find_link($iter, $neighborr);
-                        $tmpneighbor->source = $pointr;    // Set a new source.
+                        $tmplink_r = $gmain->find_link($iter, $neighborr);
+                        $tmplink_r->source = $pointr;    // Set a new source.
 
                         $this->links[] = new qtype_preg_explaining_graph_tool_link('', $pointl, $pointr, $this);
                         $this->links[count($this->links)-1]->tooltip = "Void";
                         $this->links[count($this->links)-1]->id = $iter->id;
                     } else {
                         // Find a link between left neighbor and void.
-                        $tmpneighbor = $gmain->find_link($neighborl, $iter);
-                        $tmpneighbor->destination = $neighborr;    // Set a new destination.
-                        $tmpneighbor->tooltip = "Void";
-                        $tmpneighbor->id = $iter->id;
+                        $tmplink_l = $gmain->find_link($neighborl, $iter);
+                        $tmplink_l->destination = $neighborr;    // Set a new destination.
+                        $tmplink_l->tooltip = "Void";
+                        $tmplink_l->id = $iter->id;
 
                         if ($neighborr !== null) {
                             // Find a link between void and right neighbor and destroy it.
-                            $tmpneighbor = $gmain->find_link($iter, $neighborr);
-                            unset($tmpneighbor->owner->links[array_search($tmpneighbor, $tmpneighbor->owner->links)]);
-                            $tmpneighbor->owner->links = array_values($tmpneighbor->owner->links);
+                            $tmplink_r = $gmain->find_link($iter, $neighborr);
+                            $this->copy_lattrs_for_right($tmplink_r, $tmplink_l);
+                            unset($tmplink_r->owner->links[array_search($tmplink_r, $tmplink_r->owner->links)]);
+                            $tmplink_r->owner->links = array_values($tmplink_r->owner->links);
                         } else {
                             $point = new qtype_preg_explaining_graph_tool_node(array(''), 'point', 'black', $this, -1);
                             $this->nodes[] = $point;
-                            $tmpneighbor->destination = $point;    // Set a new destination.
+                            $tmplink_l->destination = $point;    // Set a new destination.
                         }
                     }
                 } else {
@@ -505,6 +517,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
                     $tmpneighbol->id = $iter->id;
 
                     $tmpneighbor = $gmain->find_link($iter, $neighborr);
+                    $this->copy_lattrs_for_right($tmpneighbor, $tmpneighbol);
                     if ($tmpneighbor->owner !== $this && !$this->is_parent_for($tmpneighbor->owner)) {
                         unset($tmpneighbol->owner->links[array_search($tmpneighbol, $tmpneighbor->owner->links)]);
                         $tmpneighbol->owner->links = array_values($tmpneighbol->owner->links);
@@ -600,8 +613,10 @@ class qtype_preg_explaining_graph_tool_subgraph {
             $instr .= "label=\"" . $iter->label . "\", ";
             $instr .= "arrowhead=\"" . $iter->style . "\", ";
             $instr .= "color=\"" . $iter->color . "\", ";
+            $instr .= $iter->lhead !== null ? 'lhead="cluster_' . $iter->lhead->id . '", ' : '';
+            $instr .= $iter->ltail !== null ? 'ltail="cluster_' . $iter->ltail->id . '", ' : '';
             if ($iter->id !== -1) $instr .= "tooltip=\"" . $iter->tooltip . "\", ";
-            $instr .= "]\n";
+            $instr .= "];\n";
         }
 
         $instr .= "}\n";
@@ -620,7 +635,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
         $result = '';
         if (count($lbl)) {
             if (count($lbl) == 1) {
-                if ($invert || textlib::strlen($lbl[0]) != 1) {
+                if ($invert || core_text::strlen($lbl[0]) != 1) {
                     $elements[] = $lbl[0];
                 } else {
                     return '"' . $lbl[0] . '"';
@@ -664,7 +679,7 @@ class qtype_preg_explaining_graph_tool_subgraph {
         $instr .= 'style=' . $gr->style . ';';
         $instr .= 'color=' . $gr->color . ';';
         $instr .= 'bgcolor=' . $gr->bgcolor . ';';
-        $instr .= 'label="' . $gr->label . '";';
+        $instr .= 'label="' . qtype_preg_authoring_tool::string_to_html($gr->label) . '";';
         $instr .= 'id="graphid_' . $gr->id . '";';
         $instr .= 'tooltip="' . $gr->tooltip . '";';
         $instr .= $gr->edge;
@@ -693,6 +708,8 @@ class qtype_preg_explaining_graph_tool_subgraph {
             $instr .= "label=\"" . $iter->label . "\", ";
             $instr .= "arrowhead=\"" . $iter->style . "\", ";
             $instr .= "color=\"" . $iter->color . "\", ";
+            $instr .= $iter->lhead !== null ? 'lhead="cluster_' . $iter->lhead->id . '", ' : '';
+            $instr .= $iter->ltail !== null ? 'ltail="cluster_' . $iter->ltail->id . '", ' : '';
             if ($iter->id !== -1) $instr .= "tooltip=\"" . $iter->tooltip . "\", ";
             $instr .= "]\n";
         }
@@ -757,10 +774,33 @@ class qtype_preg_explaining_graph_tool_subgraph {
         }
 
         foreach ($this->subgraphs as $subgraph) {
+            if (!is_string($subgraph->id)) {
+                if ($subgraph->id == -1) {
+                    $subgraph->id = ++$maxid;
+                }
+            }
             $maxid = $subgraph->regenerate_id($maxid);
         }
 
         return $maxid;
+    }
+
+    /**
+     * If $old is right.
+     * @param $old
+     * @param $new
+     */
+    private function copy_lattrs_for_right($old, $new) {
+        $old->lhead = $new->lhead;
+    }
+
+    /**
+     * If $old is left.
+     * @param $old
+     * @param $new
+     */
+    private function copy_lattrs_for_left($old, $new) {
+        $old->ltail = $new->ltail;
     }
 }
 

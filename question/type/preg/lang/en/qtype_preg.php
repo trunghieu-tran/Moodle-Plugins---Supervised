@@ -9,13 +9,17 @@
  */
 
 $string['answersinstruct'] = '<p>Enter (at least one) regular expressions in the chosen notation as answers. If a correct answer is given, it should match at least one regular expression with 100% grade.</p><p>You can use placeholders like {$0} in the feedback to insert captured parts of a student\'s response. {$0} will be replaced by the whole match, {$1} with the first subpattern match etc. If the chosen engine doesn\'t support subpattern capturing you should use only {$0}.</p>';
+$string['assertfailmodeasis'] = 'Fast';
+$string['assertfailmodedescription'] = 'Full mode lets the finite state automata engine work 100% correctly with simple assertions and enables support of complex assertions, but it works roughtly 2 times slower than the fast mode. Fast mode may rarely yield a wrong hint in complex regexes with \b or \B assertions.';
+$string['assertfailmodelabel'] = 'Assertion support mode';
+$string['assertfailmodemerge'] = 'Full';
 $string['answerno'] = 'Answer {$a}';
 $string['charhintpenalty'] = 'Penalty for the next character hint';
 $string['charhintpenalty_help'] = 'Penalty for getting the one-character hint. Typically will be greater than usual Moodle question penalty (which applies to any new attempt to answer question without hints). These penalties are mutually exclusive.';
 $string['lexemhintpenalty'] = 'Penalty for the next lexem hint';
 $string['lexemhintpenalty_help'] = 'Penalty for getting the next lexem hint. Typically will be greater than usual Moodle question penalty (which applies to any new attempt to answer question without hints) and next character one. These penalties are mutually exclusive.';
 $string['correctanswer'] = 'Correct answer';
-$string['correctanswer_help'] = 'Enter a correct answer (not a regular expression) to be shown to students. If you leave it empty the matching engine will try to generate a correct answer itself, taking heed to get the closest one to the student\'s response. For now only FA engine can generate correct answers.';
+$string['correctanswer_help'] = 'Enter a correct answer (not a regular expression) to be shown to students. If you leave it empty the matching engine will try to generate a correct answer itself, taking heed to get the closest one to the student\'s response. For now only finite state automata engine can generate correct answers.';
 $string['debugheading'] = 'Debug settings';
 $string['defaultenginedescription'] = 'Matching engine selected by default when creating a new question';
 $string['defaultenginelabel'] = 'Default matching engine';
@@ -40,7 +44,6 @@ $string['hintnextchar'] = 'next correct character';
 $string['hintnextlexem'] = 'next correct {$a}';
 $string['langselect'] = 'Language';
 $string['langselect_help'] = 'For next lexem hint you should choose a language, which is used to break answers down to lexemes. Each language has it own rules for lexemes. Languages are defined using \'Formal languages block\'';
-$string['largefa'] = 'Too large finite automaton';
 $string['lexemusername'] = 'Student-visible name for lexem';
 $string['lexemusername_help'] = 'Your students probably won\'t know that an atomic part of the language they learn is called <b>lexem</b>. They may prefer to call it "word" or "number" or something. You may define a name for lexem that would be shown on the "Hint next lexem" button there.';
 $string['maxerrorsshowndescription'] = 'Maximum number of errors shown for each regular expression in the question editing form';
@@ -94,6 +97,7 @@ $string['leaf_meta']                   = 'meta-character or escape-sequence';
 $string['leaf_assert']                 = 'simple assertion';
 $string['leaf_backref']                = 'backreference';
 $string['leaf_subexpr_call']           = 'subexpression call';
+$string['leaf_template']               = 'template without params';
 $string['leaf_control']                = 'control sequence';
 $string['leaf_options']                = 'modifier';   // TODO: remove?
 $string['node_finite_quant']           = 'finite quantifier';
@@ -103,6 +107,7 @@ $string['node_alt']                    = 'alternation';
 $string['node_assert']                 = 'lookaround assertion';
 $string['node_subexpr']                = 'subpattern';
 $string['node_cond_subexpr']           = 'conditional subpattern';
+$string['node_template']               = 'template with params';
 $string['node_error']                  = 'syntax error';
 
 // Subtypes.
@@ -114,6 +119,9 @@ $string['capital_esc_z_leaf_assert']   = 'end of the string';
 $string['esc_g_leaf_assert']           = 'first matching position in the string';
 $string['circumflex_leaf_assert']      = 'start of the string';
 $string['dollar_leaf_assert']          = 'end of the string';
+$string['subexpr_leaf_assert']         = 'fictive';
+$string['recursion_leaf_assert']       = 'fictive';
+$string['truefalse_leaf_assert']       = 'fictive';
 $string['accept_leaf_control']         = '';   // TODO
 $string['fail_leaf_control']           = '';
 $string['mark_name_leaf_control']      = '';
@@ -148,43 +156,47 @@ $string['nla_node_cond_subexpr']       = 'negative lookahead conditional subpatt
 $string['plb_node_cond_subexpr']       = 'positive lookbehind conditional subpattern';
 $string['nlb_node_cond_subexpr']       = 'negative lookbehind conditional subpattern';
 
-$string['unknown_error_node_error']                = 'unknown error';
-$string['missing_open_paren_node_error']           = 'Syntax error: missing opening parenthesis \'(\' for the closing parenthesis in position {$a->colfirst}.';
-$string['missing_close_paren_node_error']          = 'Syntax error: missing a closing parenthesis \')\' for the opening parenthesis in position {$a->colfirst}.';
-$string['missing_comment_ending_node_error']       = 'Syntax error: missing closing parenthesis for the comment in position from {$a->colfirst} to {$a->collast}.';
-$string['missing_condsubexpr_ending_node_error']   = 'Unclosed conditional subpattern name.';
-$string['missing_callout_ending_node_error']       = 'Unclosed callout.';
-$string['missing_control_ending_node_error']       = 'Missing closing parenthesis after control sequence.';
+$string['unknown_error_node_error']                = 'Unknown error';
+$string['missing_open_paren_node_error']           = 'Syntax error: missing opening parenthesis \'(\' for the closing parenthesis in position {$a->colfirst}';
+$string['missing_template_open_paren_node_error']  = 'Syntax error: missing template opening \'(?###name<)\' for the template closing in position {$a->colfirst}';
+$string['missing_close_paren_node_error']          = 'Syntax error: missing closing parenthesis \')\' for the opening parenthesis in position {$a->colfirst}';
+$string['missing_template_close_paren_node_error'] = 'Syntax error: missing template closing \'(?###>)\' for the template opening in position {$a->colfirst}';
+$string['missing_comment_ending_node_error']       = 'Syntax error: missing closing parenthesis for the comment in position from {$a->colfirst} to {$a->collast}';
+$string['missing_condsubexpr_ending_node_error']   = 'Unclosed conditional subpattern name';
+$string['missing_callout_ending_node_error']       = 'Unclosed callout';
+$string['missing_control_ending_node_error']       = 'Missing closing parenthesis after control sequence';
 $string['missing_subexpr_name_ending_node_error']  = 'Syntax error in subpattern name';
-$string['missing_brackets_for_g_node_error']       = '\g is not followed by a braced, angle-bracketed, or quoted name/number or by a plain number.';
-$string['missing_brackets_for_k_node_error']       = '\k is not followed by a braced, angle-bracketed, or quoted name/number or by a plain number.';
-$string['unclosed_charset_node_error']             = 'Syntax error: missing a closing bracket \']\' for the character set starting in position {$a->colfirst}.';
-$string['posix_class_outside_charset_node_error']  = 'POSIX classes are not allowed outside character sets.';
-$string['quantifier_without_parameter_node_error'] = 'Syntax error: quantifier in position from {$a->colfirst} to {$a->collast} doesn\'t have an operand - nothing to repeat.';
-$string['incorrect_quant_range_node_error']        = 'Incorrect quantifier range in position from  {$a->colfirst} to {$a->collast}: the left border is greater than the right one.';
-$string['incorrect_charset_range_node_error']      = 'Incorrect character range in position from  {$a->colfirst} to {$a->collast}: the left character is "greater" than the right one.';
-$string['set_unset_same_modifier_node_error']      = 'Setting and unsetting the {$a->addinfo} modifier at the same time in position from {$a->colfirst} to {$a->collast}.';
-$string['unsupported_modifier_node_error']         = 'Unknown, wrong or unsupported modifier(s): {$a->addinfo}.';
-$string['unknown_unicode_property_node_error']     = 'Unknown Unicode property: {$a->addinfo}.';
-$string['unknown_posix_class_node_error']          = 'Unknown POSIX class: {$a->addinfo}.';
-$string['unknown_control_sequence_node_error']     = 'Unknown control sequence: {$a->addinfo}.';
-$string['condsubexpr_too_much_alter_node_error']   = 'Syntax error: too many top-level alternations in the conditional subpattern in position from {$a->colfirst} to {$a->collast}. Use parentheses if you want to include alternations in yes-expr on no-expr.';
-$string['condsubexpr_assert_expected_node_error']  = 'Assertion or condition expected.';
-$string['condsubexpr_zero_condition_node_error']   = 'Invalid condition (?(0).';
-$string['slash_at_end_of_pattern_node_error']      = 'Syntax error: \ at end of pattern.';
-$string['c_at_end_of_pattern_node_error']          = 'Syntax error: \c at end of pattern.';
-$string['cx_should_be_ascii_node_error']           = '\c should be followed by an ascii character.';
-$string['unexisting_subexpr_node_error']           = 'Subpattern "{$a->addinfo}" does not exist.';
-$string['duplicate_subexpr_names_node_error']      = 'Two named subpatterns have the same name.';
-$string['different_subexpr_names_node_error']      = 'Different subpattern names for subpatterns of the same number.';
-$string['subexpr_name_expected_node_error']        = 'Subpattern name expected.';
+$string['missing_brackets_for_g_node_error']       = '\g is not followed by a braced, angle-bracketed, or quoted name/number or by a plain number';
+$string['missing_brackets_for_k_node_error']       = '\k is not followed by a braced, angle-bracketed, or quoted name/number or by a plain number';
+$string['unclosed_charset_node_error']             = 'Syntax error: missing a closing bracket \']\' for the character set starting in position {$a->colfirst}';
+$string['posix_class_outside_charset_node_error']  = 'POSIX classes are not allowed outside character sets';
+$string['quantifier_without_parameter_node_error'] = 'Syntax error: quantifier in position from {$a->colfirst} to {$a->collast} doesn\'t have an operand - nothing to repeat';
+$string['incorrect_quant_range_node_error']        = 'Incorrect quantifier range in position from  {$a->colfirst} to {$a->collast}: the left border is greater than the right one';
+$string['incorrect_charset_range_node_error']      = 'Incorrect character range in position from  {$a->colfirst} to {$a->collast}: the left character is "greater" than the right one';
+$string['set_unset_same_modifier_node_error']      = 'Setting and unsetting the {$a->addinfo} modifier at the same time in position from {$a->colfirst} to {$a->collast}';
+$string['unsupported_modifier_node_error']         = 'Unknown, wrong or unsupported modifier(s): {$a->addinfo}';
+$string['unknown_unicode_property_node_error']     = 'Unknown Unicode property: {$a->addinfo}';
+$string['unknown_posix_class_node_error']          = 'Unknown POSIX class: {$a->addinfo}';
+$string['unknown_control_sequence_node_error']     = 'Unknown control sequence: {$a->addinfo}';
+$string['condsubexpr_too_much_alter_node_error']   = 'Syntax error: too many top-level alternations in the conditional subpattern in position from {$a->colfirst} to {$a->collast}. Use parentheses if you want to include alternations in yes-expr on no-expr';
+$string['condsubexpr_assert_expected_node_error']  = 'Assertion or condition expected';
+$string['condsubexpr_zero_condition_node_error']   = 'Invalid condition (?(0)';
+$string['slash_at_end_of_pattern_node_error']      = 'Syntax error: \ at end of pattern';
+$string['c_at_end_of_pattern_node_error']          = 'Syntax error: \c at end of pattern';
+$string['cx_should_be_ascii_node_error']           = '\c should be followed by an ascii character';
+$string['unexisting_subexpr_node_error']           = 'Subpattern "{$a->addinfo}" does not exist';
+$string['duplicate_subexpr_names_node_error']      = 'Two named subpatterns have the same name';
+$string['different_subexpr_names_node_error']      = 'Different subpattern names for subpatterns of the same number';
+$string['subexpr_name_expected_node_error']        = 'Subpattern name expected';
 $string['unrecognized_pqh_node_error']             = 'Unrecognised character after (? or (?-';
 $string['unrecognized_pqlt_node_error']            = 'Unrecognised character after (?<';
 $string['unrecognized_pqp_node_error']             = 'Unrecognised character after (?P';
-$string['char_code_too_big_node_error']            = 'The character code {$a->addinfo} is too big.';
-$string['char_code_disallowed_node_error']         = 'Unicode code points 0xd800 ... 0xdfff are now allowed.';
-$string['callout_big_number_node_error']           = 'The number {$a->addinfo} in the callout is too big, should not be greater than 255.';
-$string['lnu_unsupported_node_error']              = 'Sequences \L, \l, \N{name}, \U, and \u are not supported.';
+$string['char_code_too_big_node_error']            = 'The character code {$a->addinfo} is too big';
+$string['char_code_disallowed_node_error']         = 'Unicode code points 0xd800 ... 0xdfff are now allowed';
+$string['callout_big_number_node_error']           = 'The number {$a->addinfo} in the callout is too big, should not be greater than 255';
+$string['lnu_unsupported_node_error']              = 'Sequences \L, \l, \N{name}, \U, and \u are not supported';
+$string['unknown_template_node_error']             = 'Unknown template: {$a->addinfo}';
+$string['wrong_template_params_count_node_error']  = 'Wrong template parameters count: {$a->addinfo->expected} expected, {$a->addinfo->given} given';
 
 // Types and subtypes needed for authoring tools
 $string['leaf_charset_neg'] = 'negative character set';
@@ -193,15 +205,21 @@ $string['leaf_charset_error'] = 'incorrect character set';
 /******* Error messages *******/
 $string['error_PCREincorrectregex']              = 'Incorrect regular expression - syntax error! Consult <a href="http://pcre.org/pcre.txt">PCRE documentation</a> for more information.';
 $string['error_duringauthoringtool']             = 'There were errors while trying to build {$a}:';
+$string['error_infiniterecursion']               = 'Regex contains infinite recursion';
 
 /******* FA limitations *******/
-$string['engine_heading_descriptions'] = 'Matching regular expressions can be time and memory consuming. These settings allow you to control limits of time and memory usage by the matching engines. Increase them when you get messages that the regular expression is too complex, but do mind your server\'s performance (you may also want to increase PHP time and memory limits). Decrease them if you get blank page when saving or running a preg question.';
-$string['too_large_fa'] = 'Regular expression is too complex to be matched by {$a->engine} due to the time and/or memory limits. Please try another matching engine, ask your administrator to <a href="{$a->link}"> increase time and memory limits</a> or simplify you regular expression.';
-$string['fa_state_limit'] = 'Automata size limit: states';
-$string['fa_transition_limit'] = 'Automata size limit: transitions';
 $string['fa_settings_heading'] = 'Finite state automata engine settings';
-$string['fa_state_limit_description'] = 'Allows you to tune time and memory limits for the FA engine when matching complex regexes';
-$string['fa_transition_limit_description'] = 'Maximum number of transitions in FA';
+$string['engine_heading_descriptions'] = 'Matching regular expressions can be time and memory consuming. These settings allow you to control limits of time and memory usage by the matching engines. Increase them when you get messages that the regular expression is too complex, but do mind your server\'s performance (you may also want to increase PHP time and memory limits). Decrease them if you get blank page when saving or running a preg question.';
+$string['fa_state_limit'] = 'Automata size limit: states';
+$string['fa_state_limit_description'] = 'Max number of states in FA. Tunes time and memory limits for the FA engine when matching complex regexes.';
+$string['fa_transition_limit'] = 'Automata size limit: transitions';
+$string['fa_transition_limit_description'] = 'Max number of transitions in FA. Tunes time and memory limits for the FA engine when matching complex regexes.';
+$string['fa_simulation_state_limit'] = 'Automata simulation limit: states';
+$string['fa_simulation_state_limit_description'] = 'When matching a string with a regex containing backreferences or recurion, one FA state can be reached using different paths. This means that there are several "simulation states" created for one "structural state". This settings lets you control the overall count of such simulation states.';
+$string['too_large_fa'] = 'Regular expression is too complex to be matched by {$a->engine} due to the time and/or memory limits. Please try another matching engine, ask your administrator to <a href="{$a->link}">increase time and memory limits</a> or simplify you regular expression.';
+$string['empty_fa'] = 'No string can be matched by this regular expression (finite automaton is empty).';
+$string['backref_intersection'] = 'Using backreferences with assertions isn\'t supported yet.';
+$string['mergedassertion_option'] = 'You need to set full assertion support mode for using complex positive assertions.';
 
 /********** Strings for authoring tools form**********************/
 $string['authoring_form_page_header'] = 'Regex constructor';
@@ -238,8 +256,8 @@ $string['description_circumflex_leaf_assert'] = 'start of the string';
 $string['description_dollar_leaf_assert'] = 'end of the string';
 $string['description_esc_b_leaf_assert_neg'] = 'not a word boundary';
 // TYPE_LEAF_BACKREF
-$string['description_leaf_backref'] = 'text that matched by subpattern #{$a}';
-$string['description_leaf_backref_name'] = 'text that matched by subpattern "{$a}"';
+$string['description_leaf_backref'] = 'text matched by subpattern #{$a}';
+$string['description_leaf_backref_name'] = 'text matched by subpattern "{$a}"';
 // TYPE_LEAF_SUBEXPR_CALL
 $string['description_leaf_subexpr_call'] = 'call of the subpattern #{$a}';
 $string['description_leaf_subexpr_call_all'] = 'call of the whole regular expression';
@@ -247,6 +265,16 @@ $string['description_leaf_subexpr_call_name'] = 'call of the subpattern "{$a}"';
 $string['description_leaf_subexpr_call_recursive'] = 'recursive call of the subpattern #{$a}';
 $string['description_leaf_subexpr_call_all_recursive'] = 'recursive call of the whole regular expression';
 $string['description_leaf_subexpr_call_name_recursive'] = 'recursive call of the subpattern "{$a}"';
+// TYPE_LEAF_TEMPLATE
+$string['description_leaf_template'] = 'template without params';
+$string['description_template_word'] = 'any word';
+$string['description_template_integer'] = 'any number including + or -';
+$string['description_template_parens_req'] = 'text in round parentheses';
+$string['description_template_parens_opt'] = 'text in round parentheses or without';
+$string['description_template_brackets_req'] = 'text in square brackets';
+$string['description_template_brackets_opt'] = 'text in square brackets or without';
+$string['description_template_custom_parens_req'] = 'text in optional custom brackets';
+$string['description_template_custom_parens_opt'] = 'text in optional custom brackets or without';
 // TYPE_LEAF_CONTROL
 $string['description_accept_leaf_control'] = 'force successful subpattern match';
 $string['description_fail_leaf_control'] = 'force fail';
@@ -331,13 +359,15 @@ $string['description_subexpr_node_cond_subexpr_wrapper'] = 'if {$a->cond} then c
 $string['description_define_node_cond_subexpr'] = 'definition of {$a->firstoperand}';
 $string['description_node_cond_subexpr'] = 'if {$a->cond} then check: [{$a->firstoperand}]{$a->else}';
 $string['description_node_cond_subexpr_else'] = ' else check: [{$a->secondoperand}]';
+// TYPE_NODE_TEMPLATE
+$string['description_node_template'] = 'template with params';
 // TYPE_LEAF_CHARSET
 $string['description_charset'] = 'one of the following characters: {$a->characters};';
 $string['description_charset_neg'] = 'any character except the following: {$a->characters};';
 $string['description_charset_neg_one'] = 'not {$a->characters}';
 $string['description_charset_range'] = 'any character {$a}';
-$string['description_char'] = '<span style="color:blue">{$a->char}</span>';
-$string['description_char_16value'] = 'character with code 0x{$a->code}    {$a->char}';
+$string['description_char'] = '<span class="text-info" class=\'font-family:"Courier New", Courier, monospace;\'>{$a->char}</span>';
+$string['description_char_16value'] = 'character with code 0x{$a->code}';
 //$string['description_charset_one'] = '{$a->characters}';
 // non-printing characters
 $string['description_char0'] = 'null character(NUL)';
@@ -704,4 +734,5 @@ $string['explain_begin'] = 'begin';
 $string['explain_end'] = 'end';
 $string['explain_true'] = 'true';
 $string['explain_false'] = 'false';
-
+$string['explain_unknow_template'] = 'unknow template';
+$string['explain_parameter'] = 'parameter';

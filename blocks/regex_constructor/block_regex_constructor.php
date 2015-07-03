@@ -23,7 +23,10 @@
  * @package blocks
  */
 
- require_once($CFG->dirroot.'/blocks/moodleblock.class.php');
+global $CFG;
+global $PAGE;
+
+require_once($CFG->dirroot.'/blocks/moodleblock.class.php');
 
 class block_regex_constructor extends block_base {
 
@@ -33,10 +36,26 @@ class block_regex_constructor extends block_base {
         $this->title = get_string('regex_constructor', 'block_regex_constructor');
     }
 
+    function get_required_javascript() {
+        parent::get_required_javascript();
+
+        $this->page->requires->jquery_plugin('poasquestion-jquerymodule', 'qtype_poasquestion');
+        $this->page->requires->jquery();
+        $this->page->requires->jquery_plugin('ui');
+        $this->page->requires->jquery_plugin('ui-css');
+        $this->page->requires->jquery_plugin('poasquestion-jquerymodule', 'qtype_poasquestion');
+
+        $this->page->requires->string_for_js('collapseall', 'moodle');
+        $this->page->requires->string_for_js('expandall', 'moodle');
+        $this->page->requires->string_for_js('savechanges', 'moodle');
+        $this->page->requires->string_for_js('cancel', 'moodle');
+        $this->page->requires->string_for_js('close', 'editor');
+    }
+
     public function get_content() {
         global $CFG;
         if ($this->content !== null) {
-          return $this->content;
+            return $this->content;
         }
 
         $this->content =  new stdClass;
@@ -45,18 +64,9 @@ class block_regex_constructor extends block_base {
                                '<script type="text/javascript">document.getElementById("' . $this->id . '").style.display="block";</script>';
         $this->content->footer = '';
 
-        $this->page->requires->jquery();
-        $this->page->requires->jquery_plugin('ui');
-        $this->page->requires->jquery_plugin('ui-css');
-
-        $this->page->requires->string_for_js('collapseall', 'moodle');
-        $this->page->requires->string_for_js('expandall', 'moodle');
-        $this->page->requires->string_for_js('savechanges', 'moodle');
-        $this->page->requires->string_for_js('cancel', 'moodle');
-        $this->page->requires->string_for_js('close', 'editor');
-
         $jsmodule = array('name' => 'poasquestion_text_and_button',
                                     'fullpath' => '/question/type/poasquestion/poasquestion_text_and_button.js');
+
         $jsargs = array(
                     '90%',
                     get_string('regex_constructor', 'block_regex_constructor')
@@ -77,6 +87,10 @@ class block_regex_constructor extends block_base {
         $pregjsargs = array(
             $CFG->wwwroot,
             'TODO - poasquestion_text_and_button_objname',  // 'M.poasquestion_text_and_button' ?
+        );
+        $this->page->requires->yui_module('moodle-form-shortforms',
+            'M.form.shortforms',
+            array(array("formid"=>"mformauthoring"))
         );
         $this->page->requires->js_init_call('M.preg_authoring_tools_script.init', $pregjsargs, true, $pregjsmodule);
 

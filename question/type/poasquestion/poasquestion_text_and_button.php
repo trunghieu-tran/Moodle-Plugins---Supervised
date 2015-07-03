@@ -72,6 +72,10 @@ class qtype_poasquestion_text_and_button extends MoodleQuickForm_textarea {
         $PAGE->requires->string_for_js('cancel', 'moodle');
         $PAGE->requires->string_for_js('close', 'editor');
 
+        // dependencies
+        //$PAGE->requires->js('/question/type/poasquestion/jquery.elastic.1.6.11.js');
+        $PAGE->requires->jquery_plugin('poasquestion-jquerymodule', 'qtype_poasquestion');
+
         if (!self::$_poasquestion_text_and_button_included) {
             $jsargs = array(
                 $dialogWidth,
@@ -111,7 +115,7 @@ class qtype_poasquestion_text_and_button extends MoodleQuickForm_textarea {
 
         $PAGE->requires->js_init_call('M.poasquestion_text_and_button.set_handler', $jsargs, true, $this->jsmodule);
 
-        return parent::toHtml() . '<a href="#" name="button_' . $this->getTextareaId() . '" id="' . $this->getButtonId() . '" title="' . $this->getTooltip() . '" >' .
+        return parent::toHtml() . '<a href="#" name="button_' . $this->getTextareaId() . '" id="' . $this->getButtonId() . '" title="' . $this->getTooltip() . '" style="margin-left: 5px" >' .
                                       '<img src="' . $this->linkToBtnImage . '" />' .
                                   '</a>';
     }

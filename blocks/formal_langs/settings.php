@@ -28,10 +28,24 @@ require_once($CFG->dirroot.'/blocks/formal_langs/settingslib.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/block_formal_langs.php');
 
 if(is_object($ADMIN)) {
-    // To erase Moolde default settings page we must set settings to null, see lib/pluginlib.php, line 3033
-    // DO NOT UNDER ANY CIRCUMSTANCES REMOVE THIS LINE! THIS IS NOT A DECLARATION!
-    $settings = null;
-
-    $string = get_string('pluginname', 'block_formal_langs');
+    $string = get_string('formallangsvisibilitysettings', 'block_formal_langs');
     $ADMIN->add('blocksettings', new admin_externalpage('formallangsglobalsettings', $string,  $CFG->wwwroot . '/blocks/formal_langs/globalsettings.php'));
+    if ($ADMIN->fulltree) {
+        $settings->add(new admin_setting_configtext(
+            'block_formal_langs_maximum_lexical_backracking_execution_time',
+            get_string('maximumlexicalbacktrackingexecutuiontimesettingname', 'block_formal_langs'),
+            get_string('maximumlexicalbacktrackingexecutuiontimesettingdescription', 'block_formal_langs'),
+            30,
+            PARAM_INT,
+            20
+        ));
+        $settings->add(new admin_setting_configtext(
+            'block_formal_langs_maximum_variations_of_typo_correction',
+            get_string('maximumvariationsoftypocorrectionsettingname', 'block_formal_langs'),
+            get_string('maximumvariationsoftypocorrectionsettingdescription', 'block_formal_langs'),
+            5,
+            PARAM_INT,
+            20
+        ));
+    }
 }

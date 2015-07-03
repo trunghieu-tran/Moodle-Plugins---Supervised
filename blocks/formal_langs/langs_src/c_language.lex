@@ -28,6 +28,7 @@ require_once($CFG->dirroot.'/blocks/formal_langs/language_base.php');
 require_once($CFG->dirroot.'/question/type/poasquestion/jlex.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/c_language_tokens.php');
 require_once($CFG->dirroot.'/blocks/formal_langs/language_utils.php');
+require_once($CFG->dirroot.'/lib/textlib.class.php');
 
 class block_formal_langs_language_c_language extends block_formal_langs_predefined_language
 {
@@ -38,6 +39,7 @@ class block_formal_langs_language_c_language extends block_formal_langs_predefin
     
     public function name() {
         return 'c_language';
+    }
     }
 
     public function lexem_name() {
@@ -64,7 +66,7 @@ class block_formal_langs_language_c_language extends block_formal_langs_predefin
     // @var int number of  current parsed lexeme.
     private  $counter = 0;
     private  $errors  = array();
-    // @var qtype_poasquestion_string  temporary string for buffer
+    // @var qtype_poasquestion\string  temporary string for buffer
     protected $statestring = null;
     // @var int line yyline for token
     protected $stateyyline = 0;
@@ -90,7 +92,7 @@ class block_formal_langs_language_c_language extends block_formal_langs_predefin
         $this->stateyyline = $this->yyline;
         $this->stateyycol = $this->yycol;
 		$this->stateyychar = $this->yychar;
-        $this->statestring = new qtype_poasquestion_string();
+        $this->statestring = new qtype_poasquestion\string();
     }
     // Appends a symbol string to a buffer
     private function append($sym) {
@@ -158,7 +160,7 @@ class block_formal_langs_language_c_language extends block_formal_langs_predefin
         // create token object
         $classname = 'block_formal_langs_c_token_' . $class;
         if (is_object($value) == false) {
-            $value = new qtype_poasquestion_string($value);
+            $value = new qtype_poasquestion\string($value);
         }
         $res = new $classname(null, $class, $value, $position, $this->counter);
         // increase token count
@@ -211,7 +213,7 @@ class block_formal_langs_language_c_language extends block_formal_langs_predefin
         $value = $result->value();
         if ($value[0] == 'L')
             $maxcharacterlength = $maxcharacterlength + 1;
-        if ( textlib::strlen($value) > $maxcharacterlength) {
+        if ( core_text::strlen($value) > $maxcharacterlength) {
             $res = new block_formal_langs_lexical_error();
             $res->tokenindex = $this->counter - 1;
             $a = new stdClass();
@@ -237,10 +239,10 @@ class block_formal_langs_language_c_language extends block_formal_langs_predefin
             $num_lines = count($lines);
             
             $end_line = $begin_line + $num_lines - 1;
-            $end_col = textlib::strlen($lines[$num_lines -1]) - 1;
+            $end_col = core_text::strlen($lines[$num_lines -1]) - 1;
         } else {
             $end_line = $begin_line;
-            $end_col = $begin_col + textlib::strlen($this->yytext()) - 1;
+            $end_col = $begin_col + core_text::strlen($this->yytext()) - 1;
         }
         
         $res = new block_formal_langs_node_position($begin_line, $end_line, $begin_col, $end_col, $begin_str, $end_str);
@@ -260,8 +262,8 @@ class block_formal_langs_language_c_language extends block_formal_langs_predefin
 
     private function return_buffered_pos() {
         $this->endyyline = $this->yyline;
-        $this->endyycol = $this->yycol + textlib::strlen($this->yytext()) - 1;
-		$this->endyychar = $this->yychar + textlib::strlen($this->yytext()) - 1;
+        $this->endyycol = $this->yycol + core_text::strlen($this->yytext()) - 1;
+		$this->endyychar = $this->yychar + core_text::strlen($this->yytext()) - 1;
         return $this->return_pos_by_field('stateyyline', 'stateyycol', 'stateyychar', 'endyyline', 'endyycol', 'endyychar');
     }
 
@@ -281,10 +283,24 @@ class block_formal_langs_language_c_language extends block_formal_langs_predefin
         if (is_object($realstring)) {
             $realstring = $realstring->string();
         }
-        $token1string = textlib::substr($realstring,0, $splitoffset);
-        $token2string = textlib::substr($realstring, $splitoffset, null);
-        $token1string = new qtype_poasquestion_string($token1string);
-        $token2string = new qtype_poasquestion_string($token2string);
+    }
+
+
+
+    private function hande_buffered_token_error($errorstring, $tokenstring, $splitoffset) {
+        $pos = $this->return_error_token_pos();
+        $pos1 = new block_formal_langs_node_position($pos->linestart(), $pos->linestart(), $pos->colstart(), $pos->colstart() + $splitoffset - 1);
+        $pos2 = new block_formal_langs_node_position($pos->linestart(), $pos->lineend(), $pos->colstart() + $splitoffset, $pos->colend() - 1);
+        $this->endstate = true;
+
+        $realstring = $tokenstring;
+        if (is_object($realstring)) {
+            $realstring = $realstring->string();
+        }
+        $token1string = core_text::substr($realstring,0, $splitoffset);
+        $token2string = core_text::substr($realstring, $splitoffset, null);
+        $token1string = new qtype_poasquestion\string($token1string);
+        $token2string = new qtype_poasquestion\string($token2string);
 
         $token1 =  $this->create_token_with_position('unknown', $token1string, $pos1);
         $token2 =  $this->create_token_with_position('unknown', $token2string, $pos2);
@@ -307,7 +323,9 @@ class block_formal_langs_language_c_language extends block_formal_langs_predefin
         return $t;
     } else if ($this->yy_lexical_state == self::MULTILINE_COMMENT)  {
         return $this->hande_buffered_token_error($this->statestring, $this->buffer(), 2);
+        return $this->hande_buffered_token_error($this->statestring, $this->buffer(), 2);
     } else if ($this->yy_lexical_state == self::STRING)  {
+        return $this->hande_buffered_token_error($this->statestring, $this->statestring, 1);
         return $this->hande_buffered_token_error($this->statestring, $this->statestring, 1);
     } else if ($this->yy_lexical_state == self::CHARACTER)  {
         return $this->hande_buffered_token_error($this->statestring, $this->statestring, 1);
@@ -317,6 +335,7 @@ class block_formal_langs_language_c_language extends block_formal_langs_predefin
             return $this->endtoken;
         } else {
             return null;
+        }
         }
     }
 %eofval}

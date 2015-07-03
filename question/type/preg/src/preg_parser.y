@@ -1,7 +1,6 @@
 %name qtype_preg_
 %include {
     global $CFG;
-    require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
     require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
     require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 }
@@ -9,27 +8,36 @@
 %include_class {
     // Root of the Abstract Syntax Tree (AST).
     private $root;
-    // Objects of qtype_preg_node_error for errors found during the parsing.
+
+    // Objects of qtype_preg_node_error for errors found during parsing.
     private $errornodes;
+
     // Handling options.
-    private $handlingoptions;
+    private $options;
+
     // Counter of nodes id. After parsing, equals the number of nodes in the tree.
     private $id_counter;
+
     // Counter of subpatterns.
     private $subpatt_counter;
-    // Map subpattern number => subpattern node.
-    private $subpatt_map;
 
-    public function __construct($handlingoptions = null) {
+    // Map subpattern number => subpattern node.
+    private $subpatt_number_to_node_map;
+
+    // Map subexpression number => nodes (possibly duplicates).
+    private $subexpr_number_to_nodes_map;
+
+    public function __construct($options = null) {
         $this->root = null;
         $this->errornodes = array();
-        if ($handlingoptions == null) {
-            $handlingoptions = new qtype_preg_handling_options();
+        if ($options == null) {
+            $options = new qtype_preg_handling_options();
         }
-        $this->handlingoptions = $handlingoptions;
+        $this->options = $options;
         $this->id_counter = 0;
         $this->subpatt_counter = 0;
-        $this->subpatt_map = array();
+        $this->subpatt_number_to_node_map = array();
+        $this->subexpr_number_to_nodes_map = array();
     }
 
     public function get_root() {
@@ -56,8 +64,12 @@
         return $this->subpatt_counter - 1;
     }
 
-    public function get_subpatt_map() {
-        return $this->subpatt_map;
+    public function get_subpatt_number_to_node_map() {
+        return $this->subpatt_number_to_node_map;
+    }
+
+    public function get_subexpr_number_to_nodes_map() {
+        return $this->subexpr_number_to_nodes_map;
     }
 
     /**
@@ -84,6 +96,17 @@
         $result->operands[0] = $operand;
         $result->set_user_info($position, array(new qtype_preg_userinscription($operator->userinscription[0] . '...)')));
         return $result;
+    }
+
+    protected function add_cond_subexpr_negative_branch($node) {
+        $shift = (int)$node->is_condition_assertion();
+
+        // Add an eps leaf if there's only positive branch.
+        if (count($node->operands) - $shift == 1) {
+            $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+            $epsleaf->set_user_info($node->position->right()->add_chars_right(-1));
+            $node->operands[] = $epsleaf;
+        }
     }
 
     protected function create_cond_subexpr_assertion_node($node, $assertbody, $exprnode, $closeparen) {
@@ -125,6 +148,8 @@
             $node->operands[] = $exprnode;
         }
 
+        $this->add_cond_subexpr_negative_branch($node);
+
         $node->set_user_info($position, array(new qtype_preg_userinscription($node->userinscription[0] . '...)...|...)')));
         return $node;
     }
@@ -139,43 +164,36 @@
 
         if ($exprnode->type == qtype_preg_node::TYPE_NODE_ALT) {
             $node->operands = $exprnode->operands;
-            $limit = $node->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE ? 1 : 2;
-            if (count($exprnode->operands) > $limit) {
+            if ($node->subtype == qtype_preg_node_cond_subexpr::SUBTYPE_DEFINE || count($exprnode->operands) > 2) {
                 // Error: only one or two top-level alternations allowed in a conditional subexpression.
                 $node->errors[] = $this->create_error_node(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_TOO_MUCH_ALTER, null, $position, array(), array($exprnode));
             }
         } else {
-            $node->operands[0] = $exprnode;
+            $node->operands = array($exprnode);
         }
 
-        $node->set_user_info($position, array(new qtype_preg_userinscription($node->userinscription[0] . '...|...)')));
+        $ui = implode('|', array_fill(0, count($node->operands), '...')) . ')';
+
+        $this->add_cond_subexpr_negative_branch($node);
+
+        $node->set_user_info($position, array(new qtype_preg_userinscription($node->userinscription[0] . $ui)));
         return $node;
     }
 
-    protected function assign_subpatts($node) {
-        if ($node->is_subpattern() || $node === $this->root) {
-            $node->subpattern = $this->subpatt_counter++;
-            $this->subpatt_map[$node->subpattern] = $node;
-        }
+    protected function build_subexpr_number_to_nodes_map($node) {
         if (is_a($node, 'qtype_preg_operator')) {
             foreach ($node->operands as $operand) {
-                $this->assign_subpatts($operand);
+                $this->build_subexpr_number_to_nodes_map($operand);
             }
+        }
+        if ($node->subtype == qtype_preg_node_subexpr::SUBTYPE_SUBEXPR) {
+            if (!array_key_exists($node->number, $this->subexpr_number_to_nodes_map)) {
+                $this->subexpr_number_to_nodes_map[$node->number] = array();
+            }
+            $this->subexpr_number_to_nodes_map[$node->number][] = $node;
         }
     }
 
-    protected function assign_ids($node) {
-        $node->id = ++$this->id_counter;
-        if (is_a($node, 'qtype_preg_operator')) {
-            foreach ($node->operands as $operand) {
-                $this->assign_ids($operand);
-            }
-        }
-    }
-
-    /**
-     * Calculates $isrecursive for all qtype_preg_leaf_subexpr_call instances.
-     */
     protected function detect_recursive_subexpr_calls($node, $currentsubexprs = array(0)) {
         if ($node->type == qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL) {
             $node->isrecursive = in_array($node->number, $currentsubexprs);
@@ -193,6 +211,25 @@
                 $this->detect_recursive_subexpr_calls($operand, $newsubexprs);
             }
         }
+    }
+
+    protected function replace_non_recursive_subexpr_calls($node) {
+        if (is_a($node, 'qtype_preg_operator')) {
+            foreach ($node->operands as $key => $operand) {
+                $node->operands[$key] = $this->replace_non_recursive_subexpr_calls($operand);
+            }
+        }
+
+        if ($node->type == qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL && !$node->isrecursive && array_key_exists($node->number, $this->subexpr_number_to_nodes_map)) {
+
+            // According to pcre.txt, we are able to replace the node.
+            // Options affected the (?n) leaf do not affect the original node.
+            // But we shoud treat the replacement node as an atomic group.
+            $node = clone $this->subexpr_number_to_nodes_map[$node->number][0];
+            $node->subtype = qtype_preg_node_subexpr::SUBTYPE_GROUPING;   // TODO: onceonly.
+        }
+
+        return $node;
     }
 
     protected function expand_quantifiers($node) {
@@ -237,6 +274,27 @@
         return $node;
     }
 
+    protected function assign_subpatts($node) {
+        if ($node->is_subpattern() || $node === $this->root) {
+            $node->subpattern = $this->subpatt_counter++;
+            $this->subpatt_number_to_node_map[$node->subpattern] = $node;
+        }
+        if (is_a($node, 'qtype_preg_operator')) {
+            foreach ($node->operands as $operand) {
+                $this->assign_subpatts($operand);
+            }
+        }
+    }
+
+    protected function assign_ids($node) {
+        $node->id = ++$this->id_counter;
+        if (is_a($node, 'qtype_preg_operator')) {
+            foreach ($node->operands as $operand) {
+                $this->assign_ids($operand);
+            }
+        }
+    }
+
     protected static function is_alt_nullable($altnode) {
         foreach ($altnode->operands as $operand) {
             if ($operand->type == qtype_preg_node::TYPE_LEAF_META && $operand->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
@@ -254,35 +312,62 @@
 %nonassoc ERROR_PREC_SHORTEST.
 %nonassoc ERROR_PREC_SHORT.
 %nonassoc ERROR_PREC.
-%nonassoc CLOSEBRACK.
+%nonassoc CLOSEBRACK TEMPLATECLOSEBRACK.
+%left TEMPLATESEP_SHORTEST.
+%left TEMPLATESEP_SHORT.
+%left TEMPLATESEP.
 %left ALT_SHORTEST.
 %left ALT_SHORT.
 %left ALT.
-%left CONC PARSELEAF.
+%left CONC PARSELEAF TEMPLATEPARSELEAF.
 %nonassoc QUANT.
-%nonassoc OPENBRACK CONDSUBEXPR.
+%nonassoc OPENBRACK TEMPLATEOPENBRACK CONDSUBEXPR.
 
 start ::= expr(B). {
     // Set the root node.
     $this->root = B;
 
-    // Assign subpattern numbers.
-    $this->assign_subpatts($this->root);
-
-    // Expand quantifiers if needed.
-    if ($this->handlingoptions->expandquantifiers) {
-        $this->root = $this->expand_quantifiers($this->root);
-    }
-
-    // Assign identifiers.
-    $this->assign_ids($this->root);
+    // Build subexpr map.
+    $this->build_subexpr_number_to_nodes_map($this->root);
 
     // Calculate recursive subexpression calls.
     $this->detect_recursive_subexpr_calls($this->root);
+
+    // Replace non-recursive subexpression calls if needed.
+    if ($this->options->replacesubexprcalls) {
+        $this->root = $this->replace_non_recursive_subexpr_calls($this->root);
+    }
+
+    // Expand quantifiers if needed.
+    if ($this->options->expandquantifiers) {
+        $this->root = $this->expand_quantifiers($this->root);
+    }
+
+    // Assign subpattern numbers.
+    $this->assign_subpatts($this->root);
+
+     // Assign identifiers.
+    $this->assign_ids($this->root);
+
+    // Calculate nullable, firstpos, lastpos and followpos for all nodes.
+    $followpos = array();   // TODO: make a field + getter if this is needed
+    $this->root->calculate_nflf($followpos);
 }
 
 expr(A) ::= PARSELEAF(B). {
     A = B;
+}
+
+expr(A) ::= TEMPLATEPARSELEAF(B). {
+    A = B;
+    $available = qtype_preg\template::available_templates();
+    if (array_key_exists(A->name, $available)) {
+        $template = $available[A->name];
+        if ($template->placeholderscount > 0) {
+            // Template node called as a leaf
+            $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_TEMPLATE_PARAMS_COUNT, A->name, A->position, A->userinscription, array());
+        }
+    }
 }
 
 expr(A) ::= expr(B) expr(C). [CONC] {
@@ -325,7 +410,7 @@ expr(A) ::= expr(B) ALT(C). [ALT_SHORT] {
     if (B->type == qtype_preg_node::TYPE_LEAF_META && B->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
         A = B;
     } else if (B->type == qtype_preg_node::TYPE_NODE_ALT) {
-        if ($this->handlingoptions->preserveallnodes || !self::is_alt_nullable(B)) {
+        if ($this->options->preserveallnodes || !self::is_alt_nullable(B)) {
             $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             $epsleaf->set_user_info(C->position->add_chars_left(1));
             B->operands[] = $epsleaf;
@@ -345,7 +430,7 @@ expr(A) ::= ALT(B) expr(C). [ALT_SHORT] {
     if (C->type == qtype_preg_node::TYPE_LEAF_META && C->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY) {
         A = C;
     } else if (C->type == qtype_preg_node::TYPE_NODE_ALT) {
-        if ($this->handlingoptions->preserveallnodes || !self::is_alt_nullable(C)) {
+        if ($this->options->preserveallnodes || !self::is_alt_nullable(C)) {
             $epsleaf = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
             $epsleaf->set_user_info(B->position->add_chars_right(-1));
             C->operands = array_merge(array($epsleaf), C->operands);
@@ -383,8 +468,7 @@ expr(A) ::= OPENBRACK(B) expr(C) CLOSEBRACK(D). {
 }
 
 expr(A) ::= CONDSUBEXPR(B) expr(C) CLOSEBRACK(D) expr(E) CLOSEBRACK(F). {
-    if (B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA || B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA ||
-        B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB || B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB) {
+    if (B->is_condition_assertion()) {
         A = $this->create_cond_subexpr_assertion_node(B, C, E, F);
     } else {
         A = $this->create_cond_subexpr_other_node(B, E, F);
@@ -392,8 +476,7 @@ expr(A) ::= CONDSUBEXPR(B) expr(C) CLOSEBRACK(D) expr(E) CLOSEBRACK(F). {
 }
 
 expr(A) ::= CONDSUBEXPR(B) expr(C) CLOSEBRACK(D) CLOSEBRACK(E). {
-    if (B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA || B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA ||
-        B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB || B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB) {
+    if (B->is_condition_assertion()) {
         A = $this->create_cond_subexpr_assertion_node(B, C, null, E);
     } else {
         A = $this->create_cond_subexpr_other_node(B, null, E);
@@ -401,8 +484,7 @@ expr(A) ::= CONDSUBEXPR(B) expr(C) CLOSEBRACK(D) CLOSEBRACK(E). {
 }
 
 expr(A) ::= CONDSUBEXPR(B) CLOSEBRACK(C) expr(D) CLOSEBRACK(E). {
-    if (B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA || B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA ||
-        B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB || B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB) {
+    if (B->is_condition_assertion()) {
         A = $this->create_cond_subexpr_assertion_node(B, null, D, E);
     } else {
         A = $this->create_cond_subexpr_other_node(B, D, E);
@@ -410,11 +492,65 @@ expr(A) ::= CONDSUBEXPR(B) CLOSEBRACK(C) expr(D) CLOSEBRACK(E). {
 }
 
 expr(A) ::= CONDSUBEXPR(B) CLOSEBRACK(C) CLOSEBRACK(D). {
-    if (B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLA || B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLA ||
-        B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_PLB || B->subtype === qtype_preg_node_cond_subexpr::SUBTYPE_NLB) {
+    if (B->is_condition_assertion()) {
         A = $this->create_cond_subexpr_assertion_node(B, null, null, D);
     } else {
         A = $this->create_cond_subexpr_other_node(B, null, D);
+    }
+}
+
+/**************************************************
+ *    Below are the rules for templates parsing.  *
+ **************************************************/
+
+expr(A) ::= expr(B) TEMPLATESEP(C) expr(D). {
+    $b = is_array(B) ? B : array(B);
+    $d = is_array(D) ? D : array(D);
+    A = array_merge($b, $d);
+}
+
+expr(A) ::= expr(B) TEMPLATESEP(C). [TEMPLATESEP_SHORT] {
+    A = B;
+}
+
+expr(A) ::= TEMPLATESEP(B) expr(C). [TEMPLATESEP_SHORT] {
+    A = C;
+}
+
+expr(A) ::= TEMPLATESEP(B). [TEMPLATESEP_SHORTEST] {
+    A = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+    A->set_user_info(B->position, B->userinscription);
+}
+
+expr(A) ::= TEMPLATEOPENBRACK(B) TEMPLATECLOSEBRACK(C). {
+    $emptynode = new qtype_preg_leaf_meta(qtype_preg_leaf_meta::SUBTYPE_EMPTY);
+    $emptynode->set_user_info(C->position->add_chars_right(-1), array_merge(B->userinscription, C->userinscription));
+    $position = B->position->compose(C->position);
+    A = B;
+    A->operands = array($emptynode);
+    A->position = $position;
+    $available = qtype_preg\template::available_templates();
+    if (array_key_exists(A->name, $available)) {
+        $template = $available[A->name];
+        if ($template->placeholderscount === 0) {
+            // Template leaf called as a node
+            $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_TEMPLATE_PARAMS_COUNT, A->name, $position, A->userinscription, array());
+        }
+    }
+}
+
+expr(A) ::= TEMPLATEOPENBRACK(B) expr(C) TEMPLATECLOSEBRACK(D). {
+    $position = B->position->compose(D->position);
+    A = B;
+    A->operands = is_array(C) ? C : array(C);
+    A->position = $position;
+    $available = qtype_preg\template::available_templates();
+    if (array_key_exists(A->name, $available)) {
+        $template = $available[A->name];
+        if ($template->placeholderscount !== count(A->operands)) {
+            // Wrong number of parameters
+            $this->create_error_node(qtype_preg_node_error::SUBTYPE_WRONG_TEMPLATE_PARAMS_COUNT, A->name, $position, A->userinscription, array());
+        }
     }
 }
 
@@ -424,57 +560,51 @@ expr(A) ::= CONDSUBEXPR(B) CLOSEBRACK(C) CLOSEBRACK(D). {
 
 
 expr(A) ::= expr(B) CLOSEBRACK(C). [ERROR_PREC] {
-    $position = new qtype_preg_position(C->position->indfirst, C->position->indlast,
-                                        C->position->linefirst, C->position->linelast,
-                                        C->position->colfirst, C->position->collast);
-    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_OPEN_PAREN, C->userinscription[0]->data, $position, C->userinscription, array(B));
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_OPEN_PAREN, C->userinscription[0]->data, C->position, C->userinscription, array(B));
+}
+
+expr(A) ::= expr(B) TEMPLATECLOSEBRACK(C). [ERROR_PREC] {
+    $b = is_array(B) ? B : array(B);
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_OPEN_PAREN, C->userinscription[0]->data, C->position, C->userinscription, $b);
 }
 
 expr(A) ::= CLOSEBRACK(B). [ERROR_PREC_SHORT] {
-    $position = new qtype_preg_position(B->position->indfirst, B->position->indlast,
-                                        B->position->linefirst, B->position->linelast,
-                                        B->position->colfirst, B->position->collast);
-    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_OPEN_PAREN, B->userinscription[0]->data, $position, B->userinscription);
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_OPEN_PAREN, B->userinscription[0]->data, B->position, B->userinscription);
+}
+
+expr(A) ::= TEMPLATECLOSEBRACK(B). [ERROR_PREC_SHORT] {
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_OPEN_PAREN, B->userinscription[0]->data, B->position, B->userinscription);
 }
 
 expr(A) ::= OPENBRACK(B) expr(C). [ERROR_PREC] {
-    $position = new qtype_preg_position(B->position->indfirst, B->position->indlast,
-                                        B->position->linefirst, B->position->linelast,
-                                        B->position->colfirst, B->position->collast);
-    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, B->userinscription[0]->data, $position, B->userinscription, array(C));
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, B->userinscription[0]->data, B->position, B->userinscription, array(C));
+}
+
+expr(A) ::= TEMPLATEOPENBRACK(B) expr(C). [ERROR_PREC] {
+    $c = is_array(C) ? C : array(C);
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_CLOSE_PAREN, B->userinscription[0]->data, B->position, B->userinscription, $c);
 }
 
 expr(A) ::= OPENBRACK(B). [ERROR_PREC_SHORT] {
-    $position = new qtype_preg_position(B->position->indfirst, B->position->indlast,
-                                        B->position->linefirst, B->position->linelast,
-                                        B->position->colfirst, B->position->collast);
-    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, B->userinscription[0]->data, $position, B->userinscription);
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, B->userinscription[0]->data, B->position, B->userinscription);
+}
+
+expr(A) ::= TEMPLATEOPENBRACK(B). [ERROR_PREC_SHORT] {
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_TEMPLATE_CLOSE_PAREN, B->userinscription[0]->data, B->position, B->userinscription);
 }
 
 expr(A) ::= CONDSUBEXPR(B) expr(C) CLOSEBRACK(D) expr(E). [ERROR_PREC] {
-    $position = new qtype_preg_position(B->position->indfirst, B->position->indlast,
-                                        B->position->linefirst, B->position->linelast,
-                                        B->position->colfirst, B->position->collast);
-    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, B->userinscription[0]->data, $position, B->userinscription, array(E, C));
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, B->userinscription[0]->data, B->position, B->userinscription, array(E, C));
 }
 
 expr(A) ::= CONDSUBEXPR(B) expr(C). [ERROR_PREC_SHORT] {
-    $position = new qtype_preg_position(B->position->indfirst, B->position->indlast,
-                                        B->position->linefirst, B->position->linelast,
-                                        B->position->colfirst, B->position->collast);
-    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, B->userinscription[0]->data, $position, B->userinscription, array(C));
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, B->userinscription[0]->data, B->position, B->userinscription, array(C));
 }
 
 expr(A) ::= CONDSUBEXPR(B). [ERROR_PREC_SHORTEST] {
-    $position = new qtype_preg_position(B->position->indfirst, B->position->indlast,
-                                        B->position->linefirst, B->position->linelast,
-                                        B->position->colfirst, B->position->collast);
-    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, B->userinscription[0]->data, $position, B->userinscription);
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_MISSING_CLOSE_PAREN, B->userinscription[0]->data, B->position, B->userinscription);
 }
 
 expr(A) ::= QUANT(B). [ERROR_PREC] {
-    $position = new qtype_preg_position(B->position->indfirst, B->position->indlast,
-                                        B->position->linefirst, B->position->linelast,
-                                        B->position->colfirst, B->position->collast);
-    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER, B->userinscription[0]->data, $position, B->userinscription);
+    A = $this->create_error_node(qtype_preg_node_error::SUBTYPE_QUANTIFIER_WITHOUT_PARAMETER, B->userinscription[0]->data, B->position, B->userinscription);
 }

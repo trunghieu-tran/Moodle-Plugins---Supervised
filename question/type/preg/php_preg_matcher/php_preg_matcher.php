@@ -27,7 +27,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_matcher.php');
 
 class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
@@ -67,7 +66,7 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
      */
     protected function is_parsing_needed() {
         // We need parsing if option is set for capture subexpressions.
-        return $this->options->capturesubexpressions;
+        return $this->options->capturesubexpressions || $this->options->parsetemplates;
     }
 
     protected function is_preg_node_acceptable($pregnode) {
@@ -89,7 +88,7 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
             $regex = implode('\/', explode('/', $regex));
         }
         if (!$this->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED)) { // Avoid newlines in non-extended mode.
-            $regex = qtype_poasquestion_string::replace("\n", '', $regex);
+            $regex = qtype_poasquestion\string::replace("\n", '', $regex);
         }
         $regex = '/' . $regex . '/u';
 
@@ -109,12 +108,12 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
     protected function match_inner($str) {
         // Prepare results.
         $matchresults = new qtype_preg_matching_results();
-        $matchresults->set_source_info($str, $this->get_max_subexpr(), $this->get_subexpr_map());// Needed to invalidate match correctly.
+        $matchresults->set_source_info($str, $this->get_max_subexpr(), $this->get_subexpr_name_to_number_map());// Needed to invalidate match correctly.
         $matchresults->invalidate_match();
 
         // Preparing regexp.
         $regex = $this->regex;
-        // Enclose 
+        // Enclose
         if (strpos($regex, '/') !== false) {// Escape any slashes.
             $regex = implode('\/', explode('/', $regex));
         }
@@ -125,7 +124,7 @@ class qtype_preg_php_preg_matcher extends qtype_preg_matcher {
             $regex = '^(?:' . $regex . "\n)$";
         }
         if (!$this->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED)) { // Avoid newlines in non-extended mode.
-            $regex = qtype_poasquestion_string::replace("\n", '', $regex);
+            $regex = qtype_poasquestion\string::replace("\n", '', $regex);
         }
         $regex = '/' . $regex . '/u';
         $regex .= $this->options->modifiers_to_string();

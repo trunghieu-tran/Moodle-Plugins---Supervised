@@ -27,7 +27,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/question/type/poasquestion/poasquestion_string.php');
 require_once($CFG->dirroot . '/question/type/poasquestion/jlex.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_parser.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
@@ -70,6 +69,7 @@ class qtype_preg_opt_stack_item {
 QUANTTYPE  = ("?"|"+")?                                 // Greedy, lazy or possessive quantifiers.
 MODIFIER   = [imsxuADSUXJ]                              // Recognizable modifiers letters.
 ALNUM      = [^"!\"#$%&'()*+,-./:;<=>?[\]^`{|}~" \t\n]  // Used in subexpression\backreference names.
+DIGIT      = [0123456789]                               // Simply decimal digit.
 ANY        = (.|[\r\n])                                 // Any character.
 SIGN       = ("+"|"-")                                  // Sign of an integer.
 WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
@@ -99,28 +99,29 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
 
     // Check for references to unexisting subexpressions.
     foreach ($this->nodes_with_subexpr_refs as $node) {
-        $number = $node->number;
-        if (is_int($number)) {
-            if ($number > $this->maxsubexpr) {
+        if (is_int($node->number)) {
+            if ($node->number > $this->maxsubexpr) {
                 // Error: unexisting subexpression.
-                $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBEXPR, $number, $node);
+                $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBEXPR, $node->number, $node);
                 $error->set_user_info($node->position, $node->userinscription);
             }
             continue;   // No need for further checks if it's an integer number.
         }
 
-        // Convert name to number.
-        $number = isset($this->subexpr_name_to_number_map[$number]) ? $this->subexpr_name_to_number_map[$number] : null;
+        // Convert names to numbers.
+        if (isset($node->name)) {
+            $number = isset($this->subexpr_name_to_number_map[$node->name]) ? $this->subexpr_name_to_number_map[$node->name] : null;
 
-        if ($number === null && !($node->type == qtype_preg_node::TYPE_NODE_COND_SUBEXPR && $node->number === '')) {
-            // Error: unexisting subexpression.
-            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBEXPR, $node->number, $node);
-            $error->set_user_info($node->position, $node->userinscription);
-        }
+            if ($number === null && !($node->type == qtype_preg_node::TYPE_NODE_COND_SUBEXPR && $node->name === '')) {
+                // Error: unexisting subexpression.
+                $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNEXISTING_SUBEXPR, $node->name, $node);
+                $error->set_user_info($node->position, $node->userinscription);
+            }
 
-        // For matchers: replace name with number for simple usage.
-        if (!$this->options->preserveallnodes) {
-            $node->number = $number;
+            // For matchers: replace name with number for simple usage.
+            //if (!$this->options->preserveallnodes) {
+                $node->number = $number;
+            //}
         }
     }
 
@@ -137,11 +138,18 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     // Regex handling options set from the outside.
     protected $options = null;
 
+    // All modifiers occured in the regex.
+    protected $allmodifiers = array();
+
     // Positions skipped because preserveallnodes option was set to false.
     protected $skipped_positions = array();
 
     // Array of lexical errors found.
     protected $errors = array();
+
+    // Subexpression number corresponding to the whole regex.
+    // By default is 0, but greater when lexing templates.
+    protected $initialsubexpr = 0;
 
     // Number of the last lexed subexpression, used to deal with (?| ... ) constructions.
     protected $lastsubexpr = 0;
@@ -187,6 +195,28 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
 
     // Characters of the charset.
     protected $charset_set = '';
+
+    public static function tokenize_regex($regex, $options, &$lexer, &$hastemplates) {
+        StringStreamController::createRef('regex', $regex);
+        $pseudofile = fopen('string://regex', 'r');
+        $lexer = new qtype_preg_lexer($pseudofile);
+        $lexer->set_options($options);
+        $hastemplates = false;
+
+        $result = array();
+        while (($token = $lexer->nextToken()) !== null) {
+            if (is_array($token)) {
+                foreach ($token as $curtoken) {
+                    $result[] = $curtoken;
+                    $hastemplates = $hastemplates || ($curtoken->type === qtype_preg_parser::TEMPLATEPARSELEAF || $curtoken->type === qtype_preg_parser::TEMPLATEOPENBRACK);
+                }
+            } else {
+                $result[] = $token;
+                $hastemplates = $hastemplates || ($token->type === qtype_preg_parser::TEMPLATEPARSELEAF || $token->type === qtype_preg_parser::TEMPLATEOPENBRACK);
+            }
+        }
+        return $result;
+    }
 
     public static function char_escape_sequences_outside_charset() {
         return array('\a',
@@ -292,15 +322,23 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
         return $this->skipped_positions;
     }
 
+    public function get_all_modifiers() {
+        return $this->allmodifiers;
+    }
+
     public function get_error_nodes() {
         return $this->errors;
+    }
+
+    public function get_last_subexpr() {
+        return $this->lastsubexpr;
     }
 
     public function get_max_subexpr() {
         return $this->maxsubexpr;
     }
 
-    public function get_subexpr_map() {
+    public function get_subexpr_name_to_number_map() {
         return $this->subexpr_name_to_number_map;
     }
 
@@ -318,7 +356,7 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     }
 
     protected static function ctype_octal($str) {
-        $str = new qtype_poasquestion_string($str);
+        $str = new qtype_poasquestion\string($str);
         for ($i = 0; $i < $str->length(); $i++) {
             $ch = $str[$i];
             if (!ctype_digit($ch) || (int)$ch > 7) {
@@ -351,6 +389,13 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
         $stackitem = end($this->opt_stack);
         $stackitem->options->unset_modifier($unset);
         $stackitem->options->set_modifier($set);
+
+        foreach (qtype_preg_handling_options::get_all_modifiers() as $mod) {
+            if ($set & $mod && !in_array($mod, $this->allmodifiers)) {
+                $this->allmodifiers[] = $mod;
+            }
+        }
+
         return null;
     }
 
@@ -601,7 +646,7 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
         return $this->form_subexpr($text, qtype_preg_node_subexpr::SUBTYPE_SUBEXPR, $number, $name, $isduplicate);
     }
 
-    protected function form_subexpr($text, $subtype, $number = -1, $name = null, $isduplicate = false) {
+    protected function form_subexpr($text, $subtype, $number = null, $name = null, $isduplicate = false) {
         $node = new qtype_preg_node_subexpr($subtype, $number, $name, $isduplicate);
         $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
         return new JLexToken(qtype_preg_parser::OPENBRACK, $node);
@@ -610,7 +655,7 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     /**
      * Returns a conditional subexpression (number of name condition) token.
      */
-    protected function form_numeric_or_named_cond_subexpr($text, $number, $ending = '') {
+    protected function form_numeric_or_named_cond_subexpr($text, $number, $name, $ending = '') {
         $this->push_options_stack_item();
 
         // Error: unclosed condition.
@@ -619,15 +664,15 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
             return new JLexToken(qtype_preg_parser::OPENBRACK, $error);
         }
 
-        $node = new qtype_preg_node_cond_subexpr(qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR, $number);
+        $node = new qtype_preg_node_cond_subexpr(qtype_preg_node_cond_subexpr::SUBTYPE_SUBEXPR, $number, $name);
         $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
 
-        if (is_integer($number) && $number == 0) {
+        if (is_integer($number) && $number === 0) {
             // Error: reference to the whole expression.
-            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CONSUBEXPR_ZERO_CONDITION, $number, $node);
-        } else if ($number === '') {
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CONSUBEXPR_ZERO_CONDITION, '', $node);
+        } else if (is_string($name) && $name === '') {
             // Error: assertion expected.
-            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED, $number, $node);
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED, '', $node);
         }
 
         $this->nodes_with_subexpr_refs[] = $node;
@@ -643,7 +688,7 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     /**
      * Returns a conditional subexpression (recursion condition) token.
      */
-    protected function form_recursive_cond_subexpr($text, $number) {
+    protected function form_recursive_cond_subexpr($text, $number, $name) {
         $this->push_options_stack_item();
 
         // Error: unclosed condition.
@@ -652,13 +697,15 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
             return new JLexToken(qtype_preg_parser::OPENBRACK, $error);
         }
 
-        $node = new qtype_preg_node_cond_subexpr(qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION, $number);
+        $node = new qtype_preg_node_cond_subexpr(qtype_preg_node_cond_subexpr::SUBTYPE_RECURSION, $number, $name);
         $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
 
-        if ($number === '') {
+        if ($name === '') {
             // Error: assertion expected.
-            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED, $number, $node);
+            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_CONDSUBEXPR_ASSERT_EXPECTED, '', $node);
         }
+
+        $this->nodes_with_subexpr_refs[] = $node;
 
         $closebr = new qtype_preg_lexem();
         $closebr->set_user_info($this->current_position_for_node());
@@ -727,14 +774,14 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
             return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
         }
 
-        return $this->form_backref($text, $name);
+        return $this->form_backref($text, null, $name);
     }
 
     /**
      * Returns a backreference token.
      */
-    protected function form_backref($text, $number) {
-        $node = new qtype_preg_leaf_backref($number);
+    protected function form_backref($text, $number, $name) {
+        $node = new qtype_preg_leaf_backref($number, $name);
         $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
         $this->set_node_modifiers($node);
         $this->nodes_with_subexpr_refs[] = $node;
@@ -766,7 +813,7 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
             $flag = new qtype_preg_charset_flag;
             $flag->negative = $negative;
             if ($type == qtype_preg_charset_flag::TYPE_SET) {
-                $data = new qtype_poasquestion_string($data);
+                $data = new qtype_poasquestion\string($data);
             }
             $flag->set_data($type, $data);
             $node->flags = array(array($flag));
@@ -783,16 +830,15 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
             $error = $this->form_error(qtype_preg_node_error::SUBTYPE_SUBEXPR_NAME_EXPECTED, $text);
             return new JLexToken(qtype_preg_parser::PARSELEAF, $error);
         }
-        return $this->form_subexpr_call($text, $name);
+        return $this->form_subexpr_call($text, null, $name);
     }
 
     /**
      * Returns a subexpression call token.
      */
-    protected function form_subexpr_call($text, $number) {
-        $node = new qtype_preg_leaf_subexpr_call();
+    protected function form_subexpr_call($text, $number, $name) {
+        $node = new qtype_preg_leaf_subexpr_call($number, $name);
         $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
-        $node->number = $number;
         $this->set_node_modifiers($node);
         $this->nodes_with_subexpr_refs[] = $node;
         return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
@@ -827,7 +873,12 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
             $curord = core_text::utf8ord($startchar);
             $endord = core_text::utf8ord($endchar);
             while ($curord <= $endord) {
-                $this->charset_set .= qtype_preg_unicode::code2utf8($curord++);
+                $tmp = qtype_preg_unicode::code2utf8($curord++);
+                if ($tmp == '-') {
+                    $this->charset_set = $tmp . $this->charset_set;
+                } else {
+                    $this->charset_set .= $tmp;
+                }
                 $this->charset_count++;
             }
         } else {
@@ -871,21 +922,21 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
         $topitem = end($this->opt_stack);
         $modJ = $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_DUPNAMES);
 
-        $assumed_name = $this->subexpr_number_to_name_map[$number];
-
-        if ($number == $this->lastsubexpr && !$modJ) {
-            // Two subexpressions with same number in a row is error.
-            $error = $this->form_error(qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBEXPR_NAMES, $name, '');
-            return $error;
+        if ($modJ) {
+            // Just keep on increasing numbers.
+            $this->lastsubexpr++;
+            $this->maxsubexpr = max($this->maxsubexpr, $this->lastsubexpr);
+            return $this->lastsubexpr;
+        } else {
+            // Check if the number is correct.
+            if ($number !== $this->lastsubexpr + 1) {
+                // Two subexpressions with same number in a row is error.
+                $error = $this->form_error(qtype_preg_node_error::SUBTYPE_DUPLICATE_SUBEXPR_NAMES, $name, '');
+                return $error;
+            }
+            $this->lastsubexpr = $number;
+            return $number;
         }
-
-        if ($modJ && $number == $this->lastsubexpr) {
-            $number++;
-        }
-
-        $this->lastsubexpr++;
-        $this->maxsubexpr = max($this->maxsubexpr, $this->lastsubexpr);
-        return $number;
     }
 
     /**
@@ -956,13 +1007,35 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
         }
         return null;
     }
+
+    protected function assertion_for_circumflex() {
+        $topitem = end($this->opt_stack);
+        if ($this->options->preserveallnodes || $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_MULTILINE)) {
+            // The ^ assertion is used "as is" only in multiline mode. Or if preserveallnodes is true.
+            return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_circumflex');
+        } else {
+            // Default case: the same as \A.
+            return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_esc_a');
+        }
+    }
+
+    protected function assertion_for_dollar() {
+        $topitem = end($this->opt_stack);
+        if ($this->options->preserveallnodes || $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_MULTILINE)) {
+            // The $ assertion is used "as is" only in multiline mode. Or if preserveallnodes is true.
+            return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_dollar');
+        } else if ($topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOLLAR_ENDONLY)) {
+            // Not multiline, but dollar endonly; the same as \z.
+            return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_small_esc_z');
+        } else {
+            // Default case: the same as \Z.
+            return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_capital_esc_z');
+        }
+    }
 %}
 
 %%
 
-<YYINITIAL> \n {
-    // Newlines are totally ignored independent on the 'x' option.
-}
 <YYINITIAL> {WHITESPACE} {                       /* Whitespace */
     $topitem = end($this->opt_stack);
     if (!$topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_EXTENDED)) {
@@ -1056,7 +1129,7 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     $str = qtype_preg_unicode::substr($text, 1);
     if ((int)$str < 8 || ((int)$str <= $this->maxsubexpr && (int)$str < 100)) {
         // Return a backreference.
-        return $this->form_backref($text, (int)$str);
+        return $this->form_backref($text, (int)$str, null);
     }
     // Return a character.
     $octal = '';
@@ -1102,7 +1175,7 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     if ($number < 0) {
         $number = $this->lastsubexpr + $number + 1;
     }
-    return $this->form_backref($text, $number);
+    return $this->form_backref($text, $number, null);
 }
 <YYINITIAL> "\g{"-?[0-9][0-9]?"}" {    /* \g{n} \g{-n}    Backreference by number */
     $text = $this->yytext();
@@ -1111,7 +1184,7 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     if ($number < 0) {
         $number = $this->lastsubexpr + $number + 1;
     }
-    return $this->form_backref($text, $number);
+    return $this->form_backref($text, $number, null);
 }
 <YYINITIAL> "\k<"{ALNUM}*">" {         /* \k<name>        Backreference by name (Perl) */
     return $this->form_named_backref($this->yytext(), 3, '<', '>');
@@ -1193,8 +1266,8 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
 
 
 <YYINITIAL> "(?#" {                                        /* (?#....) Comment beginning */
-    $this->comment = $this->yytext();
-    $this->comment_length = $this->yylength();
+    $this->comment = '';
+    $this->comment_length = 0;
     $this->state_begin_position = $this->current_position_for_node();
     $this->yybegin(self::YYCOMMENT);
 }
@@ -1211,13 +1284,55 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     $this->comment_length += $this->yylength();
 }
 <YYCOMMENT> ")" {                                          /* Comment ending */
-    //$this->comment .= $this->yytext();
-    //$this->comment_length += $this->yylength();
-    // TODO: make use of it?
+    $result = null;
+    if ($this->options->parsetemplates && $this->comment_length > 0) {
+        $position = new qtype_preg_position($this->state_begin_position->indfirst, $this->yychar + $this->yylength() - 1,
+                                            $this->state_begin_position->linefirst, $this->yyline,
+                                            $this->state_begin_position->colfirst, $this->yycol + $this->yylength() - 1);
+        if ($this->comment === '##,') {
+            // Template params separator
+            $sep = new qtype_preg_lexem();
+            $sep->set_user_info($position, array(new qtype_preg_userinscription('(?##,)')));
+            $result = new JLexToken(qtype_preg_parser::TEMPLATESEP, $sep);
+
+        } else if ($this->comment === '##>') {
+            // Template close bracket
+            $closebr = new qtype_preg_lexem();
+            $closebr->set_user_info($position, array(new qtype_preg_userinscription('(?###>)')));
+            $result = new JLexToken(qtype_preg_parser::TEMPLATECLOSEBRACK, $closebr);
+        } else if (core_text::substr($this->comment, 0, 2) === '##' && core_text::substr($this->comment, -1) === '<') {
+            // Template open bracket
+            $name = core_text::substr($this->comment, 2, $this->comment_length - 3);
+            $available = qtype_preg\template::available_templates();
+            $node = new qtype_preg_node_template($name);
+            $node->set_user_info($position, array(new qtype_preg_userinscription('(?#' . $this->comment . ')')));
+            if (!array_key_exists($name, $available)) {
+                $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_TEMPLATE, $name, $node);
+                $error->position = $position;
+                $node->errors = array($error);
+            }
+            $result = new JLexToken(qtype_preg_parser::TEMPLATEOPENBRACK, $node);
+        } else if (core_text::substr($this->comment, 0, 2) === '##') {
+            // Template leaf
+            $name = core_text::substr($this->comment, 2);
+            $available = qtype_preg\template::available_templates();
+            $node = new qtype_preg_leaf_template($name);
+            $node->set_user_info($position, array(new qtype_preg_userinscription('(?#' . $this->comment . ')')));
+            if (!array_key_exists($name, $available)) {
+                $error = $this->form_error(qtype_preg_node_error::SUBTYPE_UNKNOWN_TEMPLATE, $name, $node);
+                $error->position = $position;
+                $node->errors = array($error);
+            }
+            $result = new JLexToken(qtype_preg_parser::TEMPLATEPARSELEAF, $node);
+        }
+    }
     $this->comment = '';
     $this->comment_length = 0;
     $this->state_begin_position = null;
     $this->yybegin(self::YYINITIAL);
+    if ($result !== null) {
+        return $result;
+    }
 }
 
 
@@ -1237,7 +1352,7 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     $unsetflags = qtype_preg_handling_options::string_to_modifiers($unset);
     $errors = $this->modify_top_options_stack_item($setflags, $unsetflags);
     if ($this->options->preserveallnodes) {
-        $node = new qtype_preg_leaf_options(new qtype_poasquestion_string($set), new qtype_poasquestion_string($unset));
+        $node = new qtype_preg_leaf_options(new qtype_poasquestion\string($set), new qtype_poasquestion\string($unset));
         $node->errors = $errors;
         $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
         return new JLexToken(qtype_preg_parser::PARSELEAF, $node);
@@ -1262,7 +1377,7 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     if ($this->options->preserveallnodes) {
         $res = array();
         $res[] = $this->form_subexpr($text, qtype_preg_node_subexpr::SUBTYPE_GROUPING);
-        $node = new qtype_preg_leaf_options(new qtype_poasquestion_string($set), new qtype_poasquestion_string($unset));
+        $node = new qtype_preg_leaf_options(new qtype_poasquestion\string($set), new qtype_poasquestion\string($unset));
         $node->errors = $errors;
         $node->set_user_info($this->current_position_for_node(), array(new qtype_preg_userinscription($text)));
         $res[] = new JLexToken(qtype_preg_parser::PARSELEAF, $node);
@@ -1305,12 +1420,12 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
 
 <YYINITIAL> "(?R)" {                   /* (?R)            Recurse whole pattern */
     $text = $this->yytext();
-    return $this->form_subexpr_call($text, 0);
+    return $this->form_subexpr_call($text, 0, null);
 }
 <YYINITIAL> "(?"[0-9]+")" {            /* (?n)            Call subexpression by absolute number */
     $text = $this->yytext();
     $number = (int)qtype_preg_unicode::substr($text, 2, $this->yylength() - 3);
-    return $this->form_subexpr_call($text, $number);
+    return $this->form_subexpr_call($text, $number, null);
 }
 <YYINITIAL> "(?"{SIGN}[0-9]+")" {      /* (?+n) (?-n)     Call subexpression by relative number */
     $text = $this->yytext();
@@ -1320,7 +1435,7 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     } else {
         $number = $this->lastsubexpr + $number;
     }
-    return $this->form_subexpr_call($text, $number);
+    return $this->form_subexpr_call($text, $number, null);
 }
 <YYINITIAL> "(?&"{ALNUM}*")" {         /* (?&name)        Call subexpression by name (Perl) */
     $text = $this->yytext();
@@ -1354,6 +1469,11 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
 
 
 <YYINITIAL> "(?(DEFINE"")"? {          /* (?(DEFINE)...             Conditional subexpression - define subpattern for reference */
+    $text = $this->yytext();
+    // Special case: (?(DEFINE with existing subpattern named "DEFINE"
+    if ($text == '(?(DEFINE)' && array_key_exists('DEFINE', $this->subexpr_name_to_number_map)) {
+        return $this->form_numeric_or_named_cond_subexpr($text, null, 'DEFINE', ')');
+    }
     return $this->form_define_cond_subexpr($this->yytext());
 }
 <YYINITIAL> "(?(?=" {                  /* (?(assert)...             Conditional subexpression - positive look ahead assertion */
@@ -1372,20 +1492,20 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     $text = $this->yytext();
     // Special case: (?(R with existing subpattern named "R"
     if ($text == '(?(R)' && array_key_exists('R', $this->subexpr_name_to_number_map)) {
-        return $this->form_numeric_or_named_cond_subexpr($text, 'R', ')');
+        return $this->form_numeric_or_named_cond_subexpr($text, null, 'R', ')');
     }
     $number = (int)qtype_preg_unicode::substr($text, 4, $this->yylength() - 5);
-    return $this->form_recursive_cond_subexpr($text, $number);
+    return $this->form_recursive_cond_subexpr($text, $number, null);
 }
 <YYINITIAL> "(?(R&"{ALNUM}*")"? {      /* (?(name)...               Conditional subexpression - specific recursion condition */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 5, $this->yylength() - 6);
-    return $this->form_recursive_cond_subexpr($text, $name);
+    return $this->form_recursive_cond_subexpr($text, null, $name);
 }
 <YYINITIAL> "(?("[0-9]+")"? {          /* (?(n)...                  Conditional subexpression - absolute reference condition */
     $text = $this->yytext();
     $number = (int)qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_numeric_or_named_cond_subexpr($text, $number, ')');
+    return $this->form_numeric_or_named_cond_subexpr($text, $number, null, ')');
 }
 <YYINITIAL> "(?("{SIGN}[0-9]+")"? {    /* (?(+n)... or (?(-n)...    Conditional subexpression - relative reference condition */
     $text = $this->yytext();
@@ -1395,22 +1515,22 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     } else {
         $number = $this->lastsubexpr + $number;
     }
-    return $this->form_numeric_or_named_cond_subexpr($text, $number, ')');
+    return $this->form_numeric_or_named_cond_subexpr($text, $number, null, ')');
 }
 <YYINITIAL> "(?(<"{ALNUM}*(">)")? {    /* (?(<name>)...             Conditional subexpression - named reference condition (Perl) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 4, $this->yylength() - 6);
-    return $this->form_numeric_or_named_cond_subexpr($text, $name, '>)');
+    return $this->form_numeric_or_named_cond_subexpr($text, null, $name, '>)');
 }
 <YYINITIAL> "(?('"{ALNUM}*("')")? {    /* (?('name')...             Conditional subexpression - named reference condition (Perl) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 4, $this->yylength() - 6);
-    return $this->form_numeric_or_named_cond_subexpr($text, $name, "')");
+    return $this->form_numeric_or_named_cond_subexpr($text, null, $name, "')");
 }
 <YYINITIAL> "(?("{ALNUM}*")"? {        /* (?(name)...               Conditional subexpression - named reference condition (PCRE) */
     $text = $this->yytext();
     $name = qtype_preg_unicode::substr($text, 3, $this->yylength() - 4);
-    return $this->form_numeric_or_named_cond_subexpr($text, $name, ")");
+    return $this->form_numeric_or_named_cond_subexpr($text, null, $name, ")");
 }
 
 
@@ -1684,27 +1804,10 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_esc_g');
 }
 <YYINITIAL> "^" {
-    $topitem = end($this->opt_stack);
-    if ($this->options->preserveallnodes || $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_MULTILINE)) {
-        // The ^ assertion is used "as is" only in multiline mode. Or if preserveallnodes is true.
-        return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_circumflex');
-    } else {
-        // Default case: the same as \A.
-        return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_esc_a');
-    }
+    return $this->assertion_for_circumflex();
 }
 <YYINITIAL> "$" {
-    $topitem = end($this->opt_stack);
-    if ($this->options->preserveallnodes || $topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_MULTILINE)) {
-        // The $ assertion is used "as is" only in multiline mode. Or if preserveallnodes is true.
-        return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_dollar');
-    } else if ($topitem->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_DOLLAR_ENDONLY)) {
-        // Not multiline, but dollar endonly; the same as \z.
-        return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_small_esc_z');
-    } else {
-        // Default case: the same as \Z.
-        return $this->form_simple_assertion($this->yytext(), 'qtype_preg_leaf_assert_capital_esc_z');
-    }
+    return $this->assertion_for_dollar();
 }
 <YYINITIAL> "\c" {
     $error = $this->form_error(qtype_preg_node_error::SUBTYPE_C_AT_END_OF_PATTERN, '\c');
@@ -1969,7 +2072,7 @@ WHITESPACE = [\x09\x0A\x0B\x0C\x0D\x20\x85\xA0]         // Whitespace character.
     $this->charset->set_user_info($position, $this->charset->userinscription);
     if ($this->charset_set !== '') {
         $flag = new qtype_preg_charset_flag;
-        $flag->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion_string($this->charset_set));
+        $flag->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion\string($this->charset_set));
         $this->charset->flags[] = array($flag);
     }
 

@@ -1,0 +1,18 @@
+[
+ (scoped_type) {
+  (namespace_resolve) {
+   (instantiated_template_type) {
+    std
+    (template_instantiation_arguments) {
+     <
+     (builtintype) {
+      int
+     }
+     >
+    }
+   }
+   ::
+  }
+  vector
+ }
+]

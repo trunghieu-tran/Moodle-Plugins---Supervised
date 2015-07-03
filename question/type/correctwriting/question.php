@@ -29,7 +29,6 @@ require_once($CFG->dirroot . '/question/type/shortanswer/questiontype.php');
 require_once($CFG->dirroot . '/question/type/correctwriting/lexical_analyzer.php');
 require_once($CFG->dirroot . '/question/type/correctwriting/cw_hints.php');
 require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
-require_once($CFG->dirroot . '/question/type/poasquestion/hints.php');
 require_once($CFG->dirroot . '/question/type/correctwriting/string_pair.php');
 
 /**
@@ -39,7 +38,7 @@ require_once($CFG->dirroot . '/question/type/correctwriting/string_pair.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_correctwriting_question extends question_graded_automatically
-        implements question_automatically_gradable, question_with_qtype_specific_hints {
+        implements question_automatically_gradable, qtype_poasquestion\question_with_hints {
     //Fields defining a question
     /** Whether answers should be graded case-sensitively.
      *  @var boolean
@@ -121,7 +120,7 @@ class qtype_correctwriting_question extends question_graded_automatically
      * Whether enum analyzer is enabled
      * @var int
      */
-    public $isenumanalyzerenabled = 1;
+    public $isenumanalyzerenabled = 0;
 
     /**
      * Whether sequence analyzer is enabled
@@ -133,7 +132,7 @@ class qtype_correctwriting_question extends question_graded_automatically
      * Whether syntax analyzer is enabled
      * @var int
      */
-    public $issyntaxanalyzerenabled = 1;
+    public $issyntaxanalyzerenabled = 0;
 
 
     /** Whether cache is valid
@@ -236,8 +235,8 @@ class qtype_correctwriting_question extends question_graded_automatically
             $response = array('answer' => '');
         }
         // Check, for cache, and make it lowercase to prevent some odd executions
-        if (is_a($response['answer'],'qtype_poasquestion_string') == false) {
-            $response['answer'] = new qtype_poasquestion_string($response['answer']);
+        if (is_a($response['answer'],'qtype_poasquestion\string') == false) {
+            $response['answer'] = new qtype_poasquestion\string($response['answer']);
         }
 
         if (($this->gradecachevalid == true) && ($this->gradecachedanswer == $response['answer'])) {
@@ -245,8 +244,8 @@ class qtype_correctwriting_question extends question_graded_automatically
         }
 
         foreach($this->answers as $id => $answer) {
-            if (is_a($answer->answer,'qtype_poasquestion_string') == false) {
-                $answer->answer = new qtype_poasquestion_string($answer->answer);
+            if (is_a($answer->answer,'qtype_poasquestion\string') == false) {
+                $answer->answer = new qtype_poasquestion\string($answer->answer);
             }
         }
 
@@ -514,76 +513,6 @@ class qtype_correctwriting_question extends question_graded_automatically
         return null;
     }
 
-   /**
-    * Creates all information about mistakes, passed into mistakes
-    * @var qtype_correctwriting_string_pair $results results of analysis
-    * @return string
-    */
-   public function create_image_information($results) {
-       $question = $this;
-       $keys = array_keys($question->answers);
-       $answer  = $question->answers[$keys[0]]->answer;
-       if ($question->matchedanswerid!=null) {
-          $answer = $question->answers[$question->matchedanswerid]->answer;
-       }
-
-       $language = block_formal_langs::lang_object($this->langid);
-       //Create sections, that will be passed into an URL
-       $resultsections = array();
-
-       //Create answer section
-       $answertokenvalues = array();
-       $answertokens = $language->create_from_string($answer);
-       /** @var block_formal_langs_token_base $token */
-       foreach($answertokens->stream->tokens as $token) {
-           $answertokenvalues[] = base64_encode($token->value());
-       }
-       $resultsections[] = implode(',,,',$answertokenvalues);
-       //Create response section
-       $responsetokenvalues = array();
-       $responsetokens = $results->correctedstring()->stream->tokens;
-       foreach($responsetokens as $token) {
-           $responsetokenvalues[] = base64_encode($token->value());
-       }
-       $resultsections[] = implode(',,,',$responsetokenvalues);
-
-       $fixedlexemes = array();
-       $absentlexemes = array();
-       $addedlexemes  = array();
-       $movedlexemes = array();
-
-       foreach($results->mistakes() as $mistake) {
-           // If this is lexical mistake, we should mark some lexeme as fixed
-           if (is_a($mistake,'qtype_correctwriting_lexical_mistake')) {
-               // A lexical mistakes are not supported in image, so this is commented part
-               //if ($mistake->correctedresponseindex != null) {
-               //    $fixedlexemes[] = $mistake->correctedresponseindex;
-               //}
-           // Track added mistakes
-           } elseif (count($mistake->answermistaken) == 0) {
-               foreach ($mistake->responsemistaken as $index) {
-                   $addedlexemes[] = $index;
-               }
-           // Track absent mistakes
-           }  elseif (count($mistake->responsemistaken)==0) {
-                foreach ($mistake->answermistaken as $index) {
-                   $absentlexemes[] = $index;
-                }
-            } else {
-                for($i = 0;$i < count($mistake->answermistaken);$i++) {
-                    $movedlexemes[] = $mistake->answermistaken[$i] . '_' . $mistake->responsemistaken[$i];
-                }
-            }
-       }
-
-       //Gather all section
-       $resultsections[] = implode(',,,',$fixedlexemes);
-       $resultsections[] = implode(',,,',$absentlexemes);
-       $resultsections[] = implode(',,,',$addedlexemes);
-       $resultsections[] = implode(',,,',$movedlexemes);
-
-       return  base64_encode(implode(';;;',$resultsections));
-   }
 
     //////////Specific hints implementation part
 
@@ -657,7 +586,7 @@ class qtype_correctwriting_question extends question_graded_automatically
     public function hint_object($hintkey, $response = null) {
         //Moodle-specific hints.
         if (substr($hintkey, 0, 11) == 'hintmoodle#') {
-            return new qtype_poasquestion_hintmoodle($this, $hintkey);
+            return new qtype_poasquestion\hintmoodle($this, $hintkey);
         }
 
         //CorrectWriting specific hints.

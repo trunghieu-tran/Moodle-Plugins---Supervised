@@ -1,0 +1,7 @@
+[
+ (preprocessor_concat) {
+  a
+  ##
+  std
+ }
+]

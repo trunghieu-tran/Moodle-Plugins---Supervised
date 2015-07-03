@@ -25,9 +25,13 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @package questions
  */
-global $CFG;  
+global $CFG;
+require_once($CFG->dirroot.'/question/type/correctwriting/lexical_analyzer.php');
 require_once($CFG->dirroot.'/question/type/correctwriting/sequence_analyzer.php');
- 
+require_once($CFG->dirroot.'/question/type/correctwriting/questiontype.php');
+require_once($CFG->dirroot.'/question/type/correctwriting/question.php');
+require_once($CFG->dirroot.'/blocks/formal_langs/language_c_language.php');
+
  /**
   *  Creates a specified tokens. Used for testing.
   *  @param array $types    array of token types
@@ -103,7 +107,7 @@ class qtype_correctwriting_sa_test_utils {
   * This class contains the test cases for the sequence analyzer.
   * Currently lcs() function is being tested
   */
- class qtype_correctwriting_sequence_analyzer_test extends PHPUnit_Framework_TestCase {
+class qtype_correctwriting_sequence_analyzer_test extends PHPUnit_Framework_TestCase {
     // Tests lcs() function with case, when answer is equal to response
     public function test_equal_correctedresponse() {
        $types = array('noun', 'verb', 'verb', 'exclamation_mark');
@@ -201,6 +205,145 @@ class qtype_correctwriting_sa_test_utils {
        $this->assertTrue($lcs[0][2] == 2, 'LCS must contain 2->2  index pair!');
        $this->assertTrue($lcs[0][0] == 0, 'LCS must contain 0->0  index pair!');       
     }
- }
- 
- ?>
+
+    /** Used question
+     * @var qtype_correctwriting_question
+     */
+    private $question;
+
+    /**
+     * Language
+     * @var block_formal_langs_language_c_language
+     */
+    private $language;
+
+    /**
+     * Inits environment for testing analyzer
+     */
+    protected function setUp() {
+        $this->language = new block_formal_langs_language_c_language();
+        $this->question = new qtype_correctwriting_question();
+        $this->question->usecase = true;
+        $this->question->lexicalerrorthreshold = 0.5;
+        $this->question->lexicalerrorweight = 0.1;
+        $this->question->usedlanguage = $this->language;
+        $this->question->movedmistakeweight = 0.1;
+        $this->question->absentmistakeweight = 0.11;
+        $this->question->addedmistakeweight = 0.12;
+        $this->question->hintgradeborder = 0.75;
+        $this->question->maxmistakepercentage = 1.0;
+        $this->question->qtype = new qtype_correctwriting();
+    }
+
+    /**
+     * Tests main sequence analyzer
+     */
+    public function test_sequence_analyzer() {
+        $answer = $this->language->create_from_string('int a = 23 + 54;');
+        $answer->set_descriptions_from_array(array(
+            'type', // int
+            'identifier',
+            'equality',
+            'number',
+            'sum',
+            'number',
+            'semicolon'
+        ));
+
+        $response = $this->language->create_from_string('int a = 54 23;;');
+        $pair = new qtype_correctwriting_string_pair($answer,$response, array());
+        $analyzer = new qtype_correctwriting_sequence_analyzer($this->question, $pair, $this->language,false);
+
+        $result = $analyzer->result_pairs();
+
+        $this->assertTrue(count($result) > 0);
+        /**
+         * @var qtype_correctwriting_string_pair $pair
+         */
+        $pair = $result[0];
+        $mistakes = $pair->mistakes();
+
+        $findmistakes = function($classname) use($mistakes) {
+            $result = 0;
+            $largeclassname = 'qtype_correctwriting_lexeme_' .$classname . '_mistake';
+            if (count($mistakes)) {
+                foreach($mistakes as $mistake) {
+                    if (is_a($mistake, $largeclassname)) {
+                        $result += 1;
+                    }
+                }
+            }
+            return $result;
+        };
+
+        $count = $findmistakes('moved');
+        $this->assertTrue($count > 0);
+
+        $count = $findmistakes('added');
+        $this->assertTrue($count > 0);
+
+        $count = $findmistakes('absent');
+        $this->assertTrue($count > 0);
+    }
+
+    /**
+     * Tests interaction between lexical and sequence analyzers
+     */
+    public function test_lexical_sequence_analyzers() {
+        $answer = $this->language->create_from_string('int a = 23 + 54;');
+        $answer->set_descriptions_from_array(array(
+            'type', // int
+            'identifier',
+            'equality',
+            'number',
+            'sum',
+            'number',
+            'semicolon'
+        ));
+
+        $response = $this->language->create_from_string('int a = 54 23;;');
+        $pair = new qtype_correctwriting_string_pair($answer,$response, array());
+
+        $analyzer = new qtype_correctwriting_lexical_analyzer($this->question, $pair, $this->language,false);
+        $result = $analyzer->result_pairs();
+
+        $this->assertTrue(count($result) > 0);
+        /**
+         * @var qtype_correctwriting_string_pair $pair
+         */
+        $pair = $result[0];
+
+        $analyzer = new qtype_correctwriting_sequence_analyzer($this->question, $pair, $this->language,false);
+
+        $result = $analyzer->result_pairs();
+
+        $this->assertTrue(count($result) > 0);
+        /**
+         * @var qtype_correctwriting_string_pair $pair
+         */
+        $pair = $result[0];
+        $mistakes = $pair->mistakes();
+
+        $findmistakes = function($classname) use($mistakes) {
+            $result = 0;
+            $largeclassname = 'qtype_correctwriting_lexeme_' .$classname . '_mistake';
+            if (count($mistakes)) {
+                foreach($mistakes as $mistake) {
+                    if (is_a($mistake, $largeclassname)) {
+                        $result += 1;
+                    }
+                }
+            }
+            return $result;
+        };
+
+        $count = $findmistakes('moved');
+        $this->assertTrue($count > 0);
+
+        $count = $findmistakes('added');
+        $this->assertTrue($count > 0);
+
+        $count = $findmistakes('absent');
+        $this->assertTrue($count > 0);
+    }
+}

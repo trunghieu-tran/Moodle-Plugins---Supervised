@@ -1,0 +1,32 @@
+[
+ (program) {
+  (stmt_list) {
+   (stmt_or_defined_macro) {
+    (stmt) {
+     (expr_logical_or) {
+      (expr_logical_and) {
+       (expr_logical_and) {
+        (expr_equal) {
+         Expr1
+         ==
+         Expr2
+        }
+        &&
+        (expr_notequal) {
+         Expr3
+         !=
+         Expr4
+        }
+       }
+       &&
+       Expr5
+      }
+      ||
+      Expr6
+     }
+     ;
+    }
+   }
+  }
+ }
+]

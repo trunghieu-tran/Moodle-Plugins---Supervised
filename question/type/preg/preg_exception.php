@@ -57,6 +57,30 @@ class qtype_preg_toolargefa_exception extends qtype_preg_exception {
 }
 
 /**
+ * Class for exceptions caused by empty automaton which can be after merging.
+ */
+class qtype_preg_empty_fa_exception extends qtype_preg_exception {
+    public function __construct($errorcode, $a = null, $debuginfo = null) {
+        parent::__construct($errorcode, $a, $debuginfo);
+    }
+}
+
+class qtype_preg_backref_intersection_exception extends qtype_preg_exception {
+    public function __construct($errorcode, $a = null, $debuginfo = null) {
+        parent::__construct($errorcode, $a, $debuginfo);
+    }
+}
+
+/**
+ * Class for exceptions caused by using complex asserions when merged option is unset.
+ */
+class qtype_preg_mergedassertion_option_exception extends qtype_preg_exception {
+    public function __construct($errorcode, $a = null, $debuginfo = null) {
+        parent::__construct($errorcode, $a, $debuginfo);
+    }
+}
+
+/**
  * Class for exceptions caused by empty pathtodot option.
  */
 class qtype_preg_pathtodot_empty extends qtype_preg_exception {

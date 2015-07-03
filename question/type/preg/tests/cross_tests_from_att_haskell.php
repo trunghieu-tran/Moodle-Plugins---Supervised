@@ -10,6 +10,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2));
 
         return array('regex'=>"a+",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -22,6 +23,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>0,2=>2,3=>2));
 
         return array('regex'=>"(a?)((ab)?)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -34,6 +36,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>1,2=>0,4=>1));
 
         return array('regex'=>"(a?)((ab)?)(b?)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -46,6 +49,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>2,2=>0,3=>2,4=>2,5=>0));
 
         return array('regex'=>"((a?)((ab)?))(b?)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -58,6 +62,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>1,2=>1,3=>0,5=>1));
 
         return array('regex'=>"(a?)(((ab)?)(b?))",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -70,6 +75,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>1,1=>1));
 
         return array('regex'=>"(.?)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -82,6 +88,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>1,1=>1));
 
         return array('regex'=>"(.?){1}",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -94,6 +101,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>1,1=>1,2=>0));
 
         return array('regex'=>"(.?)(.?)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -106,6 +114,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>1,1=>0));
 
         return array('regex'=>"(.?){2}",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -118,6 +127,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>1,1=>1));
 
         return array('regex'=>"(.?)*",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -130,6 +140,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>2));
 
         return array('regex'=>"(.?.?)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -142,6 +153,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>2));
 
         return array('regex'=>"(.?.?){1}",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -154,6 +166,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>3,1=>2,2=>1));
 
         return array('regex'=>"(.?.?)(.?.?)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -166,6 +179,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>3,1=>1));
 
         return array('regex'=>"(.?.?){2}",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -178,6 +192,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>3,1=>2,2=>1,3=>0));
 
         return array('regex'=>"(.?.?)(.?.?)(.?.?)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -190,6 +205,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>3,1=>0));
 
         return array('regex'=>"(.?.?){3}",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -202,6 +218,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>3,1=>1));
 
         return array('regex'=>"(.?.?)*",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -214,6 +231,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>0,3=>1));
 
         return array('regex'=>"a?((ab)?)(b?)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -226,6 +244,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>1,2=>0));
 
         return array('regex'=>"(a?)((ab)?)b?",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -238,6 +257,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>0));
 
         return array('regex'=>"a?((ab)?)b?",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -250,6 +270,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>0,1=>0));
 
         return array('regex'=>"(a*){2}",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -262,6 +283,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>3,1=>2,2=>1));
 
         return array('regex'=>"(ab?)(b?a)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -274,6 +296,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>3,1=>2,2=>1));
 
         return array('regex'=>"(a|ab)(ba|a)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -286,6 +309,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>2));
 
         return array('regex'=>"(a|ab|ba)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -298,6 +322,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>3,1=>2,2=>1));
 
         return array('regex'=>"(a|ab|ba)(a|ab|ba)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -310,6 +335,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>3,1=>1));
 
         return array('regex'=>"(a|ab|ba)*",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -322,6 +348,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>3,1=>3));
 
         return array('regex'=>"(aba|a*b)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -334,6 +361,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>5,1=>2,2=>3));
 
         return array('regex'=>"(aba|a*b)(aba|a*b)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -346,6 +374,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array());
 
         return array('regex'=>"(aba|a*b)(aba|a*b)(aba|a*b)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX, qtype_preg_cross_tester::TAG_DONT_CHECK_PARTIAL));
     }
@@ -358,6 +387,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>5,1=>3));
 
         return array('regex'=>"(aba|a*b)*",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -370,6 +400,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>3,1=>3));
 
         return array('regex'=>"(aba|ab|a)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -382,6 +413,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>5,1=>2,2=>3));
 
         return array('regex'=>"(aba|ab|a)(aba|ab|a)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -394,6 +426,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>5,1=>2,2=>2,3=>1));
 
         return array('regex'=>"(aba|ab|a)(aba|ab|a)(aba|ab|a)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -406,6 +439,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>5,1=>3));
 
         return array('regex'=>"(aba|ab|a)*",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -418,6 +452,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>2,2=>1));
 
         return array('regex'=>"(a(b)?)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -430,6 +465,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>3,1=>2,2=>1,3=>1));
 
         return array('regex'=>"(a(b)?)(a(b)?)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -442,6 +478,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>3,1=>1));
 
         return array('regex'=>"(a(b)?)+",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -454,6 +491,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>2,2=>0));
 
         return array('regex'=>"(.*)(.*)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -466,6 +504,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>0));
 
         return array('regex'=>".*(.*)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -478,6 +517,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>5,1=>5));
 
         return array('regex'=>"(a.*z|b.*y)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -490,6 +530,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>7,1=>5,2=>2));
 
         return array('regex'=>"(a.*z|b.*y)(a.*z|b.*y)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -502,6 +543,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>7,1=>2));
 
         return array('regex'=>"(a.*z|b.*y)*",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -514,6 +556,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>2,2=>0));
 
         return array('regex'=>"(.|..)(.*)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -526,6 +569,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>3,1=>3,3=>3));
 
         return array('regex'=>"((..)*(...)*)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -538,6 +582,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>3,1=>3,3=>3,4=>0));
 
         return array('regex'=>"((..)*(...)*)((..)*(...)*)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -550,6 +595,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>3,1=>3,3=>3));
 
         return array('regex'=>"((..)*(...)*)*",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -562,6 +608,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>6,1=>2));
 
         return array('regex'=>"(aa(b(b))?)+",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -574,6 +621,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>3,1=>1));
 
         return array('regex'=>"(a(b)?)+",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -586,6 +634,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>4,1=>2,2=>1,3=>1));
 
         return array('regex'=>"([ab]+)([bc]+)([cd]*)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -598,6 +647,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>2,2=>1));
 
         return array('regex'=>"^(A([^B]*))?(B(.*))?",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -610,6 +660,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,3=>2,4=>1));
 
         return array('regex'=>"^(A([^B]*))?(B(.*))?",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -622,6 +673,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>0,1=>0));
 
         return array('regex'=>"(^){0,3}",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -634,6 +686,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>0));
 
         return array('regex'=>"(\$){0,3}",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -646,6 +699,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>0,1=>0));
 
         return array('regex'=>"(^){1,3}",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -658,6 +712,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>0,1=>0));
 
         return array('regex'=>"(\$){1,3}",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -670,6 +725,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>1,1=>1,3=>1));
 
         return array('regex'=>"((s^)|(s)|(^)|(\$)|(^.))*",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -682,6 +738,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>0,2=>0));
 
         return array('regex'=>"s(()|^)e",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -694,6 +751,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>0,2=>0));
 
         return array('regex'=>"s(^|())e",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -706,6 +764,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>0,2=>0));
 
         return array('regex'=>"s(^|())e",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -718,6 +777,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>0));
 
         return array('regex'=>"s()?e",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -730,6 +790,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2));
 
         return array('regex'=>"s(^)?e",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -742,6 +803,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>3,1=>1,4=>1));
 
         return array('regex'=>"((s)|(e)|(a))*",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -754,6 +816,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>1,3=>1));
 
         return array('regex'=>"((s)|(e)|())*",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -766,6 +829,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>3,1=>2,2=>2));
 
         return array('regex'=>"((b*)|c(c*))*",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -778,6 +842,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>6,1=>3));
 
         return array('regex'=>"(yyy|(x?)){2,4}",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -790,32 +855,33 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>0,2=>0));
 
         return array('regex'=>"(\$)|()",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_haskell_66() {
-        $test1 = array('str'=>"ac
-",
+        $test1 = array('str'=>"ac\\n",
                        'is_match'=>true,
                        'full'=>true,
                        'index_first'=>array(0=>0,2=>0),
                        'length'=>array(0=>0,2=>0));
 
         return array('regex'=>"\$()|^()",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
 
     function data_for_test_att_haskell_67() {
-        $test1 = array('str'=>"ac
-",
+        $test1 = array('str'=>"ac\\n",
                        'is_match'=>true,
                        'full'=>true,
                        'index_first'=>array(0=>0,1=>0),
                        'length'=>array(0=>0,1=>0));
 
         return array('regex'=>"^()|\$()",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -828,6 +894,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>1,2=>1));
 
         return array('regex'=>"(\$)?(.)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -840,6 +907,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>1,1=>1));
 
         return array('regex'=>"(.|()|())*",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -852,6 +920,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>1,3=>1));
 
         return array('regex'=>"((a)|(b)){2,}",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -864,6 +933,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>0,2=>0));
 
         return array('regex'=>".()|((.)?)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -876,6 +946,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>1));
 
         return array('regex'=>"(.|\$){2,}",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -888,6 +959,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>1));
 
         return array('regex'=>"(.|\$){2,2}",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -900,6 +972,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>1));
 
         return array('regex'=>"(.){2,}",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -912,6 +985,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>3,1=>1,3=>1,5=>1));
 
         return array('regex'=>"(a|())(b|())(c|())",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -924,6 +998,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>3,1=>0));
 
         return array('regex'=>"ab()c|ab()c()",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -936,6 +1011,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>4,1=>2,3=>1));
 
         return array('regex'=>"(b(c)|d(e))*",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -948,6 +1024,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>3,1=>1));
 
         return array('regex'=>"(a(b)*)*",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -960,6 +1037,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>1,3=>1));
 
         return array('regex'=>"(()|.)(b)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -972,6 +1050,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>1,3=>1));
 
         return array('regex'=>"(()|[ab])(b)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -984,6 +1063,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>4,1=>1));
 
         return array('regex'=>"(()|[ab])+b",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -996,6 +1076,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>1,3=>1));
 
         return array('regex'=>"(.|())(b)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -1008,6 +1089,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>1,3=>1));
 
         return array('regex'=>"([ab]|())(b)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -1020,6 +1102,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>4,1=>1));
 
         return array('regex'=>"([ab]|())+b",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
@@ -1032,6 +1115,7 @@ class qtype_preg_cross_tests_from_att_haskell {
                        'length'=>array(0=>2,1=>1,2=>1));
 
         return array('regex'=>"(.?)(b)",
+                     'modifiers'=>'Ds',
                      'tests'=>array($test1),
                      'tags'=>array(qtype_preg_cross_tester::TAG_FROM_ATT, qtype_preg_cross_tester::TAG_MODE_POSIX));
     }
