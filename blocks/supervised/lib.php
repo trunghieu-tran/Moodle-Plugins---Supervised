@@ -168,7 +168,7 @@ function cleanup($courseid) {
  *
  * @return array active sessions
  */
-function user_active_sessions() {
+function user_active_sessions($lessontypes, &$error) {
     require_once('sessions/sessionstate.php');
     require_once('sessions/lib.php');
     global $USER, $DB, $COURSE;
@@ -183,9 +183,20 @@ function user_active_sessions() {
         $useringroup = $DB->record_exists('block_supervised_user', array('sessionid' => $id, 'userid' => $USER->id));
         // Check if the ip of current user is in classroom's subnet.
         $userinsubnet = address_in_subnet($USER->lastip, $session->iplist);
-
-        if ( !($useringroup && $userinsubnet) ) {
+        if($lessontypes != null) {
+            $userinlessontype = in_array($session->lessontypeid, $lessontypes);
+        } else {
+            $userinlessontype = true;
+        }
+        if ( !($useringroup && $userinsubnet && $userinlessontype) ) {
             unset($sessions[$id]);  // Remove current session.
+        }
+        if (!$useringroup) {
+            $error = "grouperror";
+        } else if (!$userinsubnet) {
+            $error = "iperror";
+        } else if (!$userinlessontype) {
+            $error = "lessontypeerror";
         }
     }
 

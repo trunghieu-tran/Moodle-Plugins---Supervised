@@ -24,9 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version    = 2014032200;           // The current module version (Date: YYYYMMDDXX).
-$plugin->requires   = 2013110500;           // Requires this Moodle version.
+$plugin->version    = 2015022700;           // The current module version (Date: YYYYMMDDXX).
+$plugin->requires   = 2014111000;           // Requires this Moodle version.
 $plugin->component  = 'block_supervised';   // Full name of the plugin (used for diagnostics).
 $plugin->cron       = 300;                  // Minimum execution interval for cron function in secs.
-$plugin->release    = 'Block Supervised 2.6';
+$plugin->release    = 'Block Supervised 2.8';
 $plugin->maturity   = MATURITY_STABLE;

@@ -52,13 +52,17 @@ if (!$DB->update_record('block_supervised_classroom', $classroom)) {
     print_error('insertclassroomerror', 'block_supervised');
 }
 
-// TODO Logging.
+$context = context_course::instance($courseid);
 if ($classroom->active) {
-    add_to_log($COURSE->id, 'role', 'show classroom',
-        "blocks/supervised/classrooms/addedit.php?id={$classroom->id}&courseid={$COURSE->id}", $classroom->name);
+    $event = \block_supervised\event\unhide_classroom::create(array('context' => $context,
+        'userid' => $USER->id, 'other' => array('classroomname' => $classroom->name,
+        'courseid' => $courseid, 'classroomid' => $classroom->id)));
+    $event->trigger();
 } else {
-    add_to_log($COURSE->id, 'role', 'hide classroom',
-        "blocks/supervised/classrooms/addedit.php?id={$classroom->id}&courseid={$COURSE->id}", $classroom->name);
+    $event = \block_supervised\event\hide_classroom::create(array('context' => $context,
+        'userid' => $USER->id, 'other' => array('classroomname' => $classroom->name,
+        'courseid' => $courseid, 'classroomid' => $classroom->id)));
+    $event->trigger();
 }
 
 // Redirect.

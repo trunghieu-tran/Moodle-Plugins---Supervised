@@ -77,10 +77,10 @@ if (!confirm_sesskey()) {
 
 // OK checks done, delete the classroom now.
 
-// TODO Logging.
-add_to_log($COURSE->id, 'role', 'delete classroom',
-    "blocks/supervised/classrooms/view.php?courseid={$COURSE->id}", $classroom->name);
-
+$context = context_course::instance($courseid);
+$event = \block_supervised\event\delete_classroom::create(array('context' => $context,
+    'userid' => $USER->id, 'other' => array('courseid' => $courseid , 'deletedid' => $id, 'classroomname' => $classroom->name)));
+$event->trigger();
 $DB->delete_records('block_supervised_classroom', array('id' => $id));
 // Redirect to classrooms page.
 $url = new moodle_url('/blocks/supervised/classrooms/view.php', array('courseid' => $courseid));
