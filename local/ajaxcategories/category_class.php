@@ -17,7 +17,7 @@
 /**
  * Defines classes of list and list items for ajax categories.
  *
- * @package    ajax_question_category
+ * @package    local_ajaxcategories
  * @copyright  2015 Oleg Sychev, Volgograd State Technical University
  * @author     Elena Lepilkina
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
