@@ -33,7 +33,6 @@ function get_params(options) {
 YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function(Y) {
     var addednode;
     var child;
-    var after;
     var change = true;
     var contextid;
     var beforeitemid;
@@ -123,7 +122,7 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
 
         // Get contextid of dropped list.
         contextid = drop.getAttribute('data-id');
-        if (contextid === null ||  contextid == '') {
+        if (contextid === null ||  contextid === '') {
             parent = drop.ancestor('ul[data-id]');
             if (parent !== null) {
                 contextid = parent.getAttribute('data-id');
@@ -190,7 +189,8 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
                 // Get id of item which should be undo dragged node.
                 if (item !== undefined && item !== null) {
                     if (item.get('nextSibling') !== undefined && item.get('nextSibling') !== null) {
-                        if (item.get('nextSibling').get('tagName') !== undefined && item.get('nextSibling').get('tagName').toLowerCase() === 'li') {
+                        if (item.get('nextSibling').get('tagName') !== undefined 
+                            && item.get('nextSibling').get('tagName').toLowerCase() === 'li') {
                             item = item.get('nextSibling');
                         }
                     }
@@ -253,7 +253,6 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
         //Get our drag object
         var drag = e.target;
         var dragnode = drag.get('node');
-        var clone;
         beforeitemid = -1;
         afteritemid = -1;
 
@@ -353,14 +352,16 @@ YUI().use('dd-constrain', 'dd-proxy', 'dd-drop', 'dd-plugin','io-base', function
                 // In case if top categories in context more than one add drag-handle.
                 if (childrencount > 1) {
                     childrennodes.each(function(child, key) {
-                        if (child.get('tagName').toLowerCase() === 'li' && child.one('#ajaxitem') !== null && !child.one('#ajaxitem').get("children").item(0).hasClass('drag-handle')) {
+                        if (child.get('tagName').toLowerCase() === 'li' && child.one('#ajaxitem') !== null 
+                            && !child.one('#ajaxitem').get("children").item(0).hasClass('drag-handle')) {
                             child.one('#ajaxitem').prepend(draghandle.cloneNode(true));
                         }
                     });
                 } else {
                     // In case of single top category remove drag-handle.
                     childrennodes.each(function(child, key) {
-                        if (child.get('tagName').toLowerCase() === 'li' && child.one('#ajaxitem') !== null && child.one('#ajaxitem').get("children").item(0).hasClass('drag-handle')) {
+                        if (child.get('tagName').toLowerCase() === 'li' && child.one('#ajaxitem') !== null 
+                            && child.one('#ajaxitem').get("children").item(0).hasClass('drag-handle')) {
                             child.one('#ajaxitem').get("children").item(0).remove();
                         }
                     });
