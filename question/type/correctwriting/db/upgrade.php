@@ -96,9 +96,9 @@ function xmldb_qtype_correctwriting_upgrade($oldversion=0) {
         );
 
         foreach($fieldnames as $name => $previous) {
-            $field = new xmldb_field($name, XMLDB_TYPE_INTEGER, '4', null ,XMLDB_NOTNULL, null, '1', $previous);
+            $defaultvalue = ($name == 'issequenceanalyzerenabled') ? '1' : '0';
+            $field = new xmldb_field($name, XMLDB_TYPE_INTEGER, '4', null ,XMLDB_NOTNULL, null, $defaultvalue, $previous);
             $dbman->add_field($table, $field);
-
         }
 
         $record = new stdClass();
