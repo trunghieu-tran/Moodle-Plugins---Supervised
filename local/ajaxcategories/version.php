@@ -14,10 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Integrate to menubar.
+ *
+ * @package    local_ajaxcategories
+ * @copyright  2015 Oleg Sychev, Volgograd State Technical University
+ * @author     Elena Lepilkina
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die;
 
 $plugin->version   = 2014101500;
 $plugin->release   = '0.0.0';
-$plugin->maturity  = MATURITY_ALPHA;
+$plugin->maturity  = MATURITY_BETA;
 $plugin->requires  = 2014051200;
 $plugin->component = 'local_ajaxcategories';

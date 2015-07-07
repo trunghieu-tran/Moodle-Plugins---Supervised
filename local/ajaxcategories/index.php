@@ -14,6 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Page with ajax categories.
+ *
+ * @package    local_ajaxcategories
+ * @copyright  2015 Oleg Sychev, Volgograd State Technical University
+ * @author     Elena Lepilkina
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 require_once("../../config.php");
 require_once($CFG->dirroot."/question/editlib.php");
 require_once($CFG->dirroot."/local/ajaxcategories/category_class.php");

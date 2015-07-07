@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // This file is part of ajaxcategories plugin - https://code.google.com/p/oasychev-moodle-plugins/
 //
 // Ajaxcategories plugin is free software: you can redistribute it and/or modify
@@ -14,6 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Defines classes of list and list items for ajax categories.
+ *
+ * @package    ajax_question_category
+ * @copyright  2015 Oleg Sychev, Volgograd State Technical University
+ * @author     Elena Lepilkina
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
 // Number of categories to display on page.
@@ -22,12 +31,19 @@ require_once($CFG->libdir . '/listlib.php');
 require_once($CFG->dirroot . '/question/category_form.php');
 require_once($CFG->dirroot . '/question/move_form.php');
 require_once($CFG->dirroot . '/question/category_class.php');
+
 /**
  * Class representing a list of ajax question categories
  *
  */
 class ajax_question_category_list extends moodle_list {
+    /**
+     * @var name of table in database.
+     */
     public $table = "question_categories";
+    /**
+     * @var name of list items class.
+     */
     public $listitemclassname = 'ajax_question_category_list_item';
     /**
      * @var reference to list displayed below this one.
@@ -41,6 +57,9 @@ class ajax_question_category_list extends moodle_list {
      * @var context og this list.
      */
     public $context = null;
+    /**
+     * @var columns for sorting.
+     */
     public $sortby = 'parent, sortorder, name';
 
     public function __construct($type='ul', $attributes='', $editable = false, $pageurl=null, $page = 0,
@@ -49,6 +68,11 @@ class ajax_question_category_list extends moodle_list {
         $this->context = $context;
     }
 
+    /**
+     * Returns records from list.
+     *
+     * @return list records.
+     */
     public function get_records() {
         $this->records = get_categories_for_contexts($this->context->id, $this->sortby);
     }
@@ -56,11 +80,11 @@ class ajax_question_category_list extends moodle_list {
     /**
      * Replace category item in choosen place.
      *
-     * @var $movingid - id of question_category_item replacing category.
-     * @var $environment - array with keys: 'before' - before item id
+     * @param $movingid - id of question_category_item replacing category.
+     * @param $environment - array with keys: 'before' - before item id
      *                                      'after' - after item id
      *                                      'level' - 'normal' or 'inner'
-     *                                      'dest' - destination list
+     *                                      'dest' - destination list.
      */
     public function change_category_list($movingid, $environment) {
         global $DB;
@@ -156,8 +180,11 @@ class ajax_question_category_list extends moodle_list {
      * Returns html string.
      *
      * @param integer $indent depth of indentation.
+     * @param $extraargs extra arguments for getting html.
+     *
+     * @return html code.
      */
-    public function to_html($indent=0, $extraargs=array()) {
+    public function to_html($indent = 0, $extraargs = array()) {
         $attributes = array(
             'id' => 'ajaxlistitem',
         );
@@ -225,6 +252,7 @@ class ajax_question_category_list_item extends question_category_list_item {
     /**
      * Returns array of all children items of this.
      *
+     * @return array of all children items.
      */
     public function get_all_children() {
         $children = array();
@@ -239,6 +267,9 @@ class ajax_question_category_list_item extends question_category_list_item {
         return $children;
     }
 
+    /**
+     * Generate html code for icons.
+     */
     public function set_icon_html($first, $last, $lastitem) {
         global $CFG;
         $category = $this->item;
@@ -270,6 +301,12 @@ class ajax_question_category_list_item extends question_category_list_item {
                html_writer::end_div() . (($childrenhtml != '') ? ("\n".$childrenhtml) : '');
     }
 
+    /**
+     * Return html for item.
+     *
+     * @param array $extraargs any extra data that is needed to print the list item
+     *                            may be used by sub class.
+     */
     public function item_html($extraargs = array()) {
         global $CFG, $OUTPUT;
         $str = $extraargs['str'];
@@ -312,7 +349,14 @@ class ajax_question_category_list_item extends question_category_list_item {
 class ajax_question_category_object extends question_category_object {
 
     /**
-     * Initializes this classes general category-related variables
+     * Initializes this classes general category-related variables.
+     *
+     * @param $page html page.
+     * @param $contexts contexts in question bank.
+     * @param $currentcat current category.
+     * @param $defaultcategory default category.
+     * @param $todelete what do to delete.
+     * @param $addcontexts adding contexts.
      */
     public function initialize($page, $contexts, $currentcat, $defaultcategory, $todelete, $addcontexts) {
         $lastlist = null;
