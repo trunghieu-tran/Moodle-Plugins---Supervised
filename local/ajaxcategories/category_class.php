@@ -40,7 +40,7 @@ class ajax_question_category_list extends moodle_list {
     /**
      * @var name of table in database.
      */
-    public $table = "question_categories";
+    public $table = 'question_categories';
     /**
      * @var name of list items class.
      */
