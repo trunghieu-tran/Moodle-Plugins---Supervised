@@ -87,6 +87,7 @@ function xmldb_qtype_correctwriting_upgrade($oldversion=0) {
     }
     
     $updateanalyzersenables = function() {
+        global $DB;
         $record = new stdClass();
         $record->islexicalanalyzerenabled = 0;
         $record->isenumanalyzerenabled = 0;
