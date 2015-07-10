@@ -713,7 +713,7 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 
         // TODO: Remove, when nice version of syntax analyzer will be implemented
         if ($issyntaxanalyzerenabled) {
-            $errors['issyntaxanalyzerenabled'] = get_string('syntaxanalyzerisdisabled','qtype_correctwriting');
+            $errors['issequenceanalyzerenabled'] = get_string('syntaxanalyzerisdisabled','qtype_correctwriting');
         }
         
         // Validate floating fields for min/max borders.
