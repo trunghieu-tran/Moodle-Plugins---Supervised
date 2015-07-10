@@ -119,10 +119,7 @@ function xmldb_qtype_correctwriting_upgrade($oldversion=0) {
         upgrade_plugin_savepoint(true, 2013092400, 'qtype', 'correctwriting');
     }
 
-    if ($oldversion < 2015033100) {
-        // Repeat action from last part to make sure 2.6.1 release works normally
-        $updateanalyzersenables();
-        
+    if ($oldversion < 2015033100) {        
         // Define field whatishintpenalty to be added to qtype_correctwriting
         $table = new xmldb_table('qtype_correctwriting');
         $field = new xmldb_field('howtofixpichintpenalty', XMLDB_TYPE_NUMBER, '4, 2', null, XMLDB_NOTNULL, null, '1.1', 'issyntaxanalyzerenabled');
