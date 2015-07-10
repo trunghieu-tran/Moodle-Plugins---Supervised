@@ -21,7 +21,7 @@
  * @copyright  2013 Oleg Sychev, Volgograd State Technical University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 
 function xmldb_qtype_correctwriting_upgrade($oldversion=0) {
 
@@ -139,6 +139,98 @@ function xmldb_qtype_correctwriting_upgrade($oldversion=0) {
         // correctwriting savepoint reached
         upgrade_plugin_savepoint(true, 2015033100, 'qtype', 'correctwriting');
     }
+
+    if ($oldversion < 2015071000) {
+        // Fix bugs, linked to syntax analyzer, being enabled to all question
+        // Also, if enum analyzer is enabled in incorrect cases - disable it too
+        $record = new stdClass();
+        $record->islexicalanalyzerenabled = 0;
+        $record->isenumanalyzerenabled = 0;
+        $record->issequenceanalyzerenabled = 1;
+        $record->issyntaxanalyzerenabled = 0;
+        $result = $DB->get_records(
+            'qtype_correctwriting',
+            array('issyntaxanalyzerenabled' => 1),
+            'id',
+            implode(',', array(
+                'id',
+                'langid',
+                'questionid',
+                'islexicalanalyzerenabled',
+                'isenumanalyzerenabled',
+                'issequenceanalyzerenabled',
+                'issyntaxanalyzerenabled'
+            ))
+        );
+        if (count($result)) {
+            $langidtolangs = array();
+            $questionidsforfullyupdated = array();
+            foreach($result as $id => $object) {
+                $islexicalanalyzerenabled = intval($object->islexicalanalyzerenabled);
+                $isenumanalyzerenabled = intval($object->isenumanalyzerenabled);
+                $issequenceanalyzerenabled = intval($object->issequenceanalyzerenabled);
+                if ($islexicalanalyzerenabled == 1
+                    && $isenumanalyzerenabled == 1
+                    && $issequenceanalyzerenabled == 1) {
+                    $questionidsforfullyupdated []= $object->questionid;
+                }
+            }
+            list($insql, $params) = $DB->get_in_or_equal($questionidsforfullyupdated);
+            $sql = 'SELECT id, timemodified
+            FROM {question}
+            WHERE id ' . $insql;
+            $questions = $DB->get_records_sql($sql, $params);
+            foreach($result as $id => $object) {
+                $islexicalanalyzerenabled = intval($object->islexicalanalyzerenabled);
+                $isenumanalyzerenabled = intval($object->isenumanalyzerenabled);
+                $issequenceanalyzerenabled = intval($object->issequenceanalyzerenabled);
+                $object->issyntaxanalyzerenabled = 0;
+                if ($isenumanalyzerenabled == 1) {
+                    // Fetch lang
+                    $lang = null;
+                    if (array_key_exists($object->langid, $langidtolangs)) {
+                        $lang = $langidtolangs[$object->langid];
+                    } else {
+                        $lang = block_formal_langs::lang_object($object->langid);
+                        $langidtolangs[$object->langid] = $lang;
+                    }
+
+                    if ($lang == null) {
+                        $object->isenumanalyzerenabled = 0;
+                    } else {
+                        if ($lang->name() != 'cpp_parseable') {
+                            $object->isenumanalyzerenabled = 0;
+                        }
+                    }
+                }
+                // Timestamp for 4 Jun 2015 5:42 - to make sure all timezones will be covered
+                $release28 = 1435988520;
+                if ($islexicalanalyzerenabled == 1
+                    && $isenumanalyzerenabled == 1
+                    && $issequenceanalyzerenabled == 1
+                    && $islexicalanalyzerenabled == 1) {
+                    $shouldmodify = true;
+                    if (array_key_exists($object->questionid, $questions)) {
+                        // Do not modify already changed questions
+                        $timemodified = intval($questions[$object->questionid]->timemodified);
+                        $shouldmodify = $timemodified  < $release28;
+                    }
+                    if ($shouldmodify) {
+                        $object->islexicalanalyzerenabled = 0;
+                        $object->isenumanalyzerenabled = 0;
+                        $object->issequenceanalyzerenabled = 1;
+                        $object->islexicalanalyzerenabled = 0;
+                    }
+                }
+
+                $DB->update_record('qtype_correctwriting', $object, true);
+            }
+        }
+
+        // correctwriting savepoint reached
+        upgrade_plugin_savepoint(true, 2015071000, 'qtype', 'correctwriting');
+    }
+
 
     return true;
 }
