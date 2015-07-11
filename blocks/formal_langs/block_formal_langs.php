@@ -41,9 +41,10 @@ class block_formal_langs extends block_list {
      * Returns an array of languages for given context
      *
      * @param context $context context, whose languages will be extracted, null means whole site
+     * @param int $pickedlanguage a picked language which should be shown in any cast
      * @return array where key is language id and value is user interface language name (received throught get_string)
      */
-    public static function available_langs($context = null) {
+    public static function available_langs($context = null, $pickedlanguage = 0) {
         if ($context == null) {
             $currentcontexts = array( context_system::instance()->id );
         } else {
@@ -56,7 +57,7 @@ class block_formal_langs extends block_list {
 
         $languages = block_formal_langs::all_languages();
         foreach($table as $record) {
-            if ($record->visible == 0 && array_key_exists($record->id, $languages)) {
+            if (($record->visible == 0 && $pickedlanguage != $record->id) && array_key_exists($record->id, $languages)) {
                 unset($languages[$record->id]);
             }
         }
