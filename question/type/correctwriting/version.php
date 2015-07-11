@@ -36,5 +36,5 @@ $plugin->dependencies = array(
     'qbehaviour_adaptivehintsnopenalties' => 2015033000,
     'qbehaviour_interactivehints' => 2015033000,
     'qtype_poasquestion' => 2015033000,
-    'block_formal_langs' => 2015070200
+    'block_formal_langs' => 2015071000
 );
