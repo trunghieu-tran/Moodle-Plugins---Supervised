@@ -119,8 +119,15 @@ require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
                 $context = $COURSE->get_context();
             }
         }
-
-        $currentlanguages = block_formal_langs::available_langs( $context );
+        $pickedlanguage = 0;
+        if(is_object($this->question)) {
+            if (isset($this->question->options)) {
+                if (isset($this->question->options->langid)) {
+                    $pickedlanguage = intval($this->question->options->langid);
+                }
+            }
+        }
+        $currentlanguages = block_formal_langs::available_langs( $context, $pickedlanguage );
         $languages = $currentlanguages;
         $mform->addElement('select', 'langid', get_string('langid', 'qtype_correctwriting'), $languages);
         $mform->setDefault('langid', $CFG->qtype_correctwriting_defaultlang);
