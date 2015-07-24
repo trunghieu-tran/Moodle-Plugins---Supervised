@@ -136,5 +136,5 @@ if (!empty($param->edit)) {
     // Display the user interface.
     $qcobject->display_user_interface();
 }
+$PAGE->requires->js_init_call('M.local_ajaxcategories.init');
 echo $OUTPUT->footer();
-echo '<script src="./category-dragdrop.js"></script>';

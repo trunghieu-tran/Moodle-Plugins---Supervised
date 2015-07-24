@@ -1,9 +1,9 @@
-#placeholder {
+#ajaxcategories-placeholder {
     min-width: 100px;
     min-height: 10px;
     background: none;
 }
 
-.drag-handle{
+.ajaxcategories-drag-handle{
     display:inline-block;
 }
