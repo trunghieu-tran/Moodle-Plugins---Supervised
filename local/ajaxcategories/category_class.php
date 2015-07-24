@@ -40,7 +40,7 @@ class ajax_question_category_list extends moodle_list {
     /**
      * @var name of table in database.
      */
-    public $table = 'question_categories';
+    public $table = "question_categories";
     /**
      * @var name of list items class.
      */
@@ -190,7 +190,7 @@ class ajax_question_category_list extends moodle_list {
         );
 
         $placeholder = array(
-            'id' => 'placeholder',
+            'id' => 'ajaxcategories-placeholder',
         );
 
         if (count($this->items)) {
@@ -320,7 +320,7 @@ class ajax_question_category_list_item extends question_category_list_item {
         $item = '';
         // Add drag-handle icon.
         if ($this->parentlist !== null && ($this->parentlist->parentitem !== null || count($this->parentlist->items) > 1)) {
-            $item .= html_writer::div($OUTPUT->pix_icon('i/move_2d', 'You can drag and drop this category'), 'drag-handle');
+            $item .= html_writer::div($OUTPUT->pix_icon('i/move_2d', 'You can drag and drop this category'), 'ajaxcategories-drag-handle');
         }
         $item .= html_writer::tag('b', html_writer::link($catediturl,
                 format_string(' ' . $category->name, true, array('context' => $this->parentlist->context)),

@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-function local_ajaxcategories_extends_settings_navigation(settings_navigation $nav, context $context) {
+function local_ajaxcategories_extend_settings_navigation(settings_navigation $nav, context $context) {
     $coursenode = $nav->get('courseadmin');
     if ($coursenode && has_capability('moodle/question:managecategory', $context)) {
         $questionbank = $coursenode->find($coursenode->get_children_key_list()[count($coursenode->get_children_key_list()) - 1], navigation_node::TYPE_CONTAINER);
