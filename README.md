@@ -32,8 +32,8 @@ The main repository hosts:
 
 ## Useful links for newbie developers for Moodle ##
 
-http://docs.moodle.org/dev/Coding - especially
-http://docs.moodle.org/dev/Commit_cheat_sheet
-http://docs.moodle.org/dev/Git_for_developers
-http://nathanj.github.com/gitguide/tour.html
-https://moodle.org/plugins/view.php?plugin=local_codechecker - plugin for Moodle checking some of Coding Guidelines
+* http://docs.moodle.org/dev/Coding - especially
+* http://docs.moodle.org/dev/Commit_cheat_sheet
+* http://docs.moodle.org/dev/Git_for_developers
+* http://nathanj.github.com/gitguide/tour.html
+* https://moodle.org/plugins/view.php?plugin=local_codechecker - plugin for Moodle checking some of Coding Guidelines
