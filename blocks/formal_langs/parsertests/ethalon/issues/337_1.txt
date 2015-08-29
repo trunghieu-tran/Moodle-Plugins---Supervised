@@ -1,0 +1,23 @@
+[
+ (expr_logical_or) {
+  (expr_logical_and) {
+   (expr_equal) {
+    t
+    ==
+    a
+   }
+   &&
+   b
+  }
+  ||
+  (expr_logical_and) {
+   c
+   &&
+   (expr_notequal) {
+    k
+    !=
+    true
+   }
+  }
+ }
+]
