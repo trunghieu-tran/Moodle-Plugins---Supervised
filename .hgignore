@@ -1,0 +1,8 @@
+syntax: glob
+.idea/
+lib/
+mod/assignment/
+mod/assign/
+config.php
+.htaccess
+draftfile.php
