@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/poasassignment/taskgivers/analogy_choice/db" VERSION="20120424" COMMENT="XMLDB file for Moodle mod/poasassignment/taskgivers/analogy_choice"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="poasassignment_analogych" COMMENT="Table for Analogy choice">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="originalid"/>
+        <FIELD NAME="originalid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Oroginal poasassignment instance id" PREVIOUS="id" NEXT="additionalid"/>
+        <FIELD NAME="additionalid" TYPE="int" LENGTH="11" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Additional poasassignment instance id" PREVIOUS="originalid"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="originalid"/>
+        <KEY NAME="originalid" TYPE="foreign" FIELDS="originalid" REFTABLE="poasassignment" REFFIELDS="id" PREVIOUS="primary" NEXT="additionalid"/>
+        <KEY NAME="additionalid" TYPE="foreign" FIELDS="additionalid" REFTABLE="poasassignment" REFFIELDS="id" PREVIOUS="originalid"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>

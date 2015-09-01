@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="question/type/gradertest/db" VERSION="20130313" COMMENT="XMLDB file for Moodle question/type/gradertest"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="question_gradertest_tests" COMMENT="Default comment for the table, please edit me" NEXT="question_gradertest_tasktest">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="id" NEXT="testin"/>
+        <FIELD NAME="testin" TYPE="text" NOTNULL="false" SEQUENCE="false" PREVIOUS="name" NEXT="testout"/>
+        <FIELD NAME="testout" TYPE="text" NOTNULL="false" SEQUENCE="false" PREVIOUS="testin" NEXT="questionid"/>
+        <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="testout" NEXT="testdirpath"/>
+        <FIELD NAME="testdirpath" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="questionid"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="question_gradertest_tasktest" COMMENT="Default comment for the table, please edit me" PREVIOUS="question_gradertest_tests" NEXT="question_gradertest">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="poasassignmenttaskid"/>
+        <FIELD NAME="poasassignmenttaskid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="questionid"/>
+        <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="poasassignmenttaskid"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="question_gradertest" COMMENT="Default comment for the table, please edit me" PREVIOUS="question_gradertest_tasktest">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="questionid"/>
+        <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="availablefromhome"/>
+        <FIELD NAME="availablefromhome" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" PREVIOUS="questionid"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>

@@ -14,6 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Change list in database after changing in user inreface.
+ *
+ * @package    local_ajaxcategories
+ * @copyright  2015 Oleg Sychev, Volgograd State Technical University
+ * @author     Elena Lepilkina
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 define('AJAX_SCRIPT', true);
 
 require_once("../../config.php");

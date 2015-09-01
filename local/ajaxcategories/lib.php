@@ -14,12 +14,21 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Integrate to menubar.
+ *
+ * @package    local_ajaxcategories
+ * @copyright  2015 Oleg Sychev, Volgograd State Technical University
+ * @author     Elena Lepilkina
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die;
 
-function local_ajaxcategories_extends_settings_navigation(settings_navigation $nav, context $context) {
+function local_ajaxcategories_extend_settings_navigation(settings_navigation $nav, context $context) {
     $coursenode = $nav->get('courseadmin');
     if ($coursenode && has_capability('moodle/question:managecategory', $context)) {
-        $questionbank = $coursenode->find($coursenode->get_children_key_list()[count($coursenode->get_children_key_list())-1], navigation_node::TYPE_CONTAINER);
+        $questionbank = $coursenode->find($coursenode->get_children_key_list()[count($coursenode->get_children_key_list()) - 1], navigation_node::TYPE_CONTAINER);
         if ($questionbank) {
             $params = array();
             if ($context->contextlevel == CONTEXT_COURSE) {
@@ -32,7 +41,7 @@ function local_ajaxcategories_extends_settings_navigation(settings_navigation $n
     // Add to questionbank on main page.
     $frontpagenode = $nav->get('frontpage');
     if ($frontpagenode && has_capability('moodle/question:managecategory', $context)) {
-        $questionbank = $frontpagenode->find($frontpagenode->get_children_key_list()[count($frontpagenode->get_children_key_list())-1], navigation_node::TYPE_CONTAINER);
+        $questionbank = $frontpagenode->find($frontpagenode->get_children_key_list()[count($frontpagenode->get_children_key_list()) - 1], navigation_node::TYPE_CONTAINER);
         if ($questionbank) {
             $params = array();
             if ($context->contextlevel == CONTEXT_COURSE) {
