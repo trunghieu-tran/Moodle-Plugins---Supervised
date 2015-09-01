@@ -1,0 +1,1 @@
+This repository is owner's master fork for the SACK project. If you write code for the block Supervised, Supervisedcheck access rule or Auto role assignment block - please contact this repository owner using tracker https://bitbucket.org/oasychev/moodle-plugins/issues?status=new&status=open for it to be pulled.
