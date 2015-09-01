@@ -21,7 +21,7 @@
  * @copyright  2013 Oleg Sychev, Volgograd State Technical University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+require_once($CFG->dirroot . '/blocks/formal_langs/block_formal_langs.php');
 
 function xmldb_qtype_correctwriting_upgrade($oldversion=0) {
 
@@ -85,6 +85,18 @@ function xmldb_qtype_correctwriting_upgrade($oldversion=0) {
         // correctwriting savepoint reached
         upgrade_plugin_savepoint(true, 2013012900, 'qtype', 'correctwriting');
     }
+    
+    $updateanalyzersenables = function() {
+        global $DB;
+        $DB->execute("
+            UPDATE {qtype_correctwriting}
+            SET
+            islexicalanalyzerenabled = '0',
+            isenumanalyzerenabled = '0',
+            issequenceanalyzerenabled = '1',
+            issyntaxanalyzerenabled = '0'
+        ");
+    };
 
     if ($oldversion < 2013092400) {
         $table = new xmldb_table('qtype_correctwriting');
@@ -96,29 +108,18 @@ function xmldb_qtype_correctwriting_upgrade($oldversion=0) {
         );
 
         foreach($fieldnames as $name => $previous) {
-            $field = new xmldb_field($name, XMLDB_TYPE_INTEGER, '4', null ,XMLDB_NOTNULL, null, '1', $previous);
+            $defaultvalue = ($name == 'issequenceanalyzerenabled') ? '1' : '0';
+            $field = new xmldb_field($name, XMLDB_TYPE_INTEGER, '4', null ,XMLDB_NOTNULL, null, $defaultvalue, $previous);
             $dbman->add_field($table, $field);
-
         }
 
-        $record = new stdClass();
-        $record->islexicalanalyzerenabled = 0;
-        $record->isenumanalyzerenabled = 0;
-        $record->issequenceanalyzerenabled = 1;
-        $record->issyntaxanalyzerenabled = 0;
-        $result = $DB->get_records('qtype_correctwriting', null, 'id', 'id');
-        if (count($result)) {
-            foreach($result as $id => $object) {
-                $record->id = $id;
-                $DB->update_record('qtype_correctwriting', $record, true);
-            }
-        }
+        $updateanalyzersenables();
 
         // correctwriting savepoint reached
         upgrade_plugin_savepoint(true, 2013092400, 'qtype', 'correctwriting');
     }
 
-    if ($oldversion < 2015033100) {
+    if ($oldversion < 2015033100) {        
         // Define field whatishintpenalty to be added to qtype_correctwriting
         $table = new xmldb_table('qtype_correctwriting');
         $field = new xmldb_field('howtofixpichintpenalty', XMLDB_TYPE_NUMBER, '4, 2', null, XMLDB_NOTNULL, null, '1.1', 'issyntaxanalyzerenabled');
@@ -131,6 +132,23 @@ function xmldb_qtype_correctwriting_upgrade($oldversion=0) {
         // correctwriting savepoint reached
         upgrade_plugin_savepoint(true, 2015033100, 'qtype', 'correctwriting');
     }
+
+    if ($oldversion < 2015071000) {
+        // Fix bugs, linked to syntax analyzer, being enabled to all question
+        // Also, if enum analyzer is enabled in incorrect cases - disable it too
+        $DB->execute("
+            UPDATE {qtype_correctwriting}
+            SET islexicalanalyzerenabled = '0',
+            isenumanalyzerenabled = '0',
+            issequenceanalyzerenabled = '1',
+            issyntaxanalyzerenabled = '0'
+            WHERE issyntaxanalyzerenabled='1'
+        ");
+
+        // correctwriting savepoint reached
+        upgrade_plugin_savepoint(true, 2015071000, 'qtype', 'correctwriting');
+    }
+
 
     return true;
 }
