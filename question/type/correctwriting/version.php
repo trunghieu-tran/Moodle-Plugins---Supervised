@@ -25,9 +25,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qtype_correctwriting';
-$plugin->version  = 2015070200;
+$plugin->version  = 2015071000;
 $plugin->requires = 2013110500;
-$plugin->release = 'Correct Writing 2.8';
+$plugin->release = 'Correct Writing 2.8.1';
 $plugin->maturity = MATURITY_STABLE;
 
 $plugin->dependencies = array(
@@ -36,5 +36,5 @@ $plugin->dependencies = array(
     'qbehaviour_adaptivehintsnopenalties' => 2015033000,
     'qbehaviour_interactivehints' => 2015033000,
     'qtype_poasquestion' => 2015033000,
-    'block_formal_langs' => 2015070200
+    'block_formal_langs' => 2015071000
 );
