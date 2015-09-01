@@ -97,5 +97,4 @@ echo $OUTPUT->heading(get_string('modulenameplural', 'poasassignment'), 2);
 print_table($table);
 
 /// Finish the page
-
 echo $OUTPUT->footer();

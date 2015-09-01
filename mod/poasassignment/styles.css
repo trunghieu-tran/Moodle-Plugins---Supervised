@@ -1,32 +1,127 @@
-/** General Styles **/
-.path-mod-assignment .userpicture,
-.path-mod-assignment .picture.user,
-.path-mod-assignment .picture.teacher {width:35px;height: 35px;vertical-align:top;}
-.path-mod-assignment .feedback .files,
-.path-mod-assignment .feedback .grade,
-.path-mod-assignment .feedback .outcome,
-.path-mod-assignment .feedback .finalgrade {float: right;}
-.path-mod-assignment .feedback .disabledfeedback {width: 500px;height: 250px;}
-.path-mod-assignment .feedback .from {float: left;}
-.path-mod-assignment .files img {margin-right: 4px;}
-.path-mod-assignment .files a {white-space:nowrap;}
-.path-mod-assignment .flexible-wrap {width:100%;overflow:auto;}
-.path-mod-assignment .flexible-wrap > .flexible {margin:0;}
+#page-mod-poasassignment-view #dates table {margin: 0 auto;}
+#page-mod-poasassignment-view #dates table td {border: 1px solid #ddd;}
+#page-mod-poasassignment-view #dates .c0 {text-align:right; font-weight:bold; background: #f6f6f6;}
+#page-mod-poasassignment-view #dates .c1 {}
+#page-mod-poasassignment-view #dates {
+    margin: 1em auto;
+    border: none;
+}
+/*.poasassignment-table {width:100%}*/
+.poasassignment-table {
+    margin: 0 auto;
+}
+.poasassignment-table .header,
+.poasassignment-table th { background: none repeat scroll 0 0 #f6f6f6; font-weight:bold;}
+.poasassignment-table .header,
+.poasassignment-table td,
+.poasassignment-table th {border: 1px solid #ddd;}
+.poasassignment-table .critical {color:red}
 
-/** Styles for submissions.php **/
-#page-mod-assignment-submissions form#options div {text-align:right;margin-left:auto;margin-right:20px;}
-#page-mod-assignment-submissions .header .commands {display: inline;}
-#page-mod-assignment-submissions .picture {width: 35px;}
-#page-mod-assignment-submissions .fullname,
-#page-mod-assignment-submissions .timemodified,
-#page-mod-assignment-submissions .timemarked {text-align: left;}
-#page-mod-assignment-submissions .submissions .grade,
-#page-mod-assignment-submissions .submissions .outcome,
-#page-mod-assignment-submissions .submissions .finalgrade {text-align: right;}
-#page-mod-assignment-submissions .qgprefs #optiontable {text-align:right;margin-left:auto;}
+.poasassignment-table td.center {text-align:center;}
+.poasassignment-table input[type=radio] {margin:0; text-align: center;}
 
-/** Styles for view.php **/
-#page-mod-assignment-view .feedback {margin:10px auto;}
-#page-mod-assignment-view .feedback .grade {text-align: right;}
-#page-mod-assignment-view #online .singlebutton {text-align: center;}
-#page-mod-assignment-view #dates .c0 {text-align:right;font-weight:bold;}
+#citerions-table td {border: 1px solid #ddd;}
+#criterions-table .c0 {text-align:right; font-weight:bold; background: #f6f6f6;}
+
+p.no-info-message {text-align: center;}
+
+#page-mod-poasassignment-view input[type=submit] {padding: 2px 4px}
+/*#page-mod-poasassignment-view .region-content .no-overflow {overflow:inherit;}*/
+
+/*.buttons .singlebutton{}
+#page-mod-poasassignment-view .header { background: none repeat scroll 0 0 #f6f6f6; border-bottom-width: 2px; }
+#page-mod-poasassignment-view th {font-weight: normal;}*/
+
+.poasassignment-confirmation-buttons {
+    margin-top: 10px;
+    text-align: center;
+}
+.poasassignment-confirmation-buttons .singlebutton {
+    display: inline-block;
+}
+.poasassignment-confirmation-buttons input[type=submit] {
+    width:100px;
+    margin:0 10px;
+    padding:5px 0;
+}
+.poasassignment-critical {
+    color:red;
+    font-weight:bold;
+}
+table.task-owners th,
+.tasks-table th ,
+.taskfields-table th{
+    white-space: normal !important;
+}
+table.task-owners,
+.tasks-table td,
+.taskfields-table td{
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+a:link.hiddentask, a:visited.hiddentask {
+    color: #AAAAAA;
+}
+.random-field {
+    font-weight: bold;
+}
+.center {
+    text-align: center;
+}
+
+/* new */
+.report {margin-bottom: 20px;}
+.testresults {padding: 0 30px;}
+.testresults input[type="checkbox"],
+.testresults input[type="radio"] {margin: 0;}
+.testresults > form { margin: 0 auto; max-width: 800px;}
+.testresults .input-data {display: none;}
+.testresults table {width: 100%;}
+.testresults table,
+.testresults tr,
+.testresults td {padding: 10px 3px;}
+.testresults .fail,
+.testresults .ignor,
+.testresults .ok {text-align: center; background-color: #fff; width: 60px; padding-left: 0; padding-right: 0;}
+.testresults .tests,
+.testresults .compileerror {margin: 0 17px 20px 17px; background-color: #eee;}
+    .testresults .compileerror pre {overflow: scroll; padding: 5px; width: 744px;}
+.testresults .tests div {padding: 5px;}
+.testresults .tests .diff,
+.testresults .tests .input {padding-left: 20px;}
+.testresults .caption {font-weight: bold;}
+.testresults .testinfo .decision {float:right;}
+
+.testresults .testservice {border-bottom: 1px solid #000;}
+
+.testresults .showcompileerror,
+.testresults .input,
+.testresults .hideallinput,
+.testresults .hideinput,
+.testresults .showtests,
+.testresults .showall {display: none;}
+
+.testresults .ra-decision {font-weight: bold;}
+.testresults pre {margin: 0; padding: 7px 0;}
+
+/*Grade colors */
+.testresults .bad {background-color: #f66;}
+.testresults .normal {background-color: #faa;}
+.testresults .good {background-color: #ff0;}
+.testresults .ideal {background-color: #5f5;}
+
+/* Diff colors*/
+.testresults .diff .test{background-color: #ff0;}
+.testresults .diff .student{background-color: #f00;}
+.testresults .diff .same{background-color: #fff;}
+
+.testresults .fail.chosen,
+.testresults .fail.result-for-student {background-color: #ff3333;}
+.testresults .ignor.chosen,
+.testresults .ignor.result-for-student {background-color: #888;}
+.testresults .ok.chosen,
+.testresults .ok.result-for-student {background-color: #33ff33;}
+
+.testresults .submit {text-align: center; margin: 25px 0;}
+.testresults .saved { background-color: #33ff33; font-weight: bold; height: 40px; padding-top: 15px; text-align: center; margin-bottom: 10px;}

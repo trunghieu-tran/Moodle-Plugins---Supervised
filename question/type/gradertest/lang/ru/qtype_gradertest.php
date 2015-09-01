@@ -1,0 +1,27 @@
+<?php
+$string['gradertest'] = 'Тест удаленного автотестера';
+$string['pluginname'] = 'Тест удаленного автотестера';
+$string['pluginnameediting'] = 'Редактирование теста автотестера';
+$string['pluginnamesummary'] = 'Тест для проверки программ в модуле poasassignment';
+$string['pluginname_help'] = 'Тест для проверки программ в модуле poasassignment';
+$string['pluginnameadding'] = 'Добавление нового теста автотестера';
+$string['gradertestsummary'] = 'Хранит входные и выходные данные тестов';
+$string['editinggradertest'] = 'Редактирование теста автотестера';
+$string['addinggradertest'] = 'Добавление теста автотестера';
+$string['gradertest_help'] = 'Тест автотестера';
+$string['testtext'] = 'Текст теста';
+$string['testfiles'] = 'Файлы теста';
+$string['testin'] = 'Входные данные теста';
+$string['testout'] = 'Выходные данные теста';
+$string['testweight'] = 'Вес теста';
+$string['testname'] = 'Название теста';
+$string['tasktext'] = 'Текст задания';
+$string['tasktext_help'] = 'Программа, которая должна быть написана';
+$string['testdirpath'] = 'Папка с тестом на сервере (относительный путь, например "HLL1/autotest/Lab_3/01/0/")';
+$string['or'] = 'или';
+$string['testdirpathformat'] = 'Формат пути: папка/папка/папка/';
+$string['completetestdata'] = 'Нужно заполнить все тестовые данные';
+$string['testdata'] = 'Данные теста';
+$string['poasassignmenttask'] = 'Задание модуля Poasassignment';
+$string['poasassignmentid'] = 'Экземпляр Poasassignment';
+$string['availablefromhome'] = 'Тест может быть использован при загрузке ответа из дома';
