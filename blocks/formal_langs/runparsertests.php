@@ -7,8 +7,8 @@ $CFG = new stdClass();
 $CFG->dirroot = dirname(dirname(dirname(__FILE__)));
 $CFG->libdir = $CFG->dirroot . '/lib';
 
-require_once($CFG->dirroot .'/blocks/formal_langs/language_cpp_parseable_language.php');
 require_once($CFG->dirroot .'/lib/classes/text.php');
+require_once($CFG->dirroot .'/blocks/formal_langs/language_cpp_parseable_language.php');
 
 
 function print_node($node, $paddingcount)
