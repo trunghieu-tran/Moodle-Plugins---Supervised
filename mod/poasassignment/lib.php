@@ -1,38 +1,9 @@
 <?php
 
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
-/**
- * Library of interface functions and constants for module poasassignment
- *
- * All the core Moodle functions, neeeded to allow the module to work
- * integrated in Moodle should be placed here.
- * All the poasassignment specific functions, needed to implement all the module
- * logic, should go to locallib.php. This will help to save some memory when
- * Moodle is performing actions across all modules.
- *
- * @package   mod_poasassignment
- * @copyright 2010 Your Name
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
+ // TODO: add POASASSIGNMENT before every constant
 defined('MOODLE_INTERNAL') || die();
 
-/** example constant */
 define('PREVENT_LATE_CHOICE', 1);
 define('RANDOM_TASKS_AFTER_CHOICEDATE', 2);
 define('PREVENT_LATE', 4);
@@ -43,6 +14,8 @@ define('ACTIVATE_INDIVIDUAL_TASKS', 64);
 define('SECOND_CHOICE', 128);
 define('TEACHER_APPROVAL', 256);
 define('ALL_ATTEMPTS_AS_ONE', 512);
+define('MATCH_ATTEMPT_AS_FINAL', 1024);
+define('POASASSIGNMENT_CYCLIC_RANDOM', 2048);
 
 define('ADD_MODE', 0);
 define('EDIT_MODE',1);
@@ -62,16 +35,29 @@ define('DATE',4);
 define('FILE',5);
 define('LISTOFELEMENTS',6);
 define('MULTILIST',7);
-/**
- * If you for some reason need to use global variables instead of constants, do not forget to make them
- * global as this file can be included inside a function scope. However, using the global variables
- * at the module level is not a recommended.
- */
+define('CATEGORY',8);
+
+define('TASK_RECIEVED',0);
+define('ATTEMPT_DONE',1);
+define('GRADE_DONE',2);
+
+define('POASASSIGNMENT_NO_UNIQUENESS', 0);
+define('POASASSIGNMENT_UNIQUENESS_GROUPS', 1);
+define('POASASSIGNMENT_UNIQUENESS_GROUPINGS', 2);
+define('POASASSIGNMENT_UNIQUENESS_COURSE', 3);
+
+define('POASASSIGNMENT_CRITERION_OK', 1);
+define('POASASSIGNMENT_CRITERION_CANT_BE_DELETED', 2);
+define('POASASSIGNMENT_CRITERION_CANT_BE_CHANGED', 3);
+define('POASASSIGNMENT_CRITERION_CANT_BE_CREATED', 4);
+define('POASASSIGNMENT_CRITERION_DELETE', 8);
+define('POASASSIGNMENT_CRITERION_CHANGE', 16);
+define('POASASSIGNMENT_CRITERION_CREATE', 32);
+
+
 
 require_once(dirname(dirname(dirname(__FILE__))).'/lib/navigationlib.php');
 require_once('model.php');
-//global $NEWMODULE_GLOBAL_VARIABLE;
-//$NEWMODULE_QUESTION_OF = array('Life', 'Universe', 'Everything');
 
 /**
  * Given an object containing all the necessary data,
@@ -84,12 +70,13 @@ require_once('model.php');
  */
 function poasassignment_add_instance($poasassignment) {
     global $DB;
-
     $poasassignment->timecreated = time();
-    
-    $poasassignmentmodelinstance = poasassignment_model::get_instance($poasassignment);
-    $id=$poasassignmentmodelinstance->add_instance();
-    return $id;
+    $poasmodel = poasassignment_model::get_instance($poasassignment);
+    $poasassignment->id = $poasmodel->add_instance();
+    poasassignment_grade_item_update($poasassignment);
+    return $poasassignment->id;
+
+    $poasmodel = poasassignment_model::get_instance_by_id();
 }
 
 /**
@@ -102,13 +89,11 @@ function poasassignment_add_instance($poasassignment) {
  */
 function poasassignment_update_instance($poasassignment) {
     global $DB;
-    
     $poasassignment->timemodified = time();
     $poasassignment->id = $poasassignment->instance;
-    
-    $poasassignmentmodelinstance = poasassignment_model::get_instance($poasassignment);
-    $id=$poasassignmentmodelinstance->update_instance();
-    
+    $poasmodel = poasassignment_model::get_instance($poasassignment);
+    $id = $poasmodel->update_instance();
+    poasassignment_grade_item_update($poasassignment);
     return $id;
 }
 
@@ -121,9 +106,11 @@ function poasassignment_update_instance($poasassignment) {
  * @return boolean Success/Failure
  */
 function poasassignment_delete_instance($id) {
-  //  global $DB;
-    $poasassignmentmodelinstance = poasassignment_model::get_instance($poasassignment);
-    return $poasassignmentmodelinstance->delete_instance($id);
+    global $DB;
+    $poasassignment = $DB->get_record('poasassignment', array('id'=>$id));
+    $poasmodel = poasassignment_model::get_instance($poasassignment);
+    poasassignment_grade_item_delete($poasassignment);
+    return $poasmodel->delete_instance($id);
 }
 
 /**
@@ -167,6 +154,13 @@ function poasassignment_print_recent_activity($course, $isteacher, $timestart) {
 }
 
 /**
+ * Return grade for given user or all users.
+ *
+ * @param int $assignmentid id of assignment
+ * @param int $userid optional user id, 0 means all users
+ * @return array array of grades, false if none
+ */
+/**
  * Function to be run periodically according to the moodle cron
  * This function searches for things that need to be done, such
  * as sending out mail, toggling flags etc ...
@@ -175,6 +169,11 @@ function poasassignment_print_recent_activity($course, $isteacher, $timestart) {
  * @todo Finish documenting this function
  **/
 function poasassignment_cron () {
+    //TODO Полиморфизм сюда
+    if (file_exists(dirname(__FILE__).'/additional/auditor_sync/auditor_sync.php')) {
+        require_once(dirname(__FILE__).'/additional/auditor_sync/auditor_sync.php');
+        auditor_sync::get_instance()->synchronize();
+    }
     return true;
 }
 
@@ -190,6 +189,7 @@ function poasassignment_cron () {
 function poasassignment_get_participants($poasassignmentid) {
     return false;
 }
+
 
 /**
  * This function returns if a scale is being used by one poasassignment
@@ -249,7 +249,9 @@ function poasassignment_supports($feature) {
         case FEATURE_GROUPMEMBERSONLY:        return true;
         case FEATURE_MOD_INTRO:               return true;
         case FEATURE_COMPLETION_TRACKS_VIEWS: return true;
-        
+        case FEATURE_GRADE_HAS_GRADE:         return true;
+        case FEATURE_GRADE_OUTCOMES:          return true;
+        case FEATURE_BACKUP_MOODLE2:          return true;
 
         default: return null;
     }
@@ -262,7 +264,7 @@ function poasassignment_pluginfile($course, $cm, $context, $filearea, $args, $fo
     if ($context->contextlevel != CONTEXT_MODULE) {
         return false;
     }
-    
+
     require_course_login($course, true, $cm);
 
     /* if ($filearea !== 'content') {
@@ -299,7 +301,7 @@ function poasassignment_pluginfile($course, $cm, $context, $filearea, $args, $fo
     }
     $file = $fs->get_file_by_hash(sha1($fullpath));
     /* if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
-        
+
         $resource = $DB->get_record('resource', array('id'=>$cminfo->instance), 'id, legacyfiles', MUST_EXIST);
        // if ($resource->legacyfiles != RESOURCELIB_LEGACYFILES_ACTIVE) {
            // return false;
@@ -322,4 +324,124 @@ function poasassignment_pluginfile($course, $cm, $context, $filearea, $args, $fo
 
     // finally send the file
     send_stored_file($file, 86400, $filter, $forcedownload);
+}
+
+/**
+ * Create grade item for given poasassignment
+ *
+ * @param object $poasassignment object with extra cmidnumber
+ * @param mixed optional array/object of grade(s); 'reset' means reset grades in gradebook
+ * @return int 0 if ok, error code otherwise
+ */
+function poasassignment_grade_item_update($poasassignment, $grades=NULL) {
+
+    $poasmodel = poasassignment_model::get_instance($poasassignment);
+    return($poasmodel->grade_item_update($grades));
+
+}
+
+/**
+ * Delete grade item for given poasassignment
+ *
+ * @param object $poasassignment object
+ * @return object poasassignment
+ */
+function poasassignment_grade_item_delete($poasassignment) {
+    $poasmodel = poasassignment_model::get_instance($poasassignment);
+    return($poasmodel->grade_item_delete());
+}
+
+/**
+ * Return grade for given user or all users.
+ *
+ * @param int $poasassignmentid id of poasassignment
+ * @param int $userid optional user id, 0 means all users
+ * @return array array of grades, false if none
+ */
+function poasassignment_get_user_grades($poasassignment, $userid=0) {
+    global $CFG, $DB;
+
+    if($userid) {
+        // return user's last attempt rating
+        $assignee = $DB->get_record('poasassignment_attempts',array('userid'=>$userid));
+        $lastattempt = poasassignment_model::get_instance()->get_last_attempt($assignee->id);
+        return $lastattempt->rating;
+    }
+
+}
+
+
+/**
+ * Adds module specific settings to the settings block
+ *
+ * @param settings_navigation $settings The settings navigation object
+ * @param navigation_node $poasassignmentnode The node to add module settings to
+ */
+function poasassignment_extend_settings_navigation(settings_navigation $settings, navigation_node $poasassignmentnode) {
+
+}
+function poasassignment_comment_permissions($comment_param) {
+    $return = array('post'=>true, 'view'=>true);
+    return $return;
+}
+function poasassignment_comment_validate($comment_param) {
+    return true;
+}
+
+function poasassignment_extend_navigation(navigation_node $navigation, $course, $module, $cm) {
+    global $PAGE,$DB;
+    $poasassignment  = $DB->get_record('poasassignment', array('id' => $cm->instance));
+    if($poasassignment) {
+        poasassignment_model::get_instance()->cash_instance($poasassignment->id);
+
+        foreach (poasassignment_model::$extpages as $pagename => $pagepath) {
+            require_once($pagepath);
+            $pagetype = $pagename.'_page';
+            // If user has ability to view $pagepath - add page on panel
+            //$poasassignment  = $DB->get_record('poasassignment',
+            //                                   array('id' => $cm->instance),
+            //                                   '*',
+            //                                   MUST_EXIST);
+            if(!$pagetype::display_in_navbar()) {
+                continue;
+            }
+            $pageinstance = new $pagetype($cm, $poasassignment);
+            if ($pageinstance->has_ability_to_view()) {
+                $navigation->add(get_string($pagename,'poasassignment'),
+                                 new moodle_url('/mod/poasassignment/view.php',
+                                                array('id' => $cm->id,
+                                                      'page' => $pagename)));
+            }
+        }
+    }
+}
+
+/**
+ * Called by course/reset.php
+ *
+ * @param $mform moodle form
+ */
+function poasassignment_reset_course_form_definition(&$mform) {
+    $mform->addElement('header', 'poasassignmentheader', get_string('modulenameplural', 'poasassignment'));
+
+    $mform->addElement('checkbox', 'reset_assignees', get_string('reset_assignees', 'poasassignment'));
+}
+
+/**
+ * Used for set default values to form's elements displayed by poasassignment_reset_course_form_definition.
+ *
+ * @param $course course
+ * @return array default values
+ */
+function poasassignment_reset_course_form_defaults($course) {
+    return array('reset_attempts' => 1, 'reset_assignees' => 1);
+}
+
+function poasassignment_reset_userdata($data) {
+    global $DB;
+    $instances = $DB->get_records('poasassignment', array('course' => $data->courseid));
+    foreach ($instances as $instance) {
+        poasassignment_model::get_instance()->reset($data->courseid, $instance->id);
+    }
+    return array(array('component'=>'poasassignment', 'item' => get_string('assigneesdeleted', 'poasassignment'), 'error'=> false));
 }
