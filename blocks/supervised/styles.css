@@ -12,6 +12,7 @@
 
 .block_supervised .content .mform .fitem .fitemtitle {
     width: auto;
+    padding-right: 10px;
 }
 
 .block_supervised .content .mform .fitem .fstatic,
