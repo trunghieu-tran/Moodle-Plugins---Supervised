@@ -35,6 +35,7 @@ $string['iperror']                  = 'You can\'t start the quiz from this compu
 $string['lessontypeerror']          = 'You can\'t start the quiz in this lesson type.';
 $string['noaccess']                 = 'You can\'t start the quiz now. No active supervised session for your group at this moment with appropriate lesson type.';
 $string['noaccessall']              = 'You can\'t start the quiz now. No active supervised session for your group at this moment.';
+$string['noactivesession']          = 'You can\'t the quiz now. No active supervised sessions now';
 $string['noblockinstance']          = 'To use supervised access mode for this quiz you should firstly add supervised block instance in the course.';
 $string['pluginname']               = 'Supervised access rule';
 $string['uncheckedlessontypes']     = 'You must check at least one lesson type';
