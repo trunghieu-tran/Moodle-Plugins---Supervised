@@ -191,12 +191,12 @@ function user_active_sessions($lessontypes, &$error) {
         if ( !($useringroup && $userinsubnet && $userinlessontype) ) {
             unset($sessions[$id]);  // Remove current session.
         }
-        if (!$useringroup) {
-            $error = "grouperror";
-        } else if (!$userinsubnet) {
-            $error = "iperror";
+        if (!$useringroup && $userinsubnet && $userinlessontype) {
+            $error = 'grouperror';
+        } else if (!$userinsubnet && $userinlessontype) {
+            $error = 'iperror';
         } else if (!$userinlessontype) {
-            $error = "lessontypeerror";
+            $error = 'lessontypeerror';
         }
     }
 
