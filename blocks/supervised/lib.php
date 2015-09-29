@@ -200,5 +200,8 @@ function user_active_sessions($lessontypes, &$error) {
         }
     }
 
+    if(!empty($sessions)) {
+        $error = '';
+    }
     return $sessions;
 }
