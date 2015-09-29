@@ -31,6 +31,7 @@ $string['checkforall']              = 'Yes, for all lesson types in this course'
 $string['checknotrequired']         = 'No';
 $string['checkrequired']            = 'Yes';
 $string['customcheck']              = 'Yes, for these lesson types:';
+$string['grouperror']               = 'You can\'t start the quiz now. No active supervised session for your group at this moment.';
 $string['iperror']                  = 'You can\'t start the quiz from this computer.';
 $string['lessontypeerror']          = 'You can\'t start the quiz in this lesson type.';
 $string['noblockinstance']          = 'To use supervised access mode for this quiz you should firstly add supervised block instance in the course.';
