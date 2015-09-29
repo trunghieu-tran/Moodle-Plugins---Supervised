@@ -75,26 +75,7 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
         if (!empty($sessions)) {
             return false;
         } else {
-            if (strcmp($error,"iperror") == 0) {
-                // We havn't active sessions with current user ip.
-                return get_string('iperror', 'quizaccess_supervisedcheck');
-            }
-            else if (strcmp($error, "grouperror") == 0) {
-                // We havn't active sessions with current user ip.
-                if($this->quiz->supervisedmode == 2) {
-                    return get_string('noaccess', 'quizaccess_supervisedcheck');
-                } else {
-                    return get_string('noaccessall', 'quizaccess_supervisedcheck');
-                }
-            }
-            else if (strcmp($error, "lessontypeerror") == 0) {
-                // We havn't active sessions with current user lesson type.
-                return get_string('lessontypeerror', 'quizaccess_supervisedcheck');
-            }
-            else if (empty($sessions)) {
-                // User hasn't got any supervised active session.
-                return get_string('noactivesession', 'quizaccess_supervisedcheck');
-            }
+            return get_string($error, 'quizaccess_supervisedcheck');
         }
     }
 
