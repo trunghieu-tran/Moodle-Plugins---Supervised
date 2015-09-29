@@ -176,7 +176,7 @@ function user_active_sessions($lessontypes, &$error) {
     // Select all active sessions in current course.
     $time = time();
     $sessions = get_sessions($COURSE->id, 0, 0, -1, StateSession::ACTIVE, 0, $time, $time, 0);
-
+    $error = 'grouperror';
     // Filter sessions by user's group and ip.
     foreach ($sessions as $id => $session) {
         // Check if current user is in current session's group.
