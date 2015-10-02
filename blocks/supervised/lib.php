@@ -177,7 +177,6 @@ function user_active_sessions($lessontypes, &$error) {
     $time = time();
     $sessions = get_sessions($COURSE->id, 0, 0, -1, StateSession::ACTIVE, 0, $time, $time, 0);
     $error = 'grouperror';
-    $errortemp = 'grouperror';
     // Filter sessions by user's group and ip.
     foreach ($sessions as $id => $session) {
         // Check if current user is in current session's group.
@@ -192,18 +191,13 @@ function user_active_sessions($lessontypes, &$error) {
         if ( !($useringroup && $userinsubnet && $userinlessontype) ) {
             unset($sessions[$id]);  // Remove current session.
         }
-        if (!$useringroup && $userinsubnet && $userinlessontype) {
+        if (!$useringroup && $error != 'iperror' && $error != 'lessontypeerror') {
             $error = 'grouperror';
-        } else if (!$userinsubnet && $userinlessontype) {
+        } else if (!$userinsubnet && $error != 'lessontypeerror') {
             $error = 'iperror';
         } else if (!$userinlessontype) {
             $error = 'lessontypeerror';
         }
-        // Check if current session error is more important. 
-        if(($error == 'grouperror' && ($errortemp == 'iperror' || $errortemp == 'lessontypeerror')) ||
-                                      ($error == 'iperror' && $errortemp == 'lessontypeerror')) {
-            $error = $errortemp;
-        } 
     }
 
     if(!empty($sessions)) {
