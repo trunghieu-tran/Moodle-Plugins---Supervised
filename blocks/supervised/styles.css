@@ -3,7 +3,11 @@
     font-size: 14px;
 }
 .block_supervised .content .footer {
-    font-size: 13px;
+    font-size: 14px;
+}
+
+.block_supervised .content .mform fieldset.collapsible legend a.fheader {
+    margin-left: -3px;
 }
 
 .block_supervised .content .mform .fdescription.required {
