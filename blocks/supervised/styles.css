@@ -33,6 +33,13 @@
     font-size: 14px;
 }
 
+.block_supervised .content .mform  #fitem_id_submitbutton,
+.block_supervised .content .mform  #fgroup_id_buttonar{
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+}
+
 /* Styles for view sessions page */
 #supervisedblock_selectcourseform {
     text-align: center;
