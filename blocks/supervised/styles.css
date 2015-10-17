@@ -33,6 +33,10 @@
     font-size: 14px;
 }
 
+.block_supervised .content .footer a {
+    padding-right: 20px;
+}
+
 .block_supervised .content .mform  #fitem_id_submitbutton,
 .block_supervised .content .mform  #fgroup_id_buttonar{
     margin-top: 0px;
