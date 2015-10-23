@@ -70,7 +70,7 @@ class quizaccess_supervisedcheck extends quiz_access_rule_base {
         $lessontypes = array_keys($lessontypesdb);
         $error = "";
         // Get user's active sessions.
-        $sessions = user_active_sessions($lessontypes,$error);
+        $sessions = user_active_sessions($error, $lessontypes);
         
         if (!empty($sessions)) {
             return false;
