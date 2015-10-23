@@ -379,8 +379,8 @@ class block_supervised extends block_base {
     private function render_besupervised_body() {
         global $COURSE, $CFG;
         require_once("{$CFG->dirroot}/blocks/supervised/lib.php");
-
-        $activesessions = user_active_sessions();
+        $error = '';
+        $activesessions = user_active_sessions($error);
 
         if (!empty($activesessions)) {
             $sessionstitle = get_string('activesessionsstudenttitle', 'block_supervised', count($activesessions));
