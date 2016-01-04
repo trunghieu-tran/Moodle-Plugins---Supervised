@@ -1,4 +1,4 @@
-// This file is part of Student Access Control Kit - https://code.google.com/p/oasychev-moodle-plugins/
+// This file is part of Student Access Control Kit - https://bitbucket.org/oasychev/moodle-plugins/overview
 //
 // Access Control Kit is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
