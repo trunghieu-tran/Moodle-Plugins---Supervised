@@ -41,7 +41,7 @@ require_login($course);
 $context = context_course::instance($course->id);
 require_capability('moodle/course:managegroups', $context);
 
-$returnurl = $CFG->wwwroot.'/group/index.php?id='.$course->id.'&group='.$group->id;
+$returnurl = new moodle_url('/blocks/supervised/groups/refreshing.php', array('courseid' => $course->id, 'group' => $groupid, 'urlreturn' => $urlreturn));
 
 if ($cancel) {
     redirect($returnurl);
