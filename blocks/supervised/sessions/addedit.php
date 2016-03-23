@@ -194,7 +194,18 @@ if ($mform->is_cancelled()) {
             }
         }
     }
-    $url = new moodle_url('/blocks/supervised/sessions/view.php', array('courseid' => $courseid));
+    if ($fromform->groupid != INTERSHIP_GROUP) {
+        $url = new moodle_url('/blocks/supervised/sessions/view.php', array('courseid' => $courseid));
+    } else {
+        $params['courseid'] = $courseid;
+        if (!$id) {
+            $params['sessionid'] = $newid;
+        } else {
+            $params['sessionid'] = $id;
+        }
+        $params['urlreturn'] = 1;
+        $url = new moodle_url('/blocks/supervised/groups/creating.php', $params);
+    }
     redirect($url);
 } else {
     // Form didn't validate or this is the first display.
