@@ -22,6 +22,7 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 define('ALL_GROUPS', 0);
+define('INTERSHIP_GROUP', -1);
 
 /**
  * Returns true if the user can safely delete passed lesson type
