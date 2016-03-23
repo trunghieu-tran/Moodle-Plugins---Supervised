@@ -39,7 +39,7 @@ if ($site->id == $course->id) {
 }
 
 require_login($course);
-$PAGE->set_url('/blocks/supervised/sessions/addedit.php', array('courseid' => $courseid));
+$PAGE->set_url('/blocks/supervised/sessions/addedit2.php', array('courseid' => $courseid));
 $PAGE->set_pagelayout('standard');
 require('breadcrumbs.php');
 
