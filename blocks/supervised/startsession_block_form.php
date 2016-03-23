@@ -45,6 +45,7 @@ class startsession_block_form extends moodleform {
         }
 
         // Gets array of all groups in current course.
+        $groups[-1] = get_string('internship', 'block_supervised');
         $groups[0] = get_string('allgroups', 'block_supervised');
         if ($cgroups = groups_get_all_groups($COURSE->id)) {
             foreach ($cgroups as $cgroup) {
