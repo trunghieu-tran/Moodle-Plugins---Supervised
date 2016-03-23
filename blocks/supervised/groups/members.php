@@ -45,6 +45,7 @@ require_capability('moodle/course:managegroups', $context);
 $returnurl = new moodle_url('/blocks/supervised/groups/refreshing.php', array('courseid' => $course->id, 'group' => $groupid, 'urlreturn' => $urlreturn));
 
 if ($destroy){
+    $returnurl = new moodle_url('/blocks/supervised/groups/refreshing.php', array('courseid' => $course->id, 'group' => $groupid, 'urlreturn' => $urlreturn, 'destroy' => true, 'sessionid' => $sessionid));
     redirect($returnurl);
 }
 
