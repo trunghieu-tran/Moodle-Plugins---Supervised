@@ -553,31 +553,33 @@ function update_users_in_session($groupid, $courseid, $sessionid) {
     global $DB;
     // Prepare users array.
     $users = array();
-    if ($groupid == ALL_GROUPS) {
-        $groups = groups_get_all_groups($courseid);
-        foreach ($groups as $group) {
-            $users = $users + groups_get_members($group->id);
+    if ($groupid != INTERSHIP_GROUP) {
+        if ($groupid == ALL_GROUPS) {
+            $groups = groups_get_all_groups($courseid);
+            foreach ($groups as $group) {
+                $users = $users + groups_get_members($group->id);
+            }
+        } else {
+            $users = groups_get_members($groupid);
         }
-    } else {
-        $users = groups_get_members($groupid);
-    }
 
-    // Update existing records if possible.
-    $oldusers = $DB->get_records('block_supervised_user', array('sessionid' => $sessionid));
-    foreach ($users as $user) {
-        $curuser = array_shift($oldusers);
-        if (!$curuser) {
-            $curuser                = new stdClass();
-            $curuser->sessionid     = $sessionid;
-            $curuser->userid        = $user->id;
-            $curuser->id            = $DB->insert_record('block_supervised_user', $curuser);
+        // Update existing records if possible.
+        $oldusers = $DB->get_records('block_supervised_user', array('sessionid' => $sessionid));
+        foreach ($users as $user) {
+            $curuser = array_shift($oldusers);
+            if (!$curuser) {
+                $curuser = new stdClass();
+                $curuser->sessionid = $sessionid;
+                $curuser->userid = $user->id;
+                $curuser->id = $DB->insert_record('block_supervised_user', $curuser);
+            }
+            $curuser->userid = $user->id;
+            $DB->update_record('block_supervised_user', $curuser);
         }
-        $curuser->userid        = $user->id;
-        $DB->update_record('block_supervised_user', $curuser);
-    }
-    // Delete any remaining old rules.
-    foreach ($oldusers as $olduser) {
-        $DB->delete_records('block_supervised_user', array('id' => $olduser->id));
+        // Delete any remaining old rules.
+        foreach ($oldusers as $olduser) {
+            $DB->delete_records('block_supervised_user', array('id' => $olduser->id));
+        }
     }
 }
 
