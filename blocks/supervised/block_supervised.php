@@ -361,6 +361,14 @@ class block_supervised extends block_base {
             $formbody = '';
             $this->render_activesession_form($title, $formbody);
 
+            // With internship group, we need to add student by selector.
+            if ($fromform->groupid == INTERSHIP_GROUP) {
+                $params['courseid'] = $COURSE->id;
+                $params['sessionid'] = $newid;
+                $params['urlreturn'] = 0;
+                $url = new moodle_url('/blocks/supervised/groups/creating.php', $params);
+                redirect($url);
+            }
         } else {
             // Display form.
             $toform['id']               = $COURSE->id;
