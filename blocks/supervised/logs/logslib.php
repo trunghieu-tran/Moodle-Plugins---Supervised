@@ -200,8 +200,11 @@ function print_session_info_form($sessionid) {
         new moodle_url("/course/view.php?id={$session->courseid}"),
         $session->coursename);
     $toform['classroomname']    = $session->classroomname;
-    $toform['groupname']        =
-        $session->groupname == '' ? get_string('allgroups', 'block_supervised') : $session->groupname;
+    if ($session->groupid == -1) {
+        $toform['groupname'] = get_string('internship', 'block_supervised');
+    } else {
+        $toform['groupname'] = $session->groupname == '' ? get_string('allgroups', 'block_supervised') : $session->groupname;
+    }
     $toform['teachername']      =
         html_writer::link(new moodle_url("/user/view.php?id={$session->teacherid}&course={$session->courseid}"),
         fullname($session));
