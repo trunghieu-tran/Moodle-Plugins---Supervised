@@ -30,6 +30,7 @@ $groupid = required_param('group', PARAM_INT);
 $sessionid = required_param('sessionid', PARAM_INT);
 $urlreturn = required_param('urlreturn', PARAM_INT);
 $cancel  = optional_param('cancel', false, PARAM_BOOL);
+$destroy  = optional_param('destroy', false, PARAM_BOOL);
 
 $group = $DB->get_record('groups', array('id'=>$groupid), '*', MUST_EXIST);
 $course = $DB->get_record('course', array('id'=>$group->courseid), '*', MUST_EXIST);
@@ -42,6 +43,10 @@ $context = context_course::instance($course->id);
 require_capability('moodle/course:managegroups', $context);
 
 $returnurl = new moodle_url('/blocks/supervised/groups/refreshing.php', array('courseid' => $course->id, 'group' => $groupid, 'urlreturn' => $urlreturn));
+
+if ($destroy){
+    redirect($returnurl);
+}
 
 if ($cancel) {
     update_users_in_session($groupid, $courseid, $sessionid);
@@ -166,7 +171,11 @@ if (!empty($groupinforow)) {
     </tr>
     <tr><td colspan="3" id='backcell'>
         <input type="submit" name="cancel" value="<?php print_string('backtogroups', 'group'); ?>" />
-    </td></tr>
+    </td>
+        <td colspan="3" id='backcell'>
+            <input type="submit" name="destroy" value="<?php print_string('cancel'); ?>" />
+        </td>
+    </tr>
     </table>
     </div>
     </form>
