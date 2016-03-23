@@ -29,7 +29,7 @@ require_once("{$CFG->libdir}/formslib.php");
  * @copyright   2014 Oleg Sychev, Volgograd State Technical University
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class addedit_session_form extends moodleform {
+class addedit_session_form2 extends moodleform {
 
     protected function definition() {
         global $DB, $PAGE, $USER;
