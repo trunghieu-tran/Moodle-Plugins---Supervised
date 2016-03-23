@@ -51,6 +51,15 @@ if ($cancel) {
 $groupmembersselector = new group_members_selector('removeselect', array('groupid' => $groupid, 'courseid' => $course->id));
 $potentialmembersselector = new group_non_members_selector('addselect', array('groupid' => $groupid, 'courseid' => $course->id));
 
+// Get old users from sessionid.
+$usersinsession = $DB->get_records('block_supervised_user', array('sessionid' => $sessionid));
+foreach ($usersinsession as $curuser) {
+    if (!groups_add_member($groupid, $curuser->userid)) {
+        print_error('erroraddremoveuser', 'group', $returnurl);
+    }
+    $groupmembersselector->invalidate_selected_users();
+    $potentialmembersselector->invalidate_selected_users();
+}
 if (optional_param('add', false, PARAM_BOOL) && confirm_sesskey()) {
     $userstoadd = $potentialmembersselector->get_selected_users();
     if (!empty($userstoadd)) {
