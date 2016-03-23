@@ -90,22 +90,9 @@ if (optional_param('remove', false, PARAM_BOOL) && confirm_sesskey()) {
     }
 }
 
-// Print the page and form
-$strgroups = get_string('groups');
-$strparticipants = get_string('participants');
-$stradduserstogroup = get_string('adduserstogroup', 'group');
-$strusergroupmembership = get_string('usergroupmembership', 'group');
-
 $groupname = format_string($group->name);
 
 $PAGE->requires->js('/group/clientlib.js');
-$PAGE->navbar->add($strparticipants, new moodle_url('/user/index.php', array('id'=>$course->id)));
-$PAGE->navbar->add($strgroups, new moodle_url('/group/index.php', array('id'=>$course->id)));
-$PAGE->navbar->add($stradduserstogroup);
-
-/// Print header
-$PAGE->set_title("$course->shortname: $strgroups");
-$PAGE->set_heading($course->fullname);
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('adduserstogroup', 'group').": $groupname", 3);
 
