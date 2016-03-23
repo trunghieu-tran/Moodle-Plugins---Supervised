@@ -135,13 +135,13 @@ if (!$teachersexist || !$classroomsexist) {
 }
 
 // Prepare form.
-$mform = 'addedit_form.php';
+$mform = 'addedit_form2.php';
 if (file_exists($mform)) {
     require_once($mform);
 } else {
     print_error('noformdesc');
 }
-$mform = new addedit_session_form(null, array('courseid' => $courseid, 'addnotspecified' => $addnotspecified));
+$mform = new addedit_session_form2(null, array('courseid' => $courseid, 'addnotspecified' => $addnotspecified));
 
 
 $context = context_course::instance($courseid);
