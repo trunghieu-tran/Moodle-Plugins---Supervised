@@ -59,12 +59,7 @@ class addedit_session_form2 extends moodleform {
         }
 
         // Gets array of all groups in current course.
-        $groups[0] = get_string('allgroups', 'block_supervised');
-        if ($cgroups = groups_get_all_groups($this->_customdata['courseid'])) {
-            foreach ($cgroups as $cgroup) {
-                $groups[$cgroup->id] = $cgroup->name;
-            }
-        }
+        $groups[-1] = get_string('internship', 'block_supervised');
 
         // Find lessontypes in current course.
         if ($this->_customdata['addnotspecified']) {
