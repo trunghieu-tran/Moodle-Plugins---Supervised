@@ -139,9 +139,11 @@ class block_supervised extends block_base {
             if ($fromform = $mform->get_data()) {
                 // Start session and update fields that user could edit.
                 $curtime = time();
+                $oldgroupid = $plannedsession->groupid;
+                $newgroupid = $fromform->groupid;
                 $plannedsession->state          = StateSession::ACTIVE;
                 $plannedsession->classroomid    = $fromform->classroomid;
-                $plannedsession->groupid        = $fromform->groupid;
+                $plannedsession->groupid        = $newgroupid;
                 $plannedsession->lessontypeid   = $fromform->lessontypeid;
                 $plannedsession->timestart      = $curtime;
                 $plannedsession->duration       = $fromform->duration;
@@ -156,7 +158,20 @@ class block_supervised extends block_base {
                     'userid' => $USER->id, 'other' => array('courseid' => $COURSE->id,
                     'groupid' => $plannedsession->groupid, 'lessontypeid' => $plannedsession->lessontypeid)));
                 $event->trigger();
-                unset($plannedsession);
+                // When user change from common group to internship group, we clear currently users in session.
+                if ($plannedsession->groupid == INTERSHIP_GROUP) {
+                    if ($newgroupid != $oldgroupid) {
+                        delete_all_users_in_session($plannedsession->id);
+                    }
+                    $params['courseid'] = $COURSE->id;
+                    $params['sessionid'] = $plannedsession->id;
+                    $params['urlreturn'] = 0;
+                    $url = new moodle_url('/blocks/supervised/groups/creating.php', $params);
+                    unset($plannedsession);
+                    redirect($url);
+                } else {
+                    unset($plannedsession);
+                }
             } else {
                 $title = get_string('plannedsessiontitle', 'block_supervised');
                 // Display form.
@@ -255,6 +270,17 @@ class block_supervised extends block_base {
                 $mform->set_data($toform);
                 $formbody = $mform->render();
                 $this->add_countdown_timer($activesession->timeend - time());
+                // When user change from common group to internship group, we clear currently users in session.
+                if ($activesession->groupid == INTERSHIP_GROUP) {
+                    if ($newgroupid != $oldgroupid) {
+                        delete_all_users_in_session($activesession->id);
+                    }
+                    $params['courseid'] = $COURSE->id;
+                    $params['sessionid'] = $activesession->id;
+                    $params['urlreturn'] = 0;
+                    $url = new moodle_url('/blocks/supervised/groups/creating.php', $params);
+                    redirect($url);
+                }
             } else {
                 $title = get_string('activesessiontitle', 'block_supervised');
                 // Display form.
