@@ -109,6 +109,15 @@ if ($fromform = $mform->get_data()) {
         echo $OUTPUT->single_button($url, $caption, 'get');
     }
 
+    // Add 'Plan new session for intership' button.
+    if (  has_capability('block/supervised:manageownsessions', $PAGE->context)
+        || has_capability('block/supervised:manageallsessions', $PAGE->context)  ) {
+        $params['courseid'] = $courseid;
+        $url = new moodle_url('/blocks/supervised/sessions/addedit2.php', $params);
+        $caption = get_string('plansession_forInter', 'block_supervised');
+        echo $OUTPUT->single_button($url, $caption, 'get');
+    }
+    
     print_courses_selector($courseid, $pref['block_supervised_course'],
         $pref['block_supervised_perpage'], $pref['block_supervised_from'],
         $pref['block_supervised_to'], $pref['block_supervised_classroom'],
