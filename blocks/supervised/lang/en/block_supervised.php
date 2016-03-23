@@ -51,6 +51,7 @@ $string['classroomsdefinition_help']            = 'Any supervised sessions takes
 $string['classroomsheader']                     = 'Classrooms list';
 $string['classroomspagetitle']                  = 'Classrooms list';
 $string['classroomsurl']                        = 'Classrooms';
+$string['completeSession']                      = 'Complete';
 $string['coursesettings']                       = 'Course specific settings';
 $string['createclassroom']                      = 'To plan or start a session you must create (or make visible) at least one classroom!';
 $string['deleteclassroomcheck']                 = 'Are you sure you want to completely delete this classroom from every course on the site?';
