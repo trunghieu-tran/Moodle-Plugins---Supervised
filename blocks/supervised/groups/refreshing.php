@@ -28,6 +28,8 @@ require_once('../../../group/lib.php');
 $courseid = required_param('courseid', PARAM_INT);
 $groupid   = required_param('group', PARAM_INT);
 $returnurl = required_param('urlreturn', PARAM_INT);
+$sessionid = optional_param('sessionid', -2, PARAM_INT);
+$destroy  = optional_param('destroy', false, PARAM_BOOL);
 
 groups_delete_group($groupid);
 
