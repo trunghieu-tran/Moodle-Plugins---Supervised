@@ -22,11 +22,9 @@
  * @copyright   2016 Oleg Sychev, Volgograd State Technical University
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-require_once(dirname(__FILE__) . '/../config.php');
-require_once(dirname(__FILE__) . '/lib.php');
-require_once($CFG->dirroot . '/user/selector/lib.php');
-require_once($CFG->dirroot . '/course/lib.php');
-require_once($CFG->libdir . '/filelib.php');
+require_once('../../../config.php');
+require_once('../../../user/selector/lib.php');
+require_once('../sessions/lib.php');
 
 $groupid = required_param('group', PARAM_INT);
 $cancel  = optional_param('cancel', false, PARAM_BOOL);
