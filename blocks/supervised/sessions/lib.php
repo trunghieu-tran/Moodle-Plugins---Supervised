@@ -113,6 +113,9 @@ function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $
         $tablerow = array();
         $tablerow[] = html_writer::link(new moodle_url("/course/view.php?id={$session->courseid}"), $session->coursename);
         $tablerow[] = $session->classroomname;
+        if ($session->groupid == -1) {
+            $session->groupname = get_string('internship', 'block_supervised');
+        }
         $tablerow[] = $session->groupname == '' ? get_string('allgroups', 'block_supervised') : $session->groupname;
         $tablerow[] = html_writer::link(
             new moodle_url("/user/view.php?id={$session->teacherid}&course={$session->courseid}"),
