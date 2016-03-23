@@ -139,6 +139,7 @@ $string['insertsessionerror']                   = 'Database error! Can not inser
 $string['invalidclassroomid']                   = 'You are trying to use an invalid classroom ID';
 $string['invalidlessontypeid']                  = 'You are trying to use an invalid lesson type ID';
 $string['invalidsessionid']                     = 'You are trying to use an invalid session ID';
+$string['internship']                           = 'Internship group';
 $string['iplist']                               = 'IP list';
 $string['iplist_help']                          =
 'IP list is a comma separated string of subnet definitions.
