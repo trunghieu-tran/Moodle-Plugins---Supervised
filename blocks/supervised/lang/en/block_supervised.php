@@ -173,6 +173,7 @@ $string['pagesizevalidationerror']              = 'Page size must be greater tha
 $string['plannedsessiontitle']                  = 'You have a planned session';
 $string['plannedstate']                         = 'Planned';
 $string['plansession']                          = 'Plan a new session ...';
+$string['plansession_forInter']                 = 'Plan a new session for internship...';
 $string['plansessionnavbar']                    = 'Plan session';
 $string['pluginname']                           = 'Supervised';
 $string['sessiondeleteerror']                   = 'You can\'t delete active session. End session first.';
