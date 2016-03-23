@@ -32,6 +32,15 @@ $sessionid = optional_param('sessionid', -2, PARAM_INT);
 $destroy  = optional_param('destroy', false, PARAM_BOOL);
 
 groups_delete_group($groupid);
+$context = context_course::instance($courseid);
+if ($destroy && $sessionid != -2){
+    // Delete session.
+    $event = \block_supervised\event\delete_session::create(array('context' => $context,
+        'userid' => $USER->id, 'other' => array('courseid' => $courseid)));
+    $event->trigger();
+    $DB->delete_records('block_supervised_session', array('id' => $sessionid));
+    $DB->delete_records('block_supervised_user', array('sessionid' => $sessionid));
+}
 
 if ($returnurl == 0) {
     $returnurl = new moodle_url('/course/view.php', array('id' => $courseid));
