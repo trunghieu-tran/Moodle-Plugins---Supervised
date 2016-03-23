@@ -136,13 +136,8 @@ function print_sessions($pagenum=0, $perpage=50, $url, $from, $to, $teacher=0, $
         if ($session->state == StateSession::PLANNED) {
             if (  ($session->teacherid == $USER->id && has_capability('block/supervised:manageownsessions', $PAGE->context))
                 || has_capability('block/supervised:manageallsessions', $PAGE->context) ) {
-                if ($session->groupid == -1) {
-                    $editurl = new moodle_url('/blocks/supervised/sessions/addedit2.php',
-                        array('id' => $session->id, 'courseid' => $session->courseid));
-                } else {
-                    $editurl = new moodle_url('/blocks/supervised/sessions/addedit.php',
-                        array('id' => $session->id, 'courseid' => $session->courseid));
-                }
+                $editurl    = new moodle_url('/blocks/supervised/sessions/addedit.php',
+                    array('id' => $session->id, 'courseid' => $session->courseid));
                 $iconedit   = $OUTPUT->action_icon($editurl, new pix_icon('t/edit', get_string('edit')));
             }
         }
