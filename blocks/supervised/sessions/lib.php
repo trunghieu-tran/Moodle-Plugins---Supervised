@@ -666,6 +666,14 @@ function check_sessions_filter_user_preferences(&$pref) {
     }
 }
 
+function delete_all_users_in_session($sessionid) {
+    global $DB, $CFG;
+    require_once("{$CFG->dirroot}/config.php");
+    $usersinsession = $DB->get_records('block_supervised_user', array('sessionid' => $sessionid));
+    foreach ($usersinsession as $curuser) {
+        $DB->delete_records('block_supervised_user', array('sessionid' => $sessionid, 'id' => $curuser->id));
+    }
+}
 
 function save_sessions_filter_user_preferences($pref) {
     // Remove _lastloaded field.
