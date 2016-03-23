@@ -27,6 +27,8 @@ require_once('../../../user/selector/lib.php');
 require_once('../sessions/lib.php');
 
 $groupid = required_param('group', PARAM_INT);
+$sessionid = required_param('sessionid', PARAM_INT);
+$urlreturn = required_param('urlreturn', PARAM_INT);
 $cancel  = optional_param('cancel', false, PARAM_BOOL);
 
 $group = $DB->get_record('groups', array('id'=>$groupid), '*', MUST_EXIST);
