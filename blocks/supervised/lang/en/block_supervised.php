@@ -126,6 +126,7 @@ Time end:       {$a->timeend}
 
 {$a->comment}';
 $string['enrollteacher']                        = 'To plan a session you must enroll at least one user with ability to supervise sessions in the course!';
+$string['emptygroup']                           = 'Empty group! Please add students to the session!';
 $string['filterlogsbyuser']                     = 'Filter logs by user';
 $string['finishedstate']                        = 'Finished';
 $string['finishsession']                        = 'Finish session';
