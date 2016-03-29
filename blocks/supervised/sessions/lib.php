@@ -672,6 +672,16 @@ function delete_all_users_in_session($sessionid) {
     }
 }
 
+function amount_user_in_session($sessionid) {
+    global $DB;
+    $usersinsession = $DB->get_records('block_supervised_user', array('sessionid' => $sessionid));
+    $cnt = 0;
+    foreach ($usersinsession as $curuser) {
+        $cnt += 1;
+    }
+    return $cnt;
+}
+
 function save_sessions_filter_user_preferences($pref) {
     // Remove _lastloaded field.
     if ( isset($pref['_lastloaded']) ) {
