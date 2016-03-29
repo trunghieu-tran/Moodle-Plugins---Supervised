@@ -66,6 +66,7 @@ foreach ($usersinsession as $curuser) {
     $groupmembersselector->invalidate_selected_users();
     $potentialmembersselector->invalidate_selected_users();
 }
+delete_all_users_in_session($sessionid);
 if (optional_param('add', false, PARAM_BOOL) && confirm_sesskey()) {
     $userstoadd = $potentialmembersselector->get_selected_users();
     if (!empty($userstoadd)) {
