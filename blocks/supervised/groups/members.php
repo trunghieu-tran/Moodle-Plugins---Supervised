@@ -51,7 +51,11 @@ if ($destroy){
 
 if ($cancel) {
     update_users_in_session($groupid, $courseid, $sessionid);
-    redirect($returnurl);
+    if (amount_user_in_session($sessionid) == 0) {
+        echo $OUTPUT->heading(get_string('emptygroup', 'block_supervised'), 2);
+    } else {
+        redirect($returnurl);
+    }
 }
 
 $groupmembersselector = new group_members_selector('removeselect', array('groupid' => $groupid, 'courseid' => $course->id));
