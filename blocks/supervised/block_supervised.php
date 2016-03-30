@@ -166,6 +166,7 @@ class block_supervised extends block_base {
                     $params['courseid'] = $COURSE->id;
                     $params['sessionid'] = $plannedsession->id;
                     $params['urlreturn'] = 0;
+                    $params['editmode']  = true;
                     $url = new moodle_url('/blocks/supervised/groups/creating.php', $params);
                     unset($plannedsession);
                     redirect($url);
@@ -278,6 +279,7 @@ class block_supervised extends block_base {
                     $params['courseid'] = $COURSE->id;
                     $params['sessionid'] = $activesession->id;
                     $params['urlreturn'] = 0;
+                    $params['editmode']  = true;
                     $url = new moodle_url('/blocks/supervised/groups/creating.php', $params);
                     redirect($url);
                 }
@@ -366,6 +368,7 @@ class block_supervised extends block_base {
                 $params['courseid'] = $COURSE->id;
                 $params['sessionid'] = $newid;
                 $params['urlreturn'] = 0;
+                $params['editmode']  = false;
                 $url = new moodle_url('/blocks/supervised/groups/creating.php', $params);
                 redirect($url);
             }
