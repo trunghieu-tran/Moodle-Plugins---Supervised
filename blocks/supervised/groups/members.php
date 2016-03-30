@@ -31,25 +31,55 @@ $sessionid = required_param('sessionid', PARAM_INT);
 $urlreturn = required_param('urlreturn', PARAM_INT);
 $cancel  = optional_param('cancel', false, PARAM_BOOL);
 $destroy  = optional_param('destroy', false, PARAM_BOOL);
+$editmode = required_param('editmode', PARAM_BOOL);
+$reload = required_param('reload', PARAM_BOOL);
 
 $group = $DB->get_record('groups', array('id'=>$groupid), '*', MUST_EXIST);
 $course = $DB->get_record('course', array('id'=>$group->courseid), '*', MUST_EXIST);
+$usersinsession = $DB->get_records('block_supervised_user', array('sessionid' => $sessionid));
 
-$PAGE->set_url('/blocks/supervised/groups/members.php', array('group' => $groupid, 'sessionid' => $sessionid, 'urlreturn' => $urlreturn));
+$PAGE->set_url('/blocks/supervised/groups/members.php', array('group' => $groupid, 'sessionid' => $sessionid, 'urlreturn' => $urlreturn, 'editmode' => $editmode, 'reload' => $reload));
 $PAGE->set_pagelayout('admin');
 
 require_login($course);
 $context = context_course::instance($course->id);
 require_capability('moodle/course:managegroups', $context);
 
-$returnurl = new moodle_url('/blocks/supervised/groups/refreshing.php', array('courseid' => $course->id, 'group' => $groupid, 'urlreturn' => $urlreturn));
+$groupmembersselector = new group_members_selector('removeselect', array('groupid' => $groupid, 'courseid' => $course->id));
+$potentialmembersselector = new group_non_members_selector('addselect', array('groupid' => $groupid, 'courseid' => $course->id));
 
+$returnurl = new moodle_url('/blocks/supervised/groups/refreshing.php', array('courseid' => $course->id, 'group' => $groupid, 'urlreturn' => $urlreturn, 'editmode' => $editmode));
 if ($destroy){
-    $returnurl = new moodle_url('/blocks/supervised/groups/refreshing.php', array('courseid' => $course->id, 'group' => $groupid, 'urlreturn' => $urlreturn, 'destroy' => true, 'sessionid' => $sessionid));
+    $returnurl = new moodle_url('/blocks/supervised/groups/refreshing.php', array('courseid' => $course->id, 'group' => $groupid,
+        'urlreturn' => $urlreturn, 'destroy' => true, 'sessionid' => $sessionid, 'editmode' => $editmode));
+    if ($editmode) {
+        $currusersingroup = groups_get_members($groupid);
+        foreach ($currusersingroup as $curuser) {
+            if (!groups_remove_member_allowed($groupid, $curuser->id)) {
+                print_error('errorremovenotpermitted', 'group', $returnurl,
+                    $curuser->fullname);
+            }
+            if (!groups_remove_member($groupid, $curuser->id)) {
+                print_error('erroraddremoveuser', 'group', $returnurl);
+            }
+            $groupmembersselector->invalidate_selected_users();
+            $potentialmembersselector->invalidate_selected_users();
+        }
+        foreach ($usersinsession as $curuser) {
+            if (!groups_add_member($groupid, $curuser->userid)) {
+                print_error('erroraddremoveuser', 'group', $returnurl);
+            }
+            $groupmembersselector->invalidate_selected_users();
+            $potentialmembersselector->invalidate_selected_users();
+        }
+        delete_all_users_in_session($sessionid);
+        update_users_in_session($groupid, $courseid, $sessionid);
+    }
     redirect($returnurl);
 }
 
 if ($cancel) {
+    delete_all_users_in_session($sessionid);
     update_users_in_session($groupid, $courseid, $sessionid);
     if (amount_user_in_session($sessionid) == 0) {
         echo $OUTPUT->heading(get_string('emptygroup', 'block_supervised'), 2);
@@ -58,19 +88,17 @@ if ($cancel) {
     }
 }
 
-$groupmembersselector = new group_members_selector('removeselect', array('groupid' => $groupid, 'courseid' => $course->id));
-$potentialmembersselector = new group_non_members_selector('addselect', array('groupid' => $groupid, 'courseid' => $course->id));
-
 // Get old users from sessionid.
-$usersinsession = $DB->get_records('block_supervised_user', array('sessionid' => $sessionid));
-foreach ($usersinsession as $curuser) {
-    if (!groups_add_member($groupid, $curuser->userid)) {
-        print_error('erroraddremoveuser', 'group', $returnurl);
+if (!$reload) {
+    foreach ($usersinsession as $curuser) {
+        if (!groups_add_member($groupid, $curuser->userid)) {
+            print_error('erroraddremoveuser', 'group', $returnurl);
+        }
+        $groupmembersselector->invalidate_selected_users();
+        $potentialmembersselector->invalidate_selected_users();
     }
-    $groupmembersselector->invalidate_selected_users();
-    $potentialmembersselector->invalidate_selected_users();
+    $reload = true;
 }
-delete_all_users_in_session($sessionid);
 if (optional_param('add', false, PARAM_BOOL) && confirm_sesskey()) {
     $userstoadd = $potentialmembersselector->get_selected_users();
     if (!empty($userstoadd)) {
@@ -146,7 +174,8 @@ if (!empty($groupinforow)) {
 ?>
 
 <div id="addmembersform">
-    <form id="assignform" method="post" action="<?php echo $CFG->wwwroot; ?>/group/members.php?group=<?php echo $groupid; ?>">
+    <form id="assignform" method="post" action="<?php echo $CFG->wwwroot; ?>/blocks/supervised/groups/members.php?group=<?php
+    echo $groupid; ?>&sessionid=<?php echo $sessionid;?>&urlreturn=<?php echo $urlreturn; ?>&editmode=<?php echo $editmode?>&reload=<?php echo $reload ?>">
     <div>
     <input type="hidden" name="sesskey" value="<?php p(sesskey()); ?>" />
 
