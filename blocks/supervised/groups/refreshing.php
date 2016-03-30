@@ -30,10 +30,11 @@ $groupid   = required_param('group', PARAM_INT);
 $returnurl = required_param('urlreturn', PARAM_INT);
 $sessionid = optional_param('sessionid', -2, PARAM_INT);
 $destroy  = optional_param('destroy', false, PARAM_BOOL);
+$editmode = required_param('editmode', PARAM_BOOL);
 
 groups_delete_group($groupid);
 $context = context_course::instance($courseid);
-if ($destroy && $sessionid != -2){
+if ($destroy && $sessionid != -2 && !$editmode){
     // Delete session.
     $event = \block_supervised\event\delete_session::create(array('context' => $context,
         'userid' => $USER->id, 'other' => array('courseid' => $courseid)));
