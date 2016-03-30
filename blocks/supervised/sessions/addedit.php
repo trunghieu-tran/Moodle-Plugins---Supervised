@@ -200,8 +200,10 @@ if ($mform->is_cancelled()) {
         $params['courseid'] = $courseid;
         if (!$id) {
             $params['sessionid'] = $newid;
+            $params['editmode']  = false;
         } else {
             $params['sessionid'] = $id;
+            $params['editmode']  = true;
         }
         $params['urlreturn'] = 1;
         $url = new moodle_url('/blocks/supervised/groups/creating.php', $params);
