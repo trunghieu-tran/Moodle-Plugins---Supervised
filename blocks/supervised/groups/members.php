@@ -25,7 +25,10 @@
 require_once('../../../config.php');
 require_once('../../../user/selector/lib.php');
 require_once('../sessions/lib.php');
+require_once('../../../group/lib.php');
+global $DB;
 
+$courseid = required_param('courseid', PARAM_INT);
 $groupid = required_param('group', PARAM_INT);
 $sessionid = required_param('sessionid', PARAM_INT);
 $urlreturn = required_param('urlreturn', PARAM_INT);
@@ -34,11 +37,18 @@ $destroy  = optional_param('destroy', false, PARAM_BOOL);
 $editmode = required_param('editmode', PARAM_BOOL);
 $reload = required_param('reload', PARAM_BOOL);
 
+if ($groupid == -1 && !$reload) {
+    $data->name = get_string('internship', 'block_supervised');
+    $data->courseid = $courseid;
+    $groupid = groups_create_group($data);
+}
+
+
 $group = $DB->get_record('groups', array('id'=>$groupid), '*', MUST_EXIST);
 $course = $DB->get_record('course', array('id'=>$group->courseid), '*', MUST_EXIST);
 $usersinsession = $DB->get_records('block_supervised_user', array('sessionid' => $sessionid));
 
-$PAGE->set_url('/blocks/supervised/groups/members.php', array('group' => $groupid, 'sessionid' => $sessionid, 'urlreturn' => $urlreturn, 'editmode' => $editmode, 'reload' => $reload));
+$PAGE->set_url('/blocks/supervised/groups/members.php', array('courseid' => $courseid, 'group' => $groupid, 'sessionid' => $sessionid, 'urlreturn' => $urlreturn, 'editmode' => $editmode, 'reload' => $reload));
 $PAGE->set_pagelayout('admin');
 
 require_login($course);
@@ -98,6 +108,9 @@ if (!$reload) {
         $potentialmembersselector->invalidate_selected_users();
     }
     $reload = true;
+    $returnurl = new moodle_url('/blocks/supervised/groups/members.php', array('courseid' => $courseid, 'group' => $groupid,
+        'sessionid' => $sessionid, 'urlreturn' => $urlreturn, 'editmode' => $editmode, 'reload' => $reload));
+    redirect($returnurl);
 }
 if (optional_param('add', false, PARAM_BOOL) && confirm_sesskey()) {
     $userstoadd = $potentialmembersselector->get_selected_users();
@@ -174,8 +187,7 @@ if (!empty($groupinforow)) {
 ?>
 
 <div id="addmembersform">
-    <form id="assignform" method="post" action="<?php echo $CFG->wwwroot; ?>/blocks/supervised/groups/members.php?group=<?php
-    echo $groupid; ?>&sessionid=<?php echo $sessionid;?>&urlreturn=<?php echo $urlreturn; ?>&editmode=<?php echo $editmode?>&reload=<?php echo $reload ?>">
+    <form id="assignform" method="post" action="<?php echo $CFG->wwwroot; ?>/blocks/supervised/groups/members.php?courseid=<?php echo $courseid;?>&group=<?php echo $groupid;?>&sessionid=<?php echo $sessionid;?>&urlreturn=<?php echo $urlreturn; ?>&editmode=<?php echo $editmode?>&reload=<?php echo $reload ?>">
     <div>
     <input type="hidden" name="sesskey" value="<?php p(sesskey()); ?>" />
 
