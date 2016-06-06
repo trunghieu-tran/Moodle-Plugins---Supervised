@@ -23,18 +23,14 @@
  */
 
 require_once('../../../config.php');
-require_once('../../../group/lib.php');
 
 $sessionid   = required_param('sessionid', PARAM_INT);
 $courseid    = required_param('courseid', PARAM_INT);
 $urlreturn   = required_param('urlreturn', PARAM_INT);
 $editmode    = required_param('editmode', PARAM_BOOL);
 
-$data->name = get_string('internship', 'block_supervised');
-$data->courseid = $courseid;
-$groupid = groups_create_group($data);
-
-$params['group'] = $groupid;
+$params['courseid'] = $courseid;
+$params['group'] = -1;
 $params['sessionid'] = $sessionid;
 $params['urlreturn'] = $urlreturn;
 $params['editmode']  = $editmode;
